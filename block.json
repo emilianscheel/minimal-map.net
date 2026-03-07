@@ -36,6 +36,56 @@
     "showZoomControls": {
       "type": "boolean",
       "default": true
+    },
+    "zoomControlsPosition": {
+      "type": "string",
+      "default": "top-right"
+    },
+    "zoomControlsPadding": {
+      "type": "object",
+      "default": {
+        "top": "8px",
+        "right": "8px",
+        "bottom": "8px",
+        "left": "8px"
+      }
+    },
+    "zoomControlsOuterMargin": {
+      "type": "object",
+      "default": {
+        "top": "16px",
+        "right": "16px",
+        "bottom": "16px",
+        "left": "16px"
+      }
+    },
+    "zoomControlsBackgroundColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "zoomControlsIconColor": {
+      "type": "string",
+      "default": "#1e1e1e"
+    },
+    "zoomControlsBorderRadius": {
+      "type": "string",
+      "default": "2px"
+    },
+    "zoomControlsBorderColor": {
+      "type": "string",
+      "default": "#dcdcde"
+    },
+    "zoomControlsBorderWidth": {
+      "type": "string",
+      "default": "1px"
+    },
+    "zoomControlsPlusIcon": {
+      "type": "string",
+      "default": "plus"
+    },
+    "zoomControlsMinusIcon": {
+      "type": "string",
+      "default": "line-solid"
     }
   },
   "supports": {

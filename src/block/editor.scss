@@ -45,3 +45,18 @@
 		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 	}
 }
+
+.minimal-map-editor__box-control {
+	.component-box-control__unit-control {
+		flex: 1 1 50%;
+		max-width: calc(50% - 8px);
+		min-width: 0;
+		width: auto;
+	}
+
+	.components-range-control {
+		flex: 1 1 50%;
+		min-width: 0;
+		max-width: calc(50% - 8px);
+	}
+}

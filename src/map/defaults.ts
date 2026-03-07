@@ -1,11 +1,26 @@
 import { getStylePresets } from './style-presets';
+import {
+	DEFAULT_ZOOM_CONTROLS_BACKGROUND_COLOR,
+	DEFAULT_ZOOM_CONTROLS_BORDER_COLOR,
+	DEFAULT_ZOOM_CONTROLS_BORDER_RADIUS,
+	DEFAULT_ZOOM_CONTROLS_BORDER_WIDTH,
+	DEFAULT_ZOOM_CONTROLS_ICON_COLOR,
+	DEFAULT_ZOOM_CONTROLS_MINUS_ICON,
+	DEFAULT_ZOOM_CONTROLS_OUTER_MARGIN,
+	DEFAULT_ZOOM_CONTROLS_PADDING,
+	DEFAULT_ZOOM_CONTROLS_PLUS_ICON,
+	DEFAULT_ZOOM_CONTROLS_POSITION,
+} from './zoom-control-options';
 import type {
+	BoxValue,
 	HeightUnit,
 	MapDefaults,
 	MapRuntimeConfig,
 	NormalizedMapConfig,
 	RawMapConfig,
 	StylePresets,
+	ZoomControlIcon,
+	ZoomControlsPosition,
 } from '../types';
 
 const FALLBACK_MESSAGE = 'Map preview unavailable because this browser does not support WebGL.';
@@ -19,10 +34,98 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	heightUnit: 'px',
 	stylePreset: 'liberty',
 	showZoomControls: true,
+	zoomControlsPosition: DEFAULT_ZOOM_CONTROLS_POSITION,
+	zoomControlsPadding: DEFAULT_ZOOM_CONTROLS_PADDING,
+	zoomControlsOuterMargin: DEFAULT_ZOOM_CONTROLS_OUTER_MARGIN,
+	zoomControlsBackgroundColor: DEFAULT_ZOOM_CONTROLS_BACKGROUND_COLOR,
+	zoomControlsIconColor: DEFAULT_ZOOM_CONTROLS_ICON_COLOR,
+	zoomControlsBorderRadius: DEFAULT_ZOOM_CONTROLS_BORDER_RADIUS,
+	zoomControlsBorderColor: DEFAULT_ZOOM_CONTROLS_BORDER_COLOR,
+	zoomControlsBorderWidth: DEFAULT_ZOOM_CONTROLS_BORDER_WIDTH,
+	zoomControlsPlusIcon: DEFAULT_ZOOM_CONTROLS_PLUS_ICON,
+	zoomControlsMinusIcon: DEFAULT_ZOOM_CONTROLS_MINUS_ICON,
 };
 
 export function normalizeHeightUnit(unit?: string | null): HeightUnit {
 	return HEIGHT_UNITS.includes(unit as HeightUnit) ? (unit as HeightUnit) : 'px';
+}
+
+function normalizeBoxValue(value: BoxValue | null | undefined, fallback: Required<BoxValue>): Required<BoxValue> {
+	return {
+		top: normalizeCssLength(value?.top, fallback.top),
+		right: normalizeCssLength(value?.right, fallback.right),
+		bottom: normalizeCssLength(value?.bottom, fallback.bottom),
+		left: normalizeCssLength(value?.left, fallback.left),
+	};
+}
+
+function normalizeCssLength(value: string | undefined, fallback: string): string {
+	if (typeof value !== 'string') {
+		return fallback;
+	}
+
+	const trimmed = value.trim();
+
+	if (!trimmed || !/^((\d*\.?\d+)(px|em|rem|%|vh|vw)?|0)$/i.test(trimmed)) {
+		return fallback;
+	}
+
+	return trimmed === '0' ? '0px' : trimmed;
+}
+
+function normalizeColor(value: string | undefined, fallback: string): string {
+	if (typeof value !== 'string') {
+		return fallback;
+	}
+
+	const trimmed = value.trim();
+
+	if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(trimmed)) {
+		return fallback;
+	}
+
+	return trimmed;
+}
+
+function normalizeZoomControlsPosition(value: string | undefined, fallback: ZoomControlsPosition): ZoomControlsPosition {
+	return [ 'top-right', 'top-left', 'bottom-right', 'bottom-left' ].includes(`${value}`)
+		? (value as ZoomControlsPosition)
+		: fallback;
+}
+
+function normalizeZoomControlIcon(value: string | undefined, fallback: ZoomControlIcon): ZoomControlIcon {
+	return [ 'plus', 'plus-circle', 'plus-circle-filled', 'line-solid', 'separator', 'close-small' ].includes(`${value}`)
+		? (value as ZoomControlIcon)
+		: fallback;
+}
+
+function normalizeBorderRadiusValue(value: string | BoxValue | null | undefined, fallback: string): string {
+	if (!value) {
+		return fallback;
+	}
+
+	if (typeof value === 'string') {
+		const parts = value.trim().split(/\s+/).filter(Boolean);
+
+		if (parts.length < 1 || parts.length > 4) {
+			return fallback;
+		}
+
+		const normalizedParts = parts.map((part) => normalizeCssLength(part, ''));
+
+		if (normalizedParts.some((part) => !part)) {
+			return fallback;
+		}
+
+		return normalizedParts.join(' ');
+	}
+
+	const topLeft = normalizeCssLength(value.top, fallback);
+	const topRight = normalizeCssLength(value.right, fallback);
+	const bottomRight = normalizeCssLength(value.bottom, fallback);
+	const bottomLeft = normalizeCssLength(value.left, fallback);
+
+	return `${topLeft} ${topRight} ${bottomRight} ${bottomLeft}`;
 }
 
 function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
@@ -32,6 +135,46 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 		heightUnit: normalizeHeightUnit(runtimeConfig.defaults?.heightUnit),
 		stylePreset: `${runtimeConfig.defaults?.stylePreset ?? DEFAULT_MAP_DEFAULTS.stylePreset}`,
 		showZoomControls: runtimeConfig.defaults?.showZoomControls ?? DEFAULT_MAP_DEFAULTS.showZoomControls,
+		zoomControlsPosition: normalizeZoomControlsPosition(
+			runtimeConfig.defaults?.zoomControlsPosition,
+			DEFAULT_MAP_DEFAULTS.zoomControlsPosition
+		),
+		zoomControlsPadding: normalizeBoxValue(
+			runtimeConfig.defaults?.zoomControlsPadding,
+			DEFAULT_MAP_DEFAULTS.zoomControlsPadding as Required<BoxValue>
+		),
+		zoomControlsOuterMargin: normalizeBoxValue(
+			runtimeConfig.defaults?.zoomControlsOuterMargin,
+			DEFAULT_MAP_DEFAULTS.zoomControlsOuterMargin as Required<BoxValue>
+		),
+		zoomControlsBackgroundColor: normalizeColor(
+			runtimeConfig.defaults?.zoomControlsBackgroundColor,
+			DEFAULT_MAP_DEFAULTS.zoomControlsBackgroundColor
+		),
+		zoomControlsIconColor: normalizeColor(
+			runtimeConfig.defaults?.zoomControlsIconColor,
+			DEFAULT_MAP_DEFAULTS.zoomControlsIconColor
+		),
+		zoomControlsBorderRadius: normalizeBorderRadiusValue(
+			runtimeConfig.defaults?.zoomControlsBorderRadius,
+			DEFAULT_MAP_DEFAULTS.zoomControlsBorderRadius
+		),
+		zoomControlsBorderColor: normalizeColor(
+			runtimeConfig.defaults?.zoomControlsBorderColor,
+			DEFAULT_MAP_DEFAULTS.zoomControlsBorderColor
+		),
+		zoomControlsBorderWidth: normalizeCssLength(
+			runtimeConfig.defaults?.zoomControlsBorderWidth,
+			DEFAULT_MAP_DEFAULTS.zoomControlsBorderWidth
+		),
+		zoomControlsPlusIcon: normalizeZoomControlIcon(
+			runtimeConfig.defaults?.zoomControlsPlusIcon,
+			DEFAULT_MAP_DEFAULTS.zoomControlsPlusIcon
+		),
+		zoomControlsMinusIcon: normalizeZoomControlIcon(
+			runtimeConfig.defaults?.zoomControlsMinusIcon,
+			DEFAULT_MAP_DEFAULTS.zoomControlsMinusIcon
+		),
 	};
 }
 
@@ -63,6 +206,46 @@ export function normalizeMapConfig(
 	const zoom = clampNumber(rawConfig.zoom ?? defaults.zoom, 0, 22);
 	const height = Math.max(1, Number(rawConfig.height ?? defaults.height));
 	const heightUnit = normalizeHeightUnit(rawConfig.heightUnit ?? defaults.heightUnit);
+	const zoomControlsPosition = normalizeZoomControlsPosition(
+		rawConfig.zoomControlsPosition ?? defaults.zoomControlsPosition,
+		defaults.zoomControlsPosition
+	);
+	const zoomControlsPadding = normalizeBoxValue(
+		rawConfig.zoomControlsPadding ?? defaults.zoomControlsPadding,
+		defaults.zoomControlsPadding as Required<BoxValue>
+	);
+	const zoomControlsOuterMargin = normalizeBoxValue(
+		rawConfig.zoomControlsOuterMargin ?? defaults.zoomControlsOuterMargin,
+		defaults.zoomControlsOuterMargin as Required<BoxValue>
+	);
+	const zoomControlsBackgroundColor = normalizeColor(
+		rawConfig.zoomControlsBackgroundColor ?? defaults.zoomControlsBackgroundColor,
+		defaults.zoomControlsBackgroundColor
+	);
+	const zoomControlsIconColor = normalizeColor(
+		rawConfig.zoomControlsIconColor ?? defaults.zoomControlsIconColor,
+		defaults.zoomControlsIconColor
+	);
+	const zoomControlsBorderRadius = normalizeBorderRadiusValue(
+		rawConfig.zoomControlsBorderRadius ?? defaults.zoomControlsBorderRadius,
+		defaults.zoomControlsBorderRadius
+	);
+	const zoomControlsBorderColor = normalizeColor(
+		rawConfig.zoomControlsBorderColor ?? defaults.zoomControlsBorderColor,
+		defaults.zoomControlsBorderColor
+	);
+	const zoomControlsBorderWidth = normalizeCssLength(
+		rawConfig.zoomControlsBorderWidth ?? defaults.zoomControlsBorderWidth,
+		defaults.zoomControlsBorderWidth
+	);
+	const zoomControlsPlusIcon = normalizeZoomControlIcon(
+		rawConfig.zoomControlsPlusIcon ?? defaults.zoomControlsPlusIcon,
+		defaults.zoomControlsPlusIcon
+	);
+	const zoomControlsMinusIcon = normalizeZoomControlIcon(
+		rawConfig.zoomControlsMinusIcon ?? defaults.zoomControlsMinusIcon,
+		defaults.zoomControlsMinusIcon
+	);
 	const markerLat = normalizeOptionalCoordinate(rawConfig.markerLat, -90, 90);
 	const markerLng = normalizeOptionalCoordinate(rawConfig.markerLng, -180, 180);
 	const markerClassName =
@@ -80,6 +263,16 @@ export function normalizeMapConfig(
 		stylePreset,
 		styleUrl,
 		showZoomControls: Boolean(rawConfig.showZoomControls ?? defaults.showZoomControls),
+		zoomControlsPosition,
+		zoomControlsPadding,
+		zoomControlsOuterMargin,
+		zoomControlsBackgroundColor,
+		zoomControlsIconColor,
+		zoomControlsBorderRadius,
+		zoomControlsBorderColor,
+		zoomControlsBorderWidth,
+		zoomControlsPlusIcon,
+		zoomControlsMinusIcon,
 		fallbackMessage: rawConfig.fallbackMessage || runtimeConfig.messages?.fallback || FALLBACK_MESSAGE,
 		markerLat,
 		markerLng,

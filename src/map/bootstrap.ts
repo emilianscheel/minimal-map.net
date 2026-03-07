@@ -70,6 +70,34 @@ function createMarker(config: NormalizedMapConfig): maplibregl.Marker {
 	return marker;
 }
 
+function didZoomControlsStyleChange(
+	previousConfig: NormalizedMapConfig | null,
+	nextConfig: NormalizedMapConfig
+): boolean {
+	if (!previousConfig) {
+		return true;
+	}
+
+	return (
+		previousConfig.zoomControlsPosition !== nextConfig.zoomControlsPosition ||
+		previousConfig.zoomControlsBackgroundColor !== nextConfig.zoomControlsBackgroundColor ||
+		previousConfig.zoomControlsIconColor !== nextConfig.zoomControlsIconColor ||
+		previousConfig.zoomControlsBorderRadius !== nextConfig.zoomControlsBorderRadius ||
+		previousConfig.zoomControlsBorderColor !== nextConfig.zoomControlsBorderColor ||
+		previousConfig.zoomControlsBorderWidth !== nextConfig.zoomControlsBorderWidth ||
+		previousConfig.zoomControlsPlusIcon !== nextConfig.zoomControlsPlusIcon ||
+		previousConfig.zoomControlsMinusIcon !== nextConfig.zoomControlsMinusIcon ||
+		previousConfig.zoomControlsPadding.top !== nextConfig.zoomControlsPadding.top ||
+		previousConfig.zoomControlsPadding.right !== nextConfig.zoomControlsPadding.right ||
+		previousConfig.zoomControlsPadding.bottom !== nextConfig.zoomControlsPadding.bottom ||
+		previousConfig.zoomControlsPadding.left !== nextConfig.zoomControlsPadding.left ||
+		previousConfig.zoomControlsOuterMargin.top !== nextConfig.zoomControlsOuterMargin.top ||
+		previousConfig.zoomControlsOuterMargin.right !== nextConfig.zoomControlsOuterMargin.right ||
+		previousConfig.zoomControlsOuterMargin.bottom !== nextConfig.zoomControlsOuterMargin.bottom ||
+		previousConfig.zoomControlsOuterMargin.left !== nextConfig.zoomControlsOuterMargin.left
+	);
+}
+
 function syncCenter(
 	map: MapLibreMap,
 	config: NormalizedMapConfig,
@@ -135,7 +163,7 @@ export function createMinimalMap(
 		state.controls = null;
 
 		if (config.showZoomControls && state.map) {
-			state.controls = createWordPressZoomControls(host, state.map);
+			state.controls = createWordPressZoomControls(host, state.map, config);
 		}
 	}
 
@@ -256,7 +284,11 @@ export function createMinimalMap(
 			syncCenter(state.map, nextConfig, zoomChanged);
 		}
 
-		if (!previousConfig || previousConfig.showZoomControls !== nextConfig.showZoomControls) {
+		if (
+			!previousConfig ||
+			previousConfig.showZoomControls !== nextConfig.showZoomControls ||
+			didZoomControlsStyleChange(previousConfig, nextConfig)
+		) {
 			syncControls(nextConfig);
 		}
 

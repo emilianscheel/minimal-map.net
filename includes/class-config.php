@@ -25,6 +25,8 @@ class Config {
 	 * @var string[]
 	 */
 	const HEIGHT_UNITS = array( 'px', 'em', 'rem', '%', 'vh', 'vw' );
+	const ZOOM_CONTROLS_POSITIONS = array( 'top-right', 'top-left', 'bottom-right', 'bottom-left' );
+	const ZOOM_CONTROLS_ICONS     = array( 'plus', 'plus-circle', 'plus-circle-filled', 'line-solid', 'separator', 'close-small' );
 
 	/**
 	 * Get the available style presets.
@@ -62,6 +64,26 @@ class Config {
 			'heightUnit'       => 'px',
 			'stylePreset'      => self::DEFAULT_STYLE_PRESET,
 			'showZoomControls' => true,
+			'zoomControlsPosition'        => 'top-right',
+			'zoomControlsPadding'         => array(
+				'top'    => '8px',
+				'right'  => '8px',
+				'bottom' => '8px',
+				'left'   => '8px',
+			),
+			'zoomControlsOuterMargin'     => array(
+				'top'    => '16px',
+				'right'  => '16px',
+				'bottom' => '16px',
+				'left'   => '16px',
+			),
+			'zoomControlsBackgroundColor' => '#ffffff',
+			'zoomControlsIconColor'       => '#1e1e1e',
+			'zoomControlsBorderRadius'    => '2px',
+			'zoomControlsBorderColor'     => '#dcdcde',
+			'zoomControlsBorderWidth'     => '1px',
+			'zoomControlsPlusIcon'        => 'plus',
+			'zoomControlsMinusIcon'       => 'line-solid',
 		);
 	}
 
@@ -98,6 +120,16 @@ class Config {
 			'stylePreset'      => $preset,
 			'styleUrl'         => $presets[ $preset ]['style_url'],
 			'showZoomControls' => ! empty( $attributes['showZoomControls'] ),
+			'zoomControlsPosition'        => $this->sanitize_zoom_controls_position( $attributes['zoomControlsPosition'] ?? '' ),
+			'zoomControlsPadding'         => $this->sanitize_box_value( $attributes['zoomControlsPadding'] ?? array(), $this->get_default_block_attributes()['zoomControlsPadding'] ),
+			'zoomControlsOuterMargin'     => $this->sanitize_box_value( $attributes['zoomControlsOuterMargin'] ?? array(), $this->get_default_block_attributes()['zoomControlsOuterMargin'] ),
+			'zoomControlsBackgroundColor' => $this->sanitize_color( $attributes['zoomControlsBackgroundColor'] ?? '', $this->get_default_block_attributes()['zoomControlsBackgroundColor'] ),
+			'zoomControlsIconColor'       => $this->sanitize_color( $attributes['zoomControlsIconColor'] ?? '', $this->get_default_block_attributes()['zoomControlsIconColor'] ),
+			'zoomControlsBorderRadius'    => $this->sanitize_border_radius_value( $attributes['zoomControlsBorderRadius'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderRadius'] ),
+			'zoomControlsBorderColor'     => $this->sanitize_color( $attributes['zoomControlsBorderColor'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderColor'] ),
+			'zoomControlsBorderWidth'     => $this->sanitize_dimension_value( $attributes['zoomControlsBorderWidth'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderWidth'] ),
+			'zoomControlsPlusIcon'        => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsPlusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsPlusIcon'] ),
+			'zoomControlsMinusIcon'       => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsMinusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsMinusIcon'] ),
 			'fallbackMessage'  => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 		);
 	}
@@ -170,5 +202,120 @@ class Config {
 		}
 
 		return $formatted . $unit;
+	}
+
+	/**
+	 * Sanitize one CSS dimension value.
+	 *
+	 * @param mixed  $value Raw value.
+	 * @param string $fallback Fallback value.
+	 * @return string
+	 */
+	private function sanitize_dimension_value( $value, $fallback ) {
+		$value = is_string( $value ) ? trim( $value ) : '';
+
+		if ( '0' === $value ) {
+			return '0px';
+		}
+
+		if ( preg_match( '/^\d*\.?\d+(px|em|rem|%|vh|vw)$/i', $value ) ) {
+			return $value;
+		}
+
+		return $fallback;
+	}
+
+	/**
+	 * Sanitize a border radius value that may contain up to four dimensions.
+	 *
+	 * @param mixed  $value Raw value.
+	 * @param string $fallback Fallback value.
+	 * @return string
+	 */
+	private function sanitize_border_radius_value( $value, $fallback ) {
+		$value = is_string( $value ) ? trim( $value ) : '';
+
+		if ( '' === $value ) {
+			return $fallback;
+		}
+
+		$parts = preg_split( '/\s+/', $value );
+
+		if ( ! is_array( $parts ) || count( $parts ) < 1 || count( $parts ) > 4 ) {
+			return $fallback;
+		}
+
+		$sanitized_parts = array();
+
+		foreach ( $parts as $part ) {
+			$sanitized_part = $this->sanitize_dimension_value( $part, '' );
+
+			if ( '' === $sanitized_part ) {
+				return $fallback;
+			}
+
+			$sanitized_parts[] = $sanitized_part;
+		}
+
+		return implode( ' ', $sanitized_parts );
+	}
+
+	/**
+	 * Sanitize a hex color value.
+	 *
+	 * @param mixed  $value Raw value.
+	 * @param string $fallback Fallback value.
+	 * @return string
+	 */
+	private function sanitize_color( $value, $fallback ) {
+		$sanitized = sanitize_hex_color( is_string( $value ) ? $value : '' );
+
+		return $sanitized ? $sanitized : $fallback;
+	}
+
+	/**
+	 * Sanitize box values.
+	 *
+	 * @param mixed                $value Raw box value.
+	 * @param array<string,string> $fallback Fallback box value.
+	 * @return array<string,string>
+	 */
+	private function sanitize_box_value( $value, $fallback ) {
+		$value = is_array( $value ) ? $value : array();
+
+		return array(
+			'top'    => $this->sanitize_dimension_value( $value['top'] ?? '', $fallback['top'] ),
+			'right'  => $this->sanitize_dimension_value( $value['right'] ?? '', $fallback['right'] ),
+			'bottom' => $this->sanitize_dimension_value( $value['bottom'] ?? '', $fallback['bottom'] ),
+			'left'   => $this->sanitize_dimension_value( $value['left'] ?? '', $fallback['left'] ),
+		);
+	}
+
+	/**
+	 * Sanitize zoom controls position.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	private function sanitize_zoom_controls_position( $value ) {
+		$value = sanitize_text_field( is_string( $value ) ? $value : '' );
+
+		return in_array( $value, self::ZOOM_CONTROLS_POSITIONS, true )
+			? $value
+			: $this->get_default_block_attributes()['zoomControlsPosition'];
+	}
+
+	/**
+	 * Sanitize zoom controls icon slug.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	private function sanitize_zoom_controls_icon( $value, $fallback ) {
+		$value = sanitize_text_field( is_string( $value ) ? $value : '' );
+
+		return in_array( $value, self::ZOOM_CONTROLS_ICONS, true )
+			? $value
+			: $fallback;
 	}
 }

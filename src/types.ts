@@ -1,4 +1,13 @@
 export type HeightUnit = 'px' | 'em' | 'rem' | '%' | 'vh' | 'vw';
+export type ZoomControlsPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+export type ZoomControlIcon = 'plus' | 'plus-circle' | 'plus-circle-filled' | 'line-solid' | 'separator' | 'close-small';
+
+export interface BoxValue {
+	top?: string;
+	right?: string;
+	bottom?: string;
+	left?: string;
+}
 
 export interface StylePresetDefinition {
 	label: string;
@@ -20,6 +29,16 @@ export interface MapDefaults {
 	heightUnit: HeightUnit;
 	stylePreset: string;
 	showZoomControls: boolean;
+	zoomControlsPosition: ZoomControlsPosition;
+	zoomControlsPadding: BoxValue;
+	zoomControlsOuterMargin: BoxValue;
+	zoomControlsBackgroundColor: string;
+	zoomControlsIconColor: string;
+	zoomControlsBorderRadius: string;
+	zoomControlsBorderColor: string;
+	zoomControlsBorderWidth: string;
+	zoomControlsPlusIcon: ZoomControlIcon;
+	zoomControlsMinusIcon: ZoomControlIcon;
 }
 
 export interface MapMessages {
@@ -43,6 +62,16 @@ export interface RawMapConfig {
 	stylePreset?: string;
 	styleUrl?: string;
 	showZoomControls?: boolean;
+	zoomControlsPosition?: string;
+	zoomControlsPadding?: BoxValue | null;
+	zoomControlsOuterMargin?: BoxValue | null;
+	zoomControlsBackgroundColor?: string;
+	zoomControlsIconColor?: string;
+	zoomControlsBorderRadius?: string | BoxValue | null;
+	zoomControlsBorderColor?: string;
+	zoomControlsBorderWidth?: string;
+	zoomControlsPlusIcon?: string;
+	zoomControlsMinusIcon?: string;
 	fallbackMessage?: string;
 	markerLat?: number | string | null;
 	markerLng?: number | string | null;
@@ -57,6 +86,8 @@ export interface NormalizedMapConfig extends MapDefaults {
 	heightCssValue: string;
 	styleUrl: string;
 	fallbackMessage: string;
+	zoomControlsPadding: Required<BoxValue>;
+	zoomControlsOuterMargin: Required<BoxValue>;
 	markerLat: number | null;
 	markerLng: number | null;
 	markerClassName: string;
@@ -133,11 +164,16 @@ export interface MapBlockAttributes {
 	heightUnit: HeightUnit;
 	stylePreset: string;
 	showZoomControls: boolean;
-}
-
-export interface WordPressZoomControlLabels {
-	zoomIn?: string;
-	zoomOut?: string;
+	zoomControlsPosition: ZoomControlsPosition;
+	zoomControlsPadding: BoxValue;
+	zoomControlsOuterMargin: BoxValue;
+	zoomControlsBackgroundColor: string;
+	zoomControlsIconColor: string;
+	zoomControlsBorderRadius: string;
+	zoomControlsBorderColor: string;
+	zoomControlsBorderWidth: string;
+	zoomControlsPlusIcon: ZoomControlIcon;
+	zoomControlsMinusIcon: ZoomControlIcon;
 }
 
 export interface WordPressZoomControls {
