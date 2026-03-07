@@ -1,4 +1,11 @@
-export function createWordPressZoomControls(host, map, labels = {}) {
+import type { Map as MapLibreMap } from 'maplibre-gl';
+import type { WordPressZoomControlLabels, WordPressZoomControls } from '../types';
+
+export function createWordPressZoomControls(
+	host: HTMLElement,
+	map: MapLibreMap,
+	labels: WordPressZoomControlLabels = {}
+): WordPressZoomControls {
 	const controls = document.createElement('div');
 	controls.className = 'minimal-map-controls';
 

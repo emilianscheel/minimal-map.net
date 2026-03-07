@@ -1,8 +1,10 @@
 import './style.scss';
 import { bootstrapFrontendMaps } from '../map/bootstrap';
+import type { MapRuntimeConfig } from '../types';
 
-function initialize() {
-	bootstrapFrontendMaps(window.MinimalMapFrontConfig || {});
+function initialize(): void {
+	const runtimeConfig: MapRuntimeConfig = window.MinimalMapFrontConfig ?? {};
+	bootstrapFrontendMaps(runtimeConfig);
 }
 
 if (document.readyState === 'loading') {

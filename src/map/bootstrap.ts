@@ -1,9 +1,23 @@
-import maplibregl from 'maplibre-gl';
+import maplibregl, { type Map as MapLibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { normalizeMapConfig } from './defaults';
 import { createWordPressZoomControls } from './wp-controls';
+import type {
+	MapRuntimeConfig,
+	MinimalMapInstance,
+	NormalizedMapConfig,
+	RawMapConfig,
+	WordPressZoomControls,
+} from '../types';
 
-function canCreateWebGLContext() {
+interface MinimalMapState {
+	config: NormalizedMapConfig | null;
+	controls: WordPressZoomControls | null;
+	map: MapLibreMap | null;
+	observer: ResizeObserver | null;
+}
+
+function canCreateWebGLContext(): boolean {
 	if (typeof window === 'undefined' || typeof document === 'undefined') {
 		return false;
 	}
@@ -17,15 +31,21 @@ function canCreateWebGLContext() {
 	);
 }
 
-function createFallback(host, message) {
+function createFallback(host: HTMLElement, message: string): void {
 	host.innerHTML = '';
 	const notice = document.createElement('div');
+	const content = document.createElement('div');
+	const paragraph = document.createElement('p');
+
 	notice.className = 'components-notice is-warning minimal-map-fallback';
-	notice.innerHTML = `<div class="components-notice__content"><p>${message}</p></div>`;
+	content.className = 'components-notice__content';
+	paragraph.textContent = message;
+	content.appendChild(paragraph);
+	notice.appendChild(content);
 	host.appendChild(notice);
 }
 
-function createShell(host, config) {
+function createShell(host: HTMLElement, config: NormalizedMapConfig): HTMLElement {
 	host.innerHTML = '';
 	host.classList.add('minimal-map-runtime');
 	host.style.height = config.heightCssValue;
@@ -37,26 +57,28 @@ function createShell(host, config) {
 	return viewport;
 }
 
-export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
-	const state = {
+export function createMinimalMap(
+	host: HTMLElement,
+	initialConfig: RawMapConfig = {},
+	runtimeConfig: MapRuntimeConfig = {}
+): MinimalMapInstance {
+	const state: MinimalMapState = {
 		config: null,
 		controls: null,
 		map: null,
 		observer: null,
 	};
 
-	function syncControls(config) {
-		if (state.controls) {
-			state.controls.destroy();
-			state.controls = null;
-		}
+	function syncControls(config: NormalizedMapConfig): void {
+		state.controls?.destroy();
+		state.controls = null;
 
 		if (config.showZoomControls && state.map) {
 			state.controls = createWordPressZoomControls(host, state.map);
 		}
 	}
 
-	function build(rawConfig) {
+	function build(rawConfig: RawMapConfig): void {
 		const config = normalizeMapConfig(rawConfig, runtimeConfig);
 		state.config = config;
 		const viewport = createShell(host, config);
@@ -68,22 +90,24 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 
 		try {
 			state.map = new maplibregl.Map({
-				attributionControl: true,
+				attributionControl: {},
 				center: [ config.centerLng, config.centerLat ],
 				container: viewport,
 				scrollZoom: false,
 				style: config.styleUrl,
 				zoom: config.zoom,
 			});
-		} catch (error) {
+		} catch {
 			createFallback(host, config.fallbackMessage);
 			return;
 		}
 
-		state.map.scrollZoom.disable();
-		state.map.on('load', () => state.map.resize());
-		state.map.on('error', () => {
-			if (!state.map || state.map.loaded()) {
+		const map = state.map;
+
+		map.scrollZoom.disable();
+		map.on('load', () => map.resize());
+		map.on('error', () => {
+			if (map.loaded()) {
 				return;
 			}
 
@@ -92,9 +116,7 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 
 		if (typeof window.ResizeObserver === 'function') {
 			state.observer = new window.ResizeObserver(() => {
-				if (state.map) {
-					state.map.resize();
-				}
+				state.map?.resize();
 			});
 			state.observer.observe(host);
 		}
@@ -102,26 +124,20 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 		syncControls(config);
 	}
 
-	function destroy() {
-		if (state.controls) {
-			state.controls.destroy();
-			state.controls = null;
-		}
+	function destroy(): void {
+		state.controls?.destroy();
+		state.controls = null;
 
-		if (state.observer) {
-			state.observer.disconnect();
-			state.observer = null;
-		}
+		state.observer?.disconnect();
+		state.observer = null;
 
-		if (state.map) {
-			state.map.remove();
-			state.map = null;
-		}
+		state.map?.remove();
+		state.map = null;
 
 		host.innerHTML = '';
 	}
 
-	function update(rawConfig) {
+	function update(rawConfig: RawMapConfig = {}): void {
 		const nextConfig = normalizeMapConfig(rawConfig, runtimeConfig);
 		const previousConfig = state.config;
 
@@ -174,22 +190,16 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 	};
 }
 
-export function bootstrapFrontendMaps(runtimeConfig = window.MinimalMapFrontConfig || {}) {
-	const mapNodes = document.querySelectorAll('[data-minimal-map-config]');
+function parseNodeConfig(node: HTMLElement): RawMapConfig {
+	try {
+		return JSON.parse(node.dataset.minimalMapConfig ?? '{}') as RawMapConfig;
+	} catch {
+		return {};
+	}
+}
 
-	mapNodes.forEach((node) => {
-		if (!(node instanceof HTMLElement)) {
-			return;
-		}
-
-		let config = {};
-
-		try {
-			config = JSON.parse(node.dataset.minimalMapConfig || '{}');
-		} catch (error) {
-			config = {};
-		}
-
-		createMinimalMap(node, config, runtimeConfig);
+export function bootstrapFrontendMaps(runtimeConfig: MapRuntimeConfig = window.MinimalMapFrontConfig ?? {}): void {
+	document.querySelectorAll<HTMLElement>('[data-minimal-map-config]').forEach((node) => {
+		createMinimalMap(node, parseNodeConfig(node), runtimeConfig);
 	});
 }

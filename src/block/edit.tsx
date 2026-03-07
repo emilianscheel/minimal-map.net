@@ -10,16 +10,26 @@ import {
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createMinimalMap } from '../map/bootstrap';
-import { normalizeMapConfig, normalizeHeightUnit } from '../map/defaults';
+import { normalizeHeightUnit, normalizeMapConfig } from '../map/defaults';
 import { getStyleOptions } from '../map/style-presets';
+import type {
+	MapBlockAttributes,
+	MapRuntimeConfig,
+	MinimalMapInstance,
+	RawMapConfig,
+	StyleOption,
+} from '../types';
 
-const runtimeConfig = window.MinimalMapBlockConfig || {};
-const HEIGHT_UNITS = (runtimeConfig.heightUnits || [ 'px', 'em', 'rem', '%', 'vh', 'vw' ]).map((value) => ({
+const runtimeConfig: MapRuntimeConfig = window.MinimalMapBlockConfig ?? {};
+const HEIGHT_UNITS: StyleOption[] = (runtimeConfig.heightUnits ?? [ 'px', 'em', 'rem', '%', 'vh', 'vw' ]).map((value) => ({
 	label: value,
 	value,
 }));
 
-function parseHeightValue(rawValue, fallbackUnit) {
+function parseHeightValue(
+	rawValue: string | number | undefined,
+	fallbackUnit: string
+): Pick<MapBlockAttributes, 'height' | 'heightUnit'> | null {
 	if (typeof rawValue === 'number') {
 		return {
 			height: rawValue,
@@ -27,7 +37,11 @@ function parseHeightValue(rawValue, fallbackUnit) {
 		};
 	}
 
-	const match = `${rawValue}`.trim().match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
+	if (typeof rawValue !== 'string') {
+		return null;
+	}
+
+	const match = rawValue.trim().match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
 
 	if (!match) {
 		return null;
@@ -39,11 +53,16 @@ function parseHeightValue(rawValue, fallbackUnit) {
 	};
 }
 
-export default function Edit({ attributes, setAttributes }) {
-	const mapRef = useRef(null);
-	const mapInstanceRef = useRef(null);
+interface EditProps {
+	attributes: MapBlockAttributes;
+	setAttributes: (attributes: Partial<MapBlockAttributes>) => void;
+}
+
+export default function Edit({ attributes, setAttributes }: EditProps) {
+	const mapRef = useRef<HTMLDivElement | null>(null);
+	const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
 	const styleOptions = useMemo(() => getStyleOptions(runtimeConfig.stylePresets), []);
-	const config = useMemo(() => normalizeMapConfig(attributes, runtimeConfig), [attributes]);
+	const config = useMemo(() => normalizeMapConfig(attributes, runtimeConfig), [ attributes ]);
 	const blockProps = useBlockProps({ className: 'minimal-map-editor' });
 
 	useEffect(() => {
@@ -62,24 +81,26 @@ export default function Edit({ attributes, setAttributes }) {
 	}, []);
 
 	useEffect(() => {
-		if (mapInstanceRef.current) {
-			mapInstanceRef.current.update(config);
-		}
-	}, [config]);
+		mapInstanceRef.current?.update(config);
+	}, [ config ]);
 
-	const updateNumberAttribute = (key) => (value) => {
-		const numericValue = Number(value);
+	function updateNumberAttribute<Key extends keyof Pick<MapBlockAttributes, 'centerLat' | 'centerLng' | 'zoom'>>(
+		key: Key
+	) {
+		return (value: string): void => {
+			const numericValue = Number(value);
 
-		if (Number.isNaN(numericValue)) {
-			return;
-		}
+			if (Number.isNaN(numericValue)) {
+				return;
+			}
 
-		setAttributes({
-			[key]: numericValue,
-		});
-	};
+			setAttributes({
+				[key]: numericValue,
+			} as Pick<MapBlockAttributes, Key>);
+		};
+	}
 
-	const updateHeight = (value) => {
+	const updateHeight = (value?: string | number): void => {
 		const parsed = parseHeightValue(value, attributes.heightUnit || 'px');
 
 		if (!parsed || Number.isNaN(parsed.height) || parsed.height <= 0) {
@@ -90,6 +111,12 @@ export default function Edit({ attributes, setAttributes }) {
 			height: parsed.height,
 			heightUnit: parsed.heightUnit,
 		});
+	};
+
+	const updateZoom = (value?: number): void => {
+		if (typeof value === 'number') {
+			setAttributes({ zoom: value });
+		}
 	};
 
 	return (
@@ -113,11 +140,7 @@ export default function Edit({ attributes, setAttributes }) {
 					<RangeControl
 						label={__('Zoom', 'minimal-map')}
 						value={attributes.zoom}
-						onChange={(value) => {
-							if (typeof value === 'number') {
-								setAttributes({ zoom: value });
-							}
-						}}
+						onChange={updateZoom}
 						min={0}
 						max={22}
 						step={0.5}
@@ -125,7 +148,7 @@ export default function Edit({ attributes, setAttributes }) {
 					<ToggleControl
 						label={__('Show Zoom Controls', 'minimal-map')}
 						checked={attributes.showZoomControls}
-						onChange={(value) => setAttributes({ showZoomControls: value })}
+						onChange={(value: boolean) => setAttributes({ showZoomControls: value })}
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -143,7 +166,7 @@ export default function Edit({ attributes, setAttributes }) {
 						label={__('Style Preset', 'minimal-map')}
 						value={attributes.stylePreset}
 						options={styleOptions}
-						onChange={(value) => setAttributes({ stylePreset: value })}
+						onChange={(value: string) => setAttributes({ stylePreset: value })}
 					/>
 				</PanelBody>
 			</InspectorControls>

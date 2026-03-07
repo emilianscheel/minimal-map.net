@@ -12,17 +12,35 @@ import {
 	Palette,
 	Settings,
 	Tags,
+	type LucideIcon,
 } from 'lucide-react';
 import { createMinimalMap } from '../map/bootstrap';
+import type {
+	AdminAppConfig,
+	AdminSection,
+	AdminSectionView,
+	DashboardCardView,
+	MapRuntimeConfig,
+	MinimalMapInstance,
+	RawMapConfig,
+} from '../types';
 import './style.scss';
 
-const adminConfig = window.MinimalMapAdminConfig || {
+const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 	currentView: 'dashboard',
 	sections: [],
-	stats: {},
+	stats: {
+		locations: 0,
+		categories: 0,
+		markers: 0,
+		tags: 0,
+	},
+	mapConfig: {},
 };
 
-const ICONS = {
+const adminConfig: AdminAppConfig = window.MinimalMapAdminConfig ?? DEFAULT_ADMIN_CONFIG;
+
+const ICONS: Record<AdminSectionView, LucideIcon> = {
 	dashboard: LayoutDashboard,
 	locations: MapPinned,
 	categories: FolderTree,
@@ -34,44 +52,54 @@ const ICONS = {
 	settings: Settings,
 };
 
-const CARD_VIEWS = [ 'locations', 'categories', 'markers', 'tags' ];
+const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'categories', 'markers', 'tags' ];
 
-const CARD_COPY = {
+const CARD_COPY: Record<DashboardCardView, string> = {
 	locations: __('Manage every place you want to render on your maps and prepare it for future block integrations.', 'minimal-map'),
 	categories: __('Organize locations into reusable groupings so future filters and styles stay easy to maintain.', 'minimal-map'),
 	markers: __('Create marker variants and keep your map pin system consistent across locations and styles.', 'minimal-map'),
 	tags: __('Add lightweight labels that make large map datasets easier to sort, search, and evolve.', 'minimal-map'),
 };
 
-const CTA_COPY = {
+const CTA_COPY: Record<DashboardCardView, string> = {
 	locations: __('Open locations', 'minimal-map'),
 	categories: __('Open categories', 'minimal-map'),
 	markers: __('Open markers', 'minimal-map'),
 	tags: __('Open tags', 'minimal-map'),
 };
 
-const COUNT_KEYS = {
+const COUNT_KEYS: Record<DashboardCardView, keyof AdminAppConfig['stats']> = {
 	locations: 'locations',
 	categories: 'categories',
 	markers: 'markers',
 	tags: 'tags',
 };
 
-function getSectionMap() {
-	return Object.fromEntries((adminConfig.sections || []).map((section) => [ section.view, section ]));
+function isAdminSectionView(value: string): value is AdminSectionView {
+	return value in ICONS;
 }
 
-function SectionIcon({ view }) {
-	const IconComponent = ICONS[view] || ICONS.dashboard;
+function getSectionMap(): Partial<Record<AdminSectionView, AdminSection>> {
+	return adminConfig.sections.reduce<Partial<Record<AdminSectionView, AdminSection>>>(
+		(accumulator, section) => {
+			accumulator[ section.view ] = section;
+			return accumulator;
+		},
+		{}
+	);
+}
+
+function SectionIcon({ view }: { view: AdminSectionView }) {
+	const IconComponent = ICONS[ view ] ?? ICONS.dashboard;
 
 	return <IconComponent aria-hidden="true" size={24} strokeWidth={1.75} />;
 }
 
-function AdminSidebar({ currentView }) {
+function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
 	return (
 		<aside className="minimal-map-admin__sidebar">
 			<nav className="minimal-map-admin__nav" aria-label={__('Minimal Map Sections', 'minimal-map')}>
-				{(adminConfig.sections || []).map((section) => {
+				{adminConfig.sections.map((section) => {
 					const isActive = section.view === currentView;
 
 					return (
@@ -95,7 +123,7 @@ function AdminSidebar({ currentView }) {
 	);
 }
 
-function ContentHeader({ title, description }) {
+function ContentHeader({ title, description }: { title: string; description: string }) {
 	return (
 		<header className="minimal-map-admin__header">
 			<h2 className="minimal-map-admin__header-title">{title}</h2>
@@ -104,9 +132,9 @@ function ContentHeader({ title, description }) {
 	);
 }
 
-function DashboardCard({ section, stats }) {
-	const countKey = COUNT_KEYS[section.view];
-	const count = typeof stats[countKey] === 'number' ? stats[countKey] : 0;
+function DashboardCard({ section }: { section: AdminSection }) {
+	const countKey = COUNT_KEYS[ section.view as DashboardCardView ];
+	const count = typeof adminConfig.stats[ countKey ] === 'number' ? adminConfig.stats[ countKey ] : 0;
 
 	return (
 		<Card className="minimal-map-admin__feature-card">
@@ -116,20 +144,19 @@ function DashboardCard({ section, stats }) {
 					<span className="minimal-map-admin__feature-count">{count}</span>
 				</div>
 				<h3 className="minimal-map-admin__feature-title">{section.title}</h3>
-				<p className="minimal-map-admin__feature-description">{CARD_COPY[section.view]}</p>
+				<p className="minimal-map-admin__feature-description">{CARD_COPY[ section.view as DashboardCardView ]}</p>
 				<Button href={section.url} variant="link" className="minimal-map-admin__feature-link">
-					{CTA_COPY[section.view]}
+					{CTA_COPY[ section.view as DashboardCardView ]}
 				</Button>
 			</CardBody>
 		</Card>
 	);
 }
 
-function Dashboard({ sectionMap }) {
-	const stats = adminConfig.stats || {};
-	const mapHostRef = useRef(null);
-	const mapInstanceRef = useRef(null);
-	const mapConfig = useMemo(() => ({
+function Dashboard({ sectionMap }: { sectionMap: Partial<Record<AdminSectionView, AdminSection>> }) {
+	const mapHostRef = useRef<HTMLDivElement | null>(null);
+	const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
+	const mapConfig = useMemo<RawMapConfig>(() => ({
 		centerLat: 52.517,
 		centerLng: 13.388,
 		zoom: 9.5,
@@ -138,7 +165,7 @@ function Dashboard({ sectionMap }) {
 		stylePreset: 'positron',
 		showZoomControls: true,
 	}), []);
-	const mapRuntimeConfig = adminConfig.mapConfig || {};
+	const mapRuntimeConfig: MapRuntimeConfig = adminConfig.mapConfig ?? {};
 
 	useEffect(() => {
 		if (!mapHostRef.current) {
@@ -157,14 +184,16 @@ function Dashboard({ sectionMap }) {
 				mapInstanceRef.current = null;
 			}
 		};
-	}, [mapConfig, mapRuntimeConfig]);
+	}, [ mapConfig, mapRuntimeConfig ]);
 
 	return (
 		<div className="minimal-map-admin__dashboard">
 			<div className="minimal-map-admin__dashboard-grid">
-				{CARD_VIEWS.map((view) => (
-					<DashboardCard key={view} section={sectionMap[view]} stats={stats} />
-				))}
+				{CARD_VIEWS.map((view) => {
+					const section = sectionMap[ view ];
+
+					return section ? <DashboardCard key={view} section={section} /> : null;
+				})}
 			</div>
 			<div className="minimal-map-admin__dashboard-map">
 				<div
@@ -176,13 +205,24 @@ function Dashboard({ sectionMap }) {
 	);
 }
 
-function PlaceholderView({ title }) {
+function PlaceholderView({ title }: { title: string }) {
 	return <div className="minimal-map-admin__placeholder-view" aria-label={title} />;
 }
 
-function App({ currentView }) {
+function getActiveSection(currentView: AdminSectionView): AdminSection {
 	const sectionMap = getSectionMap();
-	const activeSection = sectionMap[currentView] || sectionMap.dashboard;
+
+	return sectionMap[ currentView ] ?? sectionMap.dashboard ?? {
+		view: 'dashboard',
+		title: __('Dashboard', 'minimal-map'),
+		description: __('An overview of Minimal Map sections and upcoming data tools.', 'minimal-map'),
+		url: '#',
+	};
+}
+
+function App({ currentView }: { currentView: AdminSectionView }) {
+	const sectionMap = getSectionMap();
+	const activeSection = getActiveSection(currentView);
 
 	return (
 		<div className="minimal-map-admin__app">
@@ -206,9 +246,10 @@ function App({ currentView }) {
 	);
 }
 
-function mount() {
-	document.querySelectorAll('[data-minimal-map-admin-root]').forEach((node) => {
-		const currentView = node.getAttribute('data-current-view') || adminConfig.currentView || 'dashboard';
+function mount(): void {
+	document.querySelectorAll<HTMLElement>('[data-minimal-map-admin-root]').forEach((node) => {
+		const requestedView = node.getAttribute('data-current-view') ?? adminConfig.currentView ?? 'dashboard';
+		const currentView = isAdminSectionView(requestedView) ? requestedView : 'dashboard';
 		createRoot(node).render(<App currentView={currentView} />);
 	});
 }
