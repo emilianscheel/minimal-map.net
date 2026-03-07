@@ -87,6 +87,15 @@ export interface LocationsAdminConfig {
 	restPath: string;
 }
 
+export interface LocationRestResponse {
+	id: number;
+	title?: {
+		raw?: string;
+		rendered?: string;
+	};
+	meta?: Partial<LocationMeta>;
+}
+
 export interface AdminAppConfig {
 	currentView: AdminSectionView;
 	sections: AdminSection[];
@@ -141,3 +150,9 @@ export interface LocationFormState extends LocationMeta {
 }
 
 export type LocationDialogStep = 'details' | 'address';
+
+export interface FieldErrors {
+	title?: string;
+	email?: string;
+	website?: string;
+}
