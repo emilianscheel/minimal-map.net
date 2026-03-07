@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "minimal-map/map",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Minimal Map",
   "category": "widgets",
   "icon": "location-alt",
@@ -25,6 +25,10 @@
       "type": "number",
       "default": 420
     },
+    "heightUnit": {
+      "type": "string",
+      "default": "px"
+    },
     "stylePreset": {
       "type": "string",
       "default": "liberty"
@@ -36,7 +40,13 @@
   },
   "supports": {
     "html": false,
-    "align": ["wide", "full"]
+    "align": ["wide", "full"],
+    "__experimentalBorder": {
+      "radius": true,
+      "__experimentalDefaultControls": {
+        "radius": true
+      }
+    }
   },
   "editorScript": "minimal-map-block-editor",
   "editorStyle": "minimal-map-editor-style",

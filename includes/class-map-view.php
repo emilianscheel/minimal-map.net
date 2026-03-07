@@ -37,7 +37,7 @@ class Map_View {
 		$config             = $this->config->normalize_block_attributes( $attributes );
 		$surface_attributes = array(
 			'class'                   => 'minimal-map-surface',
-			'style'                   => sprintf( 'height: %dpx;', (int) $config['height'] ),
+			'style'                   => 'height: ' . $config['heightCssValue'] . ';',
 			'data-minimal-map-config' => wp_json_encode( $config ),
 		);
 

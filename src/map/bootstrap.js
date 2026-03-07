@@ -28,7 +28,7 @@ function createFallback(host, message) {
 function createShell(host, config) {
 	host.innerHTML = '';
 	host.classList.add('minimal-map-runtime');
-	host.style.height = `${config.height}px`;
+	host.style.height = config.heightCssValue;
 
 	const viewport = document.createElement('div');
 	viewport.className = 'minimal-map-runtime__viewport';
@@ -69,8 +69,9 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 		try {
 			state.map = new maplibregl.Map({
 				attributionControl: true,
-				center: [config.centerLng, config.centerLat],
+				center: [ config.centerLng, config.centerLat ],
 				container: viewport,
+				scrollZoom: false,
 				style: config.styleUrl,
 				zoom: config.zoom,
 			});
@@ -79,6 +80,7 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 			return;
 		}
 
+		state.map.scrollZoom.disable();
 		state.map.on('load', () => state.map.resize());
 		state.map.on('error', () => {
 			if (!state.map || state.map.loaded()) {
@@ -129,22 +131,31 @@ export function createMinimalMap(host, initialConfig = {}, runtimeConfig = {}) {
 			return;
 		}
 
-		host.style.height = `${nextConfig.height}px`;
+		host.style.height = nextConfig.heightCssValue;
 
 		if (!previousConfig || previousConfig.styleUrl !== nextConfig.styleUrl) {
 			state.map.setStyle(nextConfig.styleUrl);
 		}
 
-		if (
+		const centerChanged =
 			!previousConfig ||
 			previousConfig.centerLat !== nextConfig.centerLat ||
-			previousConfig.centerLng !== nextConfig.centerLng ||
-			previousConfig.zoom !== nextConfig.zoom
-		) {
-			state.map.jumpTo({
-				center: [nextConfig.centerLng, nextConfig.centerLat],
-				zoom: nextConfig.zoom,
-			});
+			previousConfig.centerLng !== nextConfig.centerLng;
+		const zoomChanged = !previousConfig || previousConfig.zoom !== nextConfig.zoom;
+
+		if (centerChanged || zoomChanged) {
+			if (zoomChanged) {
+				state.map.easeTo({
+					center: [ nextConfig.centerLng, nextConfig.centerLat ],
+					duration: 180,
+					essential: true,
+					zoom: nextConfig.zoom,
+				});
+			} else {
+				state.map.jumpTo({
+					center: [ nextConfig.centerLng, nextConfig.centerLat ],
+				});
+			}
 		}
 
 		if (!previousConfig || previousConfig.showZoomControls !== nextConfig.showZoomControls) {

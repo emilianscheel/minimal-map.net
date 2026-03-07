@@ -1,6 +1,15 @@
-.minimal-map-block,
+.wp-block-minimal-map-map,
 .minimal-map-editor {
 	width: 100%;
+	overflow: hidden;
+}
+
+.wp-block-minimal-map-map.alignfull,
+.editor-styles-wrapper .wp-block-minimal-map-map.alignfull {
+	width: 100vw;
+	max-width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
 }
 
 .minimal-map-runtime,
@@ -8,18 +17,26 @@
 .minimal-map-editor__canvas {
 	position: relative;
 	width: 100%;
-	border-radius: 8px;
+	margin: 0;
+	border-radius: inherit;
 	overflow: hidden;
 	background: #f6f7f7;
 }
 
+.minimal-map-runtime {
+	height: 100%;
+}
+
 .minimal-map-runtime__viewport,
+.minimal-map-surface .maplibregl-canvas,
 .minimal-map-surface .maplibregl-canvas-container,
+.minimal-map-editor__canvas .maplibregl-canvas,
 .minimal-map-editor__canvas .maplibregl-canvas-container,
 .minimal-map-surface .maplibregl-map,
 .minimal-map-editor__canvas .maplibregl-map {
 	width: 100%;
 	height: 100%;
+	border-radius: inherit;
 }
 
 .minimal-map-controls {

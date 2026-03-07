@@ -17,22 +17,86 @@ class Admin_Menu {
 	const TOP_LEVEL_SLUG = 'minimal-map';
 
 	/**
-	 * Get all page slugs and labels.
-	 *
-	 * @return array<string, string>
+	 * Default section slug.
 	 */
-	public static function get_pages() {
+	const DEFAULT_VIEW = 'dashboard';
+
+	/**
+	 * Get all internal plugin sections.
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public static function get_sections() {
 		return array(
-			self::TOP_LEVEL_SLUG         => __( 'Dashboard', 'minimal-map' ),
-			'minimal-map-locations'      => __( 'Locations', 'minimal-map' ),
-			'minimal-map-categories'     => __( 'Categories', 'minimal-map' ),
-			'minimal-map-tags'           => __( 'Tags', 'minimal-map' ),
-			'minimal-map-markers'        => __( 'Markers', 'minimal-map' ),
-			'minimal-map-styles'         => __( 'Styles', 'minimal-map' ),
-			'minimal-map-import'         => __( 'Import', 'minimal-map' ),
-			'minimal-map-export'         => __( 'Export', 'minimal-map' ),
-			'minimal-map-settings'       => __( 'Settings', 'minimal-map' ),
+			'dashboard'  => array(
+				'title'       => __( 'Dashboard', 'minimal-map' ),
+				'description' => __( 'An overview of Minimal Map sections and upcoming data tools.', 'minimal-map' ),
+			),
+			'locations'  => array(
+				'title'       => __( 'Locations', 'minimal-map' ),
+				'description' => __( 'Create and organize the places you want to render on your maps.', 'minimal-map' ),
+			),
+			'categories' => array(
+				'title'       => __( 'Categories', 'minimal-map' ),
+				'description' => __( 'Group locations into reusable category collections for future filtering.', 'minimal-map' ),
+			),
+			'tags'       => array(
+				'title'       => __( 'Tags', 'minimal-map' ),
+				'description' => __( 'Apply lightweight labels to keep map content easy to organize.', 'minimal-map' ),
+			),
+			'markers'    => array(
+				'title'       => __( 'Markers', 'minimal-map' ),
+				'description' => __( 'Define the marker styles and visual pin variants used across maps.', 'minimal-map' ),
+			),
+			'styles'     => array(
+				'title'       => __( 'Styles', 'minimal-map' ),
+				'description' => __( 'Manage the map styles and presets available inside the block editor.', 'minimal-map' ),
+			),
+			'import'     => array(
+				'title'       => __( 'Import', 'minimal-map' ),
+				'description' => __( 'Bring external map data into Minimal Map when import tools arrive.', 'minimal-map' ),
+			),
+			'export'     => array(
+				'title'       => __( 'Export', 'minimal-map' ),
+				'description' => __( 'Download map data and configuration when export tools are added.', 'minimal-map' ),
+			),
+			'settings'   => array(
+				'title'       => __( 'Settings', 'minimal-map' ),
+				'description' => __( 'Adjust global plugin defaults and future map behavior settings.', 'minimal-map' ),
+			),
 		);
+	}
+
+	/**
+	 * Resolve the current internal section.
+	 *
+	 * @return string
+	 */
+	public static function get_current_view() {
+		$view     = isset( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : self::DEFAULT_VIEW;
+		$sections = self::get_sections();
+
+		if ( ! isset( $sections[ $view ] ) ) {
+			return self::DEFAULT_VIEW;
+		}
+
+		return $view;
+	}
+
+	/**
+	 * Build the admin URL for a given section.
+	 *
+	 * @param string $view Section slug.
+	 * @return string
+	 */
+	public static function get_view_url( $view ) {
+		$base_url = admin_url( 'admin.php?page=' . self::TOP_LEVEL_SLUG );
+
+		if ( self::DEFAULT_VIEW === $view ) {
+			return $base_url;
+		}
+
+		return add_query_arg( 'view', $view, $base_url );
 	}
 
 	/**
@@ -41,8 +105,6 @@ class Admin_Menu {
 	 * @return void
 	 */
 	public function register() {
-		$pages = self::get_pages();
-
 		add_menu_page(
 			__( 'Minimal Map', 'minimal-map' ),
 			__( 'Minimal Map', 'minimal-map' ),
@@ -52,17 +114,6 @@ class Admin_Menu {
 			'dashicons-admin-site',
 			56
 		);
-
-		foreach ( $pages as $slug => $label ) {
-			add_submenu_page(
-				self::TOP_LEVEL_SLUG,
-				$label,
-				$label,
-				'manage_options',
-				$slug,
-				array( $this, 'render_page' )
-			);
-		}
 	}
 
 	/**
@@ -71,9 +122,10 @@ class Admin_Menu {
 	 * @return void
 	 */
 	public function render_page() {
-		$slug  = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : self::TOP_LEVEL_SLUG;
-		$pages = self::get_pages();
-		$title = isset( $pages[ $slug ] ) ? $pages[ $slug ] : __( 'Minimal Map', 'minimal-map' );
+		$view        = self::get_current_view();
+		$sections    = self::get_sections();
+		$title       = $sections[ $view ]['title'];
+		$description = $sections[ $view ]['description'];
 
 		require MINIMAL_MAP_PATH . 'templates/admin-page.php';
 	}

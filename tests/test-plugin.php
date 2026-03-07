@@ -31,4 +31,21 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'liberty', $presets );
 		$this->assertSame( 'https://tiles.openfreemap.org/styles/liberty', $presets['liberty']['style_url'] );
 	}
+
+	/**
+	 * Height units should normalize into a CSS-ready value.
+	 *
+	 * @return void
+	 */
+	public function test_height_unit_defaults_to_pixels() {
+		$config      = new \MinimalMap\Config();
+		$attributes  = $config->normalize_block_attributes(
+			array(
+				'height' => 36,
+			)
+		);
+
+		$this->assertSame( 'px', $attributes['heightUnit'] );
+		$this->assertSame( '36px', $attributes['heightCssValue'] );
+	}
 }
