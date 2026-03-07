@@ -1,16 +1,22 @@
 import {
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalColorGradientControl as ColorGradientControl,
 	InspectorControls,
 	__experimentalBorderRadiusControl as BorderRadiusControl,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
+	Button,
 	BoxControl,
+	ColorIndicator,
+	Dropdown,
+	FlexItem,
 	PanelBody,
 	RangeControl,
 	SelectControl,
 	TextControl,
 	ToggleControl,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	__experimentalHStack as HStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalUnitControl as UnitControl,
@@ -223,11 +229,17 @@ function ZoomControlColorSettings({
 	backgroundColor,
 	iconColor,
 	borderColor,
+	defaultBackgroundColor,
+	defaultIconColor,
+	defaultBorderColor,
 	onChange,
 }: {
 	backgroundColor: string;
 	iconColor: string;
 	borderColor: string;
+	defaultBackgroundColor: string;
+	defaultIconColor: string;
+	defaultBorderColor: string;
 	onChange: (
 		key:
 			| 'zoomControlsBackgroundColor'
@@ -237,45 +249,88 @@ function ZoomControlColorSettings({
 	) => void;
 }) {
 	return (
-		<div className="minimal-map-editor__compact-color-settings">
-			<ColorGradientSettingsDropdown
-				__experimentalIsRenderedInSidebar
-				colors={[]}
-				gradients={[]}
-				disableCustomColors={false}
-				disableCustomGradients
-				enableAlpha={false}
-				settings={[
-					{
-						label: __('Background Color', 'minimal-map'),
-						colorValue: backgroundColor,
-						onColorChange: (value?: string) => {
-							if (typeof value === 'string' && value.length > 0) {
-								onChange('zoomControlsBackgroundColor', value);
-							}
-						},
-					},
-					{
-						label: __('Icon Color', 'minimal-map'),
-						colorValue: iconColor,
-						onColorChange: (value?: string) => {
-							if (typeof value === 'string' && value.length > 0) {
-								onChange('zoomControlsIconColor', value);
-							}
-						},
-					},
-					{
-						label: __('Border Color', 'minimal-map'),
-						colorValue: borderColor,
-						onColorChange: (value?: string) => {
-							if (typeof value === 'string' && value.length > 0) {
-								onChange('zoomControlsBorderColor', value);
-							}
-						},
-					},
-				]}
+		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
+			<CompactColorDropdown
+				label={__('Background', 'minimal-map')}
+				value={backgroundColor}
+				defaultValue={defaultBackgroundColor}
+				onChange={(value) => onChange('zoomControlsBackgroundColor', value)}
+			/>
+			<CompactColorDropdown
+				label={__('Foreground', 'minimal-map')}
+				value={iconColor}
+				defaultValue={defaultIconColor}
+				onChange={(value) => onChange('zoomControlsIconColor', value)}
+			/>
+			<CompactColorDropdown
+				label={__('Border', 'minimal-map')}
+				value={borderColor}
+				defaultValue={defaultBorderColor}
+				onChange={(value) => onChange('zoomControlsBorderColor', value)}
 			/>
 		</div>
+	);
+}
+
+function CompactColorDropdown({
+	label,
+	value,
+	defaultValue,
+	onChange,
+}: {
+	label: string;
+	value: string;
+	defaultValue: string;
+	onChange: (value: string) => void;
+}) {
+	return (
+		<Dropdown
+			className="minimal-map-editor__compact-color-dropdown"
+			popoverProps={{
+				placement: 'left-start',
+				offset: 36,
+				shift: true,
+			}}
+			renderToggle={({ isOpen, onToggle }) => (
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={onToggle}
+					aria-expanded={isOpen}
+					style={{
+						width: '100%',
+						justifyContent: 'flex-start',
+						paddingInline: '12px',
+						color: 'var(--wp-components-color-foreground, #1e1e1e)',
+					}}
+				>
+					<HStack justify="flex-start" spacing={3}>
+						<ColorIndicator colorValue={value} />
+						<FlexItem title={label}>{label}</FlexItem>
+					</HStack>
+				</Button>
+			)}
+			renderContent={() => (
+				<DropdownContentWrapper>
+					<div style={{ width: '280px', maxWidth: 'min(280px, 100vw - 32px)' }}>
+						<ColorGradientControl
+							label={label}
+							showTitle={false}
+							clearable={false}
+							enableAlpha={false}
+							onColorChange={(nextValue?: string) =>
+								onChange(
+									typeof nextValue === 'string' && nextValue.length > 0
+										? nextValue
+										: defaultValue
+								)
+							}
+							colorValue={value}
+						/>
+					</div>
+				</DropdownContentWrapper>
+			)}
+		/>
 	);
 }
 
@@ -399,6 +454,15 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 					/>
 				</PanelBody>
 				<PanelBody title={__('Zoom Controls', 'minimal-map')} initialOpen={false}>
+					<ZoomControlColorSettings
+						backgroundColor={attributes.zoomControlsBackgroundColor}
+						iconColor={attributes.zoomControlsIconColor}
+						borderColor={attributes.zoomControlsBorderColor}
+						defaultBackgroundColor={runtimeConfig.defaults?.zoomControlsBackgroundColor ?? '#ffffff'}
+						defaultIconColor={runtimeConfig.defaults?.zoomControlsIconColor ?? '#1e1e1e'}
+						defaultBorderColor={runtimeConfig.defaults?.zoomControlsBorderColor ?? '#dcdcde'}
+						onChange={(key, value) => setAttributes({ [key]: value })}
+					/>
 					<ToggleGroupControl
 						__next40pxDefaultSize
 						label={__('Position', 'minimal-map')}
@@ -437,16 +501,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 							values={attributes.zoomControlsOuterMargin}
 							units={HEIGHT_UNITS}
 							onChange={(value?: BoxValue) => {
-								setAttributes({ zoomControlsOuterMargin: value ?? attributes.zoomControlsOuterMargin });
+							setAttributes({ zoomControlsOuterMargin: value ?? attributes.zoomControlsOuterMargin });
 							}}
 						/>
 					</div>
-					<ZoomControlColorSettings
-						backgroundColor={attributes.zoomControlsBackgroundColor}
-						iconColor={attributes.zoomControlsIconColor}
-						borderColor={attributes.zoomControlsBorderColor}
-						onChange={(key, value) => setAttributes({ [key]: value })}
-					/>
 					<BorderRadiusControl
 						onChange={(value: string | BorderRadiusValues) => {
 							setAttributes({
