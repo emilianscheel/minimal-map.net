@@ -11,6 +11,18 @@ body.toplevel_page_minimal-map {
   }
 }
 
+body.toplevel_page_minimal-map svg.lucide,
+body.toplevel_page_minimal-map svg.lucide * {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.toplevel_page_minimal-map svg.lucide {
+  flex: 0 0 auto;
+}
+
 .minimal-map-admin-wrap {
   margin: 0px 0 0 -20px;
   min-height: calc(100vh - 32px);
@@ -314,6 +326,10 @@ body.toplevel_page_minimal-map {
   min-width: min(720px, calc(100vw - 64px));
 }
 
+.minimal-map-admin__location-modal .components-modal__content {
+  width: min(760px, calc(100vw - 48px));
+}
+
 .minimal-map-admin__location-dialog-fields {
   display: grid;
   gap: 14px;
@@ -333,10 +349,31 @@ body.toplevel_page_minimal-map {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.minimal-map-admin__location-dialog-back {
+.minimal-map-admin__location-dialog-actions {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.minimal-map-admin__location-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   padding-top: 4px;
+}
+
+.minimal-map-admin__location-dialog-footer-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1 1 auto;
+}
+
+.minimal-map-admin__location-dialog-button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 @media (max-width: 960px) {
@@ -365,6 +402,20 @@ body.toplevel_page_minimal-map {
   .minimal-map-admin__header-actions {
     justify-content: flex-start;
     margin-left: 0;
+  }
+
+  .minimal-map-admin__location-dialog-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .minimal-map-admin__location-dialog-footer-start,
+  .minimal-map-admin__location-dialog-actions {
+    width: 100%;
+  }
+
+  .minimal-map-admin__location-dialog-actions {
+    justify-content: flex-end;
   }
 }
 

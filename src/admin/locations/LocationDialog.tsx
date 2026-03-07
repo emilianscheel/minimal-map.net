@@ -1,7 +1,13 @@
-import { Notice, __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import {
+	Button,
+	Modal,
+	Notice,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { ArrowLeft } from 'lucide-react';
 import type { KeyboardEvent } from 'react';
 import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import Kbd from '../../components/Kbd';
 import type { LocationsController } from './types';
 import LocationDialogFields from './LocationDialogFields';
 
@@ -11,15 +17,13 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 	}
 
 	return (
-		<ConfirmDialog
-			confirmButtonText={controller.step === 'details' ? __('Next', 'minimal-map') : __('Add location', 'minimal-map')}
-			cancelButtonText={__('Cancel', 'minimal-map')}
-			isBusy={controller.isSubmitting}
-			isOpen={controller.isDialogOpen}
-			onCancel={controller.onCancel}
-			onConfirm={() => {
-				void controller.onConfirm();
-			}}
+		<Modal
+			className="minimal-map-admin__location-modal"
+			contentLabel={__('Add location', 'minimal-map')}
+			focusOnMount="firstInputElement"
+			onRequestClose={controller.onCancel}
+			shouldCloseOnClickOutside={!controller.isSubmitting}
+			shouldCloseOnEsc={!controller.isSubmitting}
 			title={__('Add location', 'minimal-map')}
 		>
 			<div
@@ -44,7 +48,51 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 					onChange={controller.onChangeFormValue}
 					step={controller.step}
 				/>
+				<div className="minimal-map-admin__location-dialog-footer">
+					<div className="minimal-map-admin__location-dialog-footer-start">
+						{controller.step === 'address' ? (
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={controller.onBack}
+								disabled={controller.isSubmitting}
+								icon={<ArrowLeft size={18} strokeWidth={2} />}
+								iconPosition="left"
+							>
+								{__('Back', 'minimal-map')}
+							</Button>
+						) : null}
+					</div>
+					<div className="minimal-map-admin__location-dialog-actions">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={controller.onCancel}
+							disabled={controller.isSubmitting}
+						>
+							{__('Cancel', 'minimal-map')}
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={() => {
+								void controller.onConfirm();
+							}}
+							disabled={controller.isSubmitting}
+							isBusy={controller.isSubmitting}
+						>
+							<span className="minimal-map-admin__location-dialog-button-content">
+								<span>
+									{controller.step === 'details'
+										? __('Next', 'minimal-map')
+										: __('Finish', 'minimal-map')}
+								</span>
+								<Kbd variant="blue">Enter</Kbd>
+							</span>
+						</Button>
+					</div>
+				</div>
 			</div>
-		</ConfirmDialog>
+		</Modal>
 	);
 }

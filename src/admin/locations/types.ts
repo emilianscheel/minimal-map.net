@@ -14,6 +14,7 @@ export interface LocationsController {
 	submitError: string | null;
 	step: LocationDialogStep;
 	view: ViewTable;
+	onBack: () => void;
 	onCancel: () => void;
 	onChangeFormValue: (key: keyof LocationFormState, value: string) => void;
 	onChangeView: (nextView: ViewTable) => void;

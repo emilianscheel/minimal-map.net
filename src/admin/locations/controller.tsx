@@ -164,6 +164,7 @@ export function useLocationsController(
 		isSubmitting,
 		loadError,
 		locations,
+		onBack: () => setStep('details'),
 		onCancel,
 		onChangeFormValue,
 		onChangeView: (nextView) => setView(nextView),
