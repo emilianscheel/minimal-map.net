@@ -38,9 +38,10 @@ class Assets {
 		$this->register_script( 'minimal-map-admin', 'admin.js' );
 
 		$this->register_style( 'minimal-map-maplibre-style', 'frontend.css' );
+		$this->register_style( 'minimal-map-admin-maplibre-style', 'admin.css' );
 		$this->register_style( 'minimal-map-editor-style', 'index.css', array( 'wp-edit-blocks', 'wp-components' ) );
 		$this->register_style( 'minimal-map-style', 'style-frontend.css', array( 'wp-components', 'minimal-map-maplibre-style' ) );
-		$this->register_style( 'minimal-map-admin-style', 'style-admin.css', array( 'wp-components' ) );
+		$this->register_style( 'minimal-map-admin-style', 'style-admin.css', array( 'wp-components', 'minimal-map-style', 'minimal-map-admin-maplibre-style' ) );
 
 		$this->attach_inline_data();
 	}

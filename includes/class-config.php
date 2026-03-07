@@ -141,6 +141,7 @@ class Config {
 				'markers'    => 0,
 				'tags'       => 0,
 			),
+			'mapConfig'   => $this->get_client_config(),
 		);
 	}
 

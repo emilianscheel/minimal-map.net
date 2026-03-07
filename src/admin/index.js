@@ -1,6 +1,6 @@
 import { Button, Card, CardBody } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';
-import { createRoot } from '@wordpress/element';
+import { createRoot, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Download,
@@ -13,6 +13,7 @@ import {
 	Settings,
 	Tags,
 } from 'lucide-react';
+import { createMinimalMap } from '../map/bootstrap';
 import './style.scss';
 
 const adminConfig = window.MinimalMapAdminConfig || {
@@ -126,12 +127,51 @@ function DashboardCard({ section, stats }) {
 
 function Dashboard({ sectionMap }) {
 	const stats = adminConfig.stats || {};
+	const mapHostRef = useRef(null);
+	const mapInstanceRef = useRef(null);
+	const mapConfig = useMemo(() => ({
+		centerLat: 52.517,
+		centerLng: 13.388,
+		zoom: 9.5,
+		height: 100,
+		heightUnit: '%',
+		stylePreset: 'positron',
+		showZoomControls: true,
+	}), []);
+	const mapRuntimeConfig = adminConfig.mapConfig || {};
+
+	useEffect(() => {
+		if (!mapHostRef.current) {
+			return undefined;
+		}
+
+		mapInstanceRef.current = createMinimalMap(
+			mapHostRef.current,
+			mapConfig,
+			mapRuntimeConfig
+		);
+
+		return () => {
+			if (mapInstanceRef.current) {
+				mapInstanceRef.current.destroy();
+				mapInstanceRef.current = null;
+			}
+		};
+	}, [mapConfig, mapRuntimeConfig]);
 
 	return (
-		<div className="minimal-map-admin__dashboard-grid">
-			{CARD_VIEWS.map((view) => (
-				<DashboardCard key={view} section={sectionMap[view]} stats={stats} />
-			))}
+		<div className="minimal-map-admin__dashboard">
+			<div className="minimal-map-admin__dashboard-grid">
+				{CARD_VIEWS.map((view) => (
+					<DashboardCard key={view} section={sectionMap[view]} stats={stats} />
+				))}
+			</div>
+			<div className="minimal-map-admin__dashboard-map">
+				<div
+					ref={mapHostRef}
+					className="minimal-map-admin__dashboard-map-surface"
+				/>
+			</div>
 		</div>
 	);
 }
@@ -149,7 +189,12 @@ function App({ currentView }) {
 			<AdminSidebar currentView={activeSection.view} />
 			<div className="minimal-map-admin__panel">
 				<ContentHeader title={activeSection.title} description={activeSection.description} />
-				<div className="minimal-map-admin__content">
+				<div
+					className={[
+						'minimal-map-admin__content',
+						activeSection.view === 'dashboard' ? 'minimal-map-admin__content--dashboard' : '',
+					].filter(Boolean).join(' ')}
+				>
 					{activeSection.view === 'dashboard' ? (
 						<Dashboard sectionMap={sectionMap} />
 					) : (
