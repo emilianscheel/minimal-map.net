@@ -9,6 +9,7 @@ namespace MinimalMap;
 
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Rest\Geocode_Route;
+use WP_Post;
 
 /**
  * Provides shared config for PHP and JS consumers.
@@ -144,10 +145,52 @@ class Config {
 			'defaults'      => $this->get_default_block_attributes(),
 			'heightUnits'   => self::HEIGHT_UNITS,
 			'stylePresets'  => $this->get_style_presets(),
+			'locations'     => $this->get_map_locations(),
 			'messages'      => array(
 				'fallback' => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 			),
 		);
+	}
+
+	/**
+	 * Get all published map locations with valid coordinates.
+	 *
+	 * @return array<int, array<string, float>>
+	 */
+	public function get_map_locations() {
+		$posts = get_posts(
+			array(
+				'post_status'            => 'publish',
+				'post_type'              => Location_Post_Type::POST_TYPE,
+				'posts_per_page'         => -1,
+				'orderby'                => 'menu_order title',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$locations = array();
+
+		foreach ( $posts as $post ) {
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+
+			$location = $this->normalize_map_location(
+				get_post_meta( $post->ID, 'latitude', true ),
+				get_post_meta( $post->ID, 'longitude', true )
+			);
+
+			if ( null === $location ) {
+				continue;
+			}
+
+			$locations[] = $location;
+		}
+
+		return $locations;
 	}
 
 	/**
@@ -202,6 +245,35 @@ class Config {
 		}
 
 		return $formatted . $unit;
+	}
+
+	/**
+	 * Normalize one pair of map coordinates.
+	 *
+	 * @param mixed $latitude Raw latitude.
+	 * @param mixed $longitude Raw longitude.
+	 * @return array<string, float>|null
+	 */
+	private function normalize_map_location( $latitude, $longitude ) {
+		if ( '' === $latitude || '' === $longitude ) {
+			return null;
+		}
+
+		if ( ! is_numeric( $latitude ) || ! is_numeric( $longitude ) ) {
+			return null;
+		}
+
+		$lat = (float) $latitude;
+		$lng = (float) $longitude;
+
+		if ( $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180 ) {
+			return null;
+		}
+
+		return array(
+			'lat' => $lat,
+			'lng' => $lng,
+		);
 	}
 
 	/**

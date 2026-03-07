@@ -1,10 +1,11 @@
-import maplibregl, { type Map as MapLibreMap } from 'maplibre-gl';
+import maplibregl, { LngLatBounds, type Map as MapLibreMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { createAttributionPill } from './attribution-pill';
 import { normalizeMapConfig } from './defaults';
 import { createWordPressZoomControls } from './wp-controls';
 import type {
 	MapRuntimeConfig,
+	MapLocationPoint,
 	MinimalMapInstance,
 	NormalizedMapConfig,
 	RawMapConfig,
@@ -17,7 +18,7 @@ interface MinimalMapState {
 	config: NormalizedMapConfig | null;
 	controls: WordPressZoomControls | null;
 	map: MapLibreMap | null;
-	marker: maplibregl.Marker | null;
+	markers: maplibregl.Marker[];
 	observer: ResizeObserver | null;
 }
 
@@ -61,10 +62,10 @@ function createShell(host: HTMLElement, config: NormalizedMapConfig): HTMLElemen
 	return viewport;
 }
 
-function createMarker(config: NormalizedMapConfig): maplibregl.Marker {
+function createMarker(config: NormalizedMapConfig, point: MapLocationPoint): maplibregl.Marker {
 	const marker = new maplibregl.Marker({
 		offset: [ 0, config.markerOffsetY ],
-	}).setLngLat([ config.markerLng as number, config.markerLat as number ]);
+	}).setLngLat([ point.lng, point.lat ]);
 
 	if (config.markerClassName) {
 		marker.getElement().classList.add(...config.markerClassName.split(/\s+/).filter(Boolean));
@@ -124,6 +125,77 @@ function syncCenter(
 	map.jumpTo(target);
 }
 
+function getRenderedPoints(config: NormalizedMapConfig): MapLocationPoint[] {
+	if (config.locations.length > 0) {
+		return config.locations;
+	}
+
+	if (config.markerLat === null || config.markerLng === null) {
+		return [];
+	}
+
+	return [
+		{
+			lat: config.markerLat,
+			lng: config.markerLng,
+		},
+	];
+}
+
+function didRenderedPointsChange(
+	previousConfig: NormalizedMapConfig | null,
+	nextConfig: NormalizedMapConfig
+): boolean {
+	const previousPoints = previousConfig ? getRenderedPoints(previousConfig) : [];
+	const nextPoints = getRenderedPoints(nextConfig);
+
+	if (previousPoints.length !== nextPoints.length) {
+		return true;
+	}
+
+	return previousPoints.some((point, index) => {
+		const nextPoint = nextPoints[index];
+
+		return point.lat !== nextPoint.lat || point.lng !== nextPoint.lng;
+	});
+}
+
+function syncViewport(
+	map: MapLibreMap,
+	config: NormalizedMapConfig,
+	zoomChanged = false
+): void {
+	const points = getRenderedPoints(config);
+
+	if (points.length === 0) {
+		syncCenter(map, config, zoomChanged);
+		return;
+	}
+
+	if (points.length === 1) {
+		const [point] = points;
+		map.easeTo({
+			center: [point.lng, point.lat],
+			duration: 180,
+			essential: true,
+			offset: [0, config.centerOffsetY],
+			zoom: config.zoom,
+		});
+		return;
+	}
+
+	const bounds = points.reduce(
+		(currentBounds, point) => currentBounds.extend([point.lng, point.lat]),
+		new LngLatBounds([points[0].lng, points[0].lat], [points[0].lng, points[0].lat])
+	);
+
+	map.fitBounds(bounds, {
+		duration: 180,
+		essential: true,
+		padding: 48,
+	});
+}
+
 export function createMinimalMap(
 	host: HTMLElement,
 	initialConfig: RawMapConfig = {},
@@ -134,32 +206,27 @@ export function createMinimalMap(
 		config: null,
 		controls: null,
 		map: null,
-		marker: null,
+		markers: [],
 		observer: null,
 	};
 
-	function syncMarker(config: NormalizedMapConfig, forceRecreate = false): void {
+	function syncMarkers(config: NormalizedMapConfig, forceRecreate = false): void {
 		if (!state.map) {
 			return;
 		}
 
-		if (config.markerLat === null || config.markerLng === null) {
-			state.marker?.remove();
-			state.marker = null;
+		const points = getRenderedPoints(config);
+
+		if (forceRecreate || points.length === 0) {
+			state.markers.forEach((marker) => marker.remove());
+			state.markers = [];
+		}
+
+		if (points.length === 0) {
 			return;
 		}
 
-		if (forceRecreate) {
-			state.marker?.remove();
-			state.marker = null;
-		}
-
-		if (!state.marker) {
-			state.marker = createMarker(config).addTo(state.map);
-			return;
-		}
-
-		state.marker.setLngLat([config.markerLng, config.markerLat]);
+		state.markers = points.map((point) => createMarker(config, point).addTo(state.map as MapLibreMap));
 	}
 
 	function syncControls(config: NormalizedMapConfig): void {
@@ -222,7 +289,7 @@ export function createMinimalMap(
 			map.touchZoomRotate.disable();
 		}
 		map.on('load', () => {
-			syncCenter(map, config);
+			syncViewport(map, config);
 			map.resize();
 		});
 		map.on('click', (event) => {
@@ -252,7 +319,7 @@ export function createMinimalMap(
 			state.observer.observe(host);
 		}
 
-		syncMarker(config);
+		syncMarkers(config, true);
 		syncControls(config);
 		syncAttribution(config);
 	}
@@ -269,7 +336,7 @@ export function createMinimalMap(
 
 		state.map?.remove();
 		state.map = null;
-		state.marker = null;
+		state.markers = [];
 
 		host.innerHTML = '';
 	}
@@ -297,8 +364,8 @@ export function createMinimalMap(
 			previousConfig.centerOffsetY !== nextConfig.centerOffsetY;
 		const zoomChanged = !previousConfig || previousConfig.zoom !== nextConfig.zoom;
 
-		if (centerChanged || zoomChanged) {
-			syncCenter(state.map, nextConfig, zoomChanged);
+		if (centerChanged || zoomChanged || didRenderedPointsChange(previousConfig, nextConfig)) {
+			syncViewport(state.map, nextConfig, zoomChanged);
 		}
 
 		if (
@@ -315,16 +382,16 @@ export function createMinimalMap(
 
 		if (
 			!previousConfig ||
-			previousConfig.markerLat !== nextConfig.markerLat ||
-			previousConfig.markerLng !== nextConfig.markerLng ||
 			previousConfig.markerClassName !== nextConfig.markerClassName ||
-			previousConfig.markerOffsetY !== nextConfig.markerOffsetY
+			previousConfig.markerOffsetY !== nextConfig.markerOffsetY ||
+			didRenderedPointsChange(previousConfig, nextConfig)
 		) {
-			syncMarker(
+			syncMarkers(
 				nextConfig,
 				!previousConfig ||
 					previousConfig.markerClassName !== nextConfig.markerClassName ||
-					previousConfig.markerOffsetY !== nextConfig.markerOffsetY
+					previousConfig.markerOffsetY !== nextConfig.markerOffsetY ||
+					didRenderedPointsChange(previousConfig, nextConfig)
 			);
 		}
 

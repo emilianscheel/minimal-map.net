@@ -45,10 +45,16 @@ export interface MapMessages {
 	fallback?: string;
 }
 
+export interface MapLocationPoint {
+	lat: number;
+	lng: number;
+}
+
 export interface MapRuntimeConfig {
 	defaults?: Partial<MapDefaults>;
 	heightUnits?: string[];
 	stylePresets?: StylePresets;
+	locations?: MapLocationPoint[];
 	messages?: MapMessages;
 	onMapClick?: (coordinates: MapCoordinates) => void;
 }
@@ -78,6 +84,7 @@ export interface RawMapConfig {
 	markerClassName?: string;
 	markerOffsetY?: number | string;
 	centerOffsetY?: number | string;
+	locations?: MapLocationPoint[] | null;
 	interactive?: boolean;
 	showAttribution?: boolean;
 }
@@ -93,6 +100,7 @@ export interface NormalizedMapConfig extends MapDefaults {
 	markerClassName: string;
 	markerOffsetY: number;
 	centerOffsetY: number;
+	locations: MapLocationPoint[];
 	interactive: boolean;
 	showAttribution: boolean;
 }

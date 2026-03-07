@@ -15,6 +15,7 @@ import type {
 	BoxValue,
 	HeightUnit,
 	MapDefaults,
+	MapLocationPoint,
 	MapRuntimeConfig,
 	NormalizedMapConfig,
 	RawMapConfig,
@@ -252,6 +253,7 @@ export function normalizeMapConfig(
 		typeof rawConfig.markerClassName === 'string' ? rawConfig.markerClassName.trim() : '';
 	const markerOffsetY = Number.isFinite(Number(rawConfig.markerOffsetY)) ? Number(rawConfig.markerOffsetY) : 0;
 	const centerOffsetY = Number.isFinite(Number(rawConfig.centerOffsetY)) ? Number(rawConfig.centerOffsetY) : 0;
+	const locations = normalizeLocations(rawConfig.locations ?? runtimeConfig.locations);
 
 	return {
 		centerLat,
@@ -279,6 +281,7 @@ export function normalizeMapConfig(
 		markerClassName,
 		markerOffsetY,
 		centerOffsetY,
+		locations,
 		interactive: rawConfig.interactive ?? true,
 		showAttribution: rawConfig.showAttribution ?? true,
 	};
@@ -316,4 +319,37 @@ function normalizeOptionalCoordinate(
 	}
 
 	return Math.max(minimum, Math.min(maximum, numericValue));
+}
+
+function normalizeLocationPoint(value: MapLocationPoint | null | undefined): MapLocationPoint | null {
+	if (!value) {
+		return null;
+	}
+
+	const lat = normalizeOptionalCoordinate(value.lat, -90, 90);
+	const lng = normalizeOptionalCoordinate(value.lng, -180, 180);
+
+	if (lat === null || lng === null) {
+		return null;
+	}
+
+	return { lat, lng };
+}
+
+function normalizeLocations(
+	locations: MapLocationPoint[] | null | undefined
+): MapLocationPoint[] {
+	if (!Array.isArray(locations)) {
+		return [];
+	}
+
+	return locations.reduce<MapLocationPoint[]>((normalized, location) => {
+		const point = normalizeLocationPoint(location);
+
+		if (point) {
+			normalized.push(point);
+		}
+
+		return normalized;
+	}, []);
 }
