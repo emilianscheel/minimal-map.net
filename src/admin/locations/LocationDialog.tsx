@@ -30,11 +30,29 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 			<div
 				className="minimal-map-admin__location-dialog"
 				onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+					const target = event.target;
+					const isHTMLElement = target instanceof HTMLElement;
+
 					if (
 						(controller.step === 'map' && !controller.selectedCoordinates) ||
 						controller.isSubmitting ||
 						controller.isGeocoding
 					) {
+						return;
+					}
+
+					if (controller.step === 'map') {
+						if (
+							event.key !== 'Enter' ||
+							event.shiftKey ||
+							(isHTMLElement &&
+								target.closest('[data-minimal-map-dialog-ignore-enter="true"]'))
+						) {
+							return;
+						}
+
+						event.preventDefault();
+						void controller.onConfirm();
 						return;
 					}
 
@@ -69,6 +87,7 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 								variant="tertiary"
 								onClick={controller.onBack}
 								disabled={controller.isSubmitting}
+								data-minimal-map-dialog-ignore-enter="true"
 								icon={<ArrowLeft size={18} strokeWidth={2} />}
 								iconPosition="left"
 							>
@@ -82,6 +101,7 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 							variant="tertiary"
 							onClick={controller.onCancel}
 							disabled={controller.isSubmitting || controller.isGeocoding}
+							data-minimal-map-dialog-ignore-enter="true"
 						>
 							{__('Cancel', 'minimal-map')}
 						</Button>
