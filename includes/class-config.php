@@ -62,6 +62,7 @@ class Config {
 			'centerLat'        => 52.517,
 			'centerLng'        => 13.388,
 			'zoom'             => 9.5,
+			'collectionId'     => 0,
 			'height'           => 420,
 			'heightUnit'       => 'px',
 			'stylePreset'      => self::DEFAULT_STYLE_PRESET,
@@ -107,15 +108,20 @@ class Config {
 		$center_lat = isset( $attributes['centerLat'] ) ? (float) $attributes['centerLat'] : 0.0;
 		$center_lng = isset( $attributes['centerLng'] ) ? (float) $attributes['centerLng'] : 0.0;
 		$zoom       = isset( $attributes['zoom'] ) ? (float) $attributes['zoom'] : 0.0;
+		$collection_id = isset( $attributes['collectionId'] ) ? absint( $attributes['collectionId'] ) : 0;
 		$height     = isset( $attributes['height'] ) ? (float) $attributes['height'] : 0.0;
 		$height     = $height > 0 ? $height : (float) $this->get_default_block_attributes()['height'];
 		$height_unit = isset( $attributes['heightUnit'] ) ? sanitize_text_field( (string) $attributes['heightUnit'] ) : 'px';
 		$height_unit = in_array( $height_unit, self::HEIGHT_UNITS, true ) ? $height_unit : 'px';
+		$locations    = $collection_id > 0
+			? $this->get_map_locations( $this->get_collection_location_ids( $collection_id ) )
+			: $this->get_map_locations();
 
 		return array(
 			'centerLat'        => max( -90, min( 90, $center_lat ) ),
 			'centerLng'        => max( -180, min( 180, $center_lng ) ),
 			'zoom'             => max( 0, min( 22, $zoom ) ),
+			'collectionId'     => $collection_id,
 			'height'           => $height,
 			'heightUnit'       => $height_unit,
 			'heightCssValue'   => $this->format_dimension_value( $height, $height_unit ),
@@ -132,6 +138,7 @@ class Config {
 			'zoomControlsBorderWidth'     => $this->sanitize_dimension_value( $attributes['zoomControlsBorderWidth'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderWidth'] ),
 			'zoomControlsPlusIcon'        => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsPlusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsPlusIcon'] ),
 			'zoomControlsMinusIcon'       => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsMinusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsMinusIcon'] ),
+			'locations'       => $locations,
 			'fallbackMessage'  => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 		);
 	}
@@ -147,6 +154,7 @@ class Config {
 			'heightUnits'   => self::HEIGHT_UNITS,
 			'stylePresets'  => $this->get_style_presets(),
 			'locations'     => $this->get_map_locations(),
+			'collections'   => $this->get_map_collections(),
 			'messages'      => array(
 				'fallback' => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 			),
@@ -158,7 +166,64 @@ class Config {
 	 *
 	 * @return array<int, array<string, float>>
 	 */
-	public function get_map_locations() {
+	public function get_map_locations( $location_ids = null ) {
+		$locations = $this->get_map_locations_indexed();
+
+		if ( is_array( $location_ids ) ) {
+			return $this->filter_locations_by_ids( $locations, $location_ids );
+		}
+
+		return array_values( $locations );
+	}
+
+	/**
+	 * Get all published collections with their valid assigned points.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_map_collections() {
+		$posts = get_posts(
+			array(
+				'post_status'            => 'publish',
+				'post_type'              => Collection_Post_Type::POST_TYPE,
+				'posts_per_page'         => -1,
+				'orderby'                => 'title',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		$collections = array();
+		$locations   = $this->get_map_locations_indexed();
+
+		foreach ( $posts as $post ) {
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+
+			$collections[] = array(
+				'id'        => $post->ID,
+				'title'     => get_the_title( $post ),
+				'locations' => $this->filter_locations_by_ids(
+					$locations,
+					$this->normalize_location_ids(
+						get_post_meta( $post->ID, Collection_Post_Type::LOCATION_IDS_META_KEY, true )
+					)
+				),
+			);
+		}
+
+		return $collections;
+	}
+
+	/**
+	 * Get all published map locations with valid coordinates keyed by post id.
+	 *
+	 * @return array<int, array<string, float>>
+	 */
+	private function get_map_locations_indexed() {
 		$posts = get_posts(
 			array(
 				'post_status'            => 'publish',
@@ -188,10 +253,74 @@ class Config {
 				continue;
 			}
 
-			$locations[] = $location;
+			$locations[ $post->ID ] = $location;
 		}
 
 		return $locations;
+	}
+
+	/**
+	 * Get normalized location ids assigned to one collection.
+	 *
+	 * @param int $collection_id Collection post id.
+	 * @return int[]
+	 */
+	private function get_collection_location_ids( $collection_id ) {
+		$collection = get_post( $collection_id );
+
+		if ( ! $collection instanceof WP_Post ) {
+			return array();
+		}
+
+		if ( Collection_Post_Type::POST_TYPE !== $collection->post_type || 'publish' !== $collection->post_status ) {
+			return array();
+		}
+
+		return $this->normalize_location_ids(
+			get_post_meta( $collection_id, Collection_Post_Type::LOCATION_IDS_META_KEY, true )
+		);
+	}
+
+	/**
+	 * Filter a location map by ordered location ids.
+	 *
+	 * @param array<int, array<string, float>> $locations Indexed locations.
+	 * @param int[]                            $location_ids Ordered location ids.
+	 * @return array<int, array<string, float>>
+	 */
+	private function filter_locations_by_ids( $locations, $location_ids ) {
+		$normalized_ids = $this->normalize_location_ids( $location_ids );
+		$filtered       = array();
+
+		foreach ( $normalized_ids as $location_id ) {
+			if ( isset( $locations[ $location_id ] ) ) {
+				$filtered[] = $locations[ $location_id ];
+			}
+		}
+
+		return $filtered;
+	}
+
+	/**
+	 * Normalize a list of location ids into unique positive integers.
+	 *
+	 * @param mixed $location_ids Raw location ids.
+	 * @return int[]
+	 */
+	private function normalize_location_ids( $location_ids ) {
+		if ( ! is_array( $location_ids ) ) {
+			return array();
+		}
+
+		$location_ids = array_map( 'absint', $location_ids );
+		$location_ids = array_filter(
+			$location_ids,
+			static function ( $location_id ) {
+				return $location_id > 0;
+			}
+		);
+
+		return array_values( array_unique( $location_ids ) );
 	}
 
 	/**

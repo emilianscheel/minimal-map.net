@@ -31,6 +31,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	centerLat: 52.517,
 	centerLng: 13.388,
 	zoom: 9.5,
+	collectionId: 0,
 	height: 420,
 	heightUnit: 'px',
 	stylePreset: 'liberty',
@@ -205,6 +206,7 @@ export function normalizeMapConfig(
 	const centerLat = clampNumber(rawConfig.centerLat ?? defaults.centerLat, -90, 90);
 	const centerLng = clampNumber(rawConfig.centerLng ?? defaults.centerLng, -180, 180);
 	const zoom = clampNumber(rawConfig.zoom ?? defaults.zoom, 0, 22);
+	const collectionId = Math.max(0, Number(rawConfig.collectionId ?? defaults.collectionId) || 0);
 	const height = Math.max(1, Number(rawConfig.height ?? defaults.height));
 	const heightUnit = normalizeHeightUnit(rawConfig.heightUnit ?? defaults.heightUnit);
 	const zoomControlsPosition = normalizeZoomControlsPosition(
@@ -259,6 +261,7 @@ export function normalizeMapConfig(
 		centerLat,
 		centerLng,
 		zoom,
+		collectionId,
 		height,
 		heightUnit,
 		heightCssValue: `${trimNumber(height)}${heightUnit}`,

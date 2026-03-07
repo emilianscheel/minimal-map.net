@@ -33,6 +33,7 @@ import { getStyleOptions } from '../map/style-presets';
 import type {
 	BoxValue,
 	MapBlockAttributes,
+	MapCollectionOption,
 	MapRuntimeConfig,
 	MinimalMapInstance,
 	RawMapConfig,
@@ -334,11 +335,112 @@ function CompactColorDropdown({
 	);
 }
 
+function CollectionDropdown({
+	options,
+	selectedId,
+	onChange,
+}: {
+	options: MapCollectionOption[];
+	selectedId: number;
+	onChange: (value: number) => void;
+}) {
+	const selectedCollection = options.find((option) => option.id === selectedId);
+	const selectedLabel =
+		selectedId > 0
+			? selectedCollection?.title || __('Collection unavailable', 'minimal-map')
+			: __('All locations', 'minimal-map');
+
+	return (
+		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
+			<span>{__('Collection', 'minimal-map')}</span>
+			<Dropdown
+				className="minimal-map-editor__collection-dropdown"
+				popoverProps={{
+					placement: 'left-start',
+					offset: 36,
+					shift: true,
+				}}
+				renderToggle={({ isOpen, onToggle }) => (
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={onToggle}
+						aria-expanded={isOpen}
+						style={{
+							width: '100%',
+							justifyContent: 'space-between',
+							paddingInline: '12px',
+						}}
+					>
+						{selectedLabel}
+					</Button>
+				)}
+				renderContent={({ onClose }) => (
+					<DropdownContentWrapper>
+						<div style={{ width: '280px', maxWidth: 'min(280px, 100vw - 32px)', padding: '8px' }}>
+							<div style={{ display: 'grid', gap: '4px' }}>
+								<Button
+									__next40pxDefaultSize
+									variant={selectedId === 0 ? 'primary' : 'tertiary'}
+									onClick={() => {
+										onChange(0);
+										onClose();
+									}}
+									style={{ justifyContent: 'flex-start' }}
+								>
+									{__('All locations', 'minimal-map')}
+								</Button>
+								{options.map((option) => (
+									<Button
+										key={option.id}
+										__next40pxDefaultSize
+										variant={selectedId === option.id ? 'primary' : 'tertiary'}
+										onClick={() => {
+											onChange(option.id);
+											onClose();
+										}}
+										style={{ justifyContent: 'flex-start' }}
+									>
+										{option.title}
+									</Button>
+								))}
+								{options.length === 0 ? (
+									<div style={{ padding: '8px 12px' }}>
+										{__('No collections available.', 'minimal-map')}
+									</div>
+								) : null}
+							</div>
+						</div>
+					</DropdownContentWrapper>
+				)}
+			/>
+		</div>
+	);
+}
+
 export default function Edit({ attributes, setAttributes }: EditProps) {
 	const mapRef = useRef<HTMLDivElement | null>(null);
 	const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
 	const styleOptions = useMemo(() => getStyleOptions(runtimeConfig.stylePresets), []);
-	const config = useMemo(() => normalizeMapConfig(attributes, runtimeConfig), [ attributes ]);
+	const selectedCollection = useMemo(
+		() =>
+			attributes.collectionId > 0
+				? (runtimeConfig.collections ?? []).find((collection) => collection.id === attributes.collectionId) ??
+				  null
+				: null,
+		[attributes.collectionId]
+	);
+	const config = useMemo(
+		() =>
+			normalizeMapConfig(
+				{
+					...attributes,
+					locations: attributes.collectionId > 0 ? selectedCollection?.locations ?? [] : undefined,
+				},
+				runtimeConfig
+			),
+		[attributes, selectedCollection]
+	);
 	const blockProps = useBlockProps({ className: 'minimal-map-editor' });
 
 	useEffect(() => {
@@ -407,6 +509,11 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 		<>
 			<InspectorControls group="settings">
 				<PanelBody title={__('Map Settings', 'minimal-map')} initialOpen>
+					<CollectionDropdown
+						options={runtimeConfig.collections ?? []}
+						selectedId={attributes.collectionId}
+						onChange={(value) => setAttributes({ collectionId: value })}
+					/>
 					<TextControl
 						label={__('Center Latitude', 'minimal-map')}
 						type="number"

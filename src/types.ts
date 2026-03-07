@@ -25,6 +25,7 @@ export interface MapDefaults {
 	centerLat: number;
 	centerLng: number;
 	zoom: number;
+	collectionId: number;
 	height: number;
 	heightUnit: HeightUnit;
 	stylePreset: string;
@@ -50,11 +51,18 @@ export interface MapLocationPoint {
 	lng: number;
 }
 
+export interface MapCollectionOption {
+	id: number;
+	title: string;
+	locations: MapLocationPoint[];
+}
+
 export interface MapRuntimeConfig {
 	defaults?: Partial<MapDefaults>;
 	heightUnits?: string[];
 	stylePresets?: StylePresets;
 	locations?: MapLocationPoint[];
+	collections?: MapCollectionOption[];
 	messages?: MapMessages;
 	onMapClick?: (coordinates: MapCoordinates) => void;
 }
@@ -63,6 +71,7 @@ export interface RawMapConfig {
 	centerLat?: number | string;
 	centerLng?: number | string;
 	zoom?: number | string;
+	collectionId?: number | string;
 	height?: number | string;
 	heightUnit?: string;
 	stylePreset?: string;
@@ -190,6 +199,7 @@ export interface MapBlockAttributes {
 	centerLat: number;
 	centerLng: number;
 	zoom: number;
+	collectionId: number;
 	height: number;
 	heightUnit: HeightUnit;
 	stylePreset: string;

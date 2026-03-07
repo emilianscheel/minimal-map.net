@@ -180,6 +180,61 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Client config should expose collection options with their assigned points.
+	 *
+	 * @return void
+	 */
+	public function test_client_config_includes_collection_payload() {
+		$config        = new \MinimalMap\Config();
+		$location_id   = $this->create_location( '48.137154', '11.576124' );
+		$collection_id = $this->create_collection( array( $location_id ) );
+
+		$client_config = $config->get_client_config();
+
+		$this->assertArrayHasKey( 'collections', $client_config );
+		$this->assertCount( 1, $client_config['collections'] );
+		$this->assertSame( $collection_id, $client_config['collections'][0]['id'] );
+		$this->assertSame(
+			array(
+				array(
+					'lat' => 48.137154,
+					'lng' => 11.576124,
+				),
+			),
+			$client_config['collections'][0]['locations']
+		);
+	}
+
+	/**
+	 * Selected collection ids should restrict the rendered block payload to assigned locations.
+	 *
+	 * @return void
+	 */
+	public function test_normalize_block_attributes_filters_locations_by_selected_collection() {
+		$config            = new \MinimalMap\Config();
+		$included_location = $this->create_location( '52.517', '13.388' );
+		$this->create_location( '48.137154', '11.576124' );
+		$collection_id = $this->create_collection( array( $included_location ) );
+
+		$attributes = $config->normalize_block_attributes(
+			array(
+				'collectionId' => $collection_id,
+			)
+		);
+
+		$this->assertSame( $collection_id, $attributes['collectionId'] );
+		$this->assertSame(
+			array(
+				array(
+					'lat' => 52.517,
+					'lng' => 13.388,
+				),
+			),
+			$attributes['locations']
+		);
+	}
+
+	/**
 	 * The collection post type should be registered on init.
 	 *
 	 * @return void
