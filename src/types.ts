@@ -94,6 +94,7 @@ export interface RawMapConfig {
 	fallbackMessage?: string;
 	markerLat?: number | string | null;
 	markerLng?: number | string | null;
+	markerContent?: string | null;
 	markerClassName?: string;
 	markerOffsetY?: number | string;
 	centerOffsetY?: number | string;
@@ -111,6 +112,7 @@ export interface NormalizedMapConfig extends MapDefaults {
 	zoomControlsOuterMargin: Required<BoxValue>;
 	markerLat: number | null;
 	markerLng: number | null;
+	markerContent: string | null;
 	markerClassName: string;
 	markerOffsetY: number;
 	centerOffsetY: number;
@@ -159,6 +161,12 @@ export interface CollectionsAdminConfig {
 	restPath: string;
 }
 
+export interface MarkersAdminConfig {
+	nonce: string;
+	restBase: string;
+	restPath: string;
+}
+
 export interface StylesAdminConfig {
 	nonce: string;
 	restBase: string;
@@ -194,6 +202,7 @@ export interface AdminAppConfig {
 	mapConfig: MapRuntimeConfig;
 	locationsConfig: LocationsAdminConfig;
 	collectionsConfig: CollectionsAdminConfig;
+	markersConfig: MarkersAdminConfig;
 	stylesConfig: StylesAdminConfig;
 }
 
@@ -254,6 +263,12 @@ export interface LocationRecord extends LocationMeta {
 export interface CollectionRecord extends CollectionMeta {
 	id: number;
 	title: string;
+}
+
+export interface MarkerRecord {
+	id: number;
+	title: string;
+	content: string;
 }
 
 export interface CollectionFormState {

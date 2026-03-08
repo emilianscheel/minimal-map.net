@@ -64,9 +64,18 @@ function createShell(host: HTMLElement, config: NormalizedMapConfig): HTMLElemen
 }
 
 function createMarker(config: NormalizedMapConfig, point: MapLocationPoint): maplibregl.Marker {
-	const marker = new maplibregl.Marker({
+	const options: maplibregl.MarkerOptions = {
 		offset: [ 0, config.markerOffsetY ],
-	}).setLngLat([ point.lng, point.lat ]);
+	};
+
+	if (config.markerContent) {
+		const el = document.createElement('div');
+		el.className = 'minimal-map-custom-marker';
+		el.innerHTML = config.markerContent;
+		options.element = el;
+	}
+
+	const marker = new maplibregl.Marker(options).setLngLat([ point.lng, point.lat ]);
 
 	if (config.markerClassName) {
 		marker.getElement().classList.add(...config.markerClassName.split(/\s+/).filter(Boolean));

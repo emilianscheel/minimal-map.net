@@ -9,6 +9,7 @@ namespace MinimalMap;
 
 use MinimalMap\Collections\Collection_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
+use MinimalMap\Markers\Marker_Post_Type;
 use MinimalMap\Rest\Geocode_Route;
 use MinimalMap\Rest\Styles_Route;
 use WP_Post;
@@ -366,7 +367,7 @@ class Config {
 			'stats'          => array(
 				'locations'   => Location_Post_Type::get_location_count(),
 				'collections' => Collection_Post_Type::get_collection_count(),
-				'markers'     => 0,
+				'markers'     => Marker_Post_Type::get_marker_count(),
 				'tags'        => 0,
 			),
 			'mapConfig'      => $this->get_client_config(),
@@ -380,6 +381,11 @@ class Config {
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => Collection_Post_Type::REST_BASE,
 				'restPath' => Collection_Post_Type::get_rest_path(),
+			),
+			'markersConfig' => array(
+				'nonce'    => wp_create_nonce( 'wp_rest' ),
+				'restBase' => Marker_Post_Type::REST_BASE,
+				'restPath' => Marker_Post_Type::get_rest_path(),
 			),
 			'stylesConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),

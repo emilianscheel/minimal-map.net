@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import CollectionsView, { useCollectionsController } from './collections';
 import LocationsView, { useLocationsController } from './locations';
+import MarkersView, { useMarkersController } from './markers';
 import StylesView from './styles';
 import { useStylesController } from './styles/controller';
 import { createMinimalMap } from '../map/bootstrap';
@@ -51,6 +52,11 @@ const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		restBase: '',
 		restPath: '',
 		geocodePath: '',
+	},
+	markersConfig: {
+		nonce: '',
+		restBase: '',
+		restPath: '',
 	},
 	stylesConfig: {
 		nonce: '',
@@ -265,6 +271,10 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 		adminConfig.locationsConfig,
 		activeSection.view === 'collections'
 	);
+	const markersController = useMarkersController(
+		adminConfig.markersConfig,
+		activeSection.view === 'markers'
+	);
 	const stylesController = useStylesController(
 		adminConfig.stylesConfig,
 		activeSection.view === 'styles'
@@ -284,9 +294,11 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 								? locationsController.headerAction
 								: activeSection.view === 'collections'
 									? collectionsController.headerAction
-									: activeSection.view === 'styles'
-										? stylesController.headerAction
-										: undefined
+									: activeSection.view === 'markers'
+										? markersController.headerAction
+										: activeSection.view === 'styles'
+											? stylesController.headerAction
+											: undefined
 						}
 					/>
 					<div
@@ -301,6 +313,8 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 							<LocationsView controller={locationsController} />
 						) : activeSection.view === 'collections' ? (
 							<CollectionsView controller={collectionsController} />
+						) : activeSection.view === 'markers' ? (
+							<MarkersView controller={markersController} />
 						) : activeSection.view === 'styles' ? (
 							<StylesView
 								controller={stylesController}

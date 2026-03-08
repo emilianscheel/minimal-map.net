@@ -459,6 +459,48 @@ svg.lucide {
   width: 100%;
 }
 
+.minimal-map-custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  svg {
+    display: block;
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+}
+
+.minimal-map-admin__markers-grid-wrap {
+  .minimal-map-custom-marker svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dataviews-view-grid__title-field {
+    font-family: monospace;
+    font-size: 0.875rem;
+    word-break: break-all;
+  }
+}
+
+.minimal-map-admin__marker-mini-map-wrap {
+  width: 100%;
+  height: 100%;
+  background: #f0f0f1;
+}
+
+.minimal-map-admin__marker-mini-map {
+  width: 100%;
+  height: 100%;
+
+  .maplibregl-control-container {
+    display: none !important;
+  }
+}
+
 .minimal-map-admin__collections-grid-wrap .dataviews-view-grid__row {
   gap: 24px;
   margin-bottom: 24px;

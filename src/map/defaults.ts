@@ -254,6 +254,7 @@ export function normalizeMapConfig(
 	);
 	const markerLat = normalizeOptionalCoordinate(rawConfig.markerLat, -90, 90);
 	const markerLng = normalizeOptionalCoordinate(rawConfig.markerLng, -180, 180);
+	const markerContent = typeof rawConfig.markerContent === 'string' ? rawConfig.markerContent : null;
 	const markerClassName =
 		typeof rawConfig.markerClassName === 'string' ? rawConfig.markerClassName.trim() : '';
 	const markerOffsetY = Number.isFinite(Number(rawConfig.markerOffsetY)) ? Number(rawConfig.markerOffsetY) : 0;
@@ -297,6 +298,7 @@ export function normalizeMapConfig(
 		fallbackMessage: rawConfig.fallbackMessage || runtimeConfig.messages?.fallback || FALLBACK_MESSAGE,
 		markerLat,
 		markerLng,
+		markerContent,
 		markerClassName,
 		markerOffsetY,
 		centerOffsetY,
