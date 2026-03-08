@@ -890,11 +890,17 @@ body.toplevel_page_minimal-map svg.lucide {
   --wp-admin-theme-color: #3858e8;
   --wp-admin-theme-color--rgb: 56, 88, 232;
 
+  height: calc(
+    100vh - 32px - 100px - 70px
+  ); // Subtract admin bar, header, and padding
+  min-height: 500px;
+  overflow: hidden;
+
   &__loading {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    height: 100%;
   }
 
   &__layout {
@@ -902,16 +908,42 @@ body.toplevel_page_minimal-map svg.lucide {
     grid-template-columns: minmax(360px, 1fr) 2fr;
     gap: 32px;
     align-items: start;
+    height: 100%;
   }
 
   &__controls {
     display: grid;
     gap: 24px;
+    height: calc(100% - 12px);
+    overflow-y: auto;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+
+    /* Custom scrollbar for better fit in the panel */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #dcdcde;
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #c3c4c7;
+    }
+  }
+
+  &__group_card.components-card:not(:first-child) {
+    border-top: 1px solid #dcdcde;
+  }
+
+  &__group_card.components-card:not(:last-child) {
+    border-bottom: 1px solid #dcdcde;
   }
 
   &__group-card.components-card {
-    border: 1px solid #dcdcde;
-    border-radius: 8px;
     box-shadow: none;
   }
 
