@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import type { StyleThemeRecord, StyleThemeColors } from '../../types';
+import { ReactNode } from 'react';
+import { StyleThemeRecord, StyleThemeColors } from '../../types';
 
 export interface StylesController {
 	themes: StyleThemeRecord[];
@@ -9,5 +9,10 @@ export interface StylesController {
 	draftColors: StyleThemeColors | null;
 	setDraftColor: (slot: string, color: string) => void;
 	saveTheme: () => Promise<void>;
+	createTheme: (label: string) => Promise<void>;
+	deleteTheme: (slug: string) => Promise<void>;
+	switchTheme: (slug: string) => void;
+	importTheme: (config: StyleThemeRecord) => Promise<void>;
+	exportTheme: () => void;
 	headerAction: ReactNode;
 }

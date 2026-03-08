@@ -4,17 +4,25 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { StylesAdminConfig, StyleThemeRecord, StyleThemeColors } from '../../types';
 import type { StylesController } from './types';
+import { ThemeSelector } from './ThemeSelector';
+import { CreateThemeButton } from './CreateThemeButton';
+import { DeleteThemeButton } from './DeleteThemeButton';
+import { ExportThemeButton } from './ExportThemeButton';
+import { ImportThemeButton } from './ImportThemeButton';
 
 export function useStylesController(
 	config: StylesAdminConfig,
 	active = false
 ): StylesController {
 	const [ themes, setThemes ] = useState<StyleThemeRecord[]>([]);
+	const [ activeThemeSlug, setActiveThemeSlug ] = useState<string>('default');
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ isSaving, setIsSaving ] = useState(false);
 	const [ draftColors, setDraftColors ] = useState<StyleThemeColors | null>(null);
 
-	const activeTheme = useMemo(() => themes[0] || null, [ themes ]);
+	const activeTheme = useMemo(() => {
+		return themes.find((t) => t.slug === activeThemeSlug) || themes[0] || null;
+	}, [ themes, activeThemeSlug ]);
 
 	const fetchThemes = useCallback(async () => {
 		setIsLoading(true);
@@ -24,20 +32,30 @@ export function useStylesController(
 			});
 			setThemes(data);
 			if (data.length > 0) {
-				setDraftColors(data[0].colors);
+				const nextTheme = data.find((t) => t.slug === activeThemeSlug) || data[0];
+				setActiveThemeSlug(nextTheme.slug);
+				setDraftColors(nextTheme.colors);
 			}
 		} catch (error) {
 			console.error('Failed to fetch themes', error);
 		} finally {
 			setIsLoading(false);
 		}
-	}, [ config.restPath ]);
+	}, [ config.restPath, activeThemeSlug ]);
 
 	useEffect(() => {
 		if (active) {
 			fetchThemes();
 		}
-	}, [ active, fetchThemes ]);
+	}, [ active ]);
+
+	const switchTheme = useCallback((slug: string) => {
+		const theme = themes.find((t) => t.slug === slug);
+		if (theme) {
+			setActiveThemeSlug(slug);
+			setDraftColors(theme.colors);
+		}
+	}, [ themes ]);
 
 	const setDraftColor = useCallback((slot: string, color: string) => {
 		setDraftColors((prev) => {
@@ -68,23 +86,120 @@ export function useStylesController(
 		}
 	}, [ activeTheme, config.restPath, draftColors ]);
 
+	const createTheme = useCallback(async (label: string) => {
+		setIsLoading(true);
+		try {
+			const newTheme = await apiFetch<StyleThemeRecord>({
+				path: config.restPath,
+				method: 'POST',
+				data: { label },
+			});
+			setThemes((prev) => [ ...prev, newTheme ]);
+			setActiveThemeSlug(newTheme.slug);
+			setDraftColors(newTheme.colors);
+		} catch (error) {
+			console.error('Failed to create theme', error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [ config.restPath ]);
+
+	const deleteTheme = useCallback(async (slug: string) => {
+		if (slug === 'default') return;
+
+		setIsLoading(true);
+		try {
+			await apiFetch({
+				path: `${ config.restPath }/${ slug }`,
+				method: 'DELETE',
+			});
+			setThemes((prev) => prev.filter((t) => t.slug !== slug));
+			setActiveThemeSlug('default');
+			const defaultTheme = themes.find((t) => t.slug === 'default');
+			if (defaultTheme) {
+				setDraftColors(defaultTheme.colors);
+			}
+		} catch (error) {
+			console.error('Failed to delete theme', error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [ config.restPath, themes ]);
+
+	const exportTheme = useCallback(() => {
+		if (!activeTheme || !draftColors) return;
+
+		const configToExport = {
+			...activeTheme,
+			colors: draftColors,
+		};
+
+		const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(configToExport, null, 2));
+		const downloadAnchorNode = document.createElement('a');
+		downloadAnchorNode.setAttribute('href', dataStr);
+		downloadAnchorNode.setAttribute('download', `minimal-map-theme-${ activeTheme.slug }.json`);
+		document.body.appendChild(downloadAnchorNode);
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
+	}, [ activeTheme, draftColors ]);
+
+	const importTheme = useCallback(async (configData: StyleThemeRecord) => {
+		setIsLoading(true);
+		try {
+			const newTheme = await apiFetch<StyleThemeRecord>({
+				path: config.restPath,
+				method: 'POST',
+				data: { label: configData.label + ' (Imported)' },
+			});
+
+			const updatedTheme = await apiFetch<StyleThemeRecord>({
+				path: `${ config.restPath }/${ newTheme.slug }`,
+				method: 'PUT',
+				data: { colors: configData.colors },
+			});
+
+			setThemes((prev) => [ ...prev, updatedTheme ]);
+			setActiveThemeSlug(updatedTheme.slug);
+			setDraftColors(updatedTheme.colors);
+		} catch (error) {
+			console.error('Failed to import theme', error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [ config.restPath ]);
+
 	const headerAction = useMemo(() => {
 		if (!active) return null;
 
 		const hasChanges = activeTheme && JSON.stringify(activeTheme.colors) !== JSON.stringify(draftColors);
 
 		return (
-			<Button
-				variant="primary"
-				onClick={saveTheme}
-				isBusy={isSaving}
-				disabled={isSaving || !hasChanges}
-				__next40pxDefaultSize
-			>
-				{__('Save Theme', 'minimal-map')}
-			</Button>
+			<div className="minimal-map-styles__header-actions">
+				<div className="minimal-map-styles__theme-controls">
+					<CreateThemeButton onCreate={createTheme} />
+					<DeleteThemeButton slug={activeThemeSlug} onDelete={deleteTheme} />
+					<ExportThemeButton onExport={exportTheme} />
+					<ImportThemeButton onImport={importTheme} />
+				</div>
+
+				<ThemeSelector
+					activeSlug={activeThemeSlug}
+					themes={themes}
+					onSwitch={switchTheme}
+				/>
+
+				<Button
+					variant="primary"
+					onClick={saveTheme}
+					isBusy={isSaving}
+					disabled={isSaving || !hasChanges}
+					__next40pxDefaultSize
+				>
+					{__('Save Theme', 'minimal-map')}
+				</Button>
+			</div>
 		);
-	}, [ active, activeTheme, draftColors, isSaving, saveTheme ]);
+	}, [ active, activeTheme, activeThemeSlug, themes, draftColors, isSaving, saveTheme, createTheme, deleteTheme, exportTheme, importTheme, switchTheme ]);
 
 	return {
 		themes,
@@ -94,6 +209,11 @@ export function useStylesController(
 		draftColors,
 		setDraftColor,
 		saveTheme,
+		createTheme,
+		deleteTheme,
+		switchTheme,
+		importTheme,
+		exportTheme,
 		headerAction,
 	};
 }

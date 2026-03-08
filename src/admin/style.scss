@@ -1045,6 +1045,25 @@ body.toplevel_page_minimal-map svg.lucide {
       display: none;
     }
   }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .components-select-control {
+      margin-bottom: 0;
+      min-width: 200px;
+    }
+  }
+
+  &__theme-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 16px;
+    border-right: 1px solid #dcdcde;
+  }
 }
 
 @media (max-width: 1280px) {

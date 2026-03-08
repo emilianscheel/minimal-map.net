@@ -51,6 +51,17 @@ class Styles_Route {
 					'callback'            => array( $this, 'get_styles' ),
 					'permission_callback' => array( $this, 'can_manage_styles' ),
 				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_style' ),
+					'permission_callback' => array( $this, 'can_manage_styles' ),
+					'args'                => array(
+						'label' => array(
+							'required' => true,
+							'type'     => 'string',
+						),
+					),
+				),
 			)
 		);
 
@@ -64,10 +75,19 @@ class Styles_Route {
 					'permission_callback' => array( $this, 'can_manage_styles' ),
 					'args'                => array(
 						'colors' => array(
-							'required' => true,
+							'required' => false,
 							'type'     => 'object',
 						),
+						'label' => array(
+							'required' => false,
+							'type'     => 'string',
+						),
 					),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_style' ),
+					'permission_callback' => array( $this, 'can_manage_styles' ),
 				),
 			)
 		);
@@ -92,6 +112,34 @@ class Styles_Route {
 	}
 
 	/**
+	 * Create a new style.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function create_style( $request ) {
+		$label  = sanitize_text_field( $request->get_param( 'label' ) );
+		$slug   = sanitize_title( $label );
+		$themes = $this->get_themes();
+
+		if ( isset( $themes[ $slug ] ) ) {
+			$slug = $slug . '-' . uniqid();
+		}
+
+		$new_theme = array(
+			'slug'       => $slug,
+			'label'      => $label,
+			'basePreset' => 'positron',
+			'colors'     => $this->get_default_positron_colors(),
+		);
+
+		$themes[ $slug ] = $new_theme;
+		update_option( self::OPTION_NAME, $themes );
+
+		return rest_ensure_response( $new_theme );
+	}
+
+	/**
 	 * Update a style theme.
 	 *
 	 * @param WP_REST_Request $request Request object.
@@ -106,15 +154,42 @@ class Styles_Route {
 		}
 
 		$colors = $request->get_param( 'colors' );
-		if ( ! is_array( $colors ) ) {
-			return new WP_Error( 'minimal_map_invalid_colors', __( 'Invalid colors data.', 'minimal-map' ), array( 'status' => 400 ) );
+		if ( is_array( $colors ) ) {
+			$themes[ $slug ]['colors'] = $this->sanitize_theme_colors( $colors );
 		}
 
-		$themes[ $slug ]['colors'] = $this->sanitize_theme_colors( $colors );
+		$label = $request->get_param( 'label' );
+		if ( is_string( $label ) ) {
+			$themes[ $slug ]['label'] = sanitize_text_field( $label );
+		}
 
 		update_option( self::OPTION_NAME, $themes );
 
 		return rest_ensure_response( $themes[ $slug ] );
+	}
+
+	/**
+	 * Delete a style theme.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function delete_style( $request ) {
+		$slug   = $request->get_param( 'slug' );
+		$themes = $this->get_themes();
+
+		if ( ! isset( $themes[ $slug ] ) ) {
+			return new WP_Error( 'minimal_map_style_not_found', __( 'Style theme not found.', 'minimal-map' ), array( 'status' => 404 ) );
+		}
+
+		if ( 'default' === $slug ) {
+			return new WP_Error( 'minimal_map_cannot_delete_default', __( 'The default theme cannot be deleted.', 'minimal-map' ), array( 'status' => 400 ) );
+		}
+
+		unset( $themes[ $slug ] );
+		update_option( self::OPTION_NAME, $themes );
+
+		return rest_ensure_response( array( 'success' => true ) );
 	}
 
 	/**
