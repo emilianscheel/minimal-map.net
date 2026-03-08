@@ -75,6 +75,9 @@ function createMarker(config: NormalizedMapConfig, point: MapLocationPoint): map
 		const el = document.createElement('div');
 		el.className = 'minimal-map-custom-marker';
 		el.innerHTML = config.markerContent;
+		// Ensure MapLibre sees a size for centering calculation
+		el.style.width = '32px';
+		el.style.height = '32px';
 		options.element = el;
 	}
 
