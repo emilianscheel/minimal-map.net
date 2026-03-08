@@ -45,10 +45,6 @@ class Admin_Menu {
 				'title'       => __( 'Collections', 'minimal-map' ),
 				'description' => __( 'Assemble reusable groups of locations and manage their map-ready assignments.', 'minimal-map' ),
 			),
-			'categories' => array(
-				'title'       => __( 'Categories', 'minimal-map' ),
-				'description' => __( 'Group locations into reusable category collections for future filtering.', 'minimal-map' ),
-			),
 			'tags'       => array(
 				'title'       => __( 'Tags', 'minimal-map' ),
 				'description' => __( 'Apply lightweight labels to keep map content easy to organize.', 'minimal-map' ),
@@ -60,18 +56,6 @@ class Admin_Menu {
 			'styles'     => array(
 				'title'       => __( 'Styles', 'minimal-map' ),
 				'description' => __( 'Manage the map styles and presets available inside the block editor.', 'minimal-map' ),
-			),
-			'import'     => array(
-				'title'       => __( 'Import', 'minimal-map' ),
-				'description' => __( 'Bring external map data into Minimal Map when import tools arrive.', 'minimal-map' ),
-			),
-			'export'     => array(
-				'title'       => __( 'Export', 'minimal-map' ),
-				'description' => __( 'Download map data and configuration when export tools are added.', 'minimal-map' ),
-			),
-			'settings'   => array(
-				'title'       => __( 'Settings', 'minimal-map' ),
-				'description' => __( 'Adjust global plugin defaults and future map behavior settings.', 'minimal-map' ),
 			),
 		);
 	}

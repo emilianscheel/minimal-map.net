@@ -128,13 +128,9 @@ export type AdminSectionView =
 	| 'dashboard'
 	| 'locations'
 	| 'collections'
-	| 'categories'
 	| 'tags'
 	| 'markers'
-	| 'styles'
-	| 'import'
-	| 'export'
-	| 'settings';
+	| 'styles';
 
 export interface AdminSection {
 	view: AdminSectionView;
@@ -146,7 +142,6 @@ export interface AdminSection {
 export interface AdminStats {
 	locations: number;
 	collections: number;
-	categories: number;
 	markers: number;
 	tags: number;
 }
@@ -204,7 +199,7 @@ export interface AdminAppConfig {
 
 export type DashboardCardView = Extract<
 	AdminSectionView,
-	'locations' | 'collections' | 'categories' | 'markers' | 'tags'
+	'locations' | 'collections' | 'markers' | 'tags'
 >;
 
 export interface MapBlockAttributes {

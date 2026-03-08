@@ -38,7 +38,6 @@ const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 	stats: {
 		locations: 0,
 		collections: 0,
-		categories: 0,
 		markers: 0,
 		tags: 0,
 	},
@@ -67,21 +66,16 @@ const ICONS: Record<AdminSectionView, LucideIcon> = {
 	dashboard: LayoutDashboard,
 	locations: MapPinned,
 	collections: Layers3,
-	categories: FolderTree,
 	tags: Tags,
 	markers: MapPin,
 	styles: Palette,
-	import: FileUp,
-	export: Download,
-	settings: Settings,
 };
 
-const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'categories', 'markers', 'tags' ];
+const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'markers', 'tags' ];
 
 const CARD_COPY: Record<DashboardCardView, string> = {
 	locations: __('Manage every place you want to render on your maps and prepare it for future block integrations.', 'minimal-map'),
 	collections: __('Build reusable groups of locations and curate map-ready sets without changing the location editor flow.', 'minimal-map'),
-	categories: __('Organize locations into reusable groupings so future filters and styles stay easy to maintain.', 'minimal-map'),
 	markers: __('Create marker variants and keep your map pin system consistent across locations and styles.', 'minimal-map'),
 	tags: __('Add lightweight labels that make large map datasets easier to sort, search, and evolve.', 'minimal-map'),
 };
@@ -89,7 +83,6 @@ const CARD_COPY: Record<DashboardCardView, string> = {
 const CTA_COPY: Record<DashboardCardView, string> = {
 	locations: __('Open locations', 'minimal-map'),
 	collections: __('Open collections', 'minimal-map'),
-	categories: __('Open categories', 'minimal-map'),
 	markers: __('Open markers', 'minimal-map'),
 	tags: __('Open tags', 'minimal-map'),
 };
@@ -97,7 +90,6 @@ const CTA_COPY: Record<DashboardCardView, string> = {
 const COUNT_KEYS: Record<DashboardCardView, keyof AdminAppConfig['stats']> = {
 	locations: 'locations',
 	collections: 'collections',
-	categories: 'categories',
 	markers: 'markers',
 	tags: 'tags',
 };

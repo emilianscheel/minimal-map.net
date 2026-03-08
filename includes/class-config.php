@@ -366,7 +366,6 @@ class Config {
 			'stats'          => array(
 				'locations'   => Location_Post_Type::get_location_count(),
 				'collections' => Collection_Post_Type::get_collection_count(),
-				'categories'  => 0,
 				'markers'     => 0,
 				'tags'        => 0,
 			),
