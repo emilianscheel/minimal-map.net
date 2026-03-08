@@ -42,6 +42,7 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
+				enableGlobalSearch: true,
 			},
 			{
 				id: 'telephone',
@@ -252,6 +253,9 @@ export default function LocationsTable({ controller }: { controller: LocationsCo
 				view={controller.view}
 				onChangeView={(nextView: View) => controller.onChangeView(nextView as ViewTable)}
 			>
+				<div className="minimal-map-admin__locations-dataviews-header">
+					<DataViews.Search />
+				</div>
 				<DataViews.Layout className="minimal-map-admin__locations-dataviews-layout" />
 				<DataViews.Footer />
 			</DataViews>

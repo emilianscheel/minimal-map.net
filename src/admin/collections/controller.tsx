@@ -93,7 +93,7 @@ export function useCollectionsController(
 			...currentView,
 			page: 1,
 		}));
-	}, [collections.length]);
+	}, [collections.length, view.search]);
 
 	const locationsById = useMemo(
 		() => new Map(locations.map((location) => [location.id, location])),

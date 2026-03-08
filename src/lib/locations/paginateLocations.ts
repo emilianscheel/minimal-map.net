@@ -3,19 +3,32 @@ import type { LocationRecord } from '../../types';
 type PaginatedLocationView = {
 	page?: number;
 	perPage?: number;
+	search?: string;
 };
 
 export function paginateLocations(locations: LocationRecord[], view: PaginatedLocationView): {
 	locations: LocationRecord[];
 	totalPages: number;
 } {
+	const search = view.search?.toLowerCase() || '';
+	const filteredLocations = search
+		? locations.filter((location) => {
+				return (
+					location.title.toLowerCase().includes(search) ||
+					location.street.toLowerCase().includes(search) ||
+					location.city.toLowerCase().includes(search) ||
+					location.email.toLowerCase().includes(search)
+				);
+		  })
+		: locations;
+
 	const page = view.page ?? 1;
 	const perPage = view.perPage ?? 10;
-	const totalPages = Math.max(1, Math.ceil(locations.length / perPage));
+	const totalPages = Math.max(1, Math.ceil(filteredLocations.length / perPage));
 	const startIndex = (page - 1) * perPage;
 
 	return {
-		locations: locations.slice(startIndex, startIndex + perPage),
+		locations: filteredLocations.slice(startIndex, startIndex + perPage),
 		totalPages,
 	};
 }

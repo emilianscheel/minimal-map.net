@@ -123,7 +123,7 @@ export function useLocationsController(
 			...currentView,
 			page: 1,
 		}));
-	}, [locations.length]);
+	}, [locations.length, view.search]);
 
 	const { locations: paginatedLocations, totalPages } = useMemo(
 		() => paginateLocations(locations, view),

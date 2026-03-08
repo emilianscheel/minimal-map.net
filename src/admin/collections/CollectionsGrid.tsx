@@ -33,6 +33,7 @@ function useCollectionFields(
         enableHiding: false,
         enableSorting: false,
         filterBy: false,
+        enableGlobalSearch: true,
       },
       {
         id: "add_locations",
@@ -141,6 +142,9 @@ export default function CollectionsGrid({
           controller.onChangeView(nextView as ViewGrid)
         }
       >
+        <div className="minimal-map-admin__collections-dataviews-header">
+          <DataViews.Search />
+        </div>
         <DataViews.Layout className="minimal-map-admin__collections-grid-layout" />
         <DataViews.Footer />
       </DataViews>

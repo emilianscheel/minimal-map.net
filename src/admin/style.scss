@@ -405,6 +405,24 @@ svg.lucide {
   --wp-dataviews-color-background: #fff;
 }
 
+.minimal-map-admin__locations-dataviews-header,
+.minimal-map-admin__collections-dataviews-header {
+  padding: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .dataviews-search {
+    flex: 1;
+    max-width: 480px;
+
+    .components-search-control__input {
+      height: 40px;
+      border-radius: 8px;
+    }
+  }
+}
+
 .minimal-map-admin__collections-grid-wrap {
   --wp-dataviews-color-background: #fff;
   display: block;
