@@ -25,13 +25,16 @@ const MapSearchControl = ({ locations, onSelect, config }: SearchControlProps) =
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const filteredLocations = useMemo(() => {
-		if (!searchTerm || !isFocused) return [];
-		const term = searchTerm.toLowerCase();
+		if (!isFocused) return [];
+		
+		const term = searchTerm.toLowerCase().trim();
+		if (!term) return locations;
+
 		return locations.filter(loc => 
 			loc.title?.toLowerCase().includes(term) ||
 			loc.city?.toLowerCase().includes(term) ||
 			loc.street?.toLowerCase().includes(term)
-		).slice(0, 8);
+		);
 	}, [locations, searchTerm, isFocused]);
 
 	useEffect(() => {
@@ -48,78 +51,92 @@ const MapSearchControl = ({ locations, onSelect, config }: SearchControlProps) =
 	}, []);
 
 	return (
-		<div 
-			ref={containerRef}
-			className="minimal-map-search"
-			style={{
-				'--minimal-map-search-background': config.zoomControlsBackgroundColor,
-				'--minimal-map-search-color': config.zoomControlsIconColor,
-				'--minimal-map-search-border-color': config.zoomControlsBorderColor,
-				'--minimal-map-search-border-radius': config.zoomControlsBorderRadius,
-				'--minimal-map-search-border-width': config.zoomControlsBorderWidth,
-			} as React.CSSProperties}
-		>
-			<SearchControl
-				label="Search locations"
-				value={searchTerm}
-				onChange={setSearchTerm}
-				onFocus={() => setIsFocused(true)}
-				placeholder="Search locations..."
-				__nextHasNoMarginBottom
-			/>
-			{filteredLocations.length > 0 && (
-				<div className="minimal-map-search__results">
-					{filteredLocations.map(loc => (
-						<button 
-							key={loc.id} 
-							type="button"
-							className="minimal-map-search__result-item"
-							onClick={() => {
-								onSelect(loc);
-								setSearchTerm('');
-								setIsFocused(false);
-							}}
-						>
-							<div className="minimal-map-search__result-title">{loc.title}</div>
-							<div className="minimal-map-search__result-address">
-								<MapPin size={12} />
-								<span>
-									{[loc.street, loc.house_number].filter(Boolean).join(' ')}
-									{loc.city ? `, ${loc.city}` : ''}
-								</span>
+		<>
+			{isFocused && (
+				<div 
+					className="minimal-map-search-backdrop" 
+					onClick={() => setIsFocused(false)}
+				/>
+			)}
+			<div 
+				ref={containerRef}
+				className={`minimal-map-search ${isFocused ? 'is-focused' : ''}`}
+				style={{
+					'--minimal-map-search-background': config.zoomControlsBackgroundColor,
+					'--minimal-map-search-color': config.zoomControlsIconColor,
+					'--minimal-map-search-border-color': config.zoomControlsBorderColor,
+					'--minimal-map-search-border-radius': config.zoomControlsBorderRadius,
+					'--minimal-map-search-border-width': config.zoomControlsBorderWidth,
+				} as React.CSSProperties}
+			>
+				<div className="minimal-map-search__input-wrapper">
+					<SearchControl
+						label="Search locations"
+						value={searchTerm}
+						onChange={setSearchTerm}
+						onFocus={() => setIsFocused(true)}
+						placeholder="Search locations..."
+						__nextHasNoMarginBottom
+					/>
+				</div>
+				
+				{isFocused && (
+					<div className="minimal-map-search__results-container">
+						{filteredLocations.length > 0 ? (
+							<div className="minimal-map-search__results">
+								{filteredLocations.map(loc => (
+									<button 
+										key={loc.id} 
+										type="button"
+										className="minimal-map-search__result-item"
+										onClick={() => {
+											onSelect(loc);
+											setSearchTerm('');
+											setIsFocused(false);
+										}}
+									>
+										<div className="minimal-map-search__result-title">{loc.title}</div>
+										<div className="minimal-map-search__result-address">
+											<MapPin size={12} />
+											<span>
+												{[loc.street, loc.house_number].filter(Boolean).join(' ')}
+												{loc.city ? `, ${loc.city}` : ''}
+											</span>
+										</div>
+										{(loc.telephone || loc.email || loc.website) && (
+											<div className="minimal-map-search__result-meta">
+												{loc.telephone && (
+													<div className="minimal-map-search__meta-item">
+														<Phone size={10} />
+														<span>{loc.telephone}</span>
+													</div>
+												)}
+												{loc.email && (
+													<div className="minimal-map-search__meta-item">
+														<Mail size={10} />
+														<span>{loc.email}</span>
+													</div>
+												)}
+												{loc.website && (
+													<div className="minimal-map-search__meta-item">
+														<Globe size={10} />
+														<span>{formatDisplayUrl(loc.website)}</span>
+													</div>
+												)}
+											</div>
+										)}
+									</button>
+								))}
 							</div>
-							{(loc.telephone || loc.email || loc.website) && (
-								<div className="minimal-map-search__result-meta">
-									{loc.telephone && (
-										<div className="minimal-map-search__meta-item">
-											<Phone size={10} />
-											<span>{loc.telephone}</span>
-										</div>
-									)}
-									{loc.email && (
-										<div className="minimal-map-search__meta-item">
-											<Mail size={10} />
-											<span>{loc.email}</span>
-										</div>
-									)}
-									{loc.website && (
-										<div className="minimal-map-search__meta-item">
-											<Globe size={10} />
-											<span>{formatDisplayUrl(loc.website)}</span>
-										</div>
-									)}
-								</div>
-							)}
-						</button>
-					))}
-				</div>
-			)}
-			{searchTerm.trim() !== '' && isFocused && filteredLocations.length === 0 && (
-				<div className="minimal-map-search__no-results">
-					No locations found
-				</div>
-			)}
-		</div>
+						) : searchTerm.trim() !== '' && (
+							<div className="minimal-map-search__no-results">
+								No locations found
+							</div>
+						)}
+					</div>
+				)}
+			</div>
+		</>
 	);
 };
 
@@ -135,11 +152,13 @@ export function createWordPressSearchControl(
 	const container = document.createElement('div');
 	container.className = 'minimal-map-search-host';
 	
-	// Position it top-left by default for now
 	container.style.position = 'absolute';
-	container.style.top = config.zoomControlsOuterMargin.top;
-	container.style.left = config.zoomControlsOuterMargin.left;
+	container.style.top = '0';
+	container.style.left = '0';
+	container.style.right = '0';
+	container.style.bottom = '0';
 	container.style.zIndex = '10';
+	container.style.pointerEvents = 'none';
 	
 	host.appendChild(container);
 
