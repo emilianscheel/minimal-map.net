@@ -195,7 +195,7 @@ export function createWordPressSearchControl(
 			zoom: Math.max(map.getZoom(), 15),
 			padding: { left: 368, top: 0, right: 0, bottom: 0 },
 			essential: true
-		});
+		}, { isMinimalMapInternal: true });
 	};
 
 	const render = (cfg: NormalizedMapConfig, selId?: number) => {

@@ -150,11 +150,11 @@ function syncCenter(
 			duration: 180,
 			essential: true,
 			zoom: config.zoom,
-		});
+		}, { isMinimalMapInternal: true });
 		return;
 	}
 
-	map.jumpTo(target);
+	map.jumpTo(target, { isMinimalMapInternal: true });
 }
 
 function getRenderedPoints(config: NormalizedMapConfig): MapLocationPoint[] {
@@ -212,7 +212,7 @@ function syncViewport(
 			essential: true,
 			offset: [0, config.centerOffsetY],
 			zoom: config.zoom,
-		});
+		}, { isMinimalMapInternal: true });
 		return;
 	}
 
@@ -225,7 +225,7 @@ function syncViewport(
 		duration: 180,
 		essential: true,
 		padding: 48,
-	});
+	}, { isMinimalMapInternal: true });
 }
 
 export function createMinimalMap(
@@ -269,7 +269,7 @@ export function createMinimalMap(
 					zoom: Math.max(state.map.getZoom(), 15),
 					padding: { left: 368, top: 0, right: 0, bottom: 0 },
 					essential: true
-				});
+				}, { isMinimalMapInternal: true });
 				if (state.searchControl) {
 					state.searchControl.update(config, id);
 				}
@@ -279,6 +279,24 @@ export function createMinimalMap(
 		state.markers = points.map((point) => 
 			createMarker(config, point, onMarkerClick).addTo(state.map as MapLibreMap)
 		);
+	}
+
+	function setupUserInteractionListeners(map: MapLibreMap): void {
+		const clearSelection = (event: any) => {
+			if (event.isMinimalMapInternal) {
+				return;
+			}
+
+			if (state.selectedLocationId) {
+				state.selectedLocationId = null;
+				if (state.config) {
+					state.searchControl?.update(state.config, undefined);
+				}
+			}
+		};
+
+		map.on('movestart', clearSelection);
+		map.on('zoomstart', clearSelection);
 	}
 
 	function syncControls(config: NormalizedMapConfig): void {
@@ -416,6 +434,7 @@ export function createMinimalMap(
 		syncControls(config);
 		syncSearch(config);
 		syncAttribution(config);
+		setupUserInteractionListeners(map);
 	}
 
 	function destroy(): void {
