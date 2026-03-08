@@ -193,6 +193,7 @@ export function createWordPressSearchControl(
 		map.easeTo({
 			center: [location.lng, location.lat],
 			zoom: Math.max(map.getZoom(), 15),
+			padding: { left: 368, top: 0, right: 0, bottom: 0 },
 			essential: true
 		});
 	};

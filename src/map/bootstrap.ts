@@ -267,6 +267,7 @@ export function createMinimalMap(
 				state.map.easeTo({
 					center: [point.lng, point.lat],
 					zoom: Math.max(state.map.getZoom(), 15),
+					padding: { left: 368, top: 0, right: 0, bottom: 0 },
 					essential: true
 				});
 				if (state.searchControl) {
