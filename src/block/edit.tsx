@@ -339,6 +339,79 @@ function CompactColorDropdown({
 	);
 }
 
+function ThemeDropdown({
+	themes,
+	selectedSlug,
+	onChange,
+}: {
+	themes: StyleThemeRecord[];
+	selectedSlug: string;
+	onChange: (value: string) => void;
+}) {
+	const selectedTheme =
+		themes.find((theme) => theme.slug === selectedSlug) || themes.find((theme) => theme.slug === 'default');
+	const selectedLabel = selectedTheme?.label || __('Default', 'minimal-map');
+
+	return (
+		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
+			<span>{__('Style Theme', 'minimal-map')}</span>
+			<Dropdown
+				className="minimal-map-editor__theme-dropdown"
+				popoverProps={{
+					placement: 'left-start',
+					offset: 36,
+					shift: true,
+				}}
+				renderToggle={({ isOpen, onToggle }) => (
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={onToggle}
+						aria-expanded={isOpen}
+						style={{
+							width: '100%',
+							justifyContent: 'space-between',
+							paddingInline: '12px',
+						}}
+					>
+						<span>{selectedLabel}</span>
+						<ChevronDown size={16} style={{ flexShrink: 0 }} />
+					</Button>
+				)}
+				renderContent={({ onClose }) => (
+					<MenuGroup label={__('Switch Theme', 'minimal-map')}>
+						{themes.map((theme) => {
+							const isSelected = theme.slug === selectedSlug;
+							return (
+								<MenuItem
+									key={theme.slug}
+									onClick={() => {
+										onChange(theme.slug);
+										onClose();
+									}}
+								>
+									<HStack justify="space-between" style={{ width: '100%' }}>
+										<span>{theme.label}</span>
+										{isSelected && (
+											<Check
+												size={16}
+												style={{
+													flexShrink: 0,
+													color: 'var(--wp-admin-theme-color, #3858e8)',
+												}}
+											/>
+										)}
+									</HStack>
+								</MenuItem>
+							);
+						})}
+					</MenuGroup>
+				)}
+			/>
+		</div>
+	);
+}
+
 function CollectionDropdown({
 	options,
 	selectedId,
@@ -376,105 +449,61 @@ function CollectionDropdown({
 							paddingInline: '12px',
 						}}
 					>
-						{selectedLabel}
+						<span>{selectedLabel}</span>
+						<ChevronDown size={16} style={{ flexShrink: 0 }} />
 					</Button>
 				)}
 				renderContent={({ onClose }) => (
-					<DropdownContentWrapper>
-						<div style={{ width: '280px', maxWidth: 'min(280px, 100vw - 32px)', padding: '8px' }}>
-							<div style={{ display: 'grid', gap: '4px' }}>
-								<Button
-									__next40pxDefaultSize
-									variant={selectedId === 0 ? 'primary' : 'tertiary'}
+					<MenuGroup label={__('Switch Collection', 'minimal-map')}>
+						<MenuItem
+							onClick={() => {
+								onChange(0);
+								onClose();
+							}}
+						>
+							<HStack justify="space-between" style={{ width: '100%' }}>
+								<span>{__('All locations', 'minimal-map')}</span>
+								{selectedId === 0 && (
+									<Check
+										size={16}
+										style={{
+											flexShrink: 0,
+											color: 'var(--wp-admin-theme-color, #3858e8)',
+										}}
+									/>
+								)}
+							</HStack>
+						</MenuItem>
+						{options.map((option) => {
+							const isSelected = selectedId === option.id;
+							return (
+								<MenuItem
+									key={option.id}
 									onClick={() => {
-										onChange(0);
+										onChange(option.id);
 										onClose();
 									}}
-									style={{ justifyContent: 'flex-start' }}
 								>
-									{__('All locations', 'minimal-map')}
-								</Button>
-								{options.map((option) => (
-									<Button
-										key={option.id}
-										__next40pxDefaultSize
-										variant={selectedId === option.id ? 'primary' : 'tertiary'}
-										onClick={() => {
-											onChange(option.id);
-											onClose();
-										}}
-										style={{ justifyContent: 'flex-start' }}
-									>
-										{option.title}
-									</Button>
-								))}
-								{options.length === 0 ? (
-									<div style={{ padding: '8px 12px' }}>
-										{__('No collections available.', 'minimal-map')}
-									</div>
-								) : null}
+									<HStack justify="space-between" style={{ width: '100%' }}>
+										<span>{option.title}</span>
+										{isSelected && (
+											<Check
+												size={16}
+												style={{
+													flexShrink: 0,
+													color: 'var(--wp-admin-theme-color, #3858e8)',
+												}}
+											/>
+										)}
+									</HStack>
+								</MenuItem>
+							);
+						})}
+						{options.length === 0 ? (
+							<div style={{ padding: '8px 12px', color: '#757575', fontSize: '12px' }}>
+								{__('No collections available.', 'minimal-map')}
 							</div>
-						</div>
-					</DropdownContentWrapper>
-				)}
-			/>
-		</div>
-	);
-}
-
-function ThemeDropdown({
-	themes,
-	selectedSlug,
-	onChange,
-}: {
-	themes: StyleThemeRecord[];
-	selectedSlug: string;
-	onChange: (value: string) => void;
-}) {
-	const selectedTheme =
-		themes.find((theme) => theme.slug === selectedSlug) || themes.find((theme) => theme.slug === 'default');
-	const selectedLabel = selectedTheme?.label || __('Default', 'minimal-map');
-
-	return (
-		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
-			<span>{__('Style Theme', 'minimal-map')}</span>
-			<Dropdown
-				className="minimal-map-editor__theme-dropdown"
-				popoverProps={{
-					placement: 'left-start',
-					offset: 36,
-					shift: true,
-				}}
-				renderToggle={({ isOpen, onToggle }) => (
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={onToggle}
-						aria-expanded={isOpen}
-						style={{
-							width: '100%',
-							justifyContent: 'space-between',
-							paddingInline: '12px',
-						}}
-					>
-						<span>{selectedLabel}</span>
-						<ChevronDown size={16} />
-					</Button>
-				)}
-				renderContent={({ onClose }) => (
-					<MenuGroup label={__('Switch Theme', 'minimal-map')}>
-						{themes.map((theme) => (
-							<MenuItem
-								key={theme.slug}
-								onClick={() => {
-									onChange(theme.slug);
-									onClose();
-								}}
-								icon={theme.slug === selectedSlug ? <Check size={16} /> : undefined}
-							>
-								{theme.label}
-							</MenuItem>
-						))}
+						) : null}
 					</MenuGroup>
 				)}
 			/>

@@ -11,15 +11,15 @@ body.toplevel_page_minimal-map {
   }
 }
 
-body.toplevel_page_minimal-map svg.lucide,
-body.toplevel_page_minimal-map svg.lucide * {
+svg.lucide,
+svg.lucide * {
   fill: none !important;
   stroke: currentColor !important;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-body.toplevel_page_minimal-map svg.lucide {
+svg.lucide {
   flex: 0 0 auto;
 }
 

@@ -60,3 +60,16 @@
 		max-width: calc(50% - 8px);
 	}
 }
+
+// Ensure Lucide icons render correctly in the editor and popovers.
+svg.lucide,
+svg.lucide * {
+	fill: none !important;
+	stroke: currentColor !important;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+svg.lucide {
+	flex: 0 0 auto;
+}

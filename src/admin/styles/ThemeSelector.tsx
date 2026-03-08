@@ -1,4 +1,4 @@
-import { Button, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
+import { Button, Dropdown, MenuGroup, MenuItem, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ChevronDown, Check } from 'lucide-react';
 import { StyleThemeRecord } from '../../types';
@@ -24,20 +24,33 @@ export function ThemeSelector({ activeTheme, themes, onSwitch }: ThemeSelectorPr
 					<span className="minimal-map-styles__theme-selector-label">
 						{activeTheme?.label || __('Select theme', 'minimal-map')}
 					</span>
-					<ChevronDown size={16} />
+					<ChevronDown size={16} style={{ flexShrink: 0 }} />
 				</Button>
 			)}
 			renderContent={() => (
 				<MenuGroup label={__('Switch Theme', 'minimal-map')}>
-					{themes.map((theme) => (
-						<MenuItem
-							key={theme.slug}
-							onClick={() => onSwitch(theme.slug)}
-							icon={theme.slug === activeTheme?.slug ? <Check size={16} /> : undefined}
-						>
-							{theme.label}
-						</MenuItem>
-					))}
+					{themes.map((theme) => {
+						const isSelected = theme.slug === activeTheme?.slug;
+						return (
+							<MenuItem
+								key={theme.slug}
+								onClick={() => onSwitch(theme.slug)}
+							>
+								<HStack justify="space-between" style={{ width: '100%' }}>
+									<span>{theme.label}</span>
+									{isSelected && (
+										<Check
+											size={16}
+											style={{
+												flexShrink: 0,
+												color: 'var(--wp-admin-theme-color, #3858e8)',
+											}}
+										/>
+									)}
+								</HStack>
+							</MenuItem>
+						);
+					})}
 				</MenuGroup>
 			)}
 		/>

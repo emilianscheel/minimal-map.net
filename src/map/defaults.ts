@@ -259,7 +259,17 @@ export function normalizeMapConfig(
 	const markerOffsetY = Number.isFinite(Number(rawConfig.markerOffsetY)) ? Number(rawConfig.markerOffsetY) : 0;
 	const centerOffsetY = Number.isFinite(Number(rawConfig.centerOffsetY)) ? Number(rawConfig.centerOffsetY) : 0;
 	const locations = normalizeLocations(rawConfig.locations ?? runtimeConfig.locations);
-	const styleTheme = rawConfig.styleTheme || {};
+
+	let styleTheme = rawConfig.styleTheme || {};
+
+	// If no explicit theme colors but we have a slug, try to resolve from runtime config (editor context)
+	if (Object.keys(styleTheme).length === 0 && stylePreset === 'positron' && runtimeConfig.styleThemes) {
+		const theme = runtimeConfig.styleThemes.find(t => t.slug === styleThemeSlug) ||
+					 runtimeConfig.styleThemes.find(t => t.slug === 'default');
+		if (theme) {
+			styleTheme = theme.colors;
+		}
+	}
 
 	return {
 		centerLat,
