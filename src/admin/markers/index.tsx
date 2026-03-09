@@ -26,6 +26,12 @@ export default function MarkersView({ controller }: { controller: MarkersControl
 			) : null}
 			
 			<div className="minimal-map-admin__markers-content">
+				<DropZone
+					onFilesDrop={(files) => {
+						void controller.onUploadMarkers(files as unknown as FileList);
+					}}
+					label={__('Drop SVG files here to upload', 'minimal-map')}
+				/>
 				{controller.isLoading ? (
 					<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
 						<Spinner />
@@ -33,15 +39,7 @@ export default function MarkersView({ controller }: { controller: MarkersControl
 				) : controller.markers.length === 0 ? (
 					<MarkersEmptyState controller={controller} />
 				) : (
-					<>
-						<MarkersGrid controller={controller} />
-						<DropZone
-							onFilesDrop={(files) => {
-								void controller.onUploadMarkers(files as unknown as FileList);
-							}}
-							label={__('Drop SVG files here to upload', 'minimal-map')}
-						/>
-					</>
+					<MarkersGrid controller={controller} />
 				)}
 			</div>
 		</div>

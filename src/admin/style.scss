@@ -184,6 +184,20 @@ svg.lucide {
   padding: 28px 34px 32px;
   background: #fff;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.minimal-map-admin__markers-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.minimal-map-admin__markers-content {
+  flex: 1;
+  position: relative;
+  min-height: 240px;
 }
 
 .minimal-map-admin__content--dashboard {
