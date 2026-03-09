@@ -198,6 +198,53 @@ svg.lucide {
   flex: 1;
   position: relative;
   min-height: 240px;
+  display: flex;
+  flex-direction: column;
+}
+
+.minimal-map-admin__markers-empty-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px;
+}
+
+.minimal-map-admin__markers-empty-content {
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.minimal-map-admin__markers-empty-icon {
+  margin-bottom: 8px;
+  color: #c3c4c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minimal-map-admin__markers-empty-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.minimal-map-admin__markers-empty-description {
+  margin: 0 0 12px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #646970;
+}
+
+.minimal-map-admin__markers-empty-button-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .minimal-map-admin__content--dashboard {
