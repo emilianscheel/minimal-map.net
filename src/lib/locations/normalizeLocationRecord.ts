@@ -20,9 +20,5 @@ export function normalizeLocationRecord(record: LocationRestResponse): LocationR
 		tag_ids: record.minimal_map_tag ?? [],
 	};
 
-	if (result.tag_ids.length > 0) {
-		console.log(`Normalized location ${result.id} with tag_ids:`, result.tag_ids);
-	}
-
 	return result;
 }

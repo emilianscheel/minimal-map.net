@@ -12,7 +12,7 @@ export async function fetchAllLocations(config: LocationsAdminConfig): Promise<L
 		const response = (await apiFetch({
 			method: 'GET',
 			parse: false,
-			path: `${config.restPath}?context=edit&page=${page}&per_page=${perPage}&_fields=id,title,meta`,
+			path: `${config.restPath}?context=edit&page=${page}&per_page=${perPage}&_fields=id,title,meta,minimal_map_tag`,
 		})) as Response;
 		const records = (await response.json()) as LocationRestResponse[];
 

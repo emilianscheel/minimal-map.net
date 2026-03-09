@@ -178,7 +178,6 @@ export function useLocationsController(
 			if (!location) {
 				return [];
 			}
-			console.log(`Getting tags for location ${locationId}:`, location.tag_ids);
 			return location.tag_ids
 				.map((tagId) => tagsById.get(tagId))
 				.filter((tag): tag is TagRecord => !!tag);
@@ -330,7 +329,6 @@ export function useLocationsController(
 			return;
 		}
 
-		console.log(`Assigning tags ${assignmentTagIds} to location ${selectedTagsLocation.id}`);
 		setAssignmentSaving(true);
 		setActionNotice(null);
 
@@ -339,9 +337,7 @@ export function useLocationsController(
 				...createLocationFormStateFromRecord(selectedTagsLocation),
 				tag_ids: assignmentTagIds,
 			});
-			console.log('Update request finished. Loading locations...');
 			await loadLocations();
-			console.log('Locations reloaded.');
 			setActionNotice({
 				status: 'success',
 				message: __('Location tags updated.', 'minimal-map'),
