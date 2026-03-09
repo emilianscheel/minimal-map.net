@@ -21,10 +21,12 @@ import { fetchAllLocations } from "../../lib/locations/fetchAllLocations";
 import { paginateLocations } from "../../lib/locations/paginateLocations";
 import { createCollection } from "../../lib/collections/createCollection";
 import { deleteCollection } from "../../lib/collections/deleteCollection";
-import { fetchAllCollections } from "../../lib/collections/fetchAllCollections";
-import { filterLocationsForAssignment } from "../../lib/collections/filterLocationsForAssignment";
+import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
+import { importLocations } from '../../lib/locations/importLocations';
+import { filterLocationsForAssignment } from '../../lib/collections/filterLocationsForAssignment';
 import { paginateCollections } from "../../lib/collections/paginateCollections";
 import { updateCollection } from "../../lib/collections/updateCollection";
+import { ImportLocationsButton } from "../locations/ImportLocationsButton";
 import { ThemeSelector } from "../styles/ThemeSelector";
 import type { CollectionsController, MergeCollectionsStep } from "./types";
 
@@ -79,9 +81,9 @@ export function useCollectionsController(
   const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [view, setView] = useState<ViewGrid>(DEFAULT_GRID_VIEW);
+  const [isImporting, setIsImporting] = useState(false);
 
-  const loadCollections = useCallback(async (): Promise<void> => {
-    const records = await fetchAllCollections(collectionsConfig);
+  const loadCollections = useCallback(async (): Promise<void> => {    const records = await fetchAllCollections(collectionsConfig);
     setCollections(records);
   }, [collectionsConfig]);
 
@@ -457,6 +459,41 @@ export function useCollectionsController(
     setShouldDeleteAfterMerge((current) => !current);
   }, []);
 
+  const onImportLocations = useCallback(
+    async (file: File) => {
+      setIsImporting(true);
+      setActionNotice(null);
+
+      try {
+        const count = await importLocations(
+          file,
+          locationsConfig,
+          collectionsConfig,
+        );
+
+        await loadCollections();
+        setActionNotice({
+          status: "success",
+          message: `${count} ${__(
+            "locations imported and assigned to a new collection.",
+            "minimal-map",
+          )}`,
+        });
+      } catch (error) {
+        setActionNotice({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : __("Failed to import locations.", "minimal-map"),
+        });
+      } finally {
+        setIsImporting(false);
+      }
+    },
+    [locationsConfig, collectionsConfig, loadCollections],
+  );
+
   return {
     actionNotice,
     activeTheme: themeData.activeTheme,
@@ -469,6 +506,10 @@ export function useCollectionsController(
     formMode,
     headerAction: enabled ? (
       <div className="minimal-map-admin__header-actions-group">
+        <ImportLocationsButton
+          onImport={onImportLocations}
+          isImporting={isImporting}
+        />
         <ThemeSelector
           activeTheme={themeData.activeTheme}
           themes={themeData.themes}
@@ -503,6 +544,7 @@ export function useCollectionsController(
     isSubmitting,
     isMergeModalOpen,
     isMerging,
+    isImporting,
     mergeStep,
     mergeSelectionView,
     selectedMergeCollectionIds,
@@ -536,6 +578,7 @@ export function useCollectionsController(
     onEditCollection,
     onOpenAssignmentModal,
     onSaveAssignments,
+    onImportLocations,
     onOpenMergeModal,
     onCloseMergeModal,
     onMergeConfirm,

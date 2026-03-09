@@ -1,4 +1,5 @@
-import { Notice, Spinner } from '@wordpress/components';
+import { DropZone, Notice, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import CollectionAssignmentModal from './CollectionAssignmentModal';
 import MergeCollectionsModal from './MergeCollectionsModal';
 import CollectionDialog from './CollectionDialog';
@@ -26,15 +27,26 @@ export default function CollectionsView({ controller }: { controller: Collection
 					{controller.loadError}
 				</Notice>
 			) : null}
-			{controller.isLoading ? (
-				<div className="minimal-map-admin__collections-state minimal-map-admin__collections-state--loading">
-					<Spinner />
-				</div>
-			) : controller.collections.length === 0 ? (
-				<CollectionsEmptyState controller={controller} />
-			) : (
-				<CollectionsGrid controller={controller} />
-			)}
+			<div className="minimal-map-admin__collections-content">
+				<DropZone
+					onFilesDrop={(files) => {
+						const file = files[0];
+						if (file) {
+							void controller.onImportLocations(file);
+						}
+					}}
+					label={__('Drop CSV file here to import locations', 'minimal-map')}
+				/>
+				{controller.isLoading ? (
+					<div className="minimal-map-admin__collections-state minimal-map-admin__collections-state--loading">
+						<Spinner />
+					</div>
+				) : controller.collections.length === 0 ? (
+					<CollectionsEmptyState controller={controller} />
+				) : (
+					<CollectionsGrid controller={controller} />
+				)}
+			</div>
 			<CollectionDialog controller={controller} />
 			<CollectionAssignmentModal controller={controller} />
 			<MergeCollectionsModal controller={controller} />

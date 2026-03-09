@@ -194,7 +194,9 @@ svg.lucide {
   flex-direction: column;
 }
 
-.minimal-map-admin__markers-content {
+.minimal-map-admin__markers-content,
+.minimal-map-admin__locations-content,
+.minimal-map-admin__collections-content {
   flex: 1;
   position: relative;
   min-height: 240px;

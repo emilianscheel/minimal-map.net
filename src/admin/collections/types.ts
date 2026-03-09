@@ -34,6 +34,7 @@ export interface CollectionsController {
 	isSubmitting: boolean;
 	isMergeModalOpen: boolean;
 	isMerging: boolean;
+	isImporting: boolean;
 	mergeStep: MergeCollectionsStep;
 	mergeSelectionView: ViewPickerTable;
 	selectedMergeCollectionIds: number[];
@@ -60,6 +61,7 @@ export interface CollectionsController {
 	onEditCollection: (collection: CollectionRecord) => void;
 	onOpenAssignmentModal: (collection: CollectionRecord) => void;
 	onSaveAssignments: () => Promise<void>;
+	onImportLocations: (file: File) => Promise<void>;
 	onOpenMergeModal: () => void;
 	onCloseMergeModal: () => void;
 	onMergeConfirm: () => Promise<void>;

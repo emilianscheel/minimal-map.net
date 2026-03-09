@@ -26,6 +26,7 @@ import { createLocation } from '../../lib/locations/createLocation';
 import { deleteLocation } from '../../lib/locations/deleteLocation';
 import { duplicateLocation } from '../../lib/locations/duplicateLocation';
 import { fetchAllLocations } from '../../lib/locations/fetchAllLocations';
+import { importLocations } from '../../lib/locations/importLocations';
 import { geocodeAddress } from '../../lib/locations/geocodeAddress';
 import { hasFieldErrors } from '../../lib/locations/hasFieldErrors';
 import { hasLocationAddressChanged } from '../../lib/locations/hasLocationAddressChanged';
@@ -662,77 +663,12 @@ export function useLocationsController(
 		setActionNotice(null);
 
 		try {
-			const text = await file.text();
-			const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
-			if (lines.length < 2) throw new Error(__('CSV file is empty or missing headers.', 'minimal-map'));
-
-			// Robust CSV line parser that handles quotes and commas
-			const parseCsvLine = (line: string) => {
-				const result = [];
-				let current = '';
-				let inQuotes = false;
-				for (let i = 0; i < line.length; i++) {
-					const char = line[i];
-					if (char === '"') {
-						if (inQuotes && line[i + 1] === '"') {
-							// Handle escaped quotes ""
-							current += '"';
-							i++;
-						} else {
-							inQuotes = !inQuotes;
-						}
-					} else if (char === ',' && !inQuotes) {
-						result.push(current.trim());
-						current = '';
-					} else {
-						current += char;
-					}
-				}
-				result.push(current.trim());
-				return result;
-			};
-
-			const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase());
-			const data = lines.slice(1).map(line => {
-				const values = parseCsvLine(line);
-				const obj: any = {};
-				headers.forEach((header, index) => {
-					obj[header] = values[index];
-				});
-				return obj;
-			});
-
-			const importedLocationIds: number[] = [];
-			for (const row of data) {
-				const form: LocationFormState = {
-					title: row.title || __('Imported Location', 'minimal-map'),
-					street: row.street || '',
-					house_number: row.house_number || '',
-					postal_code: row.postal_code || '',
-					city: row.city || '',
-					state: row.state || '',
-					country: row.country || '',
-					telephone: row.telephone || '',
-					email: row.email || '',
-					website: row.website || '',
-					latitude: row.latitude || '',
-					longitude: row.longitude || '',
-				};
-				const newLocation = await createLocation(config, form);
-				importedLocationIds.push(newLocation.id);
-			}
-
-			if (importedLocationIds.length > 0) {
-				const date = new Date();
-				const timestamp = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-				const collectionTitle = `${__('Import on', 'minimal-map')} ${timestamp}`;
-				await createCollection(collectionsConfig, collectionTitle, importedLocationIds);
-			}
+			const count = await importLocations(file, config, collectionsConfig);
 
 			await loadLocations();
 			setActionNotice({
 				status: 'success',
-				message: `${importedLocationIds.length} ${__('locations imported and assigned to a new collection.', 'minimal-map')}`,
+				message: `${count} ${__('locations imported and assigned to a new collection.', 'minimal-map')}`,
 			});
 		} catch (error) {
 			setActionNotice({
