@@ -497,6 +497,25 @@ svg.lucide {
   }
 }
 
+.minimal-map-admin__tags-grid-wrap {
+  .dataviews-view-grid__media {
+    background: transparent;
+  }
+
+  .dataviews-view-grid__title-field {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+}
+
+.minimal-map-admin__tag-grid-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .minimal-map-admin__marker-mini-map-wrap {
   width: 100%;
   height: 100%;
@@ -594,10 +613,13 @@ svg.lucide {
   justify-content: center;
 }
 
-.minimal-map-admin__locations-table-wrap table th:first-child,
-.minimal-map-admin__locations-table-wrap table td:first-child {
-  width: 76px;
-  min-width: 76px;
+.minimal-map-admin__locations-table-wrap table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.minimal-map-admin__locations-table-wrap .dataviews-view-table__cell--title {
+  width: 100%;
 }
 
 /* Fix checkbox alignment in DataViews table */
@@ -629,7 +651,6 @@ svg.lucide {
 
 .minimal-map-admin__locations-table-wrap table th:first-child {
   padding: 0;
-  padding-left: 24px;
 }
 
 .minimal-map-admin__locations-table-wrap table th:first-child .components-text {

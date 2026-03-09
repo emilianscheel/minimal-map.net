@@ -181,6 +181,12 @@ export interface MarkersAdminConfig {
 	restPath: string;
 }
 
+export interface TagsAdminConfig {
+	nonce: string;
+	restBase: string;
+	restPath: string;
+}
+
 export interface StylesAdminConfig {
 	nonce: string;
 	restBase: string;
@@ -209,6 +215,13 @@ export interface CollectionRestResponse {
 	meta?: Partial<CollectionMeta>;
 }
 
+export interface TagRestResponse {
+	id: number;
+	name?: string;
+	count?: number;
+	meta?: Partial<TagMeta>;
+}
+
 export interface AdminAppConfig {
 	currentView: AdminSectionView;
 	sections: AdminSection[];
@@ -217,6 +230,7 @@ export interface AdminAppConfig {
 	locationsConfig: LocationsAdminConfig;
 	collectionsConfig: CollectionsAdminConfig;
 	markersConfig: MarkersAdminConfig;
+	tagsConfig: TagsAdminConfig;
 	stylesConfig: StylesAdminConfig;
 }
 
@@ -285,6 +299,17 @@ export interface CollectionRecord extends CollectionMeta {
 	title: string;
 }
 
+export interface TagMeta {
+	background_color: string;
+	foreground_color: string;
+}
+
+export interface TagRecord extends TagMeta {
+	id: number;
+	name: string;
+	count: number;
+}
+
 export interface MarkerRecord {
 	id: number;
 	title: string;
@@ -296,6 +321,12 @@ export interface CollectionFormState {
 }
 
 export type CollectionFormMode = 'create' | 'edit';
+
+export interface TagFormState extends TagMeta {
+	name: string;
+}
+
+export type TagFormMode = 'create' | 'edit';
 
 export interface LocationFormState extends LocationMeta {
 	title: string;

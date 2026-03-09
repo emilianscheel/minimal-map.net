@@ -12,6 +12,7 @@ use MinimalMap\Blocks\Map_Block;
 use MinimalMap\Collections\Collection_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Markers\Marker_Post_Type;
+use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Geocode_Route;
 use MinimalMap\Rest\Styles_Route;
 
@@ -69,6 +70,13 @@ final class Plugin {
 	private $marker_post_type;
 
 	/**
+	 * Tag taxonomy service.
+	 *
+	 * @var Tag_Taxonomy
+	 */
+	private $tag_taxonomy;
+
+	/**
 	 * Geocoding REST route service.
 	 *
 	 * @var Geocode_Route
@@ -107,6 +115,7 @@ final class Plugin {
 		$this->collection_post_type = new Collection_Post_Type();
 		$this->location_post_type = new Location_Post_Type();
 		$this->marker_post_type   = new Marker_Post_Type();
+		$this->tag_taxonomy       = new Tag_Taxonomy();
 		$this->geocode_route      = new Geocode_Route();
 		$this->styles_route       = new Styles_Route();
 
@@ -122,6 +131,7 @@ final class Plugin {
 		add_action( 'init', array( $this->collection_post_type, 'register' ), 5 );
 		add_action( 'init', array( $this->location_post_type, 'register' ), 5 );
 		add_action( 'init', array( $this->marker_post_type, 'register' ), 5 );
+		add_action( 'init', array( $this->tag_taxonomy, 'register' ), 5 );
 		add_action( 'init', array( $this->assets, 'register' ) );
 		add_action( 'init', array( $this->map_block, 'register' ) );
 		add_action( 'admin_menu', array( $this->admin_menu, 'register' ) );

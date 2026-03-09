@@ -19,6 +19,7 @@ import {
 import CollectionsView, { useCollectionsController } from './collections';
 import LocationsView, { useLocationsController } from './locations';
 import MarkersView, { useMarkersController } from './markers';
+import TagsView, { useTagsController } from './tags';
 import StylesView from './styles';
 import { useStylesController } from './styles/controller';
 import { createMinimalMap } from '../map/bootstrap';
@@ -54,6 +55,11 @@ const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		geocodePath: '',
 	},
 	markersConfig: {
+		nonce: '',
+		restBase: '',
+		restPath: '',
+	},
+	tagsConfig: {
 		nonce: '',
 		restBase: '',
 		restPath: '',
@@ -294,6 +300,15 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 			onSwitchTheme: stylesController.switchTheme,
 		}
 	);
+	const tagsController = useTagsController(
+		adminConfig.tagsConfig,
+		activeSection.view === 'tags',
+		{
+			activeTheme: stylesController.activeTheme,
+			themes: stylesController.themes,
+			onSwitchTheme: stylesController.switchTheme,
+		}
+	);
 	const mapRuntimeConfig: MapRuntimeConfig = adminConfig.mapConfig ?? {};
 
 	return (
@@ -311,9 +326,11 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 									? collectionsController.headerAction
 									: activeSection.view === 'markers'
 										? markersController.headerAction
-										: activeSection.view === 'styles'
-											? stylesController.headerAction
-											: undefined
+										: activeSection.view === 'tags'
+											? tagsController.headerAction
+											: activeSection.view === 'styles'
+												? stylesController.headerAction
+												: undefined
 						}
 					/>
 					<div
@@ -330,6 +347,8 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 							<CollectionsView controller={collectionsController} />
 						) : activeSection.view === 'markers' ? (
 							<MarkersView controller={markersController} />
+						) : activeSection.view === 'tags' ? (
+							<TagsView controller={tagsController} />
 						) : activeSection.view === 'styles' ? (
 							<StylesView
 								controller={stylesController}
