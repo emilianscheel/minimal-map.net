@@ -46,41 +46,32 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				enableGlobalSearch: true,
 			},
 			{
-				id: 'telephone',
-				label: __('Telephone', 'minimal-map'),
-				enableHiding: false,
-				enableSorting: false,
-				filterBy: false,
-			},
-			{
-				id: 'email',
-				label: __('Email address', 'minimal-map'),
-				enableHiding: false,
+				id: 'contact',
+				label: __('Contact', 'minimal-map'),
+				enableHiding: true,
 				enableSorting: false,
 				filterBy: false,
 				render: ({ item }) => {
-					if (!item.email) {
-						return null;
-					}
-
-					return <a href={`mailto:${item.email}`}>{item.email}</a>;
-				},
-			},
-			{
-				id: 'website',
-				label: __('Website', 'minimal-map'),
-				enableHiding: false,
-				enableSorting: false,
-				filterBy: false,
-				render: ({ item }) => {
-					if (!item.website) {
-						return null;
-					}
-
 					return (
-						<a href={item.website} rel="noreferrer" target="_blank">
-							{item.website}
-						</a>
+						<div className="minimal-map-admin__location-contact">
+							{item.telephone && (
+								<span className="minimal-map-admin__location-contact-item">
+									<a href={`tel:${item.telephone}`}>{item.telephone}</a>
+								</span>
+							)}
+							{item.email && (
+								<span className="minimal-map-admin__location-contact-item">
+									<a href={`mailto:${item.email}`}>{item.email}</a>
+								</span>
+							)}
+							{item.website && (
+								<span className="minimal-map-admin__location-contact-item">
+									<a href={item.website} rel="noreferrer" target="_blank">
+										{item.website.replace(/^https?:\/\/(www\.)?/, '')}
+									</a>
+								</span>
+							)}
+						</div>
 					);
 				},
 			},

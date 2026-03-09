@@ -342,7 +342,7 @@ svg.lucide {
 
 .minimal-map-admin__feature-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   line-height: 1.2;
 }
 
@@ -731,7 +731,14 @@ svg.lucide {
   line-height: 1.35;
 }
 
-.minimal-map-admin__location-address-line {
+.minimal-map-admin__location-contact {
+  display: grid;
+  gap: 4px;
+  line-height: 1.35;
+}
+
+.minimal-map-admin__location-address-line,
+.minimal-map-admin__location-contact-item {
   display: block;
 }
 

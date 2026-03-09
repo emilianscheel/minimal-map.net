@@ -23,9 +23,7 @@ export const DEFAULT_VIEW: ViewTable = {
 	fields: [
 		'map_preview',
 		'title',
-		'telephone',
-		'email',
-		'website',
+		'contact',
 		'address',
 		'collections',
 	],
