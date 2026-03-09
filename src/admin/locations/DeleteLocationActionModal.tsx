@@ -1,36 +1,52 @@
 import { Button } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useState } from "@wordpress/element";
+import { useEffect, useRef, useState } from "@wordpress/element";
+import type { KeyboardEvent } from "react";
 import type { LocationRecord } from "../../types";
+import Kbd from "../../components/Kbd";
+import { shouldHandleDialogEnter } from "../../lib/locations/shouldHandleDialogEnter";
 
 interface DeleteLocationActionModalProps {
-  location: LocationRecord;
+  items: LocationRecord[];
   onDelete: (location: LocationRecord) => Promise<void>;
+  onDeleteBulk?: (locations: LocationRecord[]) => Promise<void>;
   closeModal?: () => void;
   onActionPerformed?: (items: LocationRecord[]) => void;
 }
 
 export default function DeleteLocationActionModal({
-  location,
+  items,
   onDelete,
+  onDeleteBulk,
   closeModal,
   onActionPerformed,
 }: DeleteLocationActionModalProps) {
   const [isDeleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, []);
 
   const handleDelete = async (): Promise<void> => {
     setDeleting(true);
     setError(null);
 
     try {
-      await onDelete(location);
-      onActionPerformed?.([location]);
+      if (items.length > 1 && onDeleteBulk) {
+        await onDeleteBulk(items);
+      } else if (items[0]) {
+        await onDelete(items[0]);
+      }
+      onActionPerformed?.(items);
       closeModal?.();
     } catch (actionError) {
       setError(
         actionError instanceof Error
           ? actionError.message
+          : items.length > 1
+          ? __("Locations could not be deleted.", "minimal-map")
           : __("Location could not be deleted.", "minimal-map"),
       );
     } finally {
@@ -38,24 +54,66 @@ export default function DeleteLocationActionModal({
     }
   };
 
+  const isBulk = items.length > 1;
+
   return (
-    <div className="minimal-map-admin__location-delete-dialog">
+    <div
+      ref={containerRef}
+      className="minimal-map-admin__location-delete-dialog"
+      tabIndex={0}
+      style={{ outline: "none" }}
+      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+        const target = event.target;
+        const isHTMLElement = target instanceof HTMLElement;
+
+        if (
+          isDeleting ||
+          (isHTMLElement &&
+            target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
+          !shouldHandleDialogEnter(event)
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+        void handleDelete();
+      }}
+    >
+      <p className="minimal-map-admin__collection-delete-dialog-copy">
+        {isBulk
+          ? __(`Are you sure you want to delete ${items.length} locations? This action cannot be undone.`, "minimal-map")
+          : __("Delete this location and remove its saved collection assignments?", "minimal-map")}
+      </p>
+      {!isBulk && items[0] && (
+        <p className="minimal-map-admin__collection-delete-dialog-title">
+          {items[0].title}
+        </p>
+      )}
       {error && (
         <p className="minimal-map-admin__location-delete-dialog-error">
           {error}
         </p>
       )}
       <div className="minimal-map-admin__location-delete-dialog-actions">
-        <Button variant="tertiary" onClick={closeModal} disabled={isDeleting}>
+        <Button
+          variant="tertiary"
+          onClick={closeModal}
+          disabled={isDeleting}
+          data-minimal-map-dialog-ignore-enter="true"
+        >
           {__("Cancel", "minimal-map")}
         </Button>
         <Button
           variant="primary"
           isDestructive
           onClick={() => void handleDelete()}
+          isBusy={isDeleting}
           disabled={isDeleting}
         >
-          {__("Delete", "minimal-map")}
+          <span className="minimal-map-admin__location-dialog-button-content">
+            <span>{__("Delete", "minimal-map")}</span>
+            <Kbd variant="red">Enter</Kbd>
+          </span>
         </Button>
       </div>
     </div>

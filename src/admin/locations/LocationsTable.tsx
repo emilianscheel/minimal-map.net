@@ -1,3 +1,4 @@
+import { Button } from '@wordpress/components';
 import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewTable } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
@@ -210,19 +211,19 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 				id: 'delete-location',
 				label: __('Delete', 'minimal-map'),
 				icon: <Trash2 size={16} strokeWidth={2} />,
-				context: 'single',
+				isDestructive: true,
 				disabled: controller.isRowActionPending,
-				supportsBulk: false,
-				modalHeader: __('Delete location', 'minimal-map'),
+				supportsBulk: true,
+				modalHeader: (items) =>
+					items.length === 1
+						? __('Delete location', 'minimal-map')
+						: __(`Delete ${items.length} locations`, 'minimal-map'),
 				RenderModal: ({ items, closeModal, onActionPerformed }) => {
-					if (!items[0]) {
-						return <></>;
-					}
-
 					return (
 						<DeleteLocationActionModal
-							location={items[0]}
+							items={items}
 							onDelete={controller.onDeleteLocation}
+							onDeleteBulk={controller.onDeleteLocations}
 							closeModal={closeModal}
 							onActionPerformed={onActionPerformed}
 						/>
@@ -250,7 +251,9 @@ export default function LocationsTable({ controller }: { controller: LocationsCo
 					totalItems: controller.locations.length,
 					totalPages: controller.totalPages,
 				}}
+				selection={controller.selection}
 				view={controller.view}
+				onChangeSelection={controller.onChangeSelection}
 				onChangeView={(nextView: View) => controller.onChangeView(nextView as ViewTable)}
 			>
 				<div className="minimal-map-admin__locations-dataviews-header">

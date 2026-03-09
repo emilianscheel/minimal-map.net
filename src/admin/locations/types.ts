@@ -47,6 +47,7 @@ export interface LocationsController {
 	selectedRemovalCollection: CollectionRecord | null;
 	selectedRemovalLocation: LocationRecord | null;
 	selectedCoordinates: MapCoordinates | null;
+	selection: string[];
 	submitLabel: string;
 	submitError: string | null;
 	step: LocationDialogStep;
@@ -60,8 +61,10 @@ export interface LocationsController {
 	onCloseRemoveCollectionAssignmentModal: () => void;
 	onCloseAssignToCollectionModal: () => void;
 	onChangeView: (nextView: ViewTable) => void;
+	onChangeSelection: (selection: string[]) => void;
 	onConfirm: () => Promise<void>;
 	onDeleteLocation: (location: LocationRecord) => Promise<void>;
+	onDeleteLocations: (locations: LocationRecord[]) => Promise<void>;
 	onDuplicateLocation: (location: LocationRecord) => Promise<void>;
 	onEditLocation: (location: LocationRecord) => void;
 	onOpenAssignToCollectionModal: (location: LocationRecord) => void;

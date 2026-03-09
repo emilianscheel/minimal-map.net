@@ -89,6 +89,7 @@ export function useLocationsController(
 	const [isRemovingCollectionAssignment, setRemovingCollectionAssignment] = useState(false);
 	const [isImporting, setIsImporting] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
+	const [selection, setSelection] = useState<string[]>([]);
 
 	const loadLocations = useCallback(async () => {
 		if (!enabled) {
@@ -825,9 +826,14 @@ export function useLocationsController(
 		onCloseRemoveCollectionAssignmentModal: closeRemoveCollectionAssignmentModal,
 		onOpenAssignToCollectionModal,
 		onOpenRemoveCollectionAssignmentModal,
-		onChangeView: (nextView) => setView(nextView),
+		onChangeView: (nextView) => {
+			setView(nextView);
+			setSelection([]);
+		},
+		onChangeSelection: (nextSelection) => setSelection(nextSelection),
 		onConfirm,
 		onDeleteLocation,
+		onDeleteLocations,
 		onDuplicateLocation,
 		onEditLocation,
 		onImportLocations,
@@ -839,6 +845,7 @@ export function useLocationsController(
 		onSelectAssignmentCollection: setAssignmentCollectionId,
 		onAddLocation: openDialog,
 		paginatedLocations,
+		selection,
 		selectedAssignmentLocation,
 		selectedCoordinates,
 		selectedRemovalCollection,

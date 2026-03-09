@@ -600,6 +600,23 @@ svg.lucide {
   min-width: 76px;
 }
 
+/* Fix checkbox alignment in DataViews table */
+.minimal-map-admin__locations-table-wrap
+  .dataviews-view-table
+  .dataviews-view-table__cell--selection {
+  padding-left: 16px !important;
+  padding-right: 0 !important;
+  width: 48px !important;
+  min-width: 48px !important;
+}
+
+.minimal-map-admin__locations-table-wrap
+  .dataviews-view-table
+  thead
+  .dataviews-view-table__cell--selection {
+  padding-left: 16px !important;
+}
+
 .minimal-map-admin__locations-table-wrap table th,
 .minimal-map-admin__locations-table-wrap table td {
   vertical-align: middle;
@@ -612,6 +629,7 @@ svg.lucide {
 
 .minimal-map-admin__locations-table-wrap table th:first-child {
   padding: 0;
+  padding-left: 24px;
 }
 
 .minimal-map-admin__locations-table-wrap table th:first-child .components-text {
