@@ -68,6 +68,7 @@ export interface CollectionsController {
 	onChangeMergeView: (nextView: ViewPickerTable) => void;
 	onChangeMergeTitle: (value: string) => void;
 	onToggleDeleteAfterMerge: () => void;
+	onAddCollection: () => void;
 	paginatedCollections: CollectionRecord[];
 	totalPages: number;
 }

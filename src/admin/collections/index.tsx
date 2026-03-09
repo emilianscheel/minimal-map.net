@@ -31,7 +31,7 @@ export default function CollectionsView({ controller }: { controller: Collection
 					<Spinner />
 				</div>
 			) : controller.collections.length === 0 ? (
-				<CollectionsEmptyState />
+				<CollectionsEmptyState controller={controller} />
 			) : (
 				<CollectionsGrid controller={controller} />
 			)}

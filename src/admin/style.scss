@@ -202,51 +202,6 @@ svg.lucide {
   flex-direction: column;
 }
 
-.minimal-map-admin__markers-empty-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 48px;
-}
-
-.minimal-map-admin__markers-empty-content {
-  max-width: 440px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.minimal-map-admin__markers-empty-icon {
-  margin-bottom: 8px;
-  color: #c3c4c7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.minimal-map-admin__markers-empty-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.minimal-map-admin__markers-empty-description {
-  margin: 0 0 12px;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: #646970;
-}
-
-.minimal-map-admin__markers-empty-button-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .minimal-map-admin__content--dashboard {
   display: flex;
   min-height: 0;
@@ -448,38 +403,6 @@ svg.lucide {
   align-items: center;
   justify-content: center;
   min-height: 240px;
-}
-
-.minimal-map-admin__locations-empty {
-  padding-top: 32px;
-}
-
-.minimal-map-admin__collections-empty {
-  padding-top: 32px;
-}
-
-.minimal-map-admin__locations-empty h3 {
-  margin: 0 0 10px;
-  font-size: 1.125rem;
-  line-height: 1.2;
-}
-
-.minimal-map-admin__collections-empty h3 {
-  margin: 0 0 10px;
-  font-size: 1.125rem;
-  line-height: 1.2;
-}
-
-.minimal-map-admin__locations-empty p {
-  margin: 0;
-  color: #646970;
-  line-height: 1.5;
-}
-
-.minimal-map-admin__collections-empty p {
-  margin: 0;
-  color: #646970;
-  line-height: 1.5;
 }
 
 .minimal-map-admin__locations-table-wrap {

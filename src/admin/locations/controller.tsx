@@ -859,6 +859,7 @@ export function useLocationsController(
 		onRemoveCollectionAssignment,
 		onRetrieveLocation,
 		onSelectAssignmentCollection: setAssignmentCollectionId,
+		onAddLocation: openDialog,
 		paginatedLocations,
 		selectedAssignmentLocation,
 		selectedCoordinates,

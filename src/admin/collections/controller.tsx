@@ -510,6 +510,7 @@ export function useCollectionsController(
 		onChangeMergeView: (nextView: ViewPickerTable) => setMergeSelectionView(nextView),
 		onChangeMergeTitle,
 		onToggleDeleteAfterMerge,
+		onAddCollection: openDialog,
 		paginatedCollections,
 		totalPages: totalPages,
 	};

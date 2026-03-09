@@ -31,7 +31,7 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 					<Spinner />
 				</div>
 			) : controller.locations.length === 0 ? (
-				<LocationsEmptyState />
+				<LocationsEmptyState controller={controller} />
 			) : (
 				<LocationsTable controller={controller} />
 			)}

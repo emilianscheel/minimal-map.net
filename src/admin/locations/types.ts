@@ -75,6 +75,7 @@ export interface LocationsController {
 	onImportLocations: (file: File) => Promise<void>;
 	onExportLocations: () => void;
 	onExportExample: () => void;
+	onAddLocation: () => void;
 	paginatedLocations: LocationRecord[];
 	totalPages: number;
 }
