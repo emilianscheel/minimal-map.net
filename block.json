@@ -103,6 +103,36 @@
       "type": "string",
       "default": "line-solid"
     },
+    "creditsPadding": {
+      "type": "object",
+      "default": {
+        "top": "4px",
+        "right": "8px",
+        "bottom": "4px",
+        "left": "8px"
+      }
+    },
+    "creditsOuterMargin": {
+      "type": "object",
+      "default": {
+        "top": "16px",
+        "right": "16px",
+        "bottom": "16px",
+        "left": "16px"
+      }
+    },
+    "creditsBackgroundColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "creditsForegroundColor": {
+      "type": "string",
+      "default": "#1e1e1e"
+    },
+    "creditsBorderRadius": {
+      "type": "string",
+      "default": "999px"
+    },
     "_isPreview": {
       "type": "boolean",
       "default": false

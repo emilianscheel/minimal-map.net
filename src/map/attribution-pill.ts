@@ -1,4 +1,4 @@
-import type { WordPressAttributionControl } from "../types";
+import type { NormalizedMapConfig, WordPressAttributionControl } from "../types";
 
 function createAttributionLink(href: string, label: string): HTMLAnchorElement {
   const link = document.createElement("a");
@@ -13,6 +13,7 @@ function createAttributionLink(href: string, label: string): HTMLAnchorElement {
 
 export function createAttributionPill(
   host: HTMLElement,
+  config: NormalizedMapConfig,
 ): WordPressAttributionControl {
   const root = document.createElement("div");
   const content = document.createElement("span");
@@ -30,6 +31,50 @@ export function createAttributionPill(
   root.className = "minimal-map-attribution";
   root.setAttribute("role", "note");
   root.setAttribute("aria-label", "Map credits");
+  root.style.setProperty(
+    "--minimal-map-attribution-padding-top",
+    config.creditsPadding.top,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-padding-right",
+    config.creditsPadding.right,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-padding-bottom",
+    config.creditsPadding.bottom,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-padding-left",
+    config.creditsPadding.left,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-margin-top",
+    config.creditsOuterMargin.top,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-margin-right",
+    config.creditsOuterMargin.right,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-margin-bottom",
+    config.creditsOuterMargin.bottom,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-margin-left",
+    config.creditsOuterMargin.left,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-background",
+    config.creditsBackgroundColor,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-color",
+    config.creditsForegroundColor,
+  );
+  root.style.setProperty(
+    "--minimal-map-attribution-border-radius",
+    config.creditsBorderRadius,
+  );
 
   content.className = "minimal-map-attribution__content";
   separator.className = "minimal-map-attribution__separator";

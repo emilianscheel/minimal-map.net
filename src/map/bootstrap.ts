@@ -134,6 +134,29 @@ function didZoomControlsStyleChange(
 	);
 }
 
+function didCreditsStyleChange(
+	previousConfig: NormalizedMapConfig | null,
+	nextConfig: NormalizedMapConfig
+): boolean {
+	if (!previousConfig) {
+		return true;
+	}
+
+	return (
+		previousConfig.creditsBackgroundColor !== nextConfig.creditsBackgroundColor ||
+		previousConfig.creditsForegroundColor !== nextConfig.creditsForegroundColor ||
+		previousConfig.creditsBorderRadius !== nextConfig.creditsBorderRadius ||
+		previousConfig.creditsPadding.top !== nextConfig.creditsPadding.top ||
+		previousConfig.creditsPadding.right !== nextConfig.creditsPadding.right ||
+		previousConfig.creditsPadding.bottom !== nextConfig.creditsPadding.bottom ||
+		previousConfig.creditsPadding.left !== nextConfig.creditsPadding.left ||
+		previousConfig.creditsOuterMargin.top !== nextConfig.creditsOuterMargin.top ||
+		previousConfig.creditsOuterMargin.right !== nextConfig.creditsOuterMargin.right ||
+		previousConfig.creditsOuterMargin.bottom !== nextConfig.creditsOuterMargin.bottom ||
+		previousConfig.creditsOuterMargin.left !== nextConfig.creditsOuterMargin.left
+	);
+}
+
 function syncCenter(
 	map: MapLibreMap,
 	config: NormalizedMapConfig,
@@ -336,7 +359,7 @@ export function createMinimalMap(
 		state.attribution = null;
 
 		if (config.showAttribution) {
-			state.attribution = createAttributionPill(host);
+			state.attribution = createAttributionPill(host, config);
 		}
 	}
 
@@ -506,7 +529,11 @@ export function createMinimalMap(
 			syncSearch(nextConfig);
 		}
 
-		if (!previousConfig || previousConfig.showAttribution !== nextConfig.showAttribution) {
+		if (
+			!previousConfig ||
+			previousConfig.showAttribution !== nextConfig.showAttribution ||
+			didCreditsStyleChange(previousConfig, nextConfig)
+		) {
 			syncAttribution(nextConfig);
 		}
 

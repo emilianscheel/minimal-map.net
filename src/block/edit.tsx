@@ -25,7 +25,7 @@ import {
 } from "@wordpress/components";
 import { useEffect, useMemo, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, MapPinned } from "lucide-react";
 import { createMinimalMap } from "../map/bootstrap";
 import { normalizeHeightUnit, normalizeMapConfig } from "../map/defaults";
 import {
@@ -56,6 +56,24 @@ const BORDER_UNITS: StyleOption[] = ["px", "em", "rem"].map((value) => ({
   label: value,
   value,
 }));
+const BOX_CONTROL_INPUT_PROPS = { min: 0, max: 50 };
+const BORDER_RADIUS_RANGE_MAX = 50;
+
+function clampRangeInputs(root: HTMLElement | null, max: number): void {
+  if (!root) {
+    return;
+  }
+
+  const maxValue = `${max}`;
+
+  root.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach(
+    (input) => {
+      input.max = maxValue;
+      input.setAttribute("max", maxValue);
+      input.setAttribute("aria-valuemax", maxValue);
+    },
+  );
+}
 
 function parseHeightValue(
   rawValue: string | number | undefined,
@@ -276,6 +294,40 @@ function ZoomControlColorSettings({
         value={borderColor}
         defaultValue={defaultBorderColor}
         onChange={(value) => onChange("zoomControlsBorderColor", value)}
+      />
+    </div>
+  );
+}
+
+function CreditsColorSettings({
+  backgroundColor,
+  foregroundColor,
+  defaultBackgroundColor,
+  defaultForegroundColor,
+  onChange,
+}: {
+  backgroundColor: string;
+  foregroundColor: string;
+  defaultBackgroundColor: string;
+  defaultForegroundColor: string;
+  onChange: (
+    key: "creditsBackgroundColor" | "creditsForegroundColor",
+    value: string,
+  ) => void;
+}) {
+  return (
+    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
+      <CompactColorDropdown
+        label={__("Background", "minimal-map")}
+        value={backgroundColor}
+        defaultValue={defaultBackgroundColor}
+        onChange={(value) => onChange("creditsBackgroundColor", value)}
+      />
+      <CompactColorDropdown
+        label={__("Foreground", "minimal-map")}
+        value={foregroundColor}
+        defaultValue={defaultForegroundColor}
+        onChange={(value) => onChange("creditsForegroundColor", value)}
       />
     </div>
   );
@@ -525,6 +577,8 @@ function CollectionDropdown({
 export default function Edit({ attributes, setAttributes }: EditProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
+  const zoomControlsRadiusRef = useRef<HTMLDivElement | null>(null);
+  const creditsRadiusRef = useRef<HTMLDivElement | null>(null);
   const styleOptions = useMemo(
     () => getStyleOptions(runtimeConfig.stylePresets),
     [],
@@ -576,6 +630,30 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   useEffect(() => {
     mapInstanceRef.current?.update(config);
   }, [config]);
+
+  useEffect(() => {
+    const targets = [zoomControlsRadiusRef.current, creditsRadiusRef.current];
+    const observers = targets
+      .filter((target): target is HTMLDivElement => target !== null)
+      .map((target) => {
+        clampRangeInputs(target, BORDER_RADIUS_RANGE_MAX);
+
+        const observer = new MutationObserver(() => {
+          clampRangeInputs(target, BORDER_RADIUS_RANGE_MAX);
+        });
+
+        observer.observe(target, {
+          childList: true,
+          subtree: true,
+        });
+
+        return observer;
+      });
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect());
+    };
+  }, []);
 
   function updateNumberAttribute<
     Key extends keyof Pick<
@@ -783,6 +861,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               label={__("Padding", "minimal-map")}
               values={attributes.zoomControlsPadding}
               units={HEIGHT_UNITS}
+              inputProps={BOX_CONTROL_INPUT_PROPS}
               onChange={(value?: BoxValue) => {
                 setAttributes({
                   zoomControlsPadding: value ?? attributes.zoomControlsPadding,
@@ -796,6 +875,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               label={__("Outer Margin", "minimal-map")}
               values={attributes.zoomControlsOuterMargin}
               units={HEIGHT_UNITS}
+              inputProps={BOX_CONTROL_INPUT_PROPS}
               onChange={(value?: BoxValue) => {
                 setAttributes({
                   zoomControlsOuterMargin:
@@ -804,14 +884,18 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               }}
             />
           </div>
-          <BorderRadiusControl
-            onChange={(value: string | BorderRadiusValues) => {
-              setAttributes({
-                zoomControlsBorderRadius: stringifyBorderRadiusValue(value),
-              });
-            }}
-            values={parseBorderRadiusValue(attributes.zoomControlsBorderRadius)}
-          />
+          <div ref={zoomControlsRadiusRef}>
+            <BorderRadiusControl
+              onChange={(value: string | BorderRadiusValues) => {
+                setAttributes({
+                  zoomControlsBorderRadius: stringifyBorderRadiusValue(value),
+                });
+              }}
+              values={parseBorderRadiusValue(
+                attributes.zoomControlsBorderRadius,
+              )}
+            />
+          </div>
           <UnitControl
             label={__("Border Width", "minimal-map")}
             value={attributes.zoomControlsBorderWidth}
@@ -819,6 +903,58 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             units={BORDER_UNITS}
             size="__unstable-large"
           />
+        </PanelBody>
+        <PanelBody title={__("Credits", "minimal-map")} initialOpen={false}>
+          <CreditsColorSettings
+            backgroundColor={attributes.creditsBackgroundColor}
+            foregroundColor={attributes.creditsForegroundColor}
+            defaultBackgroundColor={
+              runtimeConfig.defaults?.creditsBackgroundColor ?? "#ffffff"
+            }
+            defaultForegroundColor={
+              runtimeConfig.defaults?.creditsForegroundColor ?? "#1e1e1e"
+            }
+            onChange={(key, value) => setAttributes({ [key]: value })}
+          />
+          <div ref={creditsRadiusRef} style={{ marginBottom: "8px" }}>
+            <BorderRadiusControl
+              label={__("Border Radius", "minimal-map")}
+              onChange={(value: string | BorderRadiusValues) => {
+                setAttributes({
+                  creditsBorderRadius: stringifyBorderRadiusValue(value),
+                });
+              }}
+              values={parseBorderRadiusValue(attributes.creditsBorderRadius)}
+            />
+          </div>
+          <div className="minimal-map-editor__box-control">
+            <BoxControl
+              __next40pxDefaultSize
+              label={__("Padding", "minimal-map")}
+              values={attributes.creditsPadding}
+              units={HEIGHT_UNITS}
+              inputProps={BOX_CONTROL_INPUT_PROPS}
+              onChange={(value?: BoxValue) => {
+                setAttributes({
+                  creditsPadding: value ?? attributes.creditsPadding,
+                });
+              }}
+            />
+          </div>
+          <div className="minimal-map-editor__box-control">
+            <BoxControl
+              __next40pxDefaultSize
+              label={__("Outer Margin", "minimal-map")}
+              values={attributes.creditsOuterMargin}
+              units={HEIGHT_UNITS}
+              inputProps={BOX_CONTROL_INPUT_PROPS}
+              onChange={(value?: BoxValue) => {
+                setAttributes({
+                  creditsOuterMargin: value ?? attributes.creditsOuterMargin,
+                });
+              }}
+            />
+          </div>
         </PanelBody>
       </InspectorControls>
       <div {...blockProps}>

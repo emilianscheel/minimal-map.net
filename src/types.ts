@@ -43,6 +43,11 @@ export interface MapDefaults {
 	zoomControlsBorderWidth: string;
 	zoomControlsPlusIcon: ZoomControlIcon;
 	zoomControlsMinusIcon: ZoomControlIcon;
+	creditsPadding: BoxValue;
+	creditsOuterMargin: BoxValue;
+	creditsBackgroundColor: string;
+	creditsForegroundColor: string;
+	creditsBorderRadius: string;
 	_isPreview: boolean;
 }
 
@@ -108,6 +113,12 @@ export interface RawMapConfig {
 	zoomControlsBorderWidth?: string;
 	zoomControlsPlusIcon?: string;
 	zoomControlsMinusIcon?: string;
+	creditsPadding?: BoxValue | null;
+	creditsOuterMargin?: BoxValue | null;
+	creditsBackgroundColor?: string;
+	creditsForegroundColor?: string;
+	creditsBorderRadius?: string | BoxValue | null;
+	_isPreview?: boolean;
 	fallbackMessage?: string;
 	markerLat?: number | string | null;
 	markerLng?: number | string | null;
@@ -127,6 +138,8 @@ export interface NormalizedMapConfig extends MapDefaults {
 	fallbackMessage: string;
 	zoomControlsPadding: Required<BoxValue>;
 	zoomControlsOuterMargin: Required<BoxValue>;
+	creditsPadding: Required<BoxValue>;
+	creditsOuterMargin: Required<BoxValue>;
 	markerLat: number | null;
 	markerLng: number | null;
 	markerContent: string | null;
@@ -288,6 +301,11 @@ export interface MapBlockAttributes {
 	zoomControlsBorderWidth: string;
 	zoomControlsPlusIcon: ZoomControlIcon;
 	zoomControlsMinusIcon: ZoomControlIcon;
+	creditsPadding: BoxValue;
+	creditsOuterMargin: BoxValue;
+	creditsBackgroundColor: string;
+	creditsForegroundColor: string;
+	creditsBorderRadius: string;
 	_isPreview: boolean;
 }
 

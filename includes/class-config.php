@@ -93,6 +93,21 @@ class Config {
 			'zoomControlsBorderWidth'     => '1px',
 			'zoomControlsPlusIcon'        => 'plus',
 			'zoomControlsMinusIcon'       => 'line-solid',
+			'creditsPadding'             => array(
+				'top'    => '4px',
+				'right'  => '8px',
+				'bottom' => '4px',
+				'left'   => '8px',
+			),
+			'creditsOuterMargin'         => array(
+				'top'    => '16px',
+				'right'  => '16px',
+				'bottom' => '16px',
+				'left'   => '16px',
+			),
+			'creditsBackgroundColor'     => '#ffffff',
+			'creditsForegroundColor'     => '#1e1e1e',
+			'creditsBorderRadius'        => '999px',
 			'styleThemeSlug'              => 'default',
 			'_isPreview'                  => false,
 		);
@@ -163,6 +178,11 @@ class Config {
 			'zoomControlsBorderWidth'     => $this->sanitize_dimension_value( $attributes['zoomControlsBorderWidth'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderWidth'] ),
 			'zoomControlsPlusIcon'        => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsPlusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsPlusIcon'] ),
 			'zoomControlsMinusIcon'       => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsMinusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsMinusIcon'] ),
+			'creditsPadding'             => $this->sanitize_box_value( $attributes['creditsPadding'] ?? array(), $this->get_default_block_attributes()['creditsPadding'] ),
+			'creditsOuterMargin'         => $this->sanitize_box_value( $attributes['creditsOuterMargin'] ?? array(), $this->get_default_block_attributes()['creditsOuterMargin'] ),
+			'creditsBackgroundColor'     => $this->sanitize_color( $attributes['creditsBackgroundColor'] ?? '', $this->get_default_block_attributes()['creditsBackgroundColor'] ),
+			'creditsForegroundColor'     => $this->sanitize_color( $attributes['creditsForegroundColor'] ?? '', $this->get_default_block_attributes()['creditsForegroundColor'] ),
+			'creditsBorderRadius'        => $this->sanitize_border_radius_value( $attributes['creditsBorderRadius'] ?? '', $this->get_default_block_attributes()['creditsBorderRadius'] ),
 			'locations'       => $locations,
 			'fallbackMessage'  => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 		);

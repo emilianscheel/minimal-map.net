@@ -49,6 +49,22 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	zoomControlsBorderWidth: DEFAULT_ZOOM_CONTROLS_BORDER_WIDTH,
 	zoomControlsPlusIcon: DEFAULT_ZOOM_CONTROLS_PLUS_ICON,
 	zoomControlsMinusIcon: DEFAULT_ZOOM_CONTROLS_MINUS_ICON,
+	creditsPadding: {
+		top: '4px',
+		right: '8px',
+		bottom: '4px',
+		left: '8px',
+	},
+	creditsOuterMargin: {
+		top: '16px',
+		right: '16px',
+		bottom: '16px',
+		left: '16px',
+	},
+	creditsBackgroundColor: '#ffffff',
+	creditsForegroundColor: '#1e1e1e',
+	creditsBorderRadius: '999px',
+	_isPreview: false,
 };
 
 export function normalizeHeightUnit(unit?: string | null): HeightUnit {
@@ -182,6 +198,26 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 			runtimeConfig.defaults?.zoomControlsMinusIcon,
 			DEFAULT_MAP_DEFAULTS.zoomControlsMinusIcon
 		),
+		creditsPadding: normalizeBoxValue(
+			runtimeConfig.defaults?.creditsPadding,
+			DEFAULT_MAP_DEFAULTS.creditsPadding as Required<BoxValue>
+		),
+		creditsOuterMargin: normalizeBoxValue(
+			runtimeConfig.defaults?.creditsOuterMargin,
+			DEFAULT_MAP_DEFAULTS.creditsOuterMargin as Required<BoxValue>
+		),
+		creditsBackgroundColor: normalizeColor(
+			runtimeConfig.defaults?.creditsBackgroundColor,
+			DEFAULT_MAP_DEFAULTS.creditsBackgroundColor
+		),
+		creditsForegroundColor: normalizeColor(
+			runtimeConfig.defaults?.creditsForegroundColor,
+			DEFAULT_MAP_DEFAULTS.creditsForegroundColor
+		),
+		creditsBorderRadius: normalizeBorderRadiusValue(
+			runtimeConfig.defaults?.creditsBorderRadius,
+			DEFAULT_MAP_DEFAULTS.creditsBorderRadius
+		),
 	};
 }
 
@@ -256,6 +292,26 @@ export function normalizeMapConfig(
 		rawConfig.zoomControlsMinusIcon ?? defaults.zoomControlsMinusIcon,
 		defaults.zoomControlsMinusIcon
 	);
+	const creditsPadding = normalizeBoxValue(
+		rawConfig.creditsPadding ?? defaults.creditsPadding,
+		defaults.creditsPadding as Required<BoxValue>
+	);
+	const creditsOuterMargin = normalizeBoxValue(
+		rawConfig.creditsOuterMargin ?? defaults.creditsOuterMargin,
+		defaults.creditsOuterMargin as Required<BoxValue>
+	);
+	const creditsBackgroundColor = normalizeColor(
+		rawConfig.creditsBackgroundColor ?? defaults.creditsBackgroundColor,
+		defaults.creditsBackgroundColor
+	);
+	const creditsForegroundColor = normalizeColor(
+		rawConfig.creditsForegroundColor ?? defaults.creditsForegroundColor,
+		defaults.creditsForegroundColor
+	);
+	const creditsBorderRadius = normalizeBorderRadiusValue(
+		rawConfig.creditsBorderRadius ?? defaults.creditsBorderRadius,
+		defaults.creditsBorderRadius
+	);
 	const markerLat = normalizeOptionalCoordinate(rawConfig.markerLat, -90, 90);
 	const markerLng = normalizeOptionalCoordinate(rawConfig.markerLng, -180, 180);
 	const markerContent = typeof rawConfig.markerContent === 'string' ? rawConfig.markerContent : null;
@@ -301,6 +357,12 @@ export function normalizeMapConfig(
 		zoomControlsBorderWidth,
 		zoomControlsPlusIcon,
 		zoomControlsMinusIcon,
+		creditsPadding,
+		creditsOuterMargin,
+		creditsBackgroundColor,
+		creditsForegroundColor,
+		creditsBorderRadius,
+		_isPreview: Boolean(rawConfig._isPreview ?? defaults._isPreview),
 		fallbackMessage: rawConfig.fallbackMessage || runtimeConfig.messages?.fallback || FALLBACK_MESSAGE,
 		markerLat,
 		markerLng,
