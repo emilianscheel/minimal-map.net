@@ -10,7 +10,11 @@ function normalizePoint(location: LocationRecord): MapLocationPoint | null {
 		return null;
 	}
 
-	return { lat, lng };
+	return {
+		lat,
+		lng,
+		markerContent: location.markerContent,
+	};
 }
 
 function createSeed(input: string): number {

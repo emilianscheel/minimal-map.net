@@ -71,6 +71,7 @@ export async function importLocations(
 			latitude: row.latitude || '',
 			longitude: row.longitude || '',
 			logo_id: 0,
+			marker_id: 0,
 			tag_ids: [],
 		};
 		const newLocation = await createLocation(locationsConfig, form);

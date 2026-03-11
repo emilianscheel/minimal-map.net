@@ -15,6 +15,7 @@ export const DEFAULT_FORM_STATE: LocationFormState = {
 	latitude: '',
 	longitude: '',
 	logo_id: 0,
+	marker_id: 0,
 	tag_ids: [],
 };
 

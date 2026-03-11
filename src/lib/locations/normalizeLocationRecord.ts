@@ -18,6 +18,7 @@ export function normalizeLocationRecord(record: LocationRestResponse): LocationR
 		latitude: meta.latitude ?? '',
 		longitude: meta.longitude ?? '',
 		logo_id: Number(meta.logo_id ?? 0) || 0,
+		marker_id: Number(meta.marker_id ?? 0) || 0,
 		tag_ids: record.minimal_map_tag ?? [],
 	};
 

@@ -302,7 +302,7 @@ class Config {
 				continue;
 			}
 
-			$locations[ $post->ID ] = array(
+			$location = array(
 				'id'           => $post->ID,
 				'title'        => get_the_title( $post ),
 				'lat'          => $normalized['lat'],
@@ -317,6 +317,14 @@ class Config {
 				'state'        => (string) get_post_meta( $post->ID, 'state', true ),
 				'country'      => (string) get_post_meta( $post->ID, 'country', true ),
 			);
+
+			$marker_content = $this->get_location_marker_content( $post->ID );
+
+			if ( '' !== $marker_content ) {
+				$location['markerContent'] = $marker_content;
+			}
+
+			$locations[ $post->ID ] = $location;
 		}
 
 		return $locations;
@@ -493,6 +501,34 @@ class Config {
 			'lat' => $lat,
 			'lng' => $lng,
 		);
+	}
+
+	/**
+	 * Resolve the assigned marker SVG content for one location.
+	 *
+	 * @param int $location_id Location post id.
+	 * @return string
+	 */
+	private function get_location_marker_content( $location_id ) {
+		$marker_id = absint( get_post_meta( $location_id, 'marker_id', true ) );
+
+		if ( $marker_id <= 0 ) {
+			return '';
+		}
+
+		$marker_post = get_post( $marker_id );
+
+		if ( ! $marker_post instanceof WP_Post ) {
+			return '';
+		}
+
+		if ( Marker_Post_Type::POST_TYPE !== $marker_post->post_type || 'publish' !== $marker_post->post_status ) {
+			return '';
+		}
+
+		$content = trim( (string) $marker_post->post_content );
+
+		return '' !== $content ? $content : '';
 	}
 
 	/**

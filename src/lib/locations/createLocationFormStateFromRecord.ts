@@ -15,6 +15,7 @@ export function createLocationFormStateFromRecord(location: LocationRecord): Loc
 		latitude: location.latitude,
 		longitude: location.longitude,
 		logo_id: location.logo_id,
+		marker_id: location.marker_id,
 		tag_ids: location.tag_ids,
 	};
 }

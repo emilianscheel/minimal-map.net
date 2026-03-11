@@ -60,6 +60,7 @@ export interface MapLocationPoint {
 	title?: string;
 	lat: number;
 	lng: number;
+	markerContent?: string;
 	telephone?: string;
 	email?: string;
 	website?: string;
@@ -335,12 +336,14 @@ export interface LocationMeta {
 	latitude: string;
 	longitude: string;
 	logo_id: number;
+	marker_id: number;
 }
 
 export interface LocationRecord extends LocationMeta {
 	id: number;
 	title: string;
 	tag_ids: number[];
+	markerContent?: string;
 }
 
 export interface CollectionRecord extends CollectionMeta {

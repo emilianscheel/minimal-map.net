@@ -14,7 +14,9 @@ import type {
 	LocationFormState,
 	LocationRecord,
 	LogoRecord,
+	MarkerRecord,
 	LogosAdminConfig,
+	MarkersAdminConfig,
 	LocationsAdminConfig,
 	MapCoordinates,
 	StyleThemeRecord,
@@ -23,6 +25,7 @@ import type {
 } from '../../types';
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
 import { fetchAllLogos } from '../../lib/logos/fetchAllLogos';
+import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
 import { fetchAllTags } from '../../lib/tags/fetchAllTags';
 import { updateCollection } from '../../lib/collections/updateCollection';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
@@ -54,6 +57,7 @@ export function useLocationsController(
 	config: LocationsAdminConfig,
 	collectionsConfig: CollectionsAdminConfig,
 	logosConfig: LogosAdminConfig,
+	markersConfig: MarkersAdminConfig,
 	tagsConfig: TagsAdminConfig,
 	enabled: boolean,
 	themeData: {
@@ -80,6 +84,7 @@ export function useLocationsController(
 	const [locations, setLocations] = useState<LocationRecord[]>([]);
 	const [collections, setCollections] = useState<CollectionRecord[]>([]);
 	const [logos, setLogos] = useState<LogoRecord[]>([]);
+	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
 	const [tags, setTags] = useState<TagRecord[]>([]);
 	const [step, setStep] = useState<LocationDialogStep>('details');
 	const [view, setView] = useState<ViewTable>(DEFAULT_VIEW);
@@ -91,6 +96,9 @@ export function useLocationsController(
 	const [isAssignLogoModalOpen, setAssignLogoModalOpen] = useState(false);
 	const [selectedLogoLocation, setSelectedLogoLocation] = useState<LocationRecord | null>(null);
 	const [assignmentLogoId, setAssignmentLogoId] = useState('');
+	const [isAssignMarkerModalOpen, setAssignMarkerModalOpen] = useState(false);
+	const [selectedMarkerLocation, setSelectedMarkerLocation] = useState<LocationRecord | null>(null);
+	const [assignmentMarkerId, setAssignmentMarkerId] = useState('');
 	const [isAssignTagsModalOpen, setAssignTagsModalOpen] = useState(false);
 	const [selectedTagsLocation, setSelectedTagsLocation] = useState<LocationRecord | null>(null);
 	const [assignmentTagIds, setAssignmentTagIds] = useState<number[]>([]);
@@ -119,15 +127,17 @@ export function useLocationsController(
 		setLoadError(null);
 
 		try {
-			const [locationRecords, collectionRecords, logoRecords, tagRecords] = await Promise.all([
+			const [locationRecords, collectionRecords, logoRecords, markerRecords, tagRecords] = await Promise.all([
 				fetchAllLocations(config),
 				fetchAllCollections(collectionsConfig),
 				fetchAllLogos(logosConfig),
+				fetchAllMarkers(markersConfig),
 				fetchAllTags(tagsConfig),
 			]);
 			setLocations(locationRecords);
 			setCollections(collectionRecords);
 			setLogos(logoRecords);
+			setMarkers(markerRecords);
 			setTags(tagRecords);
 		} catch (error) {
 			setLoadError(
@@ -138,7 +148,7 @@ export function useLocationsController(
 		} finally {
 			setLoading(false);
 		}
-	}, [collectionsConfig, config, enabled, logosConfig, tagsConfig]);
+	}, [collectionsConfig, config, enabled, logosConfig, markersConfig, tagsConfig]);
 
 	useEffect(() => {
 		configureApiFetch(collectionsConfig.nonce || config.nonce);
@@ -185,6 +195,7 @@ export function useLocationsController(
 
 	const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
 	const logosById = useMemo(() => new Map(logos.map((logo) => [logo.id, logo])), [logos]);
+	const markersById = useMemo(() => new Map(markers.map((marker) => [marker.id, marker])), [markers]);
 
 	const getTagsForLocation = useCallback(
 		(locationId: number): TagRecord[] => {
@@ -209,6 +220,18 @@ export function useLocationsController(
 			return logosById.get(location.logo_id) ?? null;
 		},
 		[locations, logosById]
+	);
+
+	const getMarkerForLocation = useCallback(
+		(locationId: number): MarkerRecord | null => {
+			const location = locations.find((loc) => loc.id === locationId);
+			if (!location || location.marker_id <= 0) {
+				return null;
+			}
+
+			return markersById.get(location.marker_id) ?? null;
+		},
+		[locations, markersById]
 	);
 
 	const resetDialogState = (): void => {
@@ -237,6 +260,12 @@ export function useLocationsController(
 		setAssignmentLogoId('');
 	}, []);
 
+	const resetAssignMarkerState = useCallback((): void => {
+		setAssignMarkerModalOpen(false);
+		setSelectedMarkerLocation(null);
+		setAssignmentMarkerId('');
+	}, []);
+
 	const resetAssignTagsState = useCallback((): void => {
 		setAssignTagsModalOpen(false);
 		setSelectedTagsLocation(null);
@@ -258,6 +287,14 @@ export function useLocationsController(
 
 		resetAssignLogoState();
 	}, [isAssignmentSaving, resetAssignLogoState]);
+
+	const closeAssignMarkerModal = useCallback((): void => {
+		if (isAssignmentSaving) {
+			return;
+		}
+
+		resetAssignMarkerState();
+	}, [isAssignmentSaving, resetAssignMarkerState]);
 
 	const closeAssignTagsModal = useCallback((): void => {
 		if (isAssignmentSaving) {
@@ -377,6 +414,12 @@ export function useLocationsController(
 		setAssignLogoModalOpen(true);
 	}, []);
 
+	const onOpenAssignMarkerModal = useCallback((location: LocationRecord): void => {
+		setSelectedMarkerLocation(location);
+		setAssignmentMarkerId(location.marker_id > 0 ? `${location.marker_id}` : '');
+		setAssignMarkerModalOpen(true);
+	}, []);
+
 	const onOpenAssignTagsModal = useCallback((location: LocationRecord): void => {
 		setSelectedTagsLocation(location);
 		setAssignmentTagIds(location.tag_ids);
@@ -423,6 +466,38 @@ export function useLocationsController(
 			setAssignmentSaving(false);
 		}
 	}, [assignmentLogoId, config, loadLocations, resetAssignLogoState, selectedLogoLocation]);
+
+	const onAssignMarkerToLocation = useCallback(async (): Promise<void> => {
+		if (!selectedMarkerLocation) {
+			return;
+		}
+
+		setAssignmentSaving(true);
+		setActionNotice(null);
+
+		try {
+			await updateLocation(config, selectedMarkerLocation.id, {
+				...createLocationFormStateFromRecord(selectedMarkerLocation),
+				marker_id: Number(assignmentMarkerId) || 0,
+			});
+			await loadLocations();
+			setActionNotice({
+				status: 'success',
+				message: __('Location marker updated.', 'minimal-map'),
+			});
+			resetAssignMarkerState();
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Location marker could not be updated.', 'minimal-map'),
+			});
+		} finally {
+			setAssignmentSaving(false);
+		}
+	}, [assignmentMarkerId, config, loadLocations, resetAssignMarkerState, selectedMarkerLocation]);
 
 	const onAssignTagsToLocation = useCallback(async (): Promise<void> => {
 		if (!selectedTagsLocation) {
@@ -988,9 +1063,11 @@ export function useLocationsController(
 		activeTheme: themeData.activeTheme,
 		assignmentCollectionId,
 		assignmentLogoId,
+		assignmentMarkerId,
 		assignmentTagIds,
 		collections,
 		logos,
+		markers,
 		tags,
 		dismissActionNotice,
 		fieldErrors,
@@ -998,6 +1075,7 @@ export function useLocationsController(
 		formMode,
 		getCollectionsForLocation,
 		getLogoForLocation,
+		getMarkerForLocation,
 		getTagsForLocation,
 		geocodeError,
 		geocodeNotice,
@@ -1024,6 +1102,7 @@ export function useLocationsController(
 		) : null,
 		isAssignToCollectionModalOpen,
 		isAssignLogoModalOpen,
+		isAssignMarkerModalOpen,
 		isAssignTagsModalOpen,
 		isAssignmentSaving,
 		isDeleteLogoConfirmationModalOpen,
@@ -1046,16 +1125,19 @@ export function useLocationsController(
 		onBack,
 		onAssignLocationToCollection,
 		onAssignLogoToLocation,
+		onAssignMarkerToLocation,
 		onAssignTagsToLocation,
 		onCancel,
 		onChangeFormValue,
 		onCloseAssignToCollectionModal: closeAssignToCollectionModal,
 		onCloseAssignLogoModal: closeAssignLogoModal,
+		onCloseAssignMarkerModal: closeAssignMarkerModal,
 		onCloseAssignTagsModal: closeAssignTagsModal,
 		onCloseDeleteLogoConfirmationModal: closeDeleteLogoConfirmationModal,
 		onCloseRemoveCollectionAssignmentModal: closeRemoveCollectionAssignmentModal,
 		onOpenAssignToCollectionModal,
 		onOpenAssignLogoModal,
+		onOpenAssignMarkerModal,
 		onOpenAssignTagsModal,
 		onOpenDeleteLogoConfirmationModal,
 		onOpenRemoveCollectionAssignmentModal,
@@ -1078,11 +1160,13 @@ export function useLocationsController(
 		onRetrieveLocation,
 		onSelectAssignmentCollection: setAssignmentCollectionId,
 		onSelectAssignmentLogo: setAssignmentLogoId,
+		onSelectAssignmentMarker: setAssignmentMarkerId,
 		onSelectAssignmentTags: setAssignmentTagIds,
 		onAddLocation: openDialog,
 		paginatedLocations,
 		selection,
 		selectedAssignmentLocation,
+		selectedMarkerLocation,
 		selectedLogoLocation,
 		selectedLogoRemovalLocation,
 		selectedTagsLocation,

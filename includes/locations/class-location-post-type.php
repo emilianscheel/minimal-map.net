@@ -44,6 +44,7 @@ class Location_Post_Type {
 		'latitude'     => 'sanitize_text_field',
 		'longitude'    => 'sanitize_text_field',
 		'logo_id'      => 'absint',
+		'marker_id'    => 'absint',
 	);
 
 	/**
@@ -83,7 +84,7 @@ class Location_Post_Type {
 					'sanitize_callback' => $sanitize_callback,
 					'show_in_rest'      => true,
 					'single'            => true,
-					'type'              => 'logo_id' === $meta_key ? 'integer' : 'string',
+					'type'              => in_array( $meta_key, array( 'logo_id', 'marker_id' ), true ) ? 'integer' : 'string',
 				)
 			);
 		}

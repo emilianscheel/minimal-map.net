@@ -67,8 +67,19 @@ function createShell(host: HTMLElement, config: NormalizedMapConfig): HTMLElemen
 	return viewport;
 }
 
+function getMarkerContent(
+	config: NormalizedMapConfig,
+	point: MapLocationPoint
+): string | null {
+	if (typeof point.markerContent === 'string' && point.markerContent.trim() !== '') {
+		return point.markerContent;
+	}
+
+	return config.markerContent;
+}
+
 function createMarker(
-	config: NormalizedMapConfig, 
+	config: NormalizedMapConfig,
 	point: MapLocationPoint,
 	onClick?: (id: number) => void
 ): maplibregl.Marker {
@@ -77,13 +88,15 @@ function createMarker(
 		anchor: 'center',
 	};
 
-	if (config.markerContent) {
+	const markerContent = getMarkerContent(config, point);
+
+	if (markerContent) {
 		const el = document.createElement('div');
 		el.className = 'minimal-map-custom-marker';
-		
+
 		// Create inner wrapper for transform-based centering
 		const inner = document.createElement('div');
-		inner.innerHTML = config.markerContent;
+		inner.innerHTML = markerContent;
 		el.appendChild(inner);
 
 		// Ensure MapLibre sees zero size for absolute coordinate alignment
@@ -212,6 +225,32 @@ function didRenderedPointsChange(
 		const nextPoint = nextPoints[index];
 
 		return point.lat !== nextPoint.lat || point.lng !== nextPoint.lng;
+	});
+}
+
+function didRenderedMarkerContentChange(
+	previousConfig: NormalizedMapConfig | null,
+	nextConfig: NormalizedMapConfig
+): boolean {
+	if (!previousConfig) {
+		return true;
+	}
+
+	const previousPoints = getRenderedPoints(previousConfig);
+	const nextPoints = getRenderedPoints(nextConfig);
+
+	if (previousPoints.length !== nextPoints.length) {
+		return true;
+	}
+
+	if (previousConfig.markerContent !== nextConfig.markerContent) {
+		return true;
+	}
+
+	return previousPoints.some((point, index) => {
+		const nextPoint = nextPoints[index];
+
+		return getMarkerContent(previousConfig, point) !== getMarkerContent(nextConfig, nextPoint);
 	});
 }
 
@@ -547,16 +586,20 @@ export function createMinimalMap(
 
 		if (
 			!previousConfig ||
+			previousConfig.markerContent !== nextConfig.markerContent ||
 			previousConfig.markerClassName !== nextConfig.markerClassName ||
 			previousConfig.markerOffsetY !== nextConfig.markerOffsetY ||
-			didRenderedPointsChange(previousConfig, nextConfig)
+			didRenderedPointsChange(previousConfig, nextConfig) ||
+			didRenderedMarkerContentChange(previousConfig, nextConfig)
 		) {
 			syncMarkers(
 				nextConfig,
 				!previousConfig ||
+					previousConfig.markerContent !== nextConfig.markerContent ||
 					previousConfig.markerClassName !== nextConfig.markerClassName ||
 					previousConfig.markerOffsetY !== nextConfig.markerOffsetY ||
-					didRenderedPointsChange(previousConfig, nextConfig)
+					didRenderedPointsChange(previousConfig, nextConfig) ||
+					didRenderedMarkerContentChange(previousConfig, nextConfig)
 			);
 		}
 

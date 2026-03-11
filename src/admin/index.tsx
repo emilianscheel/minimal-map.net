@@ -288,6 +288,7 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 		adminConfig.locationsConfig,
 		adminConfig.collectionsConfig,
 		adminConfig.logosConfig,
+		adminConfig.markersConfig,
 		adminConfig.tagsConfig,
 		activeSection.view === 'locations',
 		{

@@ -10,6 +10,7 @@ import type {
 	StyleThemeRecord,
 } from '../../types';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
+import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
 import { UploadMarkerButton } from './UploadMarkerButton';
 import { ThemeSelector } from '../styles/ThemeSelector';
 import type { MarkersController } from './types';
@@ -56,16 +57,7 @@ export function useMarkersController(
 		setLoadError(null);
 
 		try {
-			const records = await apiFetch<any[]>({
-				path: config.restPath + '?context=edit&per_page=100',
-			});
-			setMarkers(
-				records.map((r) => ({
-					id: r.id,
-					title: typeof r.title === 'object' ? r.title.raw : r.title,
-					content: typeof r.content === 'object' ? r.content.raw : r.content,
-				}))
-			);
+			setMarkers(await fetchAllMarkers(config));
 		} catch (error) {
 			setLoadError(
 				error instanceof Error

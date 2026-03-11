@@ -15,5 +15,6 @@ export function buildLocationMeta(form: LocationFormState): LocationMeta {
 		latitude: form.latitude.trim(),
 		longitude: form.longitude.trim(),
 		logo_id: Number.isFinite(form.logo_id) ? Math.max(0, form.logo_id) : 0,
+		marker_id: Number.isFinite(form.marker_id) ? Math.max(0, form.marker_id) : 0,
 	};
 }

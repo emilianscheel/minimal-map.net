@@ -3,7 +3,7 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewTable } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import { Copy, Image, Layers3, LocateFixed, Pencil, Tags, Trash2 } from 'lucide-react';
+import { Copy, Image, Layers3, LocateFixed, MapPin, Pencil, Tags, Trash2 } from 'lucide-react';
 import LocationMiniMap from '../../components/LocationMiniMap';
 import LogoPreview from '../../components/LogoPreview';
 import TagBadge from '../../components/TagBadge';
@@ -37,7 +37,13 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
-				render: ({ item }) => <LocationMiniMap location={item} theme={controller.activeTheme} />,
+				render: ({ item }) => (
+					<LocationMiniMap
+						location={item}
+						theme={controller.activeTheme}
+						markerContent={controller.getMarkerForLocation(item.id)?.content ?? null}
+					/>
+				),
 			},
 			{
 				id: 'logo',
@@ -268,6 +274,21 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 					}
 
 					controller.onOpenAssignLogoModal(items[0]);
+				},
+			},
+			{
+				id: 'assign-marker',
+				label: __('Assign Marker', 'minimal-map'),
+				icon: <MapPin size={16} strokeWidth={2} />,
+				context: 'single',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: false,
+				callback: (items) => {
+					if (!items[0]) {
+						return;
+					}
+
+					controller.onOpenAssignMarkerModal(items[0]);
 				},
 			},
 			{
