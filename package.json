@@ -5,8 +5,12 @@
   "description": "Minimal WordPress-native map plugin.",
   "scripts": {
     "typecheck": "bunx tsc --noEmit",
-    "build": "bun run typecheck && wp-scripts build",
-    "start": "wp-scripts start"
+    "build": "wp-scripts build",
+    "build:dev": "wp-scripts start --no-watch",
+    "start": "wp-scripts start",
+    "start:hot": "wp-scripts start --hot",
+    "dev": "wp-scripts start",
+    "dev:hot": "wp-scripts start --hot"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
