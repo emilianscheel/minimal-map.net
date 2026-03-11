@@ -33,6 +33,7 @@ export interface MapDefaults {
 	showZoomControls: boolean;
 	allowSearch: boolean;
 	scrollZoom: boolean;
+	mobileTwoFingerZoom: boolean;
 	zoomControlsPosition: ZoomControlsPosition;
 	zoomControlsPadding: BoxValue;
 	zoomControlsOuterMargin: BoxValue;
@@ -119,6 +120,7 @@ export interface RawMapConfig {
 	showZoomControls?: boolean;
 	allowSearch?: boolean;
 	scrollZoom?: boolean;
+	mobileTwoFingerZoom?: boolean;
 	zoomControlsPosition?: string;
 	zoomControlsPadding?: BoxValue | null;
 	zoomControlsOuterMargin?: BoxValue | null;
@@ -165,6 +167,7 @@ export interface NormalizedMapConfig extends MapDefaults {
 	locations: MapLocationPoint[];
 	interactive: boolean;
 	scrollZoom: boolean;
+	mobileTwoFingerZoom: boolean;
 	showAttribution: boolean;
 	allowSearch: boolean;
 }
@@ -307,6 +310,7 @@ export interface MapBlockAttributes {
 	showZoomControls: boolean;
 	allowSearch: boolean;
 	scrollZoom: boolean;
+	mobileTwoFingerZoom: boolean;
 	zoomControlsPosition: ZoomControlsPosition;
 	zoomControlsPadding: BoxValue;
 	zoomControlsOuterMargin: BoxValue;

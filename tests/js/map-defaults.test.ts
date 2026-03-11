@@ -2,6 +2,40 @@ import { describe, expect, test } from 'bun:test';
 import { normalizeMapConfig } from '../../src/map/defaults';
 
 describe('map defaults normalization', () => {
+	test('uses the runtime mobile two-finger zoom default when provided', () => {
+		const config = normalizeMapConfig(
+			{},
+			{
+				defaults: {
+					mobileTwoFingerZoom: false,
+				},
+			}
+		);
+
+		expect(config.mobileTwoFingerZoom).toBe(false);
+	});
+
+	test('falls back to enabled mobile two-finger zoom for shared maps without overrides', () => {
+		const config = normalizeMapConfig();
+
+		expect(config.mobileTwoFingerZoom).toBe(true);
+	});
+
+	test('allows raw config to override the runtime mobile two-finger zoom default', () => {
+		const config = normalizeMapConfig(
+			{
+				mobileTwoFingerZoom: true,
+			},
+			{
+				defaults: {
+					mobileTwoFingerZoom: false,
+				},
+			}
+		);
+
+		expect(config.mobileTwoFingerZoom).toBe(true);
+	});
+
 	test('preserves valid credits styling values', () => {
 		const config = normalizeMapConfig({
 			creditsBackgroundColor: '#112233',

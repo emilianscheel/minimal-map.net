@@ -290,6 +290,19 @@ function syncViewport(
 	}, { isMinimalMapInternal: true });
 }
 
+export function syncTouchZoomInteraction(
+	map: Pick<MapLibreMap, 'touchZoomRotate'>,
+	config: Pick<NormalizedMapConfig, 'interactive' | 'mobileTwoFingerZoom'>
+): void {
+	if (!config.interactive || !config.mobileTwoFingerZoom) {
+		map.touchZoomRotate.disable();
+		return;
+	}
+
+	map.touchZoomRotate.enable();
+	map.touchZoomRotate.disableRotation();
+}
+
 export function createMinimalMap(
 	host: HTMLElement,
 	initialConfig: RawMapConfig = {},
@@ -424,7 +437,7 @@ export function createMinimalMap(
 				keyboard: config.interactive,
 				scrollZoom: config.scrollZoom,
 				style: config.styleUrl,
-				touchZoomRotate: config.interactive,
+				touchZoomRotate: config.interactive && config.mobileTwoFingerZoom,
 				zoom: config.zoom,
 			});
 		} catch {
@@ -442,6 +455,9 @@ export function createMinimalMap(
 			map.keyboard.disable();
 			map.touchZoomRotate.disable();
 		}
+
+		syncTouchZoomInteraction(map, config);
+
 		map.on('load', () => {
 			syncViewport(map, config);
 			map.resize();
@@ -582,6 +598,13 @@ export function createMinimalMap(
 			} else {
 				state.map.scrollZoom.disable();
 			}
+		}
+
+		if (
+			previousConfig?.interactive !== nextConfig.interactive ||
+			previousConfig?.mobileTwoFingerZoom !== nextConfig.mobileTwoFingerZoom
+		) {
+			syncTouchZoomInteraction(state.map, nextConfig);
 		}
 
 		if (

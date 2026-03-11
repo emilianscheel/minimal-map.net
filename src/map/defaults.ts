@@ -39,6 +39,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	showZoomControls: true,
 	allowSearch: true,
 	scrollZoom: false,
+	mobileTwoFingerZoom: true,
 	zoomControlsPosition: DEFAULT_ZOOM_CONTROLS_POSITION,
 	zoomControlsPadding: DEFAULT_ZOOM_CONTROLS_PADDING,
 	zoomControlsOuterMargin: DEFAULT_ZOOM_CONTROLS_OUTER_MARGIN,
@@ -158,6 +159,8 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 		showZoomControls: runtimeConfig.defaults?.showZoomControls ?? DEFAULT_MAP_DEFAULTS.showZoomControls,
 		allowSearch: runtimeConfig.defaults?.allowSearch ?? DEFAULT_MAP_DEFAULTS.allowSearch,
 		scrollZoom: runtimeConfig.defaults?.scrollZoom ?? DEFAULT_MAP_DEFAULTS.scrollZoom,
+		mobileTwoFingerZoom:
+			runtimeConfig.defaults?.mobileTwoFingerZoom ?? DEFAULT_MAP_DEFAULTS.mobileTwoFingerZoom,
 		zoomControlsPosition: normalizeZoomControlsPosition(
 			runtimeConfig.defaults?.zoomControlsPosition,
 			DEFAULT_MAP_DEFAULTS.zoomControlsPosition
@@ -347,6 +350,9 @@ export function normalizeMapConfig(
 		showZoomControls: Boolean(rawConfig.showZoomControls ?? defaults.showZoomControls),
 		allowSearch: Boolean(rawConfig.allowSearch ?? defaults.allowSearch),
 		scrollZoom: Boolean(rawConfig.scrollZoom ?? defaults.scrollZoom),
+		mobileTwoFingerZoom: Boolean(
+			rawConfig.mobileTwoFingerZoom ?? defaults.mobileTwoFingerZoom
+		),
 		zoomControlsPosition,
 		zoomControlsPadding,
 		zoomControlsOuterMargin,

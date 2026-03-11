@@ -135,6 +135,25 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Mobile two-finger zoom should default off for blocks and accept explicit enablement.
+	 *
+	 * @return void
+	 */
+	public function test_mobile_two_finger_zoom_defaults_off_for_blocks() {
+		$config = new \MinimalMap\Config();
+
+		$default_attributes = $config->normalize_block_attributes( array() );
+		$enabled_attributes = $config->normalize_block_attributes(
+			array(
+				'mobileTwoFingerZoom' => true,
+			)
+		);
+
+		$this->assertFalse( $default_attributes['mobileTwoFingerZoom'] );
+		$this->assertTrue( $enabled_attributes['mobileTwoFingerZoom'] );
+	}
+
+	/**
 	 * Published locations with valid coordinates should be exposed to the client.
 	 *
 	 * @return void

@@ -53,6 +53,10 @@
       "type": "boolean",
       "default": false
     },
+    "mobileTwoFingerZoom": {
+      "type": "boolean",
+      "default": false
+    },
     "zoomControlsPosition": {
       "type": "string",
       "default": "top-right"

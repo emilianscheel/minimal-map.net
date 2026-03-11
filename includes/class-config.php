@@ -73,6 +73,7 @@ class Config {
 			'showZoomControls' => true,
 			'allowSearch'      => true,
 			'scrollZoom'       => false,
+			'mobileTwoFingerZoom' => false,
 			'zoomControlsPosition'        => 'top-right',
 			'zoomControlsPadding'         => array(
 				'top'    => '8px',
@@ -168,6 +169,7 @@ class Config {
 			'showZoomControls' => ! empty( $attributes['showZoomControls'] ),
 			'allowSearch'      => ! empty( $attributes['allowSearch'] ),
 			'scrollZoom'       => ! empty( $attributes['scrollZoom'] ),
+			'mobileTwoFingerZoom' => ! empty( $attributes['mobileTwoFingerZoom'] ),
 			'zoomControlsPosition'        => $this->sanitize_zoom_controls_position( $attributes['zoomControlsPosition'] ?? '' ),
 			'zoomControlsPadding'         => $this->sanitize_box_value( $attributes['zoomControlsPadding'] ?? array(), $this->get_default_block_attributes()['zoomControlsPadding'] ),
 			'zoomControlsOuterMargin'     => $this->sanitize_box_value( $attributes['zoomControlsOuterMargin'] ?? array(), $this->get_default_block_attributes()['zoomControlsOuterMargin'] ),
@@ -413,6 +415,8 @@ class Config {
 	 */
 	public function get_admin_app_config() {
 		$sections = array();
+		$map_config = $this->get_client_config();
+		$map_config['defaults']['mobileTwoFingerZoom'] = true;
 
 		foreach ( Admin\Admin_Menu::get_sections() as $view => $section ) {
 			$sections[] = array(
@@ -433,7 +437,7 @@ class Config {
 				'markers'     => Marker_Post_Type::get_marker_count(),
 				'tags'        => Tag_Taxonomy::get_tag_count(),
 			),
-			'mapConfig'      => $this->get_client_config(),
+			'mapConfig'      => $map_config,
 			'locationsConfig' => array(
 				'nonce'       => wp_create_nonce( 'wp_rest' ),
 				'restBase'    => Location_Post_Type::REST_BASE,
