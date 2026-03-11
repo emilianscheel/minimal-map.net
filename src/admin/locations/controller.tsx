@@ -13,6 +13,8 @@ import type {
 	LocationFormMode,
 	LocationFormState,
 	LocationRecord,
+	LogoRecord,
+	LogosAdminConfig,
 	LocationsAdminConfig,
 	MapCoordinates,
 	StyleThemeRecord,
@@ -20,6 +22,7 @@ import type {
 	TagsAdminConfig,
 } from '../../types';
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
+import { fetchAllLogos } from '../../lib/logos/fetchAllLogos';
 import { fetchAllTags } from '../../lib/tags/fetchAllTags';
 import { updateCollection } from '../../lib/collections/updateCollection';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
@@ -50,6 +53,7 @@ const DEFAULT_MAP_CENTER: MapCoordinates = {
 export function useLocationsController(
 	config: LocationsAdminConfig,
 	collectionsConfig: CollectionsAdminConfig,
+	logosConfig: LogosAdminConfig,
 	tagsConfig: TagsAdminConfig,
 	enabled: boolean,
 	themeData: {
@@ -75,6 +79,7 @@ export function useLocationsController(
 	const [geocodeNotice, setGeocodeNotice] = useState<string | null>(null);
 	const [locations, setLocations] = useState<LocationRecord[]>([]);
 	const [collections, setCollections] = useState<CollectionRecord[]>([]);
+	const [logos, setLogos] = useState<LogoRecord[]>([]);
 	const [tags, setTags] = useState<TagRecord[]>([]);
 	const [step, setStep] = useState<LocationDialogStep>('details');
 	const [view, setView] = useState<ViewTable>(DEFAULT_VIEW);
@@ -83,10 +88,16 @@ export function useLocationsController(
 	const [isAssignToCollectionModalOpen, setAssignToCollectionModalOpen] = useState(false);
 	const [selectedAssignmentLocation, setSelectedAssignmentLocation] = useState<LocationRecord | null>(null);
 	const [assignmentCollectionId, setAssignmentCollectionId] = useState('');
+	const [isAssignLogoModalOpen, setAssignLogoModalOpen] = useState(false);
+	const [selectedLogoLocation, setSelectedLogoLocation] = useState<LocationRecord | null>(null);
+	const [assignmentLogoId, setAssignmentLogoId] = useState('');
 	const [isAssignTagsModalOpen, setAssignTagsModalOpen] = useState(false);
 	const [selectedTagsLocation, setSelectedTagsLocation] = useState<LocationRecord | null>(null);
 	const [assignmentTagIds, setAssignmentTagIds] = useState<number[]>([]);
 	const [isAssignmentSaving, setAssignmentSaving] = useState(false);
+	const [isDeleteLogoConfirmationModalOpen, setDeleteLogoConfirmationModalOpen] = useState(false);
+	const [selectedLogoRemovalLocation, setSelectedLogoRemovalLocation] =
+		useState<LocationRecord | null>(null);
 	const [isRemoveCollectionAssignmentModalOpen, setRemoveCollectionAssignmentModalOpen] =
 		useState(false);
 	const [selectedRemovalLocation, setSelectedRemovalLocation] = useState<LocationRecord | null>(
@@ -108,13 +119,15 @@ export function useLocationsController(
 		setLoadError(null);
 
 		try {
-			const [locationRecords, collectionRecords, tagRecords] = await Promise.all([
+			const [locationRecords, collectionRecords, logoRecords, tagRecords] = await Promise.all([
 				fetchAllLocations(config),
 				fetchAllCollections(collectionsConfig),
+				fetchAllLogos(logosConfig),
 				fetchAllTags(tagsConfig),
 			]);
 			setLocations(locationRecords);
 			setCollections(collectionRecords);
+			setLogos(logoRecords);
 			setTags(tagRecords);
 		} catch (error) {
 			setLoadError(
@@ -125,7 +138,7 @@ export function useLocationsController(
 		} finally {
 			setLoading(false);
 		}
-	}, [collectionsConfig, config, enabled, tagsConfig]);
+	}, [collectionsConfig, config, enabled, logosConfig, tagsConfig]);
 
 	useEffect(() => {
 		configureApiFetch(collectionsConfig.nonce || config.nonce);
@@ -171,6 +184,7 @@ export function useLocationsController(
 	}, [collections]);
 
 	const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
+	const logosById = useMemo(() => new Map(logos.map((logo) => [logo.id, logo])), [logos]);
 
 	const getTagsForLocation = useCallback(
 		(locationId: number): TagRecord[] => {
@@ -183,6 +197,18 @@ export function useLocationsController(
 				.filter((tag): tag is TagRecord => !!tag);
 		},
 		[locations, tagsById]
+	);
+
+	const getLogoForLocation = useCallback(
+		(locationId: number): LogoRecord | null => {
+			const location = locations.find((loc) => loc.id === locationId);
+			if (!location || location.logo_id <= 0) {
+				return null;
+			}
+
+			return logosById.get(location.logo_id) ?? null;
+		},
+		[locations, logosById]
 	);
 
 	const resetDialogState = (): void => {
@@ -205,6 +231,12 @@ export function useLocationsController(
 		setAssignmentCollectionId('');
 	}, []);
 
+	const resetAssignLogoState = useCallback((): void => {
+		setAssignLogoModalOpen(false);
+		setSelectedLogoLocation(null);
+		setAssignmentLogoId('');
+	}, []);
+
 	const resetAssignTagsState = useCallback((): void => {
 		setAssignTagsModalOpen(false);
 		setSelectedTagsLocation(null);
@@ -219,6 +251,14 @@ export function useLocationsController(
 		resetAssignToCollectionState();
 	}, [isAssignmentSaving, resetAssignToCollectionState]);
 
+	const closeAssignLogoModal = useCallback((): void => {
+		if (isAssignmentSaving) {
+			return;
+		}
+
+		resetAssignLogoState();
+	}, [isAssignmentSaving, resetAssignLogoState]);
+
 	const closeAssignTagsModal = useCallback((): void => {
 		if (isAssignmentSaving) {
 			return;
@@ -226,6 +266,19 @@ export function useLocationsController(
 
 		resetAssignTagsState();
 	}, [isAssignmentSaving, resetAssignTagsState]);
+
+	const resetDeleteLogoConfirmationState = useCallback((): void => {
+		setDeleteLogoConfirmationModalOpen(false);
+		setSelectedLogoRemovalLocation(null);
+	}, []);
+
+	const closeDeleteLogoConfirmationModal = useCallback((): void => {
+		if (isAssignmentSaving) {
+			return;
+		}
+
+		resetDeleteLogoConfirmationState();
+	}, [isAssignmentSaving, resetDeleteLogoConfirmationState]);
 
 	const resetRemoveCollectionAssignmentState = useCallback((): void => {
 		setRemoveCollectionAssignmentModalOpen(false);
@@ -318,11 +371,58 @@ export function useLocationsController(
 		setAssignToCollectionModalOpen(true);
 	}, []);
 
+	const onOpenAssignLogoModal = useCallback((location: LocationRecord): void => {
+		setSelectedLogoLocation(location);
+		setAssignmentLogoId(location.logo_id > 0 ? `${location.logo_id}` : '');
+		setAssignLogoModalOpen(true);
+	}, []);
+
 	const onOpenAssignTagsModal = useCallback((location: LocationRecord): void => {
 		setSelectedTagsLocation(location);
 		setAssignmentTagIds(location.tag_ids);
 		setAssignTagsModalOpen(true);
 	}, []);
+
+	const onOpenDeleteLogoConfirmationModal = useCallback((location: LocationRecord): void => {
+		if (location.logo_id <= 0) {
+			return;
+		}
+
+		setSelectedLogoRemovalLocation(location);
+		setDeleteLogoConfirmationModalOpen(true);
+	}, []);
+
+	const onAssignLogoToLocation = useCallback(async (): Promise<void> => {
+		if (!selectedLogoLocation || !assignmentLogoId) {
+			return;
+		}
+
+		setAssignmentSaving(true);
+		setActionNotice(null);
+
+		try {
+			await updateLocation(config, selectedLogoLocation.id, {
+				...createLocationFormStateFromRecord(selectedLogoLocation),
+				logo_id: Number(assignmentLogoId),
+			});
+			await loadLocations();
+			setActionNotice({
+				status: 'success',
+				message: __('Location logo updated.', 'minimal-map'),
+			});
+			resetAssignLogoState();
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Location logo could not be updated.', 'minimal-map'),
+			});
+		} finally {
+			setAssignmentSaving(false);
+		}
+	}, [assignmentLogoId, config, loadLocations, resetAssignLogoState, selectedLogoLocation]);
 
 	const onAssignTagsToLocation = useCallback(async (): Promise<void> => {
 		if (!selectedTagsLocation) {
@@ -362,6 +462,38 @@ export function useLocationsController(
 		resetAssignTagsState,
 		selectedTagsLocation,
 	]);
+
+	const onClearLogoFromLocation = useCallback(async (): Promise<void> => {
+		if (!selectedLogoRemovalLocation) {
+			return;
+		}
+
+		setAssignmentSaving(true);
+		setActionNotice(null);
+
+		try {
+			await updateLocation(config, selectedLogoRemovalLocation.id, {
+				...createLocationFormStateFromRecord(selectedLogoRemovalLocation),
+				logo_id: 0,
+			});
+			await loadLocations();
+			setActionNotice({
+				status: 'success',
+				message: __('Logo removed from location.', 'minimal-map'),
+			});
+			resetDeleteLogoConfirmationState();
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Logo could not be removed from the location.', 'minimal-map'),
+			});
+		} finally {
+			setAssignmentSaving(false);
+		}
+	}, [config, loadLocations, resetDeleteLogoConfirmationState, selectedLogoRemovalLocation]);
 
 	const onOpenRemoveCollectionAssignmentModal = useCallback(
 		(location: LocationRecord, collection: CollectionRecord): void => {
@@ -855,14 +987,17 @@ export function useLocationsController(
 		actionNotice,
 		activeTheme: themeData.activeTheme,
 		assignmentCollectionId,
+		assignmentLogoId,
 		assignmentTagIds,
 		collections,
+		logos,
 		tags,
 		dismissActionNotice,
 		fieldErrors,
 		form,
 		formMode,
 		getCollectionsForLocation,
+		getLogoForLocation,
 		getTagsForLocation,
 		geocodeError,
 		geocodeNotice,
@@ -888,8 +1023,10 @@ export function useLocationsController(
 			</div>
 		) : null,
 		isAssignToCollectionModalOpen,
+		isAssignLogoModalOpen,
 		isAssignTagsModalOpen,
 		isAssignmentSaving,
+		isDeleteLogoConfirmationModalOpen,
 		isDialogOpen,
 		isGeocoding,
 		isLoading,
@@ -908,14 +1045,19 @@ export function useLocationsController(
 				: __('Add location', 'minimal-map'),
 		onBack,
 		onAssignLocationToCollection,
+		onAssignLogoToLocation,
 		onAssignTagsToLocation,
 		onCancel,
 		onChangeFormValue,
 		onCloseAssignToCollectionModal: closeAssignToCollectionModal,
+		onCloseAssignLogoModal: closeAssignLogoModal,
 		onCloseAssignTagsModal: closeAssignTagsModal,
+		onCloseDeleteLogoConfirmationModal: closeDeleteLogoConfirmationModal,
 		onCloseRemoveCollectionAssignmentModal: closeRemoveCollectionAssignmentModal,
 		onOpenAssignToCollectionModal,
+		onOpenAssignLogoModal,
 		onOpenAssignTagsModal,
+		onOpenDeleteLogoConfirmationModal,
 		onOpenRemoveCollectionAssignmentModal,
 		onChangeView: (nextView) => {
 			setView(nextView);
@@ -931,14 +1073,18 @@ export function useLocationsController(
 		onExportLocations,
 		onExportExample,
 		onMapLocationSelect,
+		onClearLogoFromLocation,
 		onRemoveCollectionAssignment,
 		onRetrieveLocation,
 		onSelectAssignmentCollection: setAssignmentCollectionId,
+		onSelectAssignmentLogo: setAssignmentLogoId,
 		onSelectAssignmentTags: setAssignmentTagIds,
 		onAddLocation: openDialog,
 		paginatedLocations,
 		selection,
 		selectedAssignmentLocation,
+		selectedLogoLocation,
+		selectedLogoRemovalLocation,
 		selectedTagsLocation,
 		selectedCoordinates,
 		selectedRemovalCollection,

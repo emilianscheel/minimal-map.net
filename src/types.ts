@@ -144,6 +144,7 @@ export type AdminSectionView =
 	| 'dashboard'
 	| 'locations'
 	| 'collections'
+	| 'logos'
 	| 'tags'
 	| 'markers'
 	| 'styles';
@@ -158,6 +159,7 @@ export interface AdminSection {
 export interface AdminStats {
 	locations: number;
 	collections: number;
+	logos: number;
 	markers: number;
 	tags: number;
 }
@@ -176,6 +178,12 @@ export interface CollectionsAdminConfig {
 }
 
 export interface MarkersAdminConfig {
+	nonce: string;
+	restBase: string;
+	restPath: string;
+}
+
+export interface LogosAdminConfig {
 	nonce: string;
 	restBase: string;
 	restPath: string;
@@ -201,6 +209,18 @@ export interface LocationRestResponse {
 	};
 	meta?: Partial<LocationMeta>;
 	minimal_map_tag?: number[];
+}
+
+export interface LogoRestResponse {
+	id: number;
+	title?: {
+		raw?: string;
+		rendered?: string;
+	};
+	content?: {
+		raw?: string;
+		rendered?: string;
+	};
 }
 
 export interface CollectionMeta {
@@ -231,13 +251,14 @@ export interface AdminAppConfig {
 	locationsConfig: LocationsAdminConfig;
 	collectionsConfig: CollectionsAdminConfig;
 	markersConfig: MarkersAdminConfig;
+	logosConfig: LogosAdminConfig;
 	tagsConfig: TagsAdminConfig;
 	stylesConfig: StylesAdminConfig;
 }
 
 export type DashboardCardView = Extract<
 	AdminSectionView,
-	'locations' | 'collections' | 'markers' | 'tags'
+	'locations' | 'collections' | 'logos' | 'markers' | 'tags'
 >;
 
 export interface MapBlockAttributes {
@@ -288,6 +309,7 @@ export interface LocationMeta {
 	country: string;
 	latitude: string;
 	longitude: string;
+	logo_id: number;
 }
 
 export interface LocationRecord extends LocationMeta {
@@ -313,6 +335,12 @@ export interface TagRecord extends TagMeta {
 }
 
 export interface MarkerRecord {
+	id: number;
+	title: string;
+	content: string;
+}
+
+export interface LogoRecord {
 	id: number;
 	title: string;
 	content: string;

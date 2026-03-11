@@ -7,6 +7,7 @@ import {
 	Download,
 	FileUp,
 	FolderTree,
+	Image,
 	LayoutDashboard,
 	Layers3,
 	MapPin,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 import CollectionsView, { useCollectionsController } from './collections';
 import LocationsView, { useLocationsController } from './locations';
+import LogosView, { useLogosController } from './logos';
 import MarkersView, { useMarkersController } from './markers';
 import TagsView, { useTagsController } from './tags';
 import StylesView from './styles';
@@ -40,6 +42,7 @@ const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 	stats: {
 		locations: 0,
 		collections: 0,
+		logos: 0,
 		markers: 0,
 		tags: 0,
 	},
@@ -55,6 +58,11 @@ const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		geocodePath: '',
 	},
 	markersConfig: {
+		nonce: '',
+		restBase: '',
+		restPath: '',
+	},
+	logosConfig: {
 		nonce: '',
 		restBase: '',
 		restPath: '',
@@ -78,16 +86,18 @@ const ICONS: Record<AdminSectionView, LucideIcon> = {
 	dashboard: LayoutDashboard,
 	locations: MapPinned,
 	collections: Layers3,
+	logos: Image,
 	tags: Tags,
 	markers: MapPin,
 	styles: Palette,
 };
 
-const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'markers', 'tags' ];
+const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'logos', 'markers', 'tags' ];
 
 const CARD_COPY: Record<DashboardCardView, string> = {
 	locations: __('Manage every place you want to render on your maps and prepare it for future block integrations.', 'minimal-map'),
 	collections: __('Build reusable groups of locations and curate map-ready sets without changing the location editor flow.', 'minimal-map'),
+	logos: __('Upload reusable SVG logos and assign them across multiple locations without duplicating assets.', 'minimal-map'),
 	markers: __('Create marker variants and keep your map pin system consistent across locations and styles.', 'minimal-map'),
 	tags: __('Add lightweight labels that make large map datasets easier to sort, search, and evolve.', 'minimal-map'),
 };
@@ -95,6 +105,7 @@ const CARD_COPY: Record<DashboardCardView, string> = {
 const CTA_COPY: Record<DashboardCardView, string> = {
 	locations: __('Open locations', 'minimal-map'),
 	collections: __('Open collections', 'minimal-map'),
+	logos: __('Open logos', 'minimal-map'),
 	markers: __('Open markers', 'minimal-map'),
 	tags: __('Open tags', 'minimal-map'),
 };
@@ -102,6 +113,7 @@ const CTA_COPY: Record<DashboardCardView, string> = {
 const COUNT_KEYS: Record<DashboardCardView, keyof AdminAppConfig['stats']> = {
 	locations: 'locations',
 	collections: 'collections',
+	logos: 'logos',
 	markers: 'markers',
 	tags: 'tags',
 };
@@ -274,6 +286,7 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 	const locationsController = useLocationsController(
 		adminConfig.locationsConfig,
 		adminConfig.collectionsConfig,
+		adminConfig.logosConfig,
 		adminConfig.tagsConfig,
 		activeSection.view === 'locations',
 		{
@@ -301,6 +314,11 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 			onSwitchTheme: stylesController.switchTheme,
 		}
 	);
+	const logosController = useLogosController(
+		adminConfig.logosConfig,
+		adminConfig.locationsConfig,
+		activeSection.view === 'logos'
+	);
 	const tagsController = useTagsController(
 		adminConfig.tagsConfig,
 		activeSection.view === 'tags',
@@ -325,6 +343,8 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 								? locationsController.headerAction
 								: activeSection.view === 'collections'
 									? collectionsController.headerAction
+									: activeSection.view === 'logos'
+										? logosController.headerAction
 									: activeSection.view === 'markers'
 										? markersController.headerAction
 										: activeSection.view === 'tags'
@@ -346,6 +366,8 @@ function App({ currentView }: { currentView: AdminSectionView }) {
 							<LocationsView controller={locationsController} />
 						) : activeSection.view === 'collections' ? (
 							<CollectionsView controller={collectionsController} />
+						) : activeSection.view === 'logos' ? (
+							<LogosView controller={logosController} />
 						) : activeSection.view === 'markers' ? (
 							<MarkersView controller={markersController} />
 						) : activeSection.view === 'tags' ? (

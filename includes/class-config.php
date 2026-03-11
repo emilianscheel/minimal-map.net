@@ -8,6 +8,7 @@
 namespace MinimalMap;
 
 use MinimalMap\Collections\Collection_Post_Type;
+use MinimalMap\Logos\Logo_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Markers\Marker_Post_Type;
 use MinimalMap\Tags\Tag_Taxonomy;
@@ -384,6 +385,7 @@ class Config {
 			'stats'          => array(
 				'locations'   => Location_Post_Type::get_location_count(),
 				'collections' => Collection_Post_Type::get_collection_count(),
+				'logos'       => Logo_Post_Type::get_logo_count(),
 				'markers'     => Marker_Post_Type::get_marker_count(),
 				'tags'        => Tag_Taxonomy::get_tag_count(),
 			),
@@ -403,6 +405,11 @@ class Config {
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => Marker_Post_Type::REST_BASE,
 				'restPath' => Marker_Post_Type::get_rest_path(),
+			),
+			'logosConfig' => array(
+				'nonce'    => wp_create_nonce( 'wp_rest' ),
+				'restBase' => Logo_Post_Type::REST_BASE,
+				'restPath' => Logo_Post_Type::get_rest_path(),
 			),
 			'tagsConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),

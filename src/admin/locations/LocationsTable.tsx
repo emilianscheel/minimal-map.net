@@ -3,8 +3,9 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewTable } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import { Copy, Layers3, LocateFixed, Pencil, Tags, Trash2 } from 'lucide-react';
+import { Copy, Image, Layers3, LocateFixed, Pencil, Tags, Trash2 } from 'lucide-react';
 import LocationMiniMap from '../../components/LocationMiniMap';
+import LogoPreview from '../../components/LogoPreview';
 import TagBadge from '../../components/TagBadge';
 import type { LocationRecord } from '../../types';
 import { formatLocationAddressLines } from '../../lib/locations/formatLocationAddressLines';
@@ -37,6 +38,32 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				enableSorting: false,
 				filterBy: false,
 				render: ({ item }) => <LocationMiniMap location={item} theme={controller.activeTheme} />,
+			},
+			{
+				id: 'logo',
+				label: __('Logo', 'minimal-map'),
+				enableHiding: false,
+				enableSorting: false,
+				filterBy: false,
+				render: ({ item }) => {
+					const logo = controller.getLogoForLocation(item.id);
+
+					if (!logo) {
+						return <span className="minimal-map-admin__location-logo-empty">—</span>;
+					}
+
+					return (
+						<div className="minimal-map-admin__location-logo-cell">
+							<button
+								type="button"
+								className="minimal-map-admin__location-logo-button"
+								onClick={() => controller.onOpenDeleteLogoConfirmationModal(item)}
+							>
+								<LogoPreview logo={logo} className="minimal-map-admin__location-logo-preview" />
+							</button>
+						</div>
+					);
+				},
 			},
 			{
 				id: 'title',
@@ -226,6 +253,21 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 					}
 
 					controller.onOpenAssignToCollectionModal(items[0]);
+				},
+			},
+			{
+				id: 'assign-logo',
+				label: __('Assign Logo', 'minimal-map'),
+				icon: <Image size={16} strokeWidth={2} />,
+				context: 'single',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: false,
+				callback: (items) => {
+					if (!items[0]) {
+						return;
+					}
+
+					controller.onOpenAssignLogoModal(items[0]);
 				},
 			},
 			{

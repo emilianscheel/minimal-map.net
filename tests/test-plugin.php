@@ -80,6 +80,22 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create one published logo post.
+	 *
+	 * @return int
+	 */
+	private function create_logo() {
+		return self::factory()->post->create(
+			array(
+				'post_status'  => 'publish',
+				'post_title'   => 'Logo ' . wp_generate_uuid4(),
+				'post_content' => '<svg viewBox="0 0 32 32"></svg>',
+				'post_type'    => \MinimalMap\Logos\Logo_Post_Type::POST_TYPE,
+			)
+		);
+	}
+
+	/**
 	 * The block should be registered on init.
 	 *
 	 * @return void
@@ -269,6 +285,28 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The logo post type should be registered on init.
+	 *
+	 * @return void
+	 */
+	public function test_logo_post_type_is_registered() {
+		$this->assertTrue( post_type_exists( \MinimalMap\Logos\Logo_Post_Type::POST_TYPE ) );
+	}
+
+	/**
+	 * Location logo meta should be registered as integer.
+	 *
+	 * @return void
+	 */
+	public function test_location_logo_meta_is_registered() {
+		$registered = get_registered_meta_keys( 'post', \MinimalMap\Locations\Location_Post_Type::POST_TYPE );
+
+		$this->assertArrayHasKey( 'logo_id', $registered );
+		$this->assertSame( 'integer', $registered['logo_id']['type'] );
+		$this->assertTrue( $registered['logo_id']['single'] );
+	}
+
+	/**
 	 * Admin app config should expose collections metadata.
 	 *
 	 * @return void
@@ -290,6 +328,31 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			\MinimalMap\Collections\Collection_Post_Type::get_rest_path(),
 			$admin_config['collectionsConfig']['restPath']
+		);
+	}
+
+	/**
+	 * Admin app config should expose logos metadata.
+	 *
+	 * @return void
+	 */
+	public function test_admin_app_config_includes_logos() {
+		$config = new \MinimalMap\Config();
+
+		$this->create_logo();
+
+		$admin_config = $config->get_admin_app_config();
+		$views        = wp_list_pluck( $admin_config['sections'], 'view' );
+
+		$this->assertContains( 'logos', $views, true );
+		$this->assertSame( 1, $admin_config['stats']['logos'] );
+		$this->assertSame(
+			\MinimalMap\Logos\Logo_Post_Type::REST_BASE,
+			$admin_config['logosConfig']['restBase']
+		);
+		$this->assertSame(
+			\MinimalMap\Logos\Logo_Post_Type::get_rest_path(),
+			$admin_config['logosConfig']['restPath']
 		);
 	}
 }

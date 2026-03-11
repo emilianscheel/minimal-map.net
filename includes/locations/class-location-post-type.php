@@ -43,6 +43,7 @@ class Location_Post_Type {
 		'country'      => 'sanitize_text_field',
 		'latitude'     => 'sanitize_text_field',
 		'longitude'    => 'sanitize_text_field',
+		'logo_id'      => 'absint',
 	);
 
 	/**
@@ -82,7 +83,7 @@ class Location_Post_Type {
 					'sanitize_callback' => $sanitize_callback,
 					'show_in_rest'      => true,
 					'single'            => true,
-					'type'              => 'string',
+					'type'              => 'logo_id' === $meta_key ? 'integer' : 'string',
 				)
 			);
 		}

@@ -14,6 +14,7 @@ export const DEFAULT_FORM_STATE: LocationFormState = {
 	country: '',
 	latitude: '',
 	longitude: '',
+	logo_id: 0,
 	tag_ids: [],
 };
 
@@ -23,6 +24,7 @@ export const DEFAULT_VIEW: ViewTable = {
 	perPage: 10,
 	fields: [
 		'map_preview',
+		'logo',
 		'title',
 		'contact',
 		'address',

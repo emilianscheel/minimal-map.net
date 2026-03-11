@@ -195,6 +195,7 @@ svg.lucide {
 }
 
 .minimal-map-admin__markers-content,
+.minimal-map-admin__logos-content,
 .minimal-map-admin__locations-content,
 .minimal-map-admin__collections-content {
   flex: 1;
@@ -504,6 +505,58 @@ svg.lucide {
   }
 }
 
+.minimal-map-admin__logo-preview-surface {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f1;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.minimal-map-admin__logo-preview {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minimal-map-admin__logo-preview-svg {
+  width: 50%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.minimal-map-admin__logos-grid-wrap {
+  .dataviews-view-grid__media {
+    background: transparent;
+    min-height: 220px;
+  }
+
+  .dataviews-view-grid__title-field {
+    font-family: monospace;
+    font-size: 0.875rem;
+    word-break: break-all;
+  }
+}
+
 .minimal-map-admin__tag-grid-preview {
   display: flex;
   align-items: center;
@@ -637,6 +690,12 @@ svg.lucide {
   width: 100%;
 }
 
+.minimal-map-admin__locations-table-wrap .dataviews-view-table__cell--logo,
+.minimal-map-admin__locations-table-wrap .dataviews-view-table__cell--logo .dataviews-view-table__cell-content {
+  width: 88px;
+  min-width: 88px;
+}
+
 /* Fix checkbox alignment in DataViews table */
 .minimal-map-admin__locations-table-wrap
   .dataviews-view-table
@@ -707,6 +766,38 @@ svg.lucide {
 
 .minimal-map-admin__location-mini-map-marker path {
   vector-effect: non-scaling-stroke;
+}
+
+.minimal-map-admin__location-logo-cell {
+  display: flex;
+  align-items: center;
+}
+
+.minimal-map-admin__location-logo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border: 1px solid #dcdcde;
+  border-radius: 12px;
+  background: #f0f0f1;
+  cursor: pointer;
+}
+
+.minimal-map-admin__location-logo-button:focus-visible {
+  outline: 2px solid #3858e8;
+  outline-offset: 2px;
+}
+
+.minimal-map-admin__location-logo-preview .minimal-map-admin__logo-preview-svg {
+  width: 70%;
+  height: 70%;
+}
+
+.minimal-map-admin__location-logo-empty {
+  color: #646970;
 }
 
 .minimal-map-admin__collection-mini-map {
@@ -831,6 +922,33 @@ svg.lucide {
   justify-content: flex-end;
   gap: 12px;
   margin-top: 4px;
+}
+
+.minimal-map-admin__assigned-logo-card {
+  display: grid;
+  gap: 12px;
+}
+
+.minimal-map-admin__assigned-logo-surface {
+  min-height: 160px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dcdcde;
+  border-radius: 12px;
+  background: #f0f0f1;
+}
+
+.minimal-map-admin__assigned-logo-preview .minimal-map-admin__logo-preview-svg {
+  width: 55%;
+  height: 55%;
+}
+
+.minimal-map-admin__logo-filename {
+  font-family: monospace;
+  font-size: 0.875rem;
+  word-break: break-all;
 }
 
 .minimal-map-admin__location-dialog {

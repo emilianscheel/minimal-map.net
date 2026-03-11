@@ -24,6 +24,8 @@ const LOCATIONS: LocationRecord[] = [
 		country: 'Germany',
 		latitude: '52.517',
 		longitude: '13.388',
+		logo_id: 0,
+		tag_ids: [],
 	},
 	{
 		id: 2,
@@ -39,6 +41,8 @@ const LOCATIONS: LocationRecord[] = [
 		country: 'Germany',
 		latitude: '48.137154',
 		longitude: '11.576124',
+		logo_id: 0,
+		tag_ids: [],
 	},
 	{
 		id: 3,
@@ -54,6 +58,8 @@ const LOCATIONS: LocationRecord[] = [
 		country: 'Germany',
 		latitude: '53.543764',
 		longitude: '9.966819',
+		logo_id: 0,
+		tag_ids: [],
 	},
 	{
 		id: 4,
@@ -69,6 +75,8 @@ const LOCATIONS: LocationRecord[] = [
 		country: 'Germany',
 		latitude: '',
 		longitude: '',
+		logo_id: 0,
+		tag_ids: [],
 	},
 ];
 

@@ -10,6 +10,7 @@ namespace MinimalMap;
 use MinimalMap\Admin\Admin_Menu;
 use MinimalMap\Blocks\Map_Block;
 use MinimalMap\Collections\Collection_Post_Type;
+use MinimalMap\Logos\Logo_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Markers\Marker_Post_Type;
 use MinimalMap\Tags\Tag_Taxonomy;
@@ -54,6 +55,13 @@ final class Plugin {
 	 * @var Collection_Post_Type
 	 */
 	private $collection_post_type;
+
+	/**
+	 * Logos content model service.
+	 *
+	 * @var Logo_Post_Type
+	 */
+	private $logo_post_type;
 
 	/**
 	 * Locations content model service.
@@ -113,6 +121,7 @@ final class Plugin {
 		$this->map_block          = new Map_Block( $map_view );
 		$this->admin_menu         = new Admin_Menu();
 		$this->collection_post_type = new Collection_Post_Type();
+		$this->logo_post_type     = new Logo_Post_Type();
 		$this->location_post_type = new Location_Post_Type();
 		$this->marker_post_type   = new Marker_Post_Type();
 		$this->tag_taxonomy       = new Tag_Taxonomy();
@@ -130,6 +139,7 @@ final class Plugin {
 	private function register_hooks() {
 		add_action( 'init', array( $this->collection_post_type, 'register' ), 5 );
 		add_action( 'init', array( $this->tag_taxonomy, 'register' ), 5 );
+		add_action( 'init', array( $this->logo_post_type, 'register' ), 6 );
 		add_action( 'init', array( $this->location_post_type, 'register' ), 6 );
 		add_action( 'init', array( $this->marker_post_type, 'register' ), 6 );
 		add_action( 'init', array( $this->assets, 'register' ) );

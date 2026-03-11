@@ -49,6 +49,10 @@ class Admin_Menu {
 				'title'       => __( 'Tags', 'minimal-map' ),
 				'description' => __( 'Apply lightweight labels to keep map content easy to organize.', 'minimal-map' ),
 			),
+			'logos'      => array(
+				'title'       => __( 'Logos', 'minimal-map' ),
+				'description' => __( 'Upload SVG logos and assign them across multiple locations.', 'minimal-map' ),
+			),
 			'markers'    => array(
 				'title'       => __( 'Markers', 'minimal-map' ),
 				'description' => __( 'Define the marker styles and visual pin variants used across maps.', 'minimal-map' ),
