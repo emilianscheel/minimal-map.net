@@ -482,12 +482,13 @@ function createWordPressSearchControl(host, map, initialConfig, initialSelectedI
   const root = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createRoot)(container);
   const onSelect = location => {
     onLocationSelect?.(location);
+    const isMobile = window.innerWidth <= 600;
     map.easeTo({
       center: [location.lng, location.lat],
       zoom: Math.max(map.getZoom(), 15),
       padding: {
-        left: initialConfig.allowSearch ? 368 : 0,
-        top: 0,
+        left: !isMobile && initialConfig.allowSearch ? 368 : 0,
+        top: isMobile ? 80 : 0,
         right: 0,
         bottom: 0
       },

@@ -230,11 +230,17 @@ export function createWordPressSearchControl(
 
   const onSelect = (location: MapLocationPoint) => {
   	onLocationSelect?.(location);
+    const isMobile = window.innerWidth <= 600;
   	map.easeTo(
   		{
   			center: [location.lng, location.lat],
   			zoom: Math.max(map.getZoom(), 15),
-  			padding: { left: initialConfig.allowSearch ? 368 : 0, top: 0, right: 0, bottom: 0 },
+  			padding: { 
+          left: !isMobile && initialConfig.allowSearch ? 368 : 0, 
+          top: isMobile ? 80 : 0, 
+          right: 0, 
+          bottom: 0 
+        },
   			essential: true,
   		},
   		{ isMinimalMapInternal: true },
