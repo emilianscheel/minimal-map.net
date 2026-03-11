@@ -39,22 +39,22 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const runtimeConfig = window.MinimalMapBlockConfig ?? {};
-const HEIGHT_UNITS = (runtimeConfig.heightUnits ?? ['px', 'em', 'rem', '%', 'vh', 'vw']).map(value => ({
+const HEIGHT_UNITS = (runtimeConfig.heightUnits ?? ["px", "em", "rem", "%", "vh", "vw"]).map(value => ({
   label: value,
   value
 }));
-const BORDER_UNITS = ['px', 'em', 'rem'].map(value => ({
+const BORDER_UNITS = ["px", "em", "rem"].map(value => ({
   label: value,
   value
 }));
 function parseHeightValue(rawValue, fallbackUnit) {
-  if (typeof rawValue === 'number') {
+  if (typeof rawValue === "number") {
     return {
       height: rawValue,
       heightUnit: (0,_map_defaults__WEBPACK_IMPORTED_MODULE_7__.normalizeHeightUnit)(fallbackUnit)
     };
   }
-  if (typeof rawValue !== 'string') {
+  if (typeof rawValue !== "string") {
     return null;
   }
   const match = rawValue.trim().match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
@@ -66,11 +66,11 @@ function parseHeightValue(rawValue, fallbackUnit) {
     heightUnit: (0,_map_defaults__WEBPACK_IMPORTED_MODULE_7__.normalizeHeightUnit)(match[2] || fallbackUnit)
   };
 }
-function parseLengthValue(rawValue, fallback = '1px') {
-  if (typeof rawValue === 'number') {
+function parseLengthValue(rawValue, fallback = "1px") {
+  if (typeof rawValue === "number") {
     return `${rawValue}px`;
   }
-  if (typeof rawValue !== 'string') {
+  if (typeof rawValue !== "string") {
     return null;
   }
   const trimmed = rawValue.trim();
@@ -78,26 +78,26 @@ function parseLengthValue(rawValue, fallback = '1px') {
   if (!match) {
     return null;
   }
-  if (trimmed === '0') {
-    return '0px';
+  if (trimmed === "0") {
+    return "0px";
   }
-  const unit = match[2] || fallback.replace(/^-?\d*\.?\d+/, '') || 'px';
+  const unit = match[2] || fallback.replace(/^-?\d*\.?\d+/, "") || "px";
   return `${Number(match[1])}${(0,_map_defaults__WEBPACK_IMPORTED_MODULE_7__.normalizeHeightUnit)(unit)}`;
 }
 function stringifyBorderRadiusValue(value) {
   if (!value) {
-    return '2px';
+    return "2px";
   }
-  if (typeof value === 'string') {
-    return value.trim() || '2px';
+  if (typeof value === "string") {
+    return value.trim() || "2px";
   }
-  const topLeft = value.topLeft ?? value.top ?? '';
-  const topRight = value.topRight ?? value.right ?? '';
-  const bottomRight = value.bottomRight ?? value.bottom ?? '';
-  const bottomLeft = value.bottomLeft ?? value.left ?? '';
-  const values = [topLeft, topRight, bottomRight, bottomLeft].filter(part => typeof part === 'string' && part.length > 0);
+  const topLeft = value.topLeft ?? value.top ?? "";
+  const topRight = value.topRight ?? value.right ?? "";
+  const bottomRight = value.bottomRight ?? value.bottom ?? "";
+  const bottomLeft = value.bottomLeft ?? value.left ?? "";
+  const values = [topLeft, topRight, bottomRight, bottomLeft].filter(part => typeof part === "string" && part.length > 0);
   if (values.length === 0) {
-    return '2px';
+    return "2px";
   }
   const [first, second = first, third = first, fourth = second] = values;
   if (first === second && second === third && third === fourth) {
@@ -113,10 +113,10 @@ function stringifyBorderRadiusValue(value) {
 }
 function parseBorderRadiusValue(value) {
   if (!value) {
-    return '2px';
+    return "2px";
   }
-  if (typeof value !== 'string') {
-    const topLeft = value.topLeft ?? value.top ?? '2px';
+  if (typeof value !== "string") {
+    const topLeft = value.topLeft ?? value.top ?? "2px";
     const topRight = value.topRight ?? value.right ?? topLeft;
     const bottomRight = value.bottomRight ?? value.bottom ?? topLeft;
     const bottomLeft = value.bottomLeft ?? value.left ?? topRight;
@@ -129,7 +129,7 @@ function parseBorderRadiusValue(value) {
   }
   const parts = value.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) {
-    return '2px';
+    return "2px";
   }
   const [topLeft, second = topLeft, third = topLeft, fourth = second] = parts;
   if (parts.length === 1) {
@@ -169,25 +169,25 @@ function ZoomControlColorSettings({
 }) {
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
     style: {
-      display: 'grid',
-      gap: '8px',
-      marginBottom: '16px'
+      display: "grid",
+      gap: "8px",
+      marginBottom: "16px"
     },
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(CompactColorDropdown, {
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Background', 'minimal-map'),
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Background", "minimal-map"),
       value: backgroundColor,
       defaultValue: defaultBackgroundColor,
-      onChange: value => onChange('zoomControlsBackgroundColor', value)
+      onChange: value => onChange("zoomControlsBackgroundColor", value)
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(CompactColorDropdown, {
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Foreground', 'minimal-map'),
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Foreground", "minimal-map"),
       value: iconColor,
       defaultValue: defaultIconColor,
-      onChange: value => onChange('zoomControlsIconColor', value)
+      onChange: value => onChange("zoomControlsIconColor", value)
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(CompactColorDropdown, {
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Border', 'minimal-map'),
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Border", "minimal-map"),
       value: borderColor,
       defaultValue: defaultBorderColor,
-      onChange: value => onChange('zoomControlsBorderColor', value)
+      onChange: value => onChange("zoomControlsBorderColor", value)
     })]
   });
 }
@@ -200,7 +200,7 @@ function CompactColorDropdown({
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
     className: "minimal-map-editor__compact-color-dropdown",
     popoverProps: {
-      placement: 'left-start',
+      placement: "left-start",
       offset: 36,
       shift: true
     },
@@ -213,10 +213,10 @@ function CompactColorDropdown({
       onClick: onToggle,
       "aria-expanded": isOpen,
       style: {
-        width: '100%',
-        justifyContent: 'flex-start',
-        paddingInline: '12px',
-        color: 'var(--wp-components-color-foreground, #1e1e1e)'
+        width: "100%",
+        justifyContent: "flex-start",
+        paddingInline: "12px",
+        color: "var(--wp-components-color-foreground, #1e1e1e)"
       },
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHStack, {
         justify: "flex-start",
@@ -232,15 +232,15 @@ function CompactColorDropdown({
     renderContent: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalDropdownContentWrapper, {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
         style: {
-          width: '280px',
-          maxWidth: 'min(280px, 100vw - 32px)'
+          width: "280px",
+          maxWidth: "min(280px, 100vw - 32px)"
         },
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.__experimentalColorGradientControl, {
           label: label,
           showTitle: false,
           clearable: false,
           enableAlpha: false,
-          onColorChange: nextValue => onChange(typeof nextValue === 'string' && nextValue.length > 0 ? nextValue : defaultValue),
+          onColorChange: nextValue => onChange(typeof nextValue === "string" && nextValue.length > 0 ? nextValue : defaultValue),
           colorValue: value
         })
       })
@@ -252,20 +252,20 @@ function ThemeDropdown({
   selectedSlug,
   onChange
 }) {
-  const selectedTheme = themes.find(theme => theme.slug === selectedSlug) || themes.find(theme => theme.slug === 'default');
-  const selectedLabel = selectedTheme?.label || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Default', 'minimal-map');
+  const selectedTheme = themes.find(theme => theme.slug === selectedSlug) || themes.find(theme => theme.slug === "default");
+  const selectedLabel = selectedTheme?.label || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Default", "minimal-map");
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
     style: {
-      display: 'grid',
-      gap: '8px',
-      marginBottom: '16px'
+      display: "grid",
+      gap: "8px",
+      marginBottom: "16px"
     },
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Style Theme', 'minimal-map')
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Style Theme", "minimal-map")
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
       className: "minimal-map-editor__theme-dropdown",
       popoverProps: {
-        placement: 'left-start',
+        placement: "left-start",
         offset: 36,
         shift: true
       },
@@ -278,9 +278,9 @@ function ThemeDropdown({
         onClick: onToggle,
         "aria-expanded": isOpen,
         style: {
-          width: '100%',
-          justifyContent: 'space-between',
-          paddingInline: '12px'
+          width: "100%",
+          justifyContent: "space-between",
+          paddingInline: "12px"
         },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
           children: selectedLabel
@@ -294,7 +294,7 @@ function ThemeDropdown({
       renderContent: ({
         onClose
       }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.MenuGroup, {
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Switch Theme', 'minimal-map'),
+        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Switch Theme", "minimal-map"),
         children: themes.map(theme => {
           const isSelected = theme.slug === selectedSlug;
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.MenuItem, {
@@ -305,7 +305,7 @@ function ThemeDropdown({
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHStack, {
               justify: "space-between",
               style: {
-                width: '100%'
+                width: "100%"
               },
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
                 children: theme.label
@@ -313,7 +313,7 @@ function ThemeDropdown({
                 size: 16,
                 style: {
                   flexShrink: 0,
-                  color: 'var(--wp-admin-theme-color, #3858e8)'
+                  color: "var(--wp-admin-theme-color, #3858e8)"
                 }
               })]
             })
@@ -329,19 +329,19 @@ function CollectionDropdown({
   onChange
 }) {
   const selectedCollection = options.find(option => option.id === selectedId);
-  const selectedLabel = selectedId > 0 ? selectedCollection?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Collection unavailable', 'minimal-map') : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('All locations', 'minimal-map');
+  const selectedLabel = selectedId > 0 ? selectedCollection?.title || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Collection unavailable", "minimal-map") : (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("All locations", "minimal-map");
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
     style: {
-      display: 'grid',
-      gap: '8px',
-      marginBottom: '16px'
+      display: "grid",
+      gap: "8px",
+      marginBottom: "16px"
     },
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
-      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Collection', 'minimal-map')
+      children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Collection", "minimal-map")
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Dropdown, {
       className: "minimal-map-editor__collection-dropdown",
       popoverProps: {
-        placement: 'left-start',
+        placement: "left-start",
         offset: 36,
         shift: true
       },
@@ -354,9 +354,9 @@ function CollectionDropdown({
         onClick: onToggle,
         "aria-expanded": isOpen,
         style: {
-          width: '100%',
-          justifyContent: 'space-between',
-          paddingInline: '12px'
+          width: "100%",
+          justifyContent: "space-between",
+          paddingInline: "12px"
         },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
           children: selectedLabel
@@ -370,7 +370,7 @@ function CollectionDropdown({
       renderContent: ({
         onClose
       }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.MenuGroup, {
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Switch Collection', 'minimal-map'),
+        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Switch Collection", "minimal-map"),
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.MenuItem, {
           onClick: () => {
             onChange(0);
@@ -379,15 +379,15 @@ function CollectionDropdown({
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHStack, {
             justify: "space-between",
             style: {
-              width: '100%'
+              width: "100%"
             },
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
-              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('All locations', 'minimal-map')
+              children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("All locations", "minimal-map")
             }), selectedId === 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_4__["default"], {
               size: 16,
               style: {
                 flexShrink: 0,
-                color: 'var(--wp-admin-theme-color, #3858e8)'
+                color: "var(--wp-admin-theme-color, #3858e8)"
               }
             })]
           })
@@ -401,7 +401,7 @@ function CollectionDropdown({
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalHStack, {
               justify: "space-between",
               style: {
-                width: '100%'
+                width: "100%"
               },
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("span", {
                 children: option.title
@@ -409,18 +409,18 @@ function CollectionDropdown({
                 size: 16,
                 style: {
                   flexShrink: 0,
-                  color: 'var(--wp-admin-theme-color, #3858e8)'
+                  color: "var(--wp-admin-theme-color, #3858e8)"
                 }
               })]
             })
           }, option.id);
         }), options.length === 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
           style: {
-            padding: '8px 12px',
-            color: '#757575',
-            fontSize: '12px'
+            padding: "8px 12px",
+            color: "#757575",
+            fontSize: "12px"
           },
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('No collections available.', 'minimal-map')
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("No collections available.", "minimal-map")
         }) : null]
       })
     })]
@@ -439,7 +439,7 @@ function Edit({
     locations: attributes.collectionId > 0 ? selectedCollection?.locations ?? [] : undefined
   }, runtimeConfig), [attributes, selectedCollection]);
   const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)({
-    className: 'minimal-map-editor'
+    className: "minimal-map-editor"
   });
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
     if (!mapRef.current) {
@@ -468,7 +468,7 @@ function Edit({
     };
   }
   const updateHeight = value => {
-    const parsed = parseHeightValue(value, attributes.heightUnit || 'px');
+    const parsed = parseHeightValue(value, attributes.heightUnit || "px");
     if (!parsed || Number.isNaN(parsed.height) || parsed.height <= 0) {
       return;
     }
@@ -478,14 +478,14 @@ function Edit({
     });
   };
   const updateZoom = value => {
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       setAttributes({
         zoom: value
       });
     }
   };
   const updateBorderWidth = value => {
-    const parsed = parseLengthValue(value, attributes.zoomControlsBorderWidth || '1px');
+    const parsed = parseLengthValue(value, attributes.zoomControlsBorderWidth || "1px");
     if (parsed) {
       setAttributes({
         zoomControlsBorderWidth: parsed
@@ -495,36 +495,36 @@ function Edit({
   if (attributes._isPreview) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
       ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)({
-        className: 'minimal-map-editor__preview minimal-map-editor--preview',
+        className: "minimal-map-editor__preview minimal-map-editor--preview",
         style: {
-          backgroundImage: runtimeConfig.previewImageUrl ? `url(${runtimeConfig.previewImageUrl})` : 'none',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#f0f0f1',
-          color: '#757575',
-          fontSize: '13px'
+          backgroundImage: runtimeConfig.previewImageUrl ? `url(${runtimeConfig.previewImageUrl})` : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f0f0f1",
+          color: "#757575",
+          fontSize: "13px"
         }
       }),
       children: !runtimeConfig.previewImageUrl && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
         style: {
-          textAlign: 'center',
-          padding: '20px'
+          textAlign: "center",
+          padding: "20px"
         },
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(MapPinned, {
           size: 48,
           style: {
-            marginBottom: '12px',
+            marginBottom: "12px",
             opacity: 0.5
           }
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("p", {
           style: {
             margin: 0
           },
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Minimal Map Preview', 'minimal-map')
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Minimal Map Preview", "minimal-map")
         })]
       })
     });
@@ -533,7 +533,7 @@ function Edit({
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
       group: "settings",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Map Settings', 'minimal-map'),
+        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Map Settings", "minimal-map"),
         initialOpen: true,
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(CollectionDropdown, {
           options: runtimeConfig.collections ?? [],
@@ -548,38 +548,38 @@ function Edit({
             styleThemeSlug: value
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Center Latitude', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Center Latitude", "minimal-map"),
           type: "number",
           step: "0.000001",
           value: attributes.centerLat,
-          onChange: updateNumberAttribute('centerLat')
+          onChange: updateNumberAttribute("centerLat")
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Center Longitude', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Center Longitude", "minimal-map"),
           type: "number",
           step: "0.000001",
           value: attributes.centerLng,
-          onChange: updateNumberAttribute('centerLng')
+          onChange: updateNumberAttribute("centerLng")
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.RangeControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Zoom', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Zoom", "minimal-map"),
           value: attributes.zoom,
           onChange: updateZoom,
           min: 0,
           max: 22,
           step: 0.5
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Show Zoom Controls', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Show Zoom Controls", "minimal-map"),
           checked: attributes.showZoomControls,
           onChange: value => setAttributes({
             showZoomControls: value
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Allow Zoom via Scroll', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Allow Zoom via Scroll", "minimal-map"),
           checked: attributes.scrollZoom,
           onChange: value => setAttributes({
             scrollZoom: value
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.ToggleControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Allow Search', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Allow Search", "minimal-map"),
           checked: attributes.allowSearch,
           onChange: value => setAttributes({
             allowSearch: value
@@ -589,17 +589,17 @@ function Edit({
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
       group: "styles",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Appearance', 'minimal-map'),
+        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Appearance", "minimal-map"),
         initialOpen: true,
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalUnitControl, {
           className: "minimal-map-editor__height-control components-border-radius-control__unit-control",
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Height', 'minimal-map'),
-          value: `${attributes.height ?? 420}${attributes.heightUnit || 'px'}`,
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Height", "minimal-map"),
+          value: `${attributes.height ?? 420}${attributes.heightUnit || "px"}`,
           onChange: updateHeight,
           units: HEIGHT_UNITS,
           size: "__unstable-large"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Style Preset', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Style Preset", "minimal-map"),
           value: attributes.stylePreset,
           options: styleOptions,
           onChange: value => setAttributes({
@@ -607,25 +607,25 @@ function Edit({
           })
         })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Zoom Controls', 'minimal-map'),
+        title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Zoom Controls", "minimal-map"),
         initialOpen: false,
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(ZoomControlColorSettings, {
           backgroundColor: attributes.zoomControlsBackgroundColor,
           iconColor: attributes.zoomControlsIconColor,
           borderColor: attributes.zoomControlsBorderColor,
-          defaultBackgroundColor: runtimeConfig.defaults?.zoomControlsBackgroundColor ?? '#ffffff',
-          defaultIconColor: runtimeConfig.defaults?.zoomControlsIconColor ?? '#1e1e1e',
-          defaultBorderColor: runtimeConfig.defaults?.zoomControlsBorderColor ?? '#dcdcde',
+          defaultBackgroundColor: runtimeConfig.defaults?.zoomControlsBackgroundColor ?? "#ffffff",
+          defaultIconColor: runtimeConfig.defaults?.zoomControlsIconColor ?? "#1e1e1e",
+          defaultBorderColor: runtimeConfig.defaults?.zoomControlsBorderColor ?? "#dcdcde",
           onChange: (key, value) => setAttributes({
             [key]: value
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalToggleGroupControl, {
           __next40pxDefaultSize: true,
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Position', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Position", "minimal-map"),
           value: attributes.zoomControlsPosition,
           isBlock: true,
           onChange: nextValue => {
-            if (typeof nextValue === 'string') {
+            if (typeof nextValue === "string") {
               setAttributes({
                 zoomControlsPosition: nextValue
               });
@@ -640,7 +640,7 @@ function Edit({
           className: "minimal-map-editor__box-control",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.BoxControl, {
             __next40pxDefaultSize: true,
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Padding', 'minimal-map'),
+            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Padding", "minimal-map"),
             values: attributes.zoomControlsPadding,
             units: HEIGHT_UNITS,
             onChange: value => {
@@ -653,7 +653,7 @@ function Edit({
           className: "minimal-map-editor__box-control",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.BoxControl, {
             __next40pxDefaultSize: true,
-            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Outer Margin', 'minimal-map'),
+            label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Outer Margin", "minimal-map"),
             values: attributes.zoomControlsOuterMargin,
             units: HEIGHT_UNITS,
             onChange: value => {
@@ -670,7 +670,7 @@ function Edit({
           },
           values: parseBorderRadiusValue(attributes.zoomControlsBorderRadius)
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalUnitControl, {
-          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Border Width', 'minimal-map'),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)("Border Width", "minimal-map"),
           value: attributes.zoomControlsBorderWidth,
           onChange: updateBorderWidth,
           units: BORDER_UNITS,

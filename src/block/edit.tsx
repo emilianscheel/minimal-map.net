@@ -1,778 +1,833 @@
 import {
-	__experimentalColorGradientControl as ColorGradientControl,
-	InspectorControls,
-	__experimentalBorderRadiusControl as BorderRadiusControl,
-	useBlockProps,
-} from '@wordpress/block-editor';
+  __experimentalColorGradientControl as ColorGradientControl,
+  InspectorControls,
+  __experimentalBorderRadiusControl as BorderRadiusControl,
+  useBlockProps,
+} from "@wordpress/block-editor";
 import {
-	Button,
-	BoxControl,
-	ColorIndicator,
-	Dropdown,
-	FlexItem,
-	PanelBody,
-	RangeControl,
-	SelectControl,
-	TextControl,
-	ToggleControl,
-	MenuGroup,
-	MenuItem,
-	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	__experimentalHStack as HStack,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	__experimentalUnitControl as UnitControl,
-} from '@wordpress/components';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { ChevronDown, Check } from 'lucide-react';
-import { createMinimalMap } from '../map/bootstrap';
-import { normalizeHeightUnit, normalizeMapConfig } from '../map/defaults';
+  Button,
+  BoxControl,
+  ColorIndicator,
+  Dropdown,
+  FlexItem,
+  PanelBody,
+  RangeControl,
+  SelectControl,
+  TextControl,
+  ToggleControl,
+  MenuGroup,
+  MenuItem,
+  __experimentalDropdownContentWrapper as DropdownContentWrapper,
+  __experimentalHStack as HStack,
+  __experimentalToggleGroupControl as ToggleGroupControl,
+  __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+  __experimentalUnitControl as UnitControl,
+} from "@wordpress/components";
+import { useEffect, useMemo, useRef } from "@wordpress/element";
+import { __ } from "@wordpress/i18n";
+import { ChevronDown, Check } from "lucide-react";
+import { createMinimalMap } from "../map/bootstrap";
+import { normalizeHeightUnit, normalizeMapConfig } from "../map/defaults";
 import {
-	type ZoomControlIconOption,
-	ZOOM_CONTROLS_POSITION_OPTIONS,
-} from '../map/zoom-control-options';
-import { getStyleOptions } from '../map/style-presets';
+  type ZoomControlIconOption,
+  ZOOM_CONTROLS_POSITION_OPTIONS,
+} from "../map/zoom-control-options";
+import { getStyleOptions } from "../map/style-presets";
 import type {
-	BoxValue,
-	MapBlockAttributes,
-	MapCollectionOption,
-	MapRuntimeConfig,
-	MinimalMapInstance,
-	RawMapConfig,
-	StyleOption,
-	StyleThemeRecord,
-	ZoomControlsPosition,
-} from '../types';
+  BoxValue,
+  MapBlockAttributes,
+  MapCollectionOption,
+  MapRuntimeConfig,
+  MinimalMapInstance,
+  RawMapConfig,
+  StyleOption,
+  StyleThemeRecord,
+  ZoomControlsPosition,
+} from "../types";
 
 const runtimeConfig: MapRuntimeConfig = window.MinimalMapBlockConfig ?? {};
-const HEIGHT_UNITS: StyleOption[] = (runtimeConfig.heightUnits ?? [ 'px', 'em', 'rem', '%', 'vh', 'vw' ]).map((value) => ({
-	label: value,
-	value,
+const HEIGHT_UNITS: StyleOption[] = (
+  runtimeConfig.heightUnits ?? ["px", "em", "rem", "%", "vh", "vw"]
+).map((value) => ({
+  label: value,
+  value,
 }));
-const BORDER_UNITS: StyleOption[] = [ 'px', 'em', 'rem' ].map((value) => ({
-	label: value,
-	value,
+const BORDER_UNITS: StyleOption[] = ["px", "em", "rem"].map((value) => ({
+  label: value,
+  value,
 }));
 
 function parseHeightValue(
-	rawValue: string | number | undefined,
-	fallbackUnit: string
-): Pick<MapBlockAttributes, 'height' | 'heightUnit'> | null {
-	if (typeof rawValue === 'number') {
-		return {
-			height: rawValue,
-			heightUnit: normalizeHeightUnit(fallbackUnit),
-		};
-	}
+  rawValue: string | number | undefined,
+  fallbackUnit: string,
+): Pick<MapBlockAttributes, "height" | "heightUnit"> | null {
+  if (typeof rawValue === "number") {
+    return {
+      height: rawValue,
+      heightUnit: normalizeHeightUnit(fallbackUnit),
+    };
+  }
 
-	if (typeof rawValue !== 'string') {
-		return null;
-	}
+  if (typeof rawValue !== "string") {
+    return null;
+  }
 
-	const match = rawValue.trim().match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
+  const match = rawValue.trim().match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
 
-	if (!match) {
-		return null;
-	}
+  if (!match) {
+    return null;
+  }
 
-	return {
-		height: Number(match[1]),
-		heightUnit: normalizeHeightUnit(match[2] || fallbackUnit),
-	};
+  return {
+    height: Number(match[1]),
+    heightUnit: normalizeHeightUnit(match[2] || fallbackUnit),
+  };
 }
 
 interface EditProps {
-	attributes: MapBlockAttributes;
-	setAttributes: (attributes: Partial<MapBlockAttributes>) => void;
+  attributes: MapBlockAttributes;
+  setAttributes: (attributes: Partial<MapBlockAttributes>) => void;
 }
 
 interface BorderRadiusValues {
-	topLeft?: string;
-	topRight?: string;
-	bottomRight?: string;
-	bottomLeft?: string;
-	top?: string;
-	right?: string;
-	bottom?: string;
-	left?: string;
+  topLeft?: string;
+  topRight?: string;
+  bottomRight?: string;
+  bottomLeft?: string;
+  top?: string;
+  right?: string;
+  bottom?: string;
+  left?: string;
 }
 
-function parseLengthValue(rawValue: string | number | undefined, fallback = '1px'): string | null {
-	if (typeof rawValue === 'number') {
-		return `${rawValue}px`;
-	}
+function parseLengthValue(
+  rawValue: string | number | undefined,
+  fallback = "1px",
+): string | null {
+  if (typeof rawValue === "number") {
+    return `${rawValue}px`;
+  }
 
-	if (typeof rawValue !== 'string') {
-		return null;
-	}
+  if (typeof rawValue !== "string") {
+    return null;
+  }
 
-	const trimmed = rawValue.trim();
-	const match = trimmed.match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
+  const trimmed = rawValue.trim();
+  const match = trimmed.match(/^(-?\d*\.?\d+)\s*([a-z%]*)$/i);
 
-	if (!match) {
-		return null;
-	}
+  if (!match) {
+    return null;
+  }
 
-	if (trimmed === '0') {
-		return '0px';
-	}
+  if (trimmed === "0") {
+    return "0px";
+  }
 
-	const unit = match[2] || fallback.replace(/^-?\d*\.?\d+/, '') || 'px';
+  const unit = match[2] || fallback.replace(/^-?\d*\.?\d+/, "") || "px";
 
-	return `${Number(match[1])}${normalizeHeightUnit(unit)}`;
+  return `${Number(match[1])}${normalizeHeightUnit(unit)}`;
 }
 
-function stringifyBorderRadiusValue(value: string | BorderRadiusValues | null | undefined): string {
-	if (!value) {
-		return '2px';
-	}
+function stringifyBorderRadiusValue(
+  value: string | BorderRadiusValues | null | undefined,
+): string {
+  if (!value) {
+    return "2px";
+  }
 
-	if (typeof value === 'string') {
-		return value.trim() || '2px';
-	}
+  if (typeof value === "string") {
+    return value.trim() || "2px";
+  }
 
-	const topLeft = value.topLeft ?? value.top ?? '';
-	const topRight = value.topRight ?? value.right ?? '';
-	const bottomRight = value.bottomRight ?? value.bottom ?? '';
-	const bottomLeft = value.bottomLeft ?? value.left ?? '';
-	const values = [ topLeft, topRight, bottomRight, bottomLeft ].filter(
-		(part): part is string => typeof part === 'string' && part.length > 0
-	);
+  const topLeft = value.topLeft ?? value.top ?? "";
+  const topRight = value.topRight ?? value.right ?? "";
+  const bottomRight = value.bottomRight ?? value.bottom ?? "";
+  const bottomLeft = value.bottomLeft ?? value.left ?? "";
+  const values = [topLeft, topRight, bottomRight, bottomLeft].filter(
+    (part): part is string => typeof part === "string" && part.length > 0,
+  );
 
-	if (values.length === 0) {
-		return '2px';
-	}
+  if (values.length === 0) {
+    return "2px";
+  }
 
-	const [ first, second = first, third = first, fourth = second ] = values;
+  const [first, second = first, third = first, fourth = second] = values;
 
-	if (first === second && second === third && third === fourth) {
-		return first;
-	}
+  if (first === second && second === third && third === fourth) {
+    return first;
+  }
 
-	if (first === third && second === fourth) {
-		return `${first} ${second}`;
-	}
+  if (first === third && second === fourth) {
+    return `${first} ${second}`;
+  }
 
-	if (second === fourth) {
-		return `${first} ${second} ${third}`;
-	}
+  if (second === fourth) {
+    return `${first} ${second} ${third}`;
+  }
 
-	return `${first} ${second} ${third} ${fourth}`;
+  return `${first} ${second} ${third} ${fourth}`;
 }
 
 function parseBorderRadiusValue(
-	value: string | BorderRadiusValues | null | undefined
+  value: string | BorderRadiusValues | null | undefined,
 ):
-	| {
-			topLeft: string;
-			topRight: string;
-			bottomRight: string;
-			bottomLeft: string;
-	  }
-	| string {
-	if (!value) {
-		return '2px';
-	}
+  | {
+      topLeft: string;
+      topRight: string;
+      bottomRight: string;
+      bottomLeft: string;
+    }
+  | string {
+  if (!value) {
+    return "2px";
+  }
 
-	if (typeof value !== 'string') {
-		const topLeft = value.topLeft ?? value.top ?? '2px';
-		const topRight = value.topRight ?? value.right ?? topLeft;
-		const bottomRight = value.bottomRight ?? value.bottom ?? topLeft;
-		const bottomLeft = value.bottomLeft ?? value.left ?? topRight;
+  if (typeof value !== "string") {
+    const topLeft = value.topLeft ?? value.top ?? "2px";
+    const topRight = value.topRight ?? value.right ?? topLeft;
+    const bottomRight = value.bottomRight ?? value.bottom ?? topLeft;
+    const bottomLeft = value.bottomLeft ?? value.left ?? topRight;
 
-		return {
-			topLeft,
-			topRight,
-			bottomRight,
-			bottomLeft,
-		};
-	}
+    return {
+      topLeft,
+      topRight,
+      bottomRight,
+      bottomLeft,
+    };
+  }
 
-	const parts = value
-		.trim()
-		.split(/\s+/)
-		.filter(Boolean);
+  const parts = value.trim().split(/\s+/).filter(Boolean);
 
-	if (parts.length === 0) {
-		return '2px';
-	}
+  if (parts.length === 0) {
+    return "2px";
+  }
 
-	const [ topLeft, second = topLeft, third = topLeft, fourth = second ] = parts;
+  const [topLeft, second = topLeft, third = topLeft, fourth = second] = parts;
 
-	if (parts.length === 1) {
-		return topLeft;
-	}
+  if (parts.length === 1) {
+    return topLeft;
+  }
 
-	if (parts.length === 2) {
-		return {
-			topLeft,
-			topRight: second,
-			bottomRight: topLeft,
-			bottomLeft: second,
-		};
-	}
+  if (parts.length === 2) {
+    return {
+      topLeft,
+      topRight: second,
+      bottomRight: topLeft,
+      bottomLeft: second,
+    };
+  }
 
-	if (parts.length === 3) {
-		return {
-			topLeft,
-			topRight: second,
-			bottomRight: third,
-			bottomLeft: second,
-		};
-	}
+  if (parts.length === 3) {
+    return {
+      topLeft,
+      topRight: second,
+      bottomRight: third,
+      bottomLeft: second,
+    };
+  }
 
-	return {
-		topLeft,
-		topRight: second,
-		bottomRight: third,
-		bottomLeft: fourth,
-	};
+  return {
+    topLeft,
+    topRight: second,
+    bottomRight: third,
+    bottomLeft: fourth,
+  };
 }
 
 function ZoomControlColorSettings({
-	backgroundColor,
-	iconColor,
-	borderColor,
-	defaultBackgroundColor,
-	defaultIconColor,
-	defaultBorderColor,
-	onChange,
+  backgroundColor,
+  iconColor,
+  borderColor,
+  defaultBackgroundColor,
+  defaultIconColor,
+  defaultBorderColor,
+  onChange,
 }: {
-	backgroundColor: string;
-	iconColor: string;
-	borderColor: string;
-	defaultBackgroundColor: string;
-	defaultIconColor: string;
-	defaultBorderColor: string;
-	onChange: (
-		key:
-			| 'zoomControlsBackgroundColor'
-			| 'zoomControlsIconColor'
-			| 'zoomControlsBorderColor',
-		value: string
-	) => void;
+  backgroundColor: string;
+  iconColor: string;
+  borderColor: string;
+  defaultBackgroundColor: string;
+  defaultIconColor: string;
+  defaultBorderColor: string;
+  onChange: (
+    key:
+      | "zoomControlsBackgroundColor"
+      | "zoomControlsIconColor"
+      | "zoomControlsBorderColor",
+    value: string,
+  ) => void;
 }) {
-	return (
-		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
-			<CompactColorDropdown
-				label={__('Background', 'minimal-map')}
-				value={backgroundColor}
-				defaultValue={defaultBackgroundColor}
-				onChange={(value) => onChange('zoomControlsBackgroundColor', value)}
-			/>
-			<CompactColorDropdown
-				label={__('Foreground', 'minimal-map')}
-				value={iconColor}
-				defaultValue={defaultIconColor}
-				onChange={(value) => onChange('zoomControlsIconColor', value)}
-			/>
-			<CompactColorDropdown
-				label={__('Border', 'minimal-map')}
-				value={borderColor}
-				defaultValue={defaultBorderColor}
-				onChange={(value) => onChange('zoomControlsBorderColor', value)}
-			/>
-		</div>
-	);
+  return (
+    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
+      <CompactColorDropdown
+        label={__("Background", "minimal-map")}
+        value={backgroundColor}
+        defaultValue={defaultBackgroundColor}
+        onChange={(value) => onChange("zoomControlsBackgroundColor", value)}
+      />
+      <CompactColorDropdown
+        label={__("Foreground", "minimal-map")}
+        value={iconColor}
+        defaultValue={defaultIconColor}
+        onChange={(value) => onChange("zoomControlsIconColor", value)}
+      />
+      <CompactColorDropdown
+        label={__("Border", "minimal-map")}
+        value={borderColor}
+        defaultValue={defaultBorderColor}
+        onChange={(value) => onChange("zoomControlsBorderColor", value)}
+      />
+    </div>
+  );
 }
 
 function CompactColorDropdown({
-	label,
-	value,
-	defaultValue,
-	onChange,
+  label,
+  value,
+  defaultValue,
+  onChange,
 }: {
-	label: string;
-	value: string;
-	defaultValue: string;
-	onChange: (value: string) => void;
+  label: string;
+  value: string;
+  defaultValue: string;
+  onChange: (value: string) => void;
 }) {
-	return (
-		<Dropdown
-			className="minimal-map-editor__compact-color-dropdown"
-			popoverProps={{
-				placement: 'left-start',
-				offset: 36,
-				shift: true,
-			}}
-			renderToggle={({ isOpen, onToggle }) => (
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={onToggle}
-					aria-expanded={isOpen}
-					style={{
-						width: '100%',
-						justifyContent: 'flex-start',
-						paddingInline: '12px',
-						color: 'var(--wp-components-color-foreground, #1e1e1e)',
-					}}
-				>
-					<HStack justify="flex-start" spacing={3}>
-						<ColorIndicator colorValue={value} />
-						<FlexItem title={label}>{label}</FlexItem>
-					</HStack>
-				</Button>
-			)}
-			renderContent={() => (
-				<DropdownContentWrapper>
-					<div style={{ width: '280px', maxWidth: 'min(280px, 100vw - 32px)' }}>
-						<ColorGradientControl
-							label={label}
-							showTitle={false}
-							clearable={false}
-							enableAlpha={false}
-							onColorChange={(nextValue?: string) =>
-								onChange(
-									typeof nextValue === 'string' && nextValue.length > 0
-										? nextValue
-										: defaultValue
-								)
-							}
-							colorValue={value}
-						/>
-					</div>
-				</DropdownContentWrapper>
-			)}
-		/>
-	);
+  return (
+    <Dropdown
+      className="minimal-map-editor__compact-color-dropdown"
+      popoverProps={{
+        placement: "left-start",
+        offset: 36,
+        shift: true,
+      }}
+      renderToggle={({ isOpen, onToggle }) => (
+        <Button
+          __next40pxDefaultSize
+          variant="tertiary"
+          onClick={onToggle}
+          aria-expanded={isOpen}
+          style={{
+            width: "100%",
+            justifyContent: "flex-start",
+            paddingInline: "12px",
+            color: "var(--wp-components-color-foreground, #1e1e1e)",
+          }}
+        >
+          <HStack justify="flex-start" spacing={3}>
+            <ColorIndicator colorValue={value} />
+            <FlexItem title={label}>{label}</FlexItem>
+          </HStack>
+        </Button>
+      )}
+      renderContent={() => (
+        <DropdownContentWrapper>
+          <div style={{ width: "280px", maxWidth: "min(280px, 100vw - 32px)" }}>
+            <ColorGradientControl
+              label={label}
+              showTitle={false}
+              clearable={false}
+              enableAlpha={false}
+              onColorChange={(nextValue?: string) =>
+                onChange(
+                  typeof nextValue === "string" && nextValue.length > 0
+                    ? nextValue
+                    : defaultValue,
+                )
+              }
+              colorValue={value}
+            />
+          </div>
+        </DropdownContentWrapper>
+      )}
+    />
+  );
 }
 
 function ThemeDropdown({
-	themes,
-	selectedSlug,
-	onChange,
+  themes,
+  selectedSlug,
+  onChange,
 }: {
-	themes: StyleThemeRecord[];
-	selectedSlug: string;
-	onChange: (value: string) => void;
+  themes: StyleThemeRecord[];
+  selectedSlug: string;
+  onChange: (value: string) => void;
 }) {
-	const selectedTheme =
-		themes.find((theme) => theme.slug === selectedSlug) || themes.find((theme) => theme.slug === 'default');
-	const selectedLabel = selectedTheme?.label || __('Default', 'minimal-map');
+  const selectedTheme =
+    themes.find((theme) => theme.slug === selectedSlug) ||
+    themes.find((theme) => theme.slug === "default");
+  const selectedLabel = selectedTheme?.label || __("Default", "minimal-map");
 
-	return (
-		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
-			<span>{__('Style Theme', 'minimal-map')}</span>
-			<Dropdown
-				className="minimal-map-editor__theme-dropdown"
-				popoverProps={{
-					placement: 'left-start',
-					offset: 36,
-					shift: true,
-				}}
-				renderToggle={({ isOpen, onToggle }) => (
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={onToggle}
-						aria-expanded={isOpen}
-						style={{
-							width: '100%',
-							justifyContent: 'space-between',
-							paddingInline: '12px',
-						}}
-					>
-						<span>{selectedLabel}</span>
-						<ChevronDown size={16} style={{ flexShrink: 0 }} />
-					</Button>
-				)}
-				renderContent={({ onClose }) => (
-					<MenuGroup label={__('Switch Theme', 'minimal-map')}>
-						{themes.map((theme) => {
-							const isSelected = theme.slug === selectedSlug;
-							return (
-								<MenuItem
-									key={theme.slug}
-									onClick={() => {
-										onChange(theme.slug);
-										onClose();
-									}}
-								>
-									<HStack justify="space-between" style={{ width: '100%' }}>
-										<span>{theme.label}</span>
-										{isSelected && (
-											<Check
-												size={16}
-												style={{
-													flexShrink: 0,
-													color: 'var(--wp-admin-theme-color, #3858e8)',
-												}}
-											/>
-										)}
-									</HStack>
-								</MenuItem>
-							);
-						})}
-					</MenuGroup>
-				)}
-			/>
-		</div>
-	);
+  return (
+    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
+      <span>{__("Style Theme", "minimal-map")}</span>
+      <Dropdown
+        className="minimal-map-editor__theme-dropdown"
+        popoverProps={{
+          placement: "left-start",
+          offset: 36,
+          shift: true,
+        }}
+        renderToggle={({ isOpen, onToggle }) => (
+          <Button
+            __next40pxDefaultSize
+            variant="secondary"
+            onClick={onToggle}
+            aria-expanded={isOpen}
+            style={{
+              width: "100%",
+              justifyContent: "space-between",
+              paddingInline: "12px",
+            }}
+          >
+            <span>{selectedLabel}</span>
+            <ChevronDown size={16} style={{ flexShrink: 0 }} />
+          </Button>
+        )}
+        renderContent={({ onClose }) => (
+          <MenuGroup label={__("Switch Theme", "minimal-map")}>
+            {themes.map((theme) => {
+              const isSelected = theme.slug === selectedSlug;
+              return (
+                <MenuItem
+                  key={theme.slug}
+                  onClick={() => {
+                    onChange(theme.slug);
+                    onClose();
+                  }}
+                >
+                  <HStack justify="space-between" style={{ width: "100%" }}>
+                    <span>{theme.label}</span>
+                    {isSelected && (
+                      <Check
+                        size={16}
+                        style={{
+                          flexShrink: 0,
+                          color: "var(--wp-admin-theme-color, #3858e8)",
+                        }}
+                      />
+                    )}
+                  </HStack>
+                </MenuItem>
+              );
+            })}
+          </MenuGroup>
+        )}
+      />
+    </div>
+  );
 }
 
 function CollectionDropdown({
-	options,
-	selectedId,
-	onChange,
+  options,
+  selectedId,
+  onChange,
 }: {
-	options: MapCollectionOption[];
-	selectedId: number;
-	onChange: (value: number) => void;
+  options: MapCollectionOption[];
+  selectedId: number;
+  onChange: (value: number) => void;
 }) {
-	const selectedCollection = options.find((option) => option.id === selectedId);
-	const selectedLabel =
-		selectedId > 0
-			? selectedCollection?.title || __('Collection unavailable', 'minimal-map')
-			: __('All locations', 'minimal-map');
+  const selectedCollection = options.find((option) => option.id === selectedId);
+  const selectedLabel =
+    selectedId > 0
+      ? selectedCollection?.title || __("Collection unavailable", "minimal-map")
+      : __("All locations", "minimal-map");
 
-	return (
-		<div style={{ display: 'grid', gap: '8px', marginBottom: '16px' }}>
-			<span>{__('Collection', 'minimal-map')}</span>
-			<Dropdown
-				className="minimal-map-editor__collection-dropdown"
-				popoverProps={{
-					placement: 'left-start',
-					offset: 36,
-					shift: true,
-				}}
-				renderToggle={({ isOpen, onToggle }) => (
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={onToggle}
-						aria-expanded={isOpen}
-						style={{
-							width: '100%',
-							justifyContent: 'space-between',
-							paddingInline: '12px',
-						}}
-					>
-						<span>{selectedLabel}</span>
-						<ChevronDown size={16} style={{ flexShrink: 0 }} />
-					</Button>
-				)}
-				renderContent={({ onClose }) => (
-					<MenuGroup label={__('Switch Collection', 'minimal-map')}>
-						<MenuItem
-							onClick={() => {
-								onChange(0);
-								onClose();
-							}}
-						>
-							<HStack justify="space-between" style={{ width: '100%' }}>
-								<span>{__('All locations', 'minimal-map')}</span>
-								{selectedId === 0 && (
-									<Check
-										size={16}
-										style={{
-											flexShrink: 0,
-											color: 'var(--wp-admin-theme-color, #3858e8)',
-										}}
-									/>
-								)}
-							</HStack>
-						</MenuItem>
-						{options.map((option) => {
-							const isSelected = selectedId === option.id;
-							return (
-								<MenuItem
-									key={option.id}
-									onClick={() => {
-										onChange(option.id);
-										onClose();
-									}}
-								>
-									<HStack justify="space-between" style={{ width: '100%' }}>
-										<span>{option.title}</span>
-										{isSelected && (
-											<Check
-												size={16}
-												style={{
-													flexShrink: 0,
-													color: 'var(--wp-admin-theme-color, #3858e8)',
-												}}
-											/>
-										)}
-									</HStack>
-								</MenuItem>
-							);
-						})}
-						{options.length === 0 ? (
-							<div style={{ padding: '8px 12px', color: '#757575', fontSize: '12px' }}>
-								{__('No collections available.', 'minimal-map')}
-							</div>
-						) : null}
-					</MenuGroup>
-				)}
-			/>
-		</div>
-	);
+  return (
+    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
+      <span>{__("Collection", "minimal-map")}</span>
+      <Dropdown
+        className="minimal-map-editor__collection-dropdown"
+        popoverProps={{
+          placement: "left-start",
+          offset: 36,
+          shift: true,
+        }}
+        renderToggle={({ isOpen, onToggle }) => (
+          <Button
+            __next40pxDefaultSize
+            variant="secondary"
+            onClick={onToggle}
+            aria-expanded={isOpen}
+            style={{
+              width: "100%",
+              justifyContent: "space-between",
+              paddingInline: "12px",
+            }}
+          >
+            <span>{selectedLabel}</span>
+            <ChevronDown size={16} style={{ flexShrink: 0 }} />
+          </Button>
+        )}
+        renderContent={({ onClose }) => (
+          <MenuGroup label={__("Switch Collection", "minimal-map")}>
+            <MenuItem
+              onClick={() => {
+                onChange(0);
+                onClose();
+              }}
+            >
+              <HStack justify="space-between" style={{ width: "100%" }}>
+                <span>{__("All locations", "minimal-map")}</span>
+                {selectedId === 0 && (
+                  <Check
+                    size={16}
+                    style={{
+                      flexShrink: 0,
+                      color: "var(--wp-admin-theme-color, #3858e8)",
+                    }}
+                  />
+                )}
+              </HStack>
+            </MenuItem>
+            {options.map((option) => {
+              const isSelected = selectedId === option.id;
+              return (
+                <MenuItem
+                  key={option.id}
+                  onClick={() => {
+                    onChange(option.id);
+                    onClose();
+                  }}
+                >
+                  <HStack justify="space-between" style={{ width: "100%" }}>
+                    <span>{option.title}</span>
+                    {isSelected && (
+                      <Check
+                        size={16}
+                        style={{
+                          flexShrink: 0,
+                          color: "var(--wp-admin-theme-color, #3858e8)",
+                        }}
+                      />
+                    )}
+                  </HStack>
+                </MenuItem>
+              );
+            })}
+            {options.length === 0 ? (
+              <div
+                style={{
+                  padding: "8px 12px",
+                  color: "#757575",
+                  fontSize: "12px",
+                }}
+              >
+                {__("No collections available.", "minimal-map")}
+              </div>
+            ) : null}
+          </MenuGroup>
+        )}
+      />
+    </div>
+  );
 }
 
 export default function Edit({ attributes, setAttributes }: EditProps) {
-	const mapRef = useRef<HTMLDivElement | null>(null);
-	const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
-	const styleOptions = useMemo(() => getStyleOptions(runtimeConfig.stylePresets), []);
-	const selectedCollection = useMemo(
-		() =>
-			attributes.collectionId > 0
-				? (runtimeConfig.collections ?? []).find((collection) => collection.id === attributes.collectionId) ??
-				  null
-				: null,
-		[attributes.collectionId]
-	);
-	const config = useMemo(
-		() =>
-			normalizeMapConfig(
-				{
-					...attributes,
-					locations: attributes.collectionId > 0 ? selectedCollection?.locations ?? [] : undefined,
-				},
-				runtimeConfig
-			),
-		[attributes, selectedCollection]
-	);
-	const blockProps = useBlockProps({ className: 'minimal-map-editor' });
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
+  const styleOptions = useMemo(
+    () => getStyleOptions(runtimeConfig.stylePresets),
+    [],
+  );
+  const selectedCollection = useMemo(
+    () =>
+      attributes.collectionId > 0
+        ? (runtimeConfig.collections ?? []).find(
+            (collection) => collection.id === attributes.collectionId,
+          ) ?? null
+        : null,
+    [attributes.collectionId],
+  );
+  const config = useMemo(
+    () =>
+      normalizeMapConfig(
+        {
+          ...attributes,
+          locations:
+            attributes.collectionId > 0
+              ? selectedCollection?.locations ?? []
+              : undefined,
+        },
+        runtimeConfig,
+      ),
+    [attributes, selectedCollection],
+  );
+  const blockProps = useBlockProps({ className: "minimal-map-editor" });
 
-	useEffect(() => {
-		if (!mapRef.current) {
-			return undefined;
-		}
+  useEffect(() => {
+    if (!mapRef.current) {
+      return undefined;
+    }
 
-		mapInstanceRef.current = createMinimalMap(mapRef.current, config, runtimeConfig);
+    mapInstanceRef.current = createMinimalMap(
+      mapRef.current,
+      config,
+      runtimeConfig,
+    );
 
-		return () => {
-			if (mapInstanceRef.current) {
-				mapInstanceRef.current.destroy();
-				mapInstanceRef.current = null;
-			}
-		};
-	}, []);
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.destroy();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
 
-	useEffect(() => {
-		mapInstanceRef.current?.update(config);
-	}, [ config ]);
+  useEffect(() => {
+    mapInstanceRef.current?.update(config);
+  }, [config]);
 
-	function updateNumberAttribute<Key extends keyof Pick<MapBlockAttributes, 'centerLat' | 'centerLng' | 'zoom'>>(
-		key: Key
-	) {
-		return (value: string): void => {
-			const numericValue = Number(value);
+  function updateNumberAttribute<
+    Key extends keyof Pick<
+      MapBlockAttributes,
+      "centerLat" | "centerLng" | "zoom"
+    >,
+  >(key: Key) {
+    return (value: string): void => {
+      const numericValue = Number(value);
 
-			if (Number.isNaN(numericValue)) {
-				return;
-			}
+      if (Number.isNaN(numericValue)) {
+        return;
+      }
 
-			setAttributes({
-				[key]: numericValue,
-			} as Pick<MapBlockAttributes, Key>);
-		};
-	}
+      setAttributes({
+        [key]: numericValue,
+      } as Pick<MapBlockAttributes, Key>);
+    };
+  }
 
-	const updateHeight = (value?: string | number): void => {
-		const parsed = parseHeightValue(value, attributes.heightUnit || 'px');
+  const updateHeight = (value?: string | number): void => {
+    const parsed = parseHeightValue(value, attributes.heightUnit || "px");
 
-		if (!parsed || Number.isNaN(parsed.height) || parsed.height <= 0) {
-			return;
-		}
+    if (!parsed || Number.isNaN(parsed.height) || parsed.height <= 0) {
+      return;
+    }
 
-		setAttributes({
-			height: parsed.height,
-			heightUnit: parsed.heightUnit,
-		});
-	};
+    setAttributes({
+      height: parsed.height,
+      heightUnit: parsed.heightUnit,
+    });
+  };
 
-	const updateZoom = (value?: number): void => {
-		if (typeof value === 'number') {
-			setAttributes({ zoom: value });
-		}
-	};
+  const updateZoom = (value?: number): void => {
+    if (typeof value === "number") {
+      setAttributes({ zoom: value });
+    }
+  };
 
-	const updateBorderWidth = (value?: string | number): void => {
-		const parsed = parseLengthValue(value, attributes.zoomControlsBorderWidth || '1px');
+  const updateBorderWidth = (value?: string | number): void => {
+    const parsed = parseLengthValue(
+      value,
+      attributes.zoomControlsBorderWidth || "1px",
+    );
 
-		if (parsed) {
-			setAttributes({ zoomControlsBorderWidth: parsed });
-		}
-	};
+    if (parsed) {
+      setAttributes({ zoomControlsBorderWidth: parsed });
+    }
+  };
 
-	if (attributes._isPreview) {
-		return (
-			<div 
-				{ ...useBlockProps( {
-					className: 'minimal-map-editor__preview minimal-map-editor--preview',
-					style: {
-						backgroundImage: runtimeConfig.previewImageUrl ? `url(${runtimeConfig.previewImageUrl})` : 'none',
-						backgroundSize: 'cover',
-						backgroundPosition: 'center',
-						backgroundRepeat: 'no-repeat',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						backgroundColor: '#f0f0f1',
-						color: '#757575',
-						fontSize: '13px',
-					},
-				} ) }
-			>
-				{!runtimeConfig.previewImageUrl && (
-					<div style={{ textAlign: 'center', padding: '20px' }}>
-						<MapPinned size={48} style={{ marginBottom: '12px', opacity: 0.5 }} />
-						<p style={{ margin: 0 }}>{__('Minimal Map Preview', 'minimal-map')}</p>
-					</div>
-				)}
-			</div>
-		);
-	}
+  if (attributes._isPreview) {
+    return (
+      <div
+        {...useBlockProps({
+          className: "minimal-map-editor__preview minimal-map-editor--preview",
+          style: {
+            backgroundImage: runtimeConfig.previewImageUrl
+              ? `url(${runtimeConfig.previewImageUrl})`
+              : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#f0f0f1",
+            color: "#757575",
+            fontSize: "13px",
+          },
+        })}
+      >
+        {!runtimeConfig.previewImageUrl && (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <MapPinned
+              size={48}
+              style={{ marginBottom: "12px", opacity: 0.5 }}
+            />
+            <p style={{ margin: 0 }}>
+              {__("Minimal Map Preview", "minimal-map")}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
-	return (
-		<>
-			<InspectorControls group="settings">
-				<PanelBody title={__('Map Settings', 'minimal-map')} initialOpen>
-					<CollectionDropdown
-						options={runtimeConfig.collections ?? []}
-						selectedId={attributes.collectionId}
-						onChange={(value) => setAttributes({ collectionId: value })}
-					/>
-					<ThemeDropdown
-						themes={runtimeConfig.styleThemes ?? []}
-						selectedSlug={attributes.styleThemeSlug}
-						onChange={(value) => setAttributes({ styleThemeSlug: value })}
-					/>
-					<TextControl
-						label={__('Center Latitude', 'minimal-map')}
-						type="number"
-						step="0.000001"
-						value={attributes.centerLat}
-						onChange={updateNumberAttribute('centerLat')}
-					/>
-					<TextControl
-						label={__('Center Longitude', 'minimal-map')}
-						type="number"
-						step="0.000001"
-						value={attributes.centerLng}
-						onChange={updateNumberAttribute('centerLng')}
-					/>
-					<RangeControl
-						label={__('Zoom', 'minimal-map')}
-						value={attributes.zoom}
-						onChange={updateZoom}
-						min={0}
-						max={22}
-						step={0.5}
-					/>
-					<ToggleControl
-						label={__('Show Zoom Controls', 'minimal-map')}
-						checked={attributes.showZoomControls}
-						onChange={(value: boolean) => setAttributes({ showZoomControls: value })}
-					/>
-					<ToggleControl
-						label={__('Allow Zoom via Scroll', 'minimal-map')}
-						checked={attributes.scrollZoom}
-						onChange={(value: boolean) => setAttributes({ scrollZoom: value })}
-					/>
-					<ToggleControl
-						label={__('Allow Search', 'minimal-map')}
-						checked={attributes.allowSearch}
-						onChange={(value: boolean) => setAttributes({ allowSearch: value })}
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<InspectorControls group="styles">
-				<PanelBody title={__('Appearance', 'minimal-map')} initialOpen>
-					<UnitControl
-						className="minimal-map-editor__height-control components-border-radius-control__unit-control"
-						label={__('Height', 'minimal-map')}
-						value={`${attributes.height ?? 420}${attributes.heightUnit || 'px'}`}
-						onChange={updateHeight}
-						units={HEIGHT_UNITS}
-						size="__unstable-large"
-					/>
-					<SelectControl
-						label={__('Style Preset', 'minimal-map')}
-						value={attributes.stylePreset}
-						options={styleOptions}
-						onChange={(value: string) => setAttributes({ stylePreset: value })}
-					/>
-				</PanelBody>
-				<PanelBody title={__('Zoom Controls', 'minimal-map')} initialOpen={false}>
-					<ZoomControlColorSettings
-						backgroundColor={attributes.zoomControlsBackgroundColor}
-						iconColor={attributes.zoomControlsIconColor}
-						borderColor={attributes.zoomControlsBorderColor}
-						defaultBackgroundColor={runtimeConfig.defaults?.zoomControlsBackgroundColor ?? '#ffffff'}
-						defaultIconColor={runtimeConfig.defaults?.zoomControlsIconColor ?? '#1e1e1e'}
-						defaultBorderColor={runtimeConfig.defaults?.zoomControlsBorderColor ?? '#dcdcde'}
-						onChange={(key, value) => setAttributes({ [key]: value })}
-					/>
-					<ToggleGroupControl
-						__next40pxDefaultSize
-						label={__('Position', 'minimal-map')}
-						value={attributes.zoomControlsPosition}
-						isBlock
-						onChange={(nextValue?: string | number) => {
-							if (typeof nextValue === 'string') {
-								setAttributes({ zoomControlsPosition: nextValue as ZoomControlsPosition });
-							}
-						}}
-					>
-						{ZOOM_CONTROLS_POSITION_OPTIONS.map((option) => (
-							<ToggleGroupControlOptionIcon
-								key={option.value}
-								value={option.value}
-								label={option.label}
-								icon={option.icon}
-							/>
-						))}
-					</ToggleGroupControl>
-					<div className="minimal-map-editor__box-control">
-						<BoxControl
-							__next40pxDefaultSize
-							label={__('Padding', 'minimal-map')}
-							values={attributes.zoomControlsPadding}
-							units={HEIGHT_UNITS}
-							onChange={(value?: BoxValue) => {
-								setAttributes({ zoomControlsPadding: value ?? attributes.zoomControlsPadding });
-							}}
-						/>
-					</div>
-					<div className="minimal-map-editor__box-control">
-						<BoxControl
-							__next40pxDefaultSize
-							label={__('Outer Margin', 'minimal-map')}
-							values={attributes.zoomControlsOuterMargin}
-							units={HEIGHT_UNITS}
-							onChange={(value?: BoxValue) => {
-							setAttributes({ zoomControlsOuterMargin: value ?? attributes.zoomControlsOuterMargin });
-							}}
-						/>
-					</div>
-					<BorderRadiusControl
-						onChange={(value: string | BorderRadiusValues) => {
-							setAttributes({
-								zoomControlsBorderRadius: stringifyBorderRadiusValue(value),
-							});
-						}}
-						values={parseBorderRadiusValue(attributes.zoomControlsBorderRadius)}
-					/>
-					<UnitControl
-						label={__('Border Width', 'minimal-map')}
-						value={attributes.zoomControlsBorderWidth}
-						onChange={updateBorderWidth}
-						units={BORDER_UNITS}
-						size="__unstable-large"
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<div {...blockProps}>
-				<div
-					ref={mapRef}
-					className="minimal-map-editor__canvas"
-					style={{ height: config.heightCssValue }}
-				/>
-			</div>
-		</>
-	);
+  return (
+    <>
+      <InspectorControls group="settings">
+        <PanelBody title={__("Map Settings", "minimal-map")} initialOpen>
+          <CollectionDropdown
+            options={runtimeConfig.collections ?? []}
+            selectedId={attributes.collectionId}
+            onChange={(value) => setAttributes({ collectionId: value })}
+          />
+          <ThemeDropdown
+            themes={runtimeConfig.styleThemes ?? []}
+            selectedSlug={attributes.styleThemeSlug}
+            onChange={(value) => setAttributes({ styleThemeSlug: value })}
+          />
+          <TextControl
+            label={__("Center Latitude", "minimal-map")}
+            type="number"
+            step="0.000001"
+            value={attributes.centerLat}
+            onChange={updateNumberAttribute("centerLat")}
+          />
+          <TextControl
+            label={__("Center Longitude", "minimal-map")}
+            type="number"
+            step="0.000001"
+            value={attributes.centerLng}
+            onChange={updateNumberAttribute("centerLng")}
+          />
+          <RangeControl
+            label={__("Zoom", "minimal-map")}
+            value={attributes.zoom}
+            onChange={updateZoom}
+            min={0}
+            max={22}
+            step={0.5}
+          />
+          <ToggleControl
+            label={__("Show Zoom Controls", "minimal-map")}
+            checked={attributes.showZoomControls}
+            onChange={(value: boolean) =>
+              setAttributes({ showZoomControls: value })
+            }
+          />
+          <ToggleControl
+            label={__("Allow Zoom via Scroll", "minimal-map")}
+            checked={attributes.scrollZoom}
+            onChange={(value: boolean) => setAttributes({ scrollZoom: value })}
+          />
+          <ToggleControl
+            label={__("Allow Search", "minimal-map")}
+            checked={attributes.allowSearch}
+            onChange={(value: boolean) => setAttributes({ allowSearch: value })}
+          />
+        </PanelBody>
+      </InspectorControls>
+      <InspectorControls group="styles">
+        <PanelBody title={__("Appearance", "minimal-map")} initialOpen>
+          <UnitControl
+            className="minimal-map-editor__height-control components-border-radius-control__unit-control"
+            label={__("Height", "minimal-map")}
+            value={`${attributes.height ?? 420}${
+              attributes.heightUnit || "px"
+            }`}
+            onChange={updateHeight}
+            units={HEIGHT_UNITS}
+            size="__unstable-large"
+          />
+          <SelectControl
+            label={__("Style Preset", "minimal-map")}
+            value={attributes.stylePreset}
+            options={styleOptions}
+            onChange={(value: string) => setAttributes({ stylePreset: value })}
+          />
+        </PanelBody>
+        <PanelBody
+          title={__("Zoom Controls", "minimal-map")}
+          initialOpen={false}
+        >
+          <ZoomControlColorSettings
+            backgroundColor={attributes.zoomControlsBackgroundColor}
+            iconColor={attributes.zoomControlsIconColor}
+            borderColor={attributes.zoomControlsBorderColor}
+            defaultBackgroundColor={
+              runtimeConfig.defaults?.zoomControlsBackgroundColor ?? "#ffffff"
+            }
+            defaultIconColor={
+              runtimeConfig.defaults?.zoomControlsIconColor ?? "#1e1e1e"
+            }
+            defaultBorderColor={
+              runtimeConfig.defaults?.zoomControlsBorderColor ?? "#dcdcde"
+            }
+            onChange={(key, value) => setAttributes({ [key]: value })}
+          />
+          <ToggleGroupControl
+            __next40pxDefaultSize
+            label={__("Position", "minimal-map")}
+            value={attributes.zoomControlsPosition}
+            isBlock
+            onChange={(nextValue?: string | number) => {
+              if (typeof nextValue === "string") {
+                setAttributes({
+                  zoomControlsPosition: nextValue as ZoomControlsPosition,
+                });
+              }
+            }}
+          >
+            {ZOOM_CONTROLS_POSITION_OPTIONS.map((option) => (
+              <ToggleGroupControlOptionIcon
+                key={option.value}
+                value={option.value}
+                label={option.label}
+                icon={option.icon}
+              />
+            ))}
+          </ToggleGroupControl>
+          <div className="minimal-map-editor__box-control">
+            <BoxControl
+              __next40pxDefaultSize
+              label={__("Padding", "minimal-map")}
+              values={attributes.zoomControlsPadding}
+              units={HEIGHT_UNITS}
+              onChange={(value?: BoxValue) => {
+                setAttributes({
+                  zoomControlsPadding: value ?? attributes.zoomControlsPadding,
+                });
+              }}
+            />
+          </div>
+          <div className="minimal-map-editor__box-control">
+            <BoxControl
+              __next40pxDefaultSize
+              label={__("Outer Margin", "minimal-map")}
+              values={attributes.zoomControlsOuterMargin}
+              units={HEIGHT_UNITS}
+              onChange={(value?: BoxValue) => {
+                setAttributes({
+                  zoomControlsOuterMargin:
+                    value ?? attributes.zoomControlsOuterMargin,
+                });
+              }}
+            />
+          </div>
+          <BorderRadiusControl
+            onChange={(value: string | BorderRadiusValues) => {
+              setAttributes({
+                zoomControlsBorderRadius: stringifyBorderRadiusValue(value),
+              });
+            }}
+            values={parseBorderRadiusValue(attributes.zoomControlsBorderRadius)}
+          />
+          <UnitControl
+            label={__("Border Width", "minimal-map")}
+            value={attributes.zoomControlsBorderWidth}
+            onChange={updateBorderWidth}
+            units={BORDER_UNITS}
+            size="__unstable-large"
+          />
+        </PanelBody>
+      </InspectorControls>
+      <div {...blockProps}>
+        <div
+          ref={mapRef}
+          className="minimal-map-editor__canvas"
+          style={{ height: config.heightCssValue }}
+        />
+      </div>
+    </>
+  );
 }
