@@ -1,5 +1,6 @@
 import type { ViewTable } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
+import type { CsvImportMapping } from '../../lib/locations/importLocations';
 import type {
 	CollectionRecord,
 	FieldErrors,
@@ -26,6 +27,11 @@ export interface LocationsController {
 	assignmentLogoId: string;
 	assignmentMarkerId: string;
 	assignmentTagIds: number[];
+	csvImportHeaders: string[];
+	csvImportMapping: CsvImportMapping;
+	csvImportProgressCompleted: number;
+	csvImportProgressTotal: number;
+	csvImportStep: 'mapping' | 'progress';
 	collections: CollectionRecord[];
 	logos: LogoRecord[];
 	markers: MarkerRecord[];
@@ -45,6 +51,7 @@ export interface LocationsController {
 	isDialogOpen: boolean;
 	isGeocoding: boolean;
 	isLoading: boolean;
+	isCustomCsvImportModalOpen: boolean;
 	isRemoveCollectionAssignmentModalOpen: boolean;
 	isRemovingCollectionAssignment: boolean;
 	isRowActionPending: boolean;
@@ -80,7 +87,9 @@ export interface LocationsController {
 	onBack: () => void;
 	onCancel: () => void;
 	onChangeFormValue: (key: keyof LocationFormState, value: any) => void;
+	onChangeCsvImportMapping: (field: keyof CsvImportMapping, columnIndex: string) => void;
 	onMapLocationSelect: (coordinates: MapCoordinates) => void;
+	onCloseCustomCsvImportModal: () => void;
 	onCloseRemoveCollectionAssignmentModal: () => void;
 	onCloseAssignToCollectionModal: () => void;
 	onCloseAssignLogoModal: () => void;
@@ -111,6 +120,7 @@ export interface LocationsController {
 	onSelectAssignmentMarker: (markerId: string) => void;
 	onSelectAssignmentTags: (tagIds: number[]) => void;
 	onImportLocations: (file: File) => Promise<void>;
+	onStartCustomCsvImport: () => Promise<void>;
 	onExportLocations: () => void;
 	onExportExample: () => void;
 	onAddLocation: () => void;

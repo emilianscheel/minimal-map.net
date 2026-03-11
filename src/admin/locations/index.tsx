@@ -4,6 +4,7 @@ import AssignLogoModal from './AssignLogoModal';
 import AssignMarkerModal from './AssignMarkerModal';
 import AssignToCollectionModal from './AssignToCollectionModal';
 import AssignTagsModal from './AssignTagsModal';
+import CustomCsvImportModal from './CustomCsvImportModal';
 import DeleteLogoConfirmationModal from './DeleteLogoConfirmationModal';
 import LocationDialog from './LocationDialog';
 import LocationsEmptyState from './LocationsEmptyState';
@@ -56,6 +57,7 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 			<AssignLogoModal controller={controller} />
 			<AssignMarkerModal controller={controller} />
 			<AssignTagsModal controller={controller} />
+			<CustomCsvImportModal controller={controller} />
 			<DeleteLogoConfirmationModal controller={controller} />
 			<RemoveCollectionAssignmentModal controller={controller} />
 		</>

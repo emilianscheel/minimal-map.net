@@ -988,9 +988,40 @@ svg.lucide {
   width: min(520px, calc(100vw - 48px));
 }
 
+.minimal-map-admin__custom-csv-import-modal .components-modal__content {
+  width: min(820px, calc(100vw - 48px));
+}
+
 .minimal-map-admin__location-dialog-fields {
   display: grid;
   gap: 14px;
+}
+
+.minimal-map-admin__custom-csv-import-dialog {
+  min-width: min(780px, calc(100vw - 64px));
+}
+
+.minimal-map-admin__custom-csv-import-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.minimal-map-admin__custom-csv-import-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.minimal-map-admin__custom-csv-import-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+}
+
+.minimal-map-admin__custom-csv-import-progress-bar {
+  width: min(100%, 520px);
+  height: 12px;
 }
 
 .minimal-map-admin__field-label-with-hint {
@@ -1160,6 +1191,14 @@ svg.lucide {
 
   .minimal-map-admin__collection-dialog {
     min-width: auto;
+  }
+
+  .minimal-map-admin__custom-csv-import-dialog {
+    min-width: auto;
+  }
+
+  .minimal-map-admin__custom-csv-import-row {
+    grid-template-columns: 1fr;
   }
 }
 

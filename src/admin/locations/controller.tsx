@@ -3,9 +3,12 @@ import type { ViewTable } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Plus } from 'lucide-react';
-import { createCollection } from '../../lib/collections/createCollection';
 import { ExportLocationsDropdown } from './ExportLocationsDropdown';
 import { ImportLocationsButton } from './ImportLocationsButton';
+import type {
+	CsvImportMapping,
+	ParsedCsvData,
+} from '../../lib/locations/importLocations';
 import type {
 	CollectionRecord,
 	CollectionsAdminConfig,
@@ -35,7 +38,14 @@ import { createLocation } from '../../lib/locations/createLocation';
 import { deleteLocation } from '../../lib/locations/deleteLocation';
 import { duplicateLocation } from '../../lib/locations/duplicateLocation';
 import { fetchAllLocations } from '../../lib/locations/fetchAllLocations';
-import { importLocations } from '../../lib/locations/importLocations';
+import {
+	countMappedCsvGeocodeRequests,
+	createEmptyCsvImportMapping,
+	isCommonCsvFormat,
+	parseCsvFile,
+	runCommonCsvImport,
+	runMappedCsvImport,
+} from '../../lib/locations/importLocations';
 import { geocodeAddress } from '../../lib/locations/geocodeAddress';
 import { hasFieldErrors } from '../../lib/locations/hasFieldErrors';
 import { hasLocationAddressChanged } from '../../lib/locations/hasLocationAddressChanged';
@@ -116,6 +126,16 @@ export function useLocationsController(
 	const [isRemovingCollectionAssignment, setRemovingCollectionAssignment] = useState(false);
 	const [isImporting, setIsImporting] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
+	const [isCustomCsvImportModalOpen, setCustomCsvImportModalOpen] = useState(false);
+	const [customCsvImportStep, setCustomCsvImportStep] = useState<'mapping' | 'progress'>(
+		'mapping'
+	);
+	const [pendingCsvImport, setPendingCsvImport] = useState<ParsedCsvData | null>(null);
+	const [csvImportMapping, setCsvImportMapping] = useState<CsvImportMapping>(
+		createEmptyCsvImportMapping()
+	);
+	const [csvImportProgressCompleted, setCsvImportProgressCompleted] = useState(0);
+	const [csvImportProgressTotal, setCsvImportProgressTotal] = useState(0);
 	const [selection, setSelection] = useState<string[]>([]);
 
 	const loadLocations = useCallback(async () => {
@@ -248,6 +268,15 @@ export function useLocationsController(
 		setStep('details');
 	};
 
+	const resetCustomCsvImportState = useCallback((): void => {
+		setCustomCsvImportModalOpen(false);
+		setCustomCsvImportStep('mapping');
+		setPendingCsvImport(null);
+		setCsvImportMapping(createEmptyCsvImportMapping());
+		setCsvImportProgressCompleted(0);
+		setCsvImportProgressTotal(0);
+	}, []);
+
 	const resetAssignToCollectionState = useCallback((): void => {
 		setAssignToCollectionModalOpen(false);
 		setSelectedAssignmentLocation(null);
@@ -322,6 +351,14 @@ export function useLocationsController(
 		setSelectedRemovalLocation(null);
 		setSelectedRemovalCollection(null);
 	}, []);
+
+	const closeCustomCsvImportModal = useCallback((): void => {
+		if (isImporting) {
+			return;
+		}
+
+		resetCustomCsvImportState();
+	}, [isImporting, resetCustomCsvImportState]);
 
 	const closeRemoveCollectionAssignmentModal = useCallback((): void => {
 		if (isRemovingCollectionAssignment) {
@@ -992,27 +1029,111 @@ export function useLocationsController(
 		selectedCoordinates,
 	]);
 
+	const onChangeCsvImportMapping = useCallback(
+		(field: keyof CsvImportMapping, columnIndex: string): void => {
+			setCsvImportMapping((currentMapping) => ({
+				...currentMapping,
+				[field]: columnIndex === '' ? null : Number(columnIndex),
+			}));
+		},
+		[]
+	);
+
 	const onImportLocations = useCallback(async (file: File) => {
-		setIsImporting(true);
 		setActionNotice(null);
 
 		try {
-			const count = await importLocations(file, config, collectionsConfig);
+			const parsedCsv = await parseCsvFile(file);
 
-			await loadLocations();
-			setActionNotice({
-				status: 'success',
-				message: `${count} ${__('locations imported and assigned to a new collection.', 'minimal-map')}`,
-			});
+			if (isCommonCsvFormat(parsedCsv)) {
+				setIsImporting(true);
+
+				try {
+					const result = await runCommonCsvImport(parsedCsv, config, collectionsConfig);
+
+					await loadLocations();
+					setActionNotice({
+						status: 'success',
+						message: `${result.importedCount} ${__(
+							'locations imported and assigned to a new collection.',
+							'minimal-map'
+						)}`,
+					});
+				} finally {
+					setIsImporting(false);
+				}
+
+				return;
+			}
+
+			resetCustomCsvImportState();
+			setPendingCsvImport(parsedCsv);
+			setCustomCsvImportStep('mapping');
+			setCustomCsvImportModalOpen(true);
 		} catch (error) {
 			setActionNotice({
 				status: 'error',
 				message: error instanceof Error ? error.message : __('Failed to import locations.', 'minimal-map'),
 			});
+		}
+	}, [collectionsConfig, config, loadLocations, resetCustomCsvImportState]);
+
+	const onStartCustomCsvImport = useCallback(async (): Promise<void> => {
+		if (!pendingCsvImport) {
+			return;
+		}
+
+		const totalGeocodeRequests = countMappedCsvGeocodeRequests(pendingCsvImport, csvImportMapping);
+
+		setActionNotice(null);
+		setCustomCsvImportStep('progress');
+		setCsvImportProgressCompleted(0);
+		setCsvImportProgressTotal(totalGeocodeRequests);
+		setIsImporting(true);
+
+		try {
+			const result = await runMappedCsvImport(
+				pendingCsvImport,
+				csvImportMapping,
+				config,
+				collectionsConfig,
+				{
+					onGeocodeProgress: (completed, total) => {
+						setCsvImportProgressCompleted(completed);
+						setCsvImportProgressTotal(total);
+					},
+				}
+			);
+
+			await loadLocations();
+			setActionNotice({
+				status: 'success',
+				message: `${result.importedCount} ${__(
+					'locations imported and assigned to a new collection.',
+					'minimal-map'
+				)}`,
+			});
+			resetCustomCsvImportState();
+		} catch (error) {
+			resetCustomCsvImportState();
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Failed to import locations.', 'minimal-map'),
+			});
 		} finally {
 			setIsImporting(false);
 		}
-	}, [config, collectionsConfig, loadLocations]);
+	}, [
+		collectionsConfig,
+		config,
+		csvImportMapping,
+		loadLocations,
+		pendingCsvImport,
+		resetCustomCsvImportState,
+	]);
 
 	const onExportLocations = useCallback(() => {
 		if (locations.length === 0) return;
@@ -1065,6 +1186,11 @@ export function useLocationsController(
 		assignmentLogoId,
 		assignmentMarkerId,
 		assignmentTagIds,
+		csvImportHeaders: pendingCsvImport?.headers ?? [],
+		csvImportMapping,
+		csvImportProgressCompleted,
+		csvImportProgressTotal,
+		csvImportStep: customCsvImportStep,
 		collections,
 		logos,
 		markers,
@@ -1107,6 +1233,7 @@ export function useLocationsController(
 		isAssignmentSaving,
 		isDeleteLogoConfirmationModalOpen,
 		isDialogOpen,
+		isCustomCsvImportModalOpen,
 		isGeocoding,
 		isLoading,
 		isRemoveCollectionAssignmentModalOpen,
@@ -1128,8 +1255,10 @@ export function useLocationsController(
 		onAssignMarkerToLocation,
 		onAssignTagsToLocation,
 		onCancel,
+		onChangeCsvImportMapping,
 		onChangeFormValue,
 		onCloseAssignToCollectionModal: closeAssignToCollectionModal,
+		onCloseCustomCsvImportModal: closeCustomCsvImportModal,
 		onCloseAssignLogoModal: closeAssignLogoModal,
 		onCloseAssignMarkerModal: closeAssignMarkerModal,
 		onCloseAssignTagsModal: closeAssignTagsModal,
@@ -1152,6 +1281,7 @@ export function useLocationsController(
 		onDuplicateLocation,
 		onEditLocation,
 		onImportLocations,
+		onStartCustomCsvImport,
 		onExportLocations,
 		onExportExample,
 		onMapLocationSelect,
