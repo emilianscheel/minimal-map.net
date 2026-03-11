@@ -43,6 +43,7 @@ export interface MapDefaults {
 	zoomControlsBorderWidth: string;
 	zoomControlsPlusIcon: ZoomControlIcon;
 	zoomControlsMinusIcon: ZoomControlIcon;
+	_isPreview: boolean;
 }
 
 export interface MapMessages {
@@ -79,6 +80,7 @@ export interface MapRuntimeConfig {
 	locations?: MapLocationPoint[];
 	collections?: MapCollectionOption[];
 	messages?: MapMessages;
+	previewImageUrl?: string;
 	onMapClick?: (coordinates: MapCoordinates) => void;
 }
 
@@ -286,6 +288,7 @@ export interface MapBlockAttributes {
 	zoomControlsBorderWidth: string;
 	zoomControlsPlusIcon: ZoomControlIcon;
 	zoomControlsMinusIcon: ZoomControlIcon;
+	_isPreview: boolean;
 }
 
 export interface WordPressZoomControls {

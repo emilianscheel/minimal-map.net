@@ -1,75 +1,92 @@
 .wp-block-minimal-map-map {
-	overflow: hidden;
+  overflow: hidden;
 
-	&.alignfull {
-		width: auto;
-		max-width: none;
-		margin-left: calc(50% - 50vw);
-		margin-right: calc(50% - 50vw);
-	}
+  &.alignfull {
+    width: auto;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
 
-	.minimal-map-editor__canvas {
-		min-height: 240px;
-	}
+  .minimal-map-editor__canvas {
+    min-height: 225px;
+  }
+
+  &.minimal-map-editor--preview {
+    margin: -20px !important; // Negates default preview container padding
+    width: calc(100% + 40px) !important;
+    height: 225px !important; // Standard height for the preview card area
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+
+    .minimal-map-editor__preview {
+      width: 100%;
+      height: 100%;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+    }
+  }
 }
 
 .minimal-map-editor__height-control.components-unit-control {
-	.components-input-control__container {
-		position: relative;
-	}
+  .components-input-control__container {
+    position: relative;
+  }
 
-	.components-input-control__suffix {
-		align-self: stretch;
-		align-items: center;
-		display: flex;
-		margin: 0;
-	}
+  .components-input-control__suffix {
+    align-self: stretch;
+    align-items: center;
+    display: flex;
+    margin: 0;
+  }
 
-	.components-unit-control__select {
-		align-self: center;
-		border-left: 1px solid #1e1e1e;
-		border-radius: 0 2px 2px 0;
-		height: 38px;
-		line-height: 38px;
-		margin: 0;
-		min-width: 52px;
-		padding-left: 12px;
-		padding-right: 28px;
-		padding-top: 0;
-		padding-bottom: 0;
-	}
+  .components-unit-control__select {
+    align-self: center;
+    border-left: 1px solid #1e1e1e;
+    border-radius: 0 2px 2px 0;
+    height: 38px;
+    line-height: 38px;
+    margin: 0;
+    min-width: 52px;
+    padding-left: 12px;
+    padding-right: 28px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 
-	.components-unit-control__select:focus {
-		border-left-color: var(--wp-admin-theme-color);
-		border-radius: 0 2px 2px 0;
-		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
-	}
+  .components-unit-control__select:focus {
+    border-left-color: var(--wp-admin-theme-color);
+    border-radius: 0 2px 2px 0;
+    box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
+  }
 }
 
 .minimal-map-editor__box-control {
-	.component-box-control__unit-control {
-		flex: 1 1 50%;
-		max-width: calc(50% - 8px);
-		min-width: 0;
-		width: auto;
-	}
+  .component-box-control__unit-control {
+    flex: 1 1 50%;
+    max-width: calc(50% - 8px);
+    min-width: 0;
+    width: auto;
+  }
 
-	.components-range-control {
-		flex: 1 1 50%;
-		min-width: 0;
-		max-width: calc(50% - 8px);
-	}
+  .components-range-control {
+    flex: 1 1 50%;
+    min-width: 0;
+    max-width: calc(50% - 8px);
+  }
 }
 
 // Ensure Lucide icons render correctly in the editor and popovers.
 svg.lucide,
 svg.lucide * {
-	fill: none !important;
-	stroke: currentColor !important;
-	stroke-linecap: round;
-	stroke-linejoin: round;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 svg.lucide {
-	flex: 0 0 auto;
+  flex: 0 0 auto;
 }

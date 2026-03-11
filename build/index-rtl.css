@@ -15,7 +15,22 @@
   margin-left: calc(50% - 50vw);
 }
 .wp-block-minimal-map-map .minimal-map-editor__canvas {
-  min-height: 240px;
+  min-height: 225px;
+}
+.wp-block-minimal-map-map.minimal-map-editor--preview {
+  margin: -20px !important;
+  width: calc(100% + 40px) !important;
+  height: 225px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+.wp-block-minimal-map-map.minimal-map-editor--preview .minimal-map-editor__preview {
+  width: 100%;
+  height: 100%;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 .minimal-map-editor__height-control.components-unit-control .components-input-control__container {
   position: relative;

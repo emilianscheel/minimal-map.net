@@ -492,6 +492,43 @@ function Edit({
       });
     }
   };
+  if (attributes._isPreview) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("div", {
+      ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)({
+        className: 'minimal-map-editor__preview minimal-map-editor--preview',
+        style: {
+          backgroundImage: runtimeConfig.previewImageUrl ? `url(${runtimeConfig.previewImageUrl})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f0f0f1',
+          color: '#757575',
+          fontSize: '13px'
+        }
+      }),
+      children: !runtimeConfig.previewImageUrl && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)("div", {
+        style: {
+          textAlign: 'center',
+          padding: '20px'
+        },
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(MapPinned, {
+          size: 48,
+          style: {
+            marginBottom: '12px',
+            opacity: 0.5
+          }
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("p", {
+          style: {
+            margin: 0
+          },
+          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_3__.__)('Minimal Map Preview', 'minimal-map')
+        })]
+      })
+    });
+  }
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
       group: "settings",
@@ -3079,7 +3116,7 @@ var separator_default = /* @__PURE__ */ (0,react_jsx_runtime__WEBPACK_IMPORTED_M
 (module) {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"minimal-map/map","version":"0.2.0","title":"Minimal Map","category":"widgets","icon":"location-alt","description":"Render a minimalist MapLibre-powered map.","textdomain":"minimal-map","attributes":{"centerLat":{"type":"number","default":52.517},"centerLng":{"type":"number","default":13.388},"zoom":{"type":"number","default":9.5},"collectionId":{"type":"number","default":0},"height":{"type":"number","default":420},"heightUnit":{"type":"string","default":"px"},"stylePreset":{"type":"string","default":"liberty"},"styleThemeSlug":{"type":"string","default":"default"},"showZoomControls":{"type":"boolean","default":true},"allowSearch":{"type":"boolean","default":true},"scrollZoom":{"type":"boolean","default":false},"zoomControlsPosition":{"type":"string","default":"top-right"},"zoomControlsPadding":{"type":"object","default":{"top":"8px","right":"8px","bottom":"8px","left":"8px"}},"zoomControlsOuterMargin":{"type":"object","default":{"top":"16px","right":"16px","bottom":"16px","left":"16px"}},"zoomControlsBackgroundColor":{"type":"string","default":"#ffffff"},"zoomControlsIconColor":{"type":"string","default":"#1e1e1e"},"zoomControlsBorderRadius":{"type":"string","default":"2px"},"zoomControlsBorderColor":{"type":"string","default":"#dcdcde"},"zoomControlsBorderWidth":{"type":"string","default":"1px"},"zoomControlsPlusIcon":{"type":"string","default":"plus"},"zoomControlsMinusIcon":{"type":"string","default":"line-solid"}},"supports":{"html":false,"align":["wide","full"],"spacing":{"margin":true,"padding":true,"__experimentalDefaultControls":{"margin":true,"padding":true}},"__experimentalBorder":{"radius":true,"__experimentalDefaultControls":{"radius":true}}},"editorScript":"minimal-map-block-editor","editorStyle":"minimal-map-editor-style","style":"minimal-map-style","viewScript":"minimal-map-frontend"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"minimal-map/map","version":"0.2.0","title":"Minimal Map","category":"widgets","icon":"location-alt","description":"Render a minimalist MapLibre-powered map.","textdomain":"minimal-map","attributes":{"centerLat":{"type":"number","default":52.517},"centerLng":{"type":"number","default":13.388},"zoom":{"type":"number","default":9.5},"collectionId":{"type":"number","default":0},"height":{"type":"number","default":420},"heightUnit":{"type":"string","default":"px"},"stylePreset":{"type":"string","default":"liberty"},"styleThemeSlug":{"type":"string","default":"default"},"showZoomControls":{"type":"boolean","default":true},"allowSearch":{"type":"boolean","default":true},"scrollZoom":{"type":"boolean","default":false},"zoomControlsPosition":{"type":"string","default":"top-right"},"zoomControlsPadding":{"type":"object","default":{"top":"8px","right":"8px","bottom":"8px","left":"8px"}},"zoomControlsOuterMargin":{"type":"object","default":{"top":"16px","right":"16px","bottom":"16px","left":"16px"}},"zoomControlsBackgroundColor":{"type":"string","default":"#ffffff"},"zoomControlsIconColor":{"type":"string","default":"#1e1e1e"},"zoomControlsBorderRadius":{"type":"string","default":"2px"},"zoomControlsBorderColor":{"type":"string","default":"#dcdcde"},"zoomControlsBorderWidth":{"type":"string","default":"1px"},"zoomControlsPlusIcon":{"type":"string","default":"plus"},"zoomControlsMinusIcon":{"type":"string","default":"line-solid"},"_isPreview":{"type":"boolean","default":false}},"supports":{"html":false,"align":["wide","full"],"spacing":{"margin":true,"padding":true,"__experimentalDefaultControls":{"margin":true,"padding":true}},"__experimentalBorder":{"radius":true,"__experimentalDefaultControls":{"radius":true}}},"editorScript":"minimal-map-block-editor","editorStyle":"minimal-map-editor-style","style":"minimal-map-style","viewScript":"minimal-map-frontend","example":{"viewportWidth":400,"attributes":{"centerLat":52.75,"centerLng":13.4,"zoom":9.5,"height":240,"stylePreset":"liberty","_isPreview":true}}}');
 
 /***/ }
 

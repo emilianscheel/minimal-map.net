@@ -102,6 +102,10 @@
     "zoomControlsMinusIcon": {
       "type": "string",
       "default": "line-solid"
+    },
+    "_isPreview": {
+      "type": "boolean",
+      "default": false
     }
   },
   "supports": {
@@ -125,5 +129,16 @@
   "editorScript": "minimal-map-block-editor",
   "editorStyle": "minimal-map-editor-style",
   "style": "minimal-map-style",
-  "viewScript": "minimal-map-frontend"
+  "viewScript": "minimal-map-frontend",
+  "example": {
+    "viewportWidth": 400,
+    "attributes": {
+      "centerLat": 52.75,
+      "centerLng": 13.4,
+      "zoom": 9.5,
+      "height": 240,
+      "stylePreset": "liberty",
+      "_isPreview": true
+    }
+  }
 }

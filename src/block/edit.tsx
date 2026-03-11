@@ -598,6 +598,35 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 		}
 	};
 
+	if (attributes._isPreview) {
+		return (
+			<div 
+				{ ...useBlockProps( {
+					className: 'minimal-map-editor__preview minimal-map-editor--preview',
+					style: {
+						backgroundImage: runtimeConfig.previewImageUrl ? `url(${runtimeConfig.previewImageUrl})` : 'none',
+						backgroundSize: 'cover',
+						backgroundPosition: 'center',
+						backgroundRepeat: 'no-repeat',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: '#f0f0f1',
+						color: '#757575',
+						fontSize: '13px',
+					},
+				} ) }
+			>
+				{!runtimeConfig.previewImageUrl && (
+					<div style={{ textAlign: 'center', padding: '20px' }}>
+						<MapPinned size={48} style={{ marginBottom: '12px', opacity: 0.5 }} />
+						<p style={{ margin: 0 }}>{__('Minimal Map Preview', 'minimal-map')}</p>
+					</div>
+				)}
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<InspectorControls group="settings">

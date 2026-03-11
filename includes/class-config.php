@@ -94,6 +94,7 @@ class Config {
 			'zoomControlsPlusIcon'        => 'plus',
 			'zoomControlsMinusIcon'       => 'line-solid',
 			'styleThemeSlug'              => 'default',
+			'_isPreview'                  => false,
 		);
 	}
 
@@ -185,6 +186,7 @@ class Config {
 			'messages'      => array(
 				'fallback' => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 			),
+			'previewImageUrl' => plugins_url( 'assets/preview.png', MINIMAL_MAP_FILE ),
 		);
 	}
 
