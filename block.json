@@ -49,6 +49,10 @@
       "type": "boolean",
       "default": true
     },
+    "scrollZoom": {
+      "type": "boolean",
+      "default": false
+    },
     "zoomControlsPosition": {
       "type": "string",
       "default": "top-right"

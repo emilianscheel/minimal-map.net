@@ -640,6 +640,11 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 						onChange={(value: boolean) => setAttributes({ showZoomControls: value })}
 					/>
 					<ToggleControl
+						label={__('Allow Zoom via Scroll', 'minimal-map')}
+						checked={attributes.scrollZoom}
+						onChange={(value: boolean) => setAttributes({ scrollZoom: value })}
+					/>
+					<ToggleControl
 						label={__('Allow Search', 'minimal-map')}
 						checked={attributes.allowSearch}
 						onChange={(value: boolean) => setAttributes({ allowSearch: value })}
