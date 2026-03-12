@@ -755,11 +755,96 @@ svg.lucide {
 }
 
 .minimal-map-admin__location-mini-map {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 60px;
   height: 60px;
   border-radius: 12px;
   overflow: hidden;
   background: #f0f0f1;
+}
+
+.minimal-map-admin__location-mini-map-surface {
+  position: absolute;
+  inset: 0;
+  background: var(--minimal-map-mini-map-background, #f2f3f0);
+}
+
+.minimal-map-admin__location-mini-map-water,
+.minimal-map-admin__location-mini-map-park,
+.minimal-map-admin__location-mini-map-road {
+  position: absolute;
+  display: block;
+}
+
+.minimal-map-admin__location-mini-map-water {
+  top: -8px;
+  right: -10px;
+  width: 34px;
+  height: 30px;
+  background: var(--minimal-map-mini-map-water, #cad2d3);
+  border-radius: 18px 0 20px 12px;
+  opacity: 0.95;
+}
+
+.minimal-map-admin__location-mini-map-park {
+  left: -8px;
+  bottom: -10px;
+  width: 30px;
+  height: 30px;
+  background: var(--minimal-map-mini-map-park, #d2e8d4);
+  border-radius: 18px 16px 0 12px;
+}
+
+.minimal-map-admin__location-mini-map-road {
+  left: -8px;
+  right: -8px;
+  height: 8px;
+  background: var(--minimal-map-mini-map-road-casing, #e5e5e5);
+  border-radius: 999px;
+}
+
+.minimal-map-admin__location-mini-map-road::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  background: var(--minimal-map-mini-map-road-fill, #ffffff);
+  border-radius: inherit;
+}
+
+.minimal-map-admin__location-mini-map-road--primary {
+  top: 14px;
+  transform: rotate(-18deg);
+}
+
+.minimal-map-admin__location-mini-map-road--secondary {
+  bottom: 12px;
+  transform: rotate(24deg);
+}
+
+.minimal-map-admin__location-mini-map-preview-marker {
+  position: relative;
+  z-index: 1;
+  width: 18px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.18));
+}
+
+.minimal-map-admin__location-mini-map-preview-marker > * {
+  width: 100%;
+  height: 100%;
+}
+
+.minimal-map-admin__location-mini-map-preview-marker img,
+.minimal-map-admin__location-mini-map-preview-marker svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .minimal-map-admin__location-mini-map .maplibregl-control-container,

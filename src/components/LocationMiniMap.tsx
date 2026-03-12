@@ -1,6 +1,38 @@
-import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { createMinimalMap } from '../map/bootstrap';
-import type { LocationRecord, MinimalMapInstance, RawMapConfig, StyleThemeRecord } from '../types';
+import type { CSSProperties } from 'react';
+import { DEFAULT_POSITRON_THEME_COLORS } from '../lib/styles/defaultThemeColors';
+import type { LocationRecord, StyleThemeRecord } from '../types';
+
+const DEFAULT_STATIC_MARKER_CONTENT = `
+<svg viewBox="0 0 27 41" aria-hidden="true" focusable="false">
+	<defs>
+		<filter id="minimal-map-mini-marker-shadow" x="-40%" y="-20%" width="180%" height="180%">
+			<feOffset dy="1" in="SourceAlpha" result="offset" />
+			<feGaussianBlur in="offset" stdDeviation="1.25" result="blur" />
+			<feColorMatrix
+				in="blur"
+				type="matrix"
+				values="0 0 0 0 0
+								0 0 0 0 0
+								0 0 0 0 0
+								0 0 0 0.28 0"
+				result="shadow"
+			/>
+			<feMerge>
+				<feMergeNode in="shadow" />
+				<feMergeNode in="SourceGraphic" />
+			</feMerge>
+		</filter>
+	</defs>
+	<path
+		fill="#3fb1ce"
+		stroke="#2b7f94"
+		stroke-width="1.5"
+		filter="url(#minimal-map-mini-marker-shadow)"
+		d="M13.5 1.5C6.873 1.5 1.5 6.873 1.5 13.5c0 9.137 10.308 19.954 11.487 21.17a.75.75 0 0 0 1.026 0C15.192 33.454 25.5 22.637 25.5 13.5 25.5 6.873 20.127 1.5 13.5 1.5Z"
+	/>
+	<circle cx="13.5" cy="13" r="5.5" fill="#fff" />
+</svg>
+`;
 
 export default function LocationMiniMap({
 	location,
@@ -11,51 +43,32 @@ export default function LocationMiniMap({
 	theme: StyleThemeRecord | null;
 	markerContent?: string | null;
 }) {
-	const hostRef = useRef<HTMLDivElement | null>(null);
-	const mapRef = useRef<MinimalMapInstance | null>(null);
-	const latitude = Number(location.latitude);
-	const longitude = Number(location.longitude);
-	const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude);
-	const mapConfig = useMemo<RawMapConfig>(() => ({
-		centerLat: hasCoordinates ? latitude : 52.517,
-		centerLng: hasCoordinates ? longitude : 13.388,
-		zoom: hasCoordinates ? 13 : 8.5,
-		height: 60,
-		heightUnit: 'px',
-		stylePreset: theme?.basePreset || 'positron',
-		styleTheme: theme?.colors,
-		showZoomControls: false,
-		allowSearch: false,
-		markerLat: hasCoordinates ? latitude : null,
-		markerLng: hasCoordinates ? longitude : null,
-		markerContent: markerContent ?? location.markerContent ?? null,
-		markerClassName: 'minimal-map-admin__location-mini-map-marker',
-		markerOffsetY: 0,
-		centerOffsetY: 13,
-		interactive: false,
-		showAttribution: false,
-	}), [hasCoordinates, latitude, longitude, location.markerContent, markerContent, theme]);
+	const colors = theme?.colors ?? DEFAULT_POSITRON_THEME_COLORS;
+	const previewStyle = {
+		'--minimal-map-mini-map-background': colors.background,
+		'--minimal-map-mini-map-water': colors.water,
+		'--minimal-map-mini-map-park': colors.park,
+		'--minimal-map-mini-map-road-casing': colors.roadMajorCasing,
+		'--minimal-map-mini-map-road-fill': colors.roadMajorFill,
+	} as CSSProperties;
+	const previewMarkerContent = markerContent ?? location.markerContent ?? DEFAULT_STATIC_MARKER_CONTENT;
 
-	useEffect(() => {
-		if (!hostRef.current) {
-			return undefined;
-		}
-
-		mapRef.current = createMinimalMap(
-			hostRef.current,
-			mapConfig,
-			window.MinimalMapAdminConfig?.mapConfig ?? {}
-		);
-
-		return () => {
-			mapRef.current?.destroy();
-			mapRef.current = null;
-		};
-	}, []);
-
-	useEffect(() => {
-		mapRef.current?.update(mapConfig);
-	}, [mapConfig]);
-
-	return <div ref={hostRef} className="minimal-map-admin__location-mini-map" aria-hidden="true" />;
+	return (
+		<div
+			className="minimal-map-admin__location-mini-map minimal-map-admin__location-mini-map--static"
+			aria-hidden="true"
+			style={previewStyle}
+		>
+			<div className="minimal-map-admin__location-mini-map-surface">
+				<span className="minimal-map-admin__location-mini-map-water" />
+				<span className="minimal-map-admin__location-mini-map-park" />
+				<span className="minimal-map-admin__location-mini-map-road minimal-map-admin__location-mini-map-road--primary" />
+				<span className="minimal-map-admin__location-mini-map-road minimal-map-admin__location-mini-map-road--secondary" />
+			</div>
+			<div
+				className="minimal-map-admin__location-mini-map-preview-marker"
+				dangerouslySetInnerHTML={{ __html: previewMarkerContent }}
+			/>
+		</div>
+	);
 }
