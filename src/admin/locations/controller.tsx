@@ -55,7 +55,6 @@ import { updateLocation } from '../../lib/locations/updateLocation';
 import { validateAddressStep } from '../../lib/locations/validateAddressStep';
 import { validateDetailsStep } from '../../lib/locations/validateDetailsStep';
 import { DEFAULT_FORM_STATE, DEFAULT_VIEW, LOCATIONS_TABLE_PER_PAGE } from './constants';
-import { ThemeSelector } from '../styles/ThemeSelector';
 import type { LocationsController } from './types';
 
 const DEFAULT_MAP_CENTER: MapCoordinates = {
@@ -1212,11 +1211,6 @@ export function useLocationsController(
 					<ImportLocationsButton onImport={onImportLocations} isImporting={isImporting} />
 					<ExportLocationsDropdown onExport={onExportLocations} onExportExample={onExportExample} />
 				</div>
-				<ThemeSelector
-					activeTheme={themeData.activeTheme}
-					themes={themeData.themes}
-					onSwitch={themeData.onSwitchTheme}
-				/>
 				<Button
 					variant="primary"
 					onClick={openDialog}
