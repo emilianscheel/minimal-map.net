@@ -1,142 +1,56 @@
-import { Button, Card, CardBody, Popover, SlotFillProvider } from '@wordpress/components';
+import { Button, Popover, SlotFillProvider } from '@wordpress/components';
 import domReady from '@wordpress/dom-ready';
-import { createRoot, useEffect, useMemo, useRef } from '@wordpress/element';
+import { Suspense, createRoot, lazy } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { ReactNode } from 'react';
-import {
-	Download,
-	FileUp,
-	FolderTree,
-	Image,
-	LayoutDashboard,
-	Layers3,
-	MapPin,
-	MapPinned,
-	Palette,
-	Settings,
-	Tags,
-	type LucideIcon,
-} from 'lucide-react';
-import CollectionsView, { useCollectionsController } from './collections';
-import LocationsView, { useLocationsController } from './locations';
-import LogosView, { useLogosController } from './logos';
-import MarkersView, { useMarkersController } from './markers';
-import TagsView, { useTagsController } from './tags';
-import StylesView from './styles';
-import { useStylesController } from './styles/controller';
-import { createMinimalMap } from '../map/bootstrap';
-import type {
-	AdminAppConfig,
-	AdminSection,
-	AdminSectionView,
-	DashboardCardView,
-	MapRuntimeConfig,
-	MinimalMapInstance,
-	RawMapConfig,
-} from '../types';
+import type { ComponentType, LazyExoticComponent } from 'react';
+import AdminSectionIcon from './AdminSectionIcon';
+import { adminConfig, getActiveSection, getSectionMap, isAdminSectionView } from './app-config';
+import LoadingView from './LoadingView';
+import type { AdminSectionView } from '../types';
+import type { AdminSectionComponentProps } from './sections/types';
 import './style.scss';
 
-const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
-	currentView: 'dashboard',
-	sections: [],
-	stats: {
-		locations: 0,
-		collections: 0,
-		logos: 0,
-		markers: 0,
-		tags: 0,
-	},
-	collectionsConfig: {
-		nonce: '',
-		restBase: '',
-		restPath: '',
-	},
-	locationsConfig: {
-		nonce: '',
-		restBase: '',
-		restPath: '',
-		geocodePath: '',
-	},
-	markersConfig: {
-		nonce: '',
-		restBase: '',
-		restPath: '',
-	},
-	logosConfig: {
-		nonce: '',
-		restBase: '',
-		restPath: '',
-	},
-	tagsConfig: {
-		nonce: '',
-		restBase: '',
-		restPath: '',
-	},
-	stylesConfig: {
-		nonce: '',
-		restBase: '',
-		restPath: '',
-	},
-	mapConfig: {},
+const DashboardSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-dashboard" */
+	'./sections/DashboardSection'
+));
+const LocationsSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-locations" */
+	'./sections/LocationsSection'
+));
+const CollectionsSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-collections" */
+	'./sections/CollectionsSection'
+));
+const LogosSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-logos" */
+	'./sections/LogosSection'
+));
+const MarkersSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-markers" */
+	'./sections/MarkersSection'
+));
+const TagsSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-tags" */
+	'./sections/TagsSection'
+));
+const StylesSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-styles" */
+	'./sections/StylesSection'
+));
+
+const SECTION_COMPONENTS: Record<
+	AdminSectionView,
+	LazyExoticComponent<ComponentType<AdminSectionComponentProps>>
+> = {
+	dashboard: DashboardSection,
+	locations: LocationsSection,
+	collections: CollectionsSection,
+	logos: LogosSection,
+	markers: MarkersSection,
+	tags: TagsSection,
+	styles: StylesSection,
 };
-
-const adminConfig: AdminAppConfig = window.MinimalMapAdminConfig ?? DEFAULT_ADMIN_CONFIG;
-
-const ICONS: Record<AdminSectionView, LucideIcon> = {
-	dashboard: LayoutDashboard,
-	locations: MapPinned,
-	collections: Layers3,
-	logos: Image,
-	tags: Tags,
-	markers: MapPin,
-	styles: Palette,
-};
-
-const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'logos', 'markers', 'tags' ];
-
-const CARD_COPY: Record<DashboardCardView, string> = {
-	locations: __('Manage every place you want to render on your maps and prepare it for future block integrations.', 'minimal-map'),
-	collections: __('Build reusable groups of locations and curate map-ready sets without changing the location editor flow.', 'minimal-map'),
-	logos: __('Upload reusable SVG logos and assign them across multiple locations without duplicating assets.', 'minimal-map'),
-	markers: __('Create marker variants and keep your map pin system consistent across locations and styles.', 'minimal-map'),
-	tags: __('Add lightweight labels that make large map datasets easier to sort, search, and evolve.', 'minimal-map'),
-};
-
-const CTA_COPY: Record<DashboardCardView, string> = {
-	locations: __('Open locations', 'minimal-map'),
-	collections: __('Open collections', 'minimal-map'),
-	logos: __('Open logos', 'minimal-map'),
-	markers: __('Open markers', 'minimal-map'),
-	tags: __('Open tags', 'minimal-map'),
-};
-
-const COUNT_KEYS: Record<DashboardCardView, keyof AdminAppConfig['stats']> = {
-	locations: 'locations',
-	collections: 'collections',
-	logos: 'logos',
-	markers: 'markers',
-	tags: 'tags',
-};
-
-function isAdminSectionView(value: string): value is AdminSectionView {
-	return value in ICONS;
-}
-
-function getSectionMap(): Partial<Record<AdminSectionView, AdminSection>> {
-	return adminConfig.sections.reduce<Partial<Record<AdminSectionView, AdminSection>>>(
-		(accumulator, section) => {
-			accumulator[ section.view ] = section;
-			return accumulator;
-		},
-		{}
-	);
-}
-
-function SectionIcon({ view }: { view: AdminSectionView }) {
-	const IconComponent = ICONS[ view ] ?? ICONS.dashboard;
-
-	return <IconComponent aria-hidden="true" size={24} strokeWidth={1.75} />;
-}
 
 function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
 	return (
@@ -156,7 +70,9 @@ function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
 								isActive ? 'is-active' : '',
 							].filter(Boolean).join(' ')}
 						>
-							<span className="minimal-map-admin__nav-icon"><SectionIcon view={section.view} /></span>
+							<span className="minimal-map-admin__nav-icon">
+								<AdminSectionIcon view={section.view} />
+							</span>
 							<span>{section.title}</span>
 						</Button>
 					);
@@ -166,223 +82,23 @@ function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
 	);
 }
 
-function ContentHeader({
-	actions,
-	description,
-	title,
-}: {
-	actions?: ReactNode;
-	description: string;
-	title: string;
-}) {
-	return (
-		<header className="minimal-map-admin__header">
-			<div className="minimal-map-admin__header-row">
-				<div className="minimal-map-admin__header-copy">
-					<h2 className="minimal-map-admin__header-title">{title}</h2>
-					<p className="minimal-map-admin__header-description">{description}</p>
-				</div>
-				{actions ? <div className="minimal-map-admin__header-actions">{actions}</div> : null}
-			</div>
-		</header>
-	);
-}
-
-function DashboardCard({ section }: { section: AdminSection }) {
-	const countKey = COUNT_KEYS[ section.view as DashboardCardView ];
-	const count = typeof adminConfig.stats[ countKey ] === 'number' ? adminConfig.stats[ countKey ] : 0;
-
-	return (
-		<Card className="minimal-map-admin__feature-card">
-			<CardBody>
-				<div className="minimal-map-admin__feature-meta">
-					<span className="minimal-map-admin__feature-icon"><SectionIcon view={section.view} /></span>
-					<span className="minimal-map-admin__feature-count">{count}</span>
-				</div>
-				<h3 className="minimal-map-admin__feature-title">{section.title}</h3>
-				<p className="minimal-map-admin__feature-description">{CARD_COPY[ section.view as DashboardCardView ]}</p>
-				<Button href={section.url} variant="link" className="minimal-map-admin__feature-link">
-					{CTA_COPY[ section.view as DashboardCardView ]}
-				</Button>
-			</CardBody>
-		</Card>
-	);
-}
-
-function Dashboard({ sectionMap }: { sectionMap: Partial<Record<AdminSectionView, AdminSection>> }) {
-	const mapHostRef = useRef<HTMLDivElement | null>(null);
-	const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
-	const mapConfig = useMemo<RawMapConfig>(() => ({
-		centerLat: 52.517,
-		centerLng: 13.388,
-		zoom: 9.5,
-		height: 100,
-		heightUnit: '%',
-		stylePreset: 'positron',
-		showZoomControls: true,
-		scrollZoom: true,
-	}), []);
-	const mapRuntimeConfig: MapRuntimeConfig = adminConfig.mapConfig ?? {};
-
-	useEffect(() => {
-		if (!mapHostRef.current) {
-			return undefined;
-		}
-
-		mapInstanceRef.current = createMinimalMap(
-			mapHostRef.current,
-			mapConfig,
-			mapRuntimeConfig
-		);
-
-		return () => {
-			if (mapInstanceRef.current) {
-				mapInstanceRef.current.destroy();
-				mapInstanceRef.current = null;
-			}
-		};
-	}, [ mapConfig, mapRuntimeConfig ]);
-
-	return (
-		<div className="minimal-map-admin__dashboard">
-			<div className="minimal-map-admin__dashboard-grid">
-				{CARD_VIEWS.map((view) => {
-					const section = sectionMap[ view ];
-
-					return section ? <DashboardCard key={view} section={section} /> : null;
-				})}
-			</div>
-			<div className="minimal-map-admin__dashboard-map">
-				<div
-					ref={mapHostRef}
-					className="minimal-map-admin__dashboard-map-surface"
-				/>
-			</div>
-		</div>
-	);
-}
-
-function PlaceholderView({ title }: { title: string }) {
-	return <div className="minimal-map-admin__placeholder-view" aria-label={title} />;
-}
-
-function getActiveSection(currentView: AdminSectionView): AdminSection {
-	const sectionMap = getSectionMap();
-
-	return sectionMap[ currentView ] ?? sectionMap.dashboard ?? {
-		view: 'dashboard',
-		title: __('Dashboard', 'minimal-map'),
-		description: __('An overview of Minimal Map sections and upcoming data tools.', 'minimal-map'),
-		url: '#',
-	};
-}
-
 function App({ currentView }: { currentView: AdminSectionView }) {
 	const sectionMap = getSectionMap();
 	const activeSection = getActiveSection(currentView);
-	const stylesController = useStylesController(
-		adminConfig.stylesConfig,
-		activeSection.view === 'styles' || activeSection.view === 'markers' || activeSection.view === 'locations' || activeSection.view === 'collections'
-	);
-	const locationsController = useLocationsController(
-		adminConfig.locationsConfig,
-		adminConfig.collectionsConfig,
-		adminConfig.logosConfig,
-		adminConfig.markersConfig,
-		adminConfig.tagsConfig,
-		activeSection.view === 'locations',
-		{
-			activeTheme: stylesController.activeTheme,
-			themes: stylesController.themes,
-			onSwitchTheme: stylesController.switchTheme,
-		}
-	);
-	const collectionsController = useCollectionsController(
-		adminConfig.collectionsConfig,
-		adminConfig.locationsConfig,
-		activeSection.view === 'collections',
-		{
-			activeTheme: stylesController.activeTheme,
-			themes: stylesController.themes,
-			onSwitchTheme: stylesController.switchTheme,
-		}
-	);
-	const markersController = useMarkersController(
-		adminConfig.markersConfig,
-		activeSection.view === 'markers',
-		{
-			activeTheme: stylesController.activeTheme,
-			themes: stylesController.themes,
-			onSwitchTheme: stylesController.switchTheme,
-		}
-	);
-	const logosController = useLogosController(
-		adminConfig.logosConfig,
-		adminConfig.locationsConfig,
-		activeSection.view === 'logos'
-	);
-	const tagsController = useTagsController(
-		adminConfig.tagsConfig,
-		activeSection.view === 'tags',
-		{
-			activeTheme: stylesController.activeTheme,
-			themes: stylesController.themes,
-			onSwitchTheme: stylesController.switchTheme,
-		}
-	);
-	const mapRuntimeConfig: MapRuntimeConfig = adminConfig.mapConfig ?? {};
+	const ActiveSectionComponent = SECTION_COMPONENTS[activeSection.view] ?? DashboardSection;
 
 	return (
 		<SlotFillProvider>
 			<div className="minimal-map-admin__app">
 				<AdminSidebar currentView={activeSection.view} />
 				<div className="minimal-map-admin__panel">
-					<ContentHeader
-						title={activeSection.title}
-						description={activeSection.description}
-						actions={
-							activeSection.view === 'locations'
-								? locationsController.headerAction
-								: activeSection.view === 'collections'
-									? collectionsController.headerAction
-									: activeSection.view === 'logos'
-										? logosController.headerAction
-									: activeSection.view === 'markers'
-										? markersController.headerAction
-										: activeSection.view === 'tags'
-											? tagsController.headerAction
-											: activeSection.view === 'styles'
-												? stylesController.headerAction
-												: undefined
-						}
-					/>
-					<div
-						className={[
-							'minimal-map-admin__content',
-							activeSection.view === 'dashboard' ? 'minimal-map-admin__content--dashboard' : '',
-						].filter(Boolean).join(' ')}
-					>
-						{activeSection.view === 'dashboard' ? (
-							<Dashboard sectionMap={sectionMap} />
-						) : activeSection.view === 'locations' ? (
-							<LocationsView controller={locationsController} />
-						) : activeSection.view === 'collections' ? (
-							<CollectionsView controller={collectionsController} />
-						) : activeSection.view === 'logos' ? (
-							<LogosView controller={logosController} />
-						) : activeSection.view === 'markers' ? (
-							<MarkersView controller={markersController} />
-						) : activeSection.view === 'tags' ? (
-							<TagsView controller={tagsController} />
-						) : activeSection.view === 'styles' ? (
-							<StylesView
-								controller={stylesController}
-								runtimeConfig={mapRuntimeConfig}
-							/>
-						) : (
-							<PlaceholderView title={activeSection.title} />
-						)}
-					</div>
+					<Suspense fallback={<LoadingView />}>
+						<ActiveSectionComponent
+							activeSection={activeSection}
+							appConfig={adminConfig}
+							sectionMap={sectionMap}
+						/>
+					</Suspense>
 				</div>
 			</div>
 			<Popover.Slot />

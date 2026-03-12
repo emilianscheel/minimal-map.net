@@ -1,11 +1,15 @@
 {
   "name": "minimal-map",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Minimal WordPress-native map plugin.",
   "scripts": {
     "typecheck": "bunx tsc --noEmit",
-    "build": "wp-scripts build",
+    "build": "bun run build:bundle && bun run build:check",
+    "build:bundle": "wp-scripts build",
+    "build:check": "node ./bin/check-bundle-budgets.mjs",
+    "build:stats": "mkdir -p reports && wp-scripts build --profile --json > reports/bundle-stats.json",
+    "build:analyze": "bun run build:stats && node ./bin/create-bundle-report.mjs",
     "build:dev": "wp-scripts start --no-watch",
     "i18n:pot:php": "wp i18n make-pot . /tmp/minimal-map-php.pot --domain=minimal-map --exclude=node_modules,build,.git,languages --skip-block-json",
     "i18n:pot:js": "node ./bin/make-js-pot.mjs /tmp/minimal-map-js.pot",

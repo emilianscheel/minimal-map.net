@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { normalizeMapConfig } from '../../src/map/defaults';
-import { syncTouchZoomInteraction } from '../../src/map/bootstrap';
+import { syncTouchZoomInteraction } from '../../src/map/interactions';
 import { getSearchPanelDesktopPadding } from '../../src/map/search-panel-layout';
 
 function createTouchZoomRotateSpy() {

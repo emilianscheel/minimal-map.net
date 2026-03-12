@@ -37,11 +37,9 @@ class Assets {
 		$this->register_script( 'minimal-map-frontend', 'frontend.js' );
 		$this->register_script( 'minimal-map-admin', 'admin.js' );
 
-		$this->register_style( 'minimal-map-maplibre-style', 'frontend.css' );
-		$this->register_style( 'minimal-map-admin-maplibre-style', 'admin.css' );
 		$this->register_style( 'minimal-map-editor-style', 'index.css', array( 'wp-edit-blocks', 'wp-components' ) );
-		$this->register_style( 'minimal-map-style', 'style-frontend.css', array( 'wp-components', 'minimal-map-maplibre-style' ) );
-		$this->register_style( 'minimal-map-admin-style', 'style-admin.css', array( 'wp-components', 'minimal-map-style', 'minimal-map-admin-maplibre-style' ) );
+		$this->register_style( 'minimal-map-style', 'style-frontend.css', array( 'wp-components' ) );
+		$this->register_style( 'minimal-map-admin-style', 'style-admin.css', array( 'wp-components', 'minimal-map-style' ) );
 
 		$this->attach_inline_data();
 	}
@@ -81,7 +79,7 @@ class Assets {
 		wp_register_script(
 			$handle,
 			$file_url,
-			$asset['dependencies'],
+			$this->sanitize_script_dependencies( $asset['dependencies'] ),
 			$asset['version'],
 			true
 		);
@@ -101,15 +99,46 @@ class Assets {
 		$file_path = MINIMAL_MAP_PATH . 'build/' . $filename;
 		$file_url  = MINIMAL_MAP_URL . 'build/' . $filename;
 
-		if ( ! file_exists( $file_path ) ) {
+		if ( ! is_readable( $file_path ) ) {
 			return;
+		}
+
+		$version = filemtime( $file_path );
+
+		if ( false === $version ) {
+			$version = MINIMAL_MAP_VERSION;
 		}
 
 		wp_register_style(
 			$handle,
 			$file_url,
 			$dependencies,
-			(string) filemtime( $file_path )
+			(string) $version
+		);
+	}
+
+	/**
+	 * Remove extracted CSS handles from generated script dependencies.
+	 *
+	 * Webpack can include CSS pseudo-handles in the asset metadata when styles are
+	 * imported from lazy JS chunks. WordPress script registration only accepts
+	 * script handles here.
+	 *
+	 * @param array<int, mixed> $dependencies Raw generated dependencies.
+	 * @return array<int, string>
+	 */
+	private function sanitize_script_dependencies( $dependencies ) {
+		if ( ! is_array( $dependencies ) ) {
+			return array();
+		}
+
+		return array_values(
+			array_filter(
+				$dependencies,
+				static function ( $dependency ) {
+					return is_string( $dependency ) && '.css' !== substr( $dependency, -4 );
+				}
+			)
 		);
 	}
 

@@ -25,7 +25,7 @@ import {
 } from "@wordpress/components";
 import { useEffect, useMemo, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { ChevronDown, Check, MapPinned } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, MapPinnedIcon } from "../components/Icons";
 import { createMinimalMap } from "../map/bootstrap";
 import { normalizeHeightUnit, normalizeMapConfig } from "../map/defaults";
 import {
@@ -499,7 +499,7 @@ function ThemeDropdown({
             }}
           >
             <span>{selectedLabel}</span>
-            <ChevronDown size={16} style={{ flexShrink: 0 }} />
+            <ChevronDownIcon size={16} style={{ flexShrink: 0 }} />
           </Button>
         )}
         renderContent={({ onClose }) => (
@@ -517,7 +517,7 @@ function ThemeDropdown({
                   <HStack justify="space-between" style={{ width: "100%" }}>
                     <span>{theme.label}</span>
                     {isSelected && (
-                      <Check
+                      <CheckIcon
                         size={16}
                         style={{
                           flexShrink: 0,
@@ -574,7 +574,7 @@ function CollectionDropdown({
             }}
           >
             <span>{selectedLabel}</span>
-            <ChevronDown size={16} style={{ flexShrink: 0 }} />
+            <ChevronDownIcon size={16} style={{ flexShrink: 0 }} />
           </Button>
         )}
         renderContent={({ onClose }) => (
@@ -588,7 +588,7 @@ function CollectionDropdown({
               <HStack justify="space-between" style={{ width: "100%" }}>
                 <span>{__("All locations", "minimal-map")}</span>
                 {selectedId === 0 && (
-                  <Check
+                  <CheckIcon
                     size={16}
                     style={{
                       flexShrink: 0,
@@ -611,7 +611,7 @@ function CollectionDropdown({
                   <HStack justify="space-between" style={{ width: "100%" }}>
                     <span>{option.title}</span>
                     {isSelected && (
-                      <Check
+                      <CheckIcon
                         size={16}
                         style={{
                           flexShrink: 0,
@@ -817,7 +817,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       >
         {!runtimeConfig.previewImageUrl && (
           <div style={{ textAlign: "center", padding: "20px" }}>
-            <MapPinned
+            <MapPinnedIcon
               size={48}
               style={{ marginBottom: "12px", opacity: 0.5 }}
             />
