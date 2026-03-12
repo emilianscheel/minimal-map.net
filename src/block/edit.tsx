@@ -786,6 +786,14 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     }
   };
 
+  const updateSearchPanelWidth = (value?: string | number): void => {
+    const parsed = parseLengthValue(value, attributes.searchPanelWidth || "320px");
+
+    if (parsed) {
+      setAttributes({ searchPanelWidth: parsed });
+    }
+  };
+
   if (attributes._isPreview) {
     return (
       <div
@@ -1061,6 +1069,13 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__("Card Gap", "minimal-map")}
             value={attributes.searchPanelCardGap}
             onChange={updateSearchPanelCardGap}
+            units={HEIGHT_UNITS}
+            size="__unstable-large"
+          />
+          <UnitControl
+            label={__("Panel Width", "minimal-map")}
+            value={attributes.searchPanelWidth}
+            onChange={updateSearchPanelWidth}
             units={HEIGHT_UNITS}
             size="__unstable-large"
           />

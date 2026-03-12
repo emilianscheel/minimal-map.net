@@ -148,6 +148,10 @@
       "type": "string",
       "default": "12px"
     },
+    "searchPanelWidth": {
+      "type": "string",
+      "default": "320px"
+    },
     "creditsPadding": {
       "type": "object",
       "default": {

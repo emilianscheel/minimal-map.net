@@ -124,6 +124,7 @@ describe('map defaults normalization', () => {
 			searchPanelBorderRadiusInput: '12px 16px',
 			searchPanelBorderRadiusCard: '8px',
 			searchPanelCardGap: '20px',
+			searchPanelWidth: '440px',
 		});
 
 		expect(config.searchPanelBackgroundPrimary).toBe('#112233');
@@ -140,12 +141,14 @@ describe('map defaults normalization', () => {
 		expect(config.searchPanelBorderRadiusInput).toBe('12px 16px');
 		expect(config.searchPanelBorderRadiusCard).toBe('8px');
 		expect(config.searchPanelCardGap).toBe('20px');
+		expect(config.searchPanelWidth).toBe('440px');
 	});
 
 	test('uses the updated default search input border radius', () => {
 		const config = normalizeMapConfig();
 
 		expect(config.searchPanelBorderRadiusInput).toBe('10px');
+		expect(config.searchPanelWidth).toBe('320px');
 	});
 
 	test('falls back when search panel styling values are invalid', () => {
@@ -164,6 +167,7 @@ describe('map defaults normalization', () => {
 			searchPanelBorderRadiusInput: 'oops nope',
 			searchPanelBorderRadiusCard: 'no thanks',
 			searchPanelCardGap: 'auto',
+			searchPanelWidth: 'fit-content',
 		});
 
 		expect(config.searchPanelBackgroundPrimary).toBe('#ffffff');
@@ -180,5 +184,6 @@ describe('map defaults normalization', () => {
 		expect(config.searchPanelBorderRadiusInput).toBe('10px');
 		expect(config.searchPanelBorderRadiusCard).toBe('2px');
 		expect(config.searchPanelCardGap).toBe('12px');
+		expect(config.searchPanelWidth).toBe('320px');
 	});
 });

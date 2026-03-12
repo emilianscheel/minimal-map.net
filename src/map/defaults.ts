@@ -64,6 +64,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	searchPanelBorderRadiusInput: '10px',
 	searchPanelBorderRadiusCard: '2px',
 	searchPanelCardGap: '12px',
+	searchPanelWidth: '320px',
 	creditsPadding: {
 		top: '4px',
 		right: '8px',
@@ -251,6 +252,10 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 			runtimeConfig.defaults?.searchPanelCardGap,
 			DEFAULT_MAP_DEFAULTS.searchPanelCardGap
 		),
+		searchPanelWidth: normalizeCssLength(
+			runtimeConfig.defaults?.searchPanelWidth,
+			DEFAULT_MAP_DEFAULTS.searchPanelWidth
+		),
 		creditsPadding: normalizeBoxValue(
 			runtimeConfig.defaults?.creditsPadding,
 			DEFAULT_MAP_DEFAULTS.creditsPadding as Required<BoxValue>
@@ -381,6 +386,10 @@ export function normalizeMapConfig(
 		rawConfig.searchPanelCardGap ?? defaults.searchPanelCardGap,
 		defaults.searchPanelCardGap
 	);
+	const searchPanelWidth = normalizeCssLength(
+		rawConfig.searchPanelWidth ?? defaults.searchPanelWidth,
+		defaults.searchPanelWidth
+	);
 	const creditsPadding = normalizeBoxValue(
 		rawConfig.creditsPadding ?? defaults.creditsPadding,
 		defaults.creditsPadding as Required<BoxValue>
@@ -458,6 +467,7 @@ export function normalizeMapConfig(
 		searchPanelBorderRadiusInput,
 		searchPanelBorderRadiusCard,
 		searchPanelCardGap,
+		searchPanelWidth,
 		creditsPadding,
 		creditsOuterMargin,
 		creditsBackgroundColor,

@@ -80,6 +80,7 @@ describe('map touch zoom interaction', () => {
 
 	test('derives desktop selection padding from the search panel width and outer margins', () => {
 		const config = normalizeMapConfig({
+			searchPanelWidth: '360px',
 			searchPanelOuterMargin: {
 				top: '10px',
 				right: '30px',
@@ -88,12 +89,13 @@ describe('map touch zoom interaction', () => {
 			},
 		});
 
-		expect(getSearchPanelDesktopPadding(config)).toBe(368);
+		expect(getSearchPanelDesktopPadding(config)).toBe(408);
 	});
 
 	test('returns zero desktop selection padding when search is disabled', () => {
 		const config = normalizeMapConfig({
 			allowSearch: false,
+			searchPanelWidth: '360px',
 			searchPanelOuterMargin: {
 				top: '10px',
 				right: '30px',

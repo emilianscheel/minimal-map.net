@@ -53,6 +53,7 @@ export interface MapDefaults {
 	searchPanelBorderRadiusInput: string;
 	searchPanelBorderRadiusCard: string;
 	searchPanelCardGap: string;
+	searchPanelWidth: string;
 	creditsPadding: BoxValue;
 	creditsOuterMargin: BoxValue;
 	creditsBackgroundColor: string;
@@ -149,6 +150,7 @@ export interface RawMapConfig {
 	searchPanelBorderRadiusInput?: string | BoxValue | null;
 	searchPanelBorderRadiusCard?: string | BoxValue | null;
 	searchPanelCardGap?: string;
+	searchPanelWidth?: string;
 	creditsPadding?: BoxValue | null;
 	creditsOuterMargin?: BoxValue | null;
 	creditsBackgroundColor?: string;
@@ -349,6 +351,7 @@ export interface MapBlockAttributes {
 	searchPanelBorderRadiusInput: string;
 	searchPanelBorderRadiusCard: string;
 	searchPanelCardGap: string;
+	searchPanelWidth: string;
 	creditsPadding: BoxValue;
 	creditsOuterMargin: BoxValue;
 	creditsBackgroundColor: string;

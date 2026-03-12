@@ -1,6 +1,6 @@
 import type { NormalizedMapConfig } from '../types';
 
-export const SEARCH_PANEL_WIDTH = 320;
+export const DEFAULT_SEARCH_PANEL_WIDTH = '320px';
 const MOBILE_BREAKPOINT = 600;
 
 type SearchPanelConfig = Pick<
@@ -15,6 +15,7 @@ type SearchPanelConfig = Pick<
 	| 'searchPanelBorderRadiusInput'
 	| 'searchPanelBorderRadiusCard'
 	| 'searchPanelCardGap'
+	| 'searchPanelWidth'
 >;
 
 function parsePixelValue(value: string): number {
@@ -27,7 +28,7 @@ export function applySearchPanelCssVariables(
 	target: HTMLElement,
 	config: SearchPanelConfig
 ): void {
-	target.style.setProperty('--minimal-map-search-width', `${SEARCH_PANEL_WIDTH}px`);
+	target.style.setProperty('--minimal-map-search-width', config.searchPanelWidth);
 	target.style.setProperty(
 		'--minimal-map-search-background-primary',
 		config.searchPanelBackgroundPrimary
@@ -83,7 +84,10 @@ export function applySearchPanelCssVariables(
 }
 
 export function getSearchPanelDesktopPadding(
-	config: Pick<NormalizedMapConfig, 'allowSearch' | 'searchPanelOuterMargin'>,
+	config: Pick<
+		NormalizedMapConfig,
+		'allowSearch' | 'searchPanelOuterMargin' | 'searchPanelWidth'
+	>,
 	searchHost?: HTMLElement | null
 ): number {
 	if (
@@ -114,7 +118,7 @@ export function getSearchPanelDesktopPadding(
 	}
 
 	return (
-		SEARCH_PANEL_WIDTH +
+		parsePixelValue(config.searchPanelWidth || DEFAULT_SEARCH_PANEL_WIDTH) +
 		parsePixelValue(config.searchPanelOuterMargin.left) +
 		parsePixelValue(config.searchPanelOuterMargin.right)
 	);

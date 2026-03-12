@@ -108,6 +108,7 @@ class Config {
 			'searchPanelBorderRadiusInput'  => '10px',
 			'searchPanelBorderRadiusCard'   => '2px',
 			'searchPanelCardGap'            => '12px',
+			'searchPanelWidth'              => '320px',
 			'creditsPadding'             => array(
 				'top'    => '4px',
 				'right'  => '8px',
@@ -203,6 +204,7 @@ class Config {
 			'searchPanelBorderRadiusInput'   => $this->sanitize_border_radius_value( $attributes['searchPanelBorderRadiusInput'] ?? '', $this->get_default_block_attributes()['searchPanelBorderRadiusInput'] ),
 			'searchPanelBorderRadiusCard'    => $this->sanitize_border_radius_value( $attributes['searchPanelBorderRadiusCard'] ?? '', $this->get_default_block_attributes()['searchPanelBorderRadiusCard'] ),
 			'searchPanelCardGap'             => $this->sanitize_dimension_value( $attributes['searchPanelCardGap'] ?? '', $this->get_default_block_attributes()['searchPanelCardGap'] ),
+			'searchPanelWidth'               => $this->sanitize_dimension_value( $attributes['searchPanelWidth'] ?? '', $this->get_default_block_attributes()['searchPanelWidth'] ),
 			'creditsPadding'             => $this->sanitize_box_value( $attributes['creditsPadding'] ?? array(), $this->get_default_block_attributes()['creditsPadding'] ),
 			'creditsOuterMargin'         => $this->sanitize_box_value( $attributes['creditsOuterMargin'] ?? array(), $this->get_default_block_attributes()['creditsOuterMargin'] ),
 			'creditsBackgroundColor'     => $this->sanitize_color( $attributes['creditsBackgroundColor'] ?? '', $this->get_default_block_attributes()['creditsBackgroundColor'] ),
