@@ -7,7 +7,7 @@ import type { TagsController } from './types';
 
 export default function TagsView({ controller }: { controller: TagsController }) {
 	return (
-		<>
+		<div className="minimal-map-admin__tags-view">
 			{controller.actionNotice ? (
 				<Notice
 					className="minimal-map-admin__locations-notice"
@@ -24,18 +24,20 @@ export default function TagsView({ controller }: { controller: TagsController })
 				</Notice>
 			) : null}
 
-			{controller.isLoading ? (
-				<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
-					<Spinner />
-				</div>
-			) : controller.tags.length === 0 ? (
-				<TagsEmptyState controller={controller} />
-			) : (
-				<TagsGrid controller={controller} />
-			)}
+			<div className="minimal-map-admin__tags-content">
+				{controller.isLoading ? (
+					<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
+						<Spinner />
+					</div>
+				) : controller.tags.length === 0 ? (
+					<TagsEmptyState controller={controller} />
+				) : (
+					<TagsGrid controller={controller} />
+				)}
+			</div>
 
 			<TagDialog controller={controller} />
-		</>
+		</div>
 	);
 }
 

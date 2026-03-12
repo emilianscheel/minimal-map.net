@@ -12,7 +12,7 @@ export type { CollectionsController } from './types';
 
 export default function CollectionsView({ controller }: { controller: CollectionsController }) {
 	return (
-		<>
+		<div className="minimal-map-admin__collections-view">
 			{controller.actionNotice ? (
 				<Notice
 					className="minimal-map-admin__collections-notice"
@@ -50,6 +50,6 @@ export default function CollectionsView({ controller }: { controller: Collection
 			<CollectionDialog controller={controller} />
 			<CollectionAssignmentModal controller={controller} />
 			<MergeCollectionsModal controller={controller} />
-		</>
+		</div>
 	);
 }

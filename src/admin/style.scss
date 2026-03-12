@@ -133,6 +133,7 @@ svg.lucide {
   display: grid;
   grid-template-rows: auto 1fr;
   min-width: 0;
+  min-height: 0;
 }
 
 .minimal-map-admin__header {
@@ -184,25 +185,39 @@ svg.lucide {
   padding: 28px 34px 32px;
   background: #fff;
   min-width: 0;
+  min-height: 0;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
 }
 
-.minimal-map-admin__markers-view {
-  flex: 1;
+.minimal-map-admin__locations-view,
+.minimal-map-admin__collections-view,
+.minimal-map-admin__markers-view,
+.minimal-map-admin__logos-view,
+.minimal-map-admin__tags-view {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+.minimal-map-admin__markers-view {
+  width: 100%;
 }
 
 .minimal-map-admin__markers-content,
 .minimal-map-admin__logos-content,
 .minimal-map-admin__locations-content,
-.minimal-map-admin__collections-content {
+.minimal-map-admin__collections-content,
+.minimal-map-admin__tags-content {
   flex: 1;
   position: relative;
   min-height: 240px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  width: 100%;
 }
 
 .minimal-map-admin__content--dashboard {
@@ -398,14 +413,18 @@ svg.lucide {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1 1 auto;
   min-height: 240px;
+  width: 100%;
 }
 
 .minimal-map-admin__collections-state {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1 1 auto;
   min-height: 240px;
+  width: 100%;
 }
 
 .minimal-map-admin__locations-table-wrap {

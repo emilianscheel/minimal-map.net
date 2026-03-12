@@ -17,7 +17,7 @@ export type { LocationsController } from './types';
 
 export default function LocationsView({ controller }: { controller: LocationsController }) {
 	return (
-		<>
+		<div className="minimal-map-admin__locations-view">
 			{controller.actionNotice && (
 				<Notice
 					className="minimal-map-admin__locations-notice"
@@ -60,6 +60,6 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 			<CustomCsvImportModal controller={controller} />
 			<DeleteLogoConfirmationModal controller={controller} />
 			<RemoveCollectionAssignmentModal controller={controller} />
-		</>
+		</div>
 	);
 }
