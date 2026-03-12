@@ -3,7 +3,7 @@ Contributors: codex
 Tags: maps, gutenberg, blocks, geolocation
 Requires at least: 6.9
 Tested up to: 6.9.4
-Requires PHP: 8.5
+Requires PHP: 8.3
 Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@ Minimal Map adds a WordPress-native map block plus a dedicated admin workspace f
 
 == Description ==
 
-Minimal Map is built for current WordPress only. The plugin supports the latest stable WordPress release and PHP 8.5, and its build pipeline is optimized around that target instead of carrying legacy compatibility code.
+Minimal Map is built for current WordPress only. The plugin supports the latest stable WordPress release and PHP 8.3, and its build pipeline is optimized around that target instead of carrying legacy compatibility code.
 
 Features include:
 
@@ -33,7 +33,7 @@ Only the latest stable WordPress release is supported. Older WordPress and PHP v
 
 = Which WordPress and PHP versions are supported? =
 
-The plugin supports WordPress 6.9.4 and PHP 8.5. The codebase and CI pipeline are optimized for the latest stable stack only.
+The plugin supports WordPress 6.9.4 and PHP 8.3. The codebase and CI pipeline are optimized for the latest stable stack only.
 
 = Does the plugin include translations? =
 
