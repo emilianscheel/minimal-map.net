@@ -66,13 +66,13 @@ function clampRangeInputs(root: HTMLElement | null, max: number): void {
 
   const maxValue = `${max}`;
 
-  root.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach(
-    (input) => {
+  root
+    .querySelectorAll<HTMLInputElement>('input[type="range"]')
+    .forEach((input) => {
       input.max = maxValue;
       input.setAttribute("max", maxValue);
       input.setAttribute("aria-valuemax", maxValue);
-    },
-  );
+    });
 }
 
 function parseHeightValue(
@@ -803,7 +803,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         </PanelBody>
       </InspectorControls>
       <InspectorControls group="styles">
-        <PanelBody title={__("Appearance", "minimal-map")} initialOpen>
+        <PanelBody title={__("Appearance", "minimal-map")} initialOpen={false}>
           <UnitControl
             className="minimal-map-editor__height-control components-border-radius-control__unit-control"
             label={__("Height", "minimal-map")}
