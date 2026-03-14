@@ -779,7 +779,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   };
 
   const updateSearchPanelCardGap = (value?: string | number): void => {
-    const parsed = parseLengthValue(value, attributes.searchPanelCardGap || "12px");
+    const parsed = parseLengthValue(
+      value,
+      attributes.searchPanelCardGap || "12px",
+    );
 
     if (parsed) {
       setAttributes({ searchPanelCardGap: parsed });
@@ -787,7 +790,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   };
 
   const updateSearchPanelWidth = (value?: string | number): void => {
-    const parsed = parseLengthValue(value, attributes.searchPanelWidth || "320px");
+    const parsed = parseLengthValue(
+      value,
+      attributes.searchPanelWidth || "320px",
+    );
 
     if (parsed) {
       setAttributes({ searchPanelWidth: parsed });
@@ -1001,7 +1007,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             size="__unstable-large"
           />
         </PanelBody>
-        <PanelBody title={__("Search Panel", "minimal-map")} initialOpen={false}>
+        <PanelBody
+          title={__("Search Panel", "minimal-map")}
+          initialOpen={false}
+        >
           <SearchPanelColorSettings
             backgroundPrimary={attributes.searchPanelBackgroundPrimary}
             backgroundSecondary={attributes.searchPanelBackgroundSecondary}
@@ -1010,15 +1019,19 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             foregroundSecondary={attributes.searchPanelForegroundSecondary}
             defaults={{
               backgroundPrimary:
-                runtimeConfig.defaults?.searchPanelBackgroundPrimary ?? "#ffffff",
+                runtimeConfig.defaults?.searchPanelBackgroundPrimary ??
+                "#ffffff",
               backgroundSecondary:
-                runtimeConfig.defaults?.searchPanelBackgroundSecondary ?? "#f0f0f1",
+                runtimeConfig.defaults?.searchPanelBackgroundSecondary ??
+                "#f0f0f1",
               backgroundHover:
                 runtimeConfig.defaults?.searchPanelBackgroundHover ?? "#f8f8f8",
               foregroundPrimary:
-                runtimeConfig.defaults?.searchPanelForegroundPrimary ?? "#1e1e1e",
+                runtimeConfig.defaults?.searchPanelForegroundPrimary ??
+                "#1e1e1e",
               foregroundSecondary:
-                runtimeConfig.defaults?.searchPanelForegroundSecondary ?? "#1e1e1e",
+                runtimeConfig.defaults?.searchPanelForegroundSecondary ??
+                "#1e1e1e",
             }}
             onChange={(key, value) => setAttributes({ [key]: value })}
           />

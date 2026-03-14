@@ -90,3 +90,11 @@ svg.lucide * {
 svg.lucide {
   flex: 0 0 auto;
 }
+
+.components-button svg.lucide {
+  fill: none !important;
+}
+
+.components-menu-item__item {
+  min-width: 100% !important;
+}
