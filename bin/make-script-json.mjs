@@ -20,8 +20,9 @@ for (const entry of fs.readdirSync(languagesDir, { withFileTypes: true })) {
   const messages = extractJsMessages(poPath);
 
   const payload = JSON.stringify({
-    "translation-revision-date": getHeaderValue(poPath, "PO-Revision-Date") || "",
-    generator: "Codex",
+    "translation-revision-date":
+      getHeaderValue(poPath, "PO-Revision-Date") || "",
+    generator: "Emilian Scheel",
     source: "src",
     domain: "messages",
     locale_data: {
@@ -30,7 +31,8 @@ for (const entry of fs.readdirSync(languagesDir, { withFileTypes: true })) {
           domain: "messages",
           lang: locale,
           "plural-forms":
-            getHeaderValue(poPath, "Plural-Forms") || "nplurals=2; plural=(n != 1);",
+            getHeaderValue(poPath, "Plural-Forms") ||
+            "nplurals=2; plural=(n != 1);",
         },
         ...messages,
       },
@@ -38,7 +40,10 @@ for (const entry of fs.readdirSync(languagesDir, { withFileTypes: true })) {
   });
 
   for (const handle of handles) {
-    const outputPath = path.join(languagesDir, `minimal-map-${locale}-${handle}.json`);
+    const outputPath = path.join(
+      languagesDir,
+      `minimal-map-${locale}-${handle}.json`,
+    );
     fs.writeFileSync(outputPath, `${payload}\n`);
     console.log(`Wrote ${path.relative(process.cwd(), outputPath)}`);
   }

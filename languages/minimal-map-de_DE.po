@@ -1,16 +1,16 @@
-# Copyright (C) 2026 Codex
+# Copyright (C) 2026 Emilian Scheel
 # This file is distributed under the same license as the Minimal Map plugin.
 msgid ""
 msgstr ""
 "Project-Id-Version: Minimal Map 0.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map\n"
-"Last-Translator: Codex\n"
+"Last-Translator: Emilian Scheel\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2026-03-12 16:00+0100\n"
-"X-Generator: Codex\n"
+"X-Generator: Emilian Scheel\n"
 "X-Domain: minimal-map\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -29,8 +29,8 @@ msgstr "Gutenberg-orientierter nativer Kartenblock und Admin-Oberflaeche fuer Wo
 
 #. Author of the plugin
 #: minimal-map.php
-msgid "Codex"
-msgstr "Codex"
+msgid "Emilian Scheel"
+msgstr "Emilian Scheel"
 
 #: includes/admin/class-admin-menu.php:37
 msgid "Dashboard"

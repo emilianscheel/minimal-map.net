@@ -2,6 +2,7 @@
   "name": "minimal-map",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Minimal WordPress-native map plugin.",
   "scripts": {
     "typecheck": "bunx tsc --noEmit",

@@ -1,12 +1,12 @@
 === Minimal Map ===
-Contributors: codex
+Contributors: Emilian Scheel
 Tags: maps, gutenberg, blocks, geolocation
 Requires at least: 6.9
 Tested up to: 6.9.4
 Requires PHP: 8.3
 Stable tag: 0.1.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: MIT
+License URI: https://opensource.org/license/mit/
 
 Minimal Map adds a WordPress-native map block plus a dedicated admin workspace for locations, collections, markers, logos, tags, and style themes.
 

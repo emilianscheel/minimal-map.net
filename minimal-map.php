@@ -5,7 +5,9 @@
  * Version:           0.2.0
  * Requires at least: 6.9
  * Requires PHP:      8.3
- * Author:            Codex
+ * Author:            Emilian Scheel
+ * License:           MIT
+ * License URI:       https://opensource.org/license/mit/
  * Text Domain:       minimal-map
  * Domain Path:       /languages
  *
