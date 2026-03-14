@@ -42,6 +42,8 @@ Render a minimalist MapLibre-powered map in Wordpress.
 - English source strings with German translations
 - Feels native to WordPress and built for modern WordPress sites
 
+## Development
+
 ```bash
 zip -r ../minimal-map-0.1.0.zip . \
   -x "node_modules/*" ".git/*" "src/*" "tests/*" "reports/*" ".circleci/*" ".github/*" "bin/*" \
