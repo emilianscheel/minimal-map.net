@@ -2,7 +2,9 @@
 
 Render a minimalist MapLibre-powered map in Wordpress.
 
-![Screenshot](screenshot.png)
+![Preview](screenshot.png)
+
+[All Screenshots](Screenshots.md)
 
 ```bash
 zip -r ../minimal-map-0.1.0.zip . \

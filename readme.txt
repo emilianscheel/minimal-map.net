@@ -39,6 +39,19 @@ The plugin supports WordPress 6.9.4 and PHP 8.3. The codebase and CI pipeline ar
 
 Yes. English is the source language and German translations are included.
 
+== Screenshots ==
+
+1. Dashboard overview (`dashboard.png`)
+2. Location management (`locations.png`)
+3. Collection management (`collections.png`)
+4. Tag management (`tags.png`)
+5. Map style management (`styles.png`)
+6. Search interface (`search.png`)
+7. Zoom controls (`zoom.png`)
+8. Layout options (`layout.png`)
+9. Gutenberg block integration (`gutenberg.png`)
+10. Map preview (`preview.png`)
+
 == Changelog ==
 
 = 0.2.0 =
