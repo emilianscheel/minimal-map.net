@@ -61,7 +61,7 @@ msgstr "Stelle wiederverwendbare Gruppen von Standorten zusammen und verwalte ih
 #: includes/admin/class-admin-menu.php:49
 #: includes/tags/class-tag-taxonomy.php:50
 msgid "Tags"
-msgstr "Schlagwoerter"
+msgstr "Schlagwörter"
 
 #: includes/admin/class-admin-menu.php:50
 msgid "Apply lightweight labels to keep map content easy to organize."
@@ -193,7 +193,7 @@ msgstr "Sammlung hinzufuegen"
 
 #: src/admin/index.tsx:102
 msgid "Add lightweight labels that make large map datasets easier to sort, search, and evolve."
-msgstr "Fuege leichte Schlagwoerter hinzu, damit grosse Kartendatensaetze leichter sortiert, durchsucht und erweitert werden koennen."
+msgstr "Füge leichte Schlagwörter hinzu, damit grosse Kartendatensaetze leichter sortiert, durchsucht und erweitert werden koennen."
 
 #: src/admin/locations/LocationsEmptyState.tsx:13
 #: src/admin/locations/controller.tsx:1233
@@ -274,7 +274,7 @@ msgstr "Marker zuweisen"
 #: src/admin/locations/AssignTagsModal.tsx:44
 #: src/admin/locations/LocationsTable.tsx:297
 msgid "Assign Tags"
-msgstr "Schlagwoerter zuweisen"
+msgstr "Schlagwörter zuweisen"
 
 #: src/admin/locations/AssignToCollectionModal.tsx:63
 msgid "Assign to collection"
@@ -513,7 +513,7 @@ msgstr "Neues Theme erstellen"
 
 #: src/admin/tags/TagsEmptyState.tsx:11
 msgid "Create tags to apply lightweight labels to your locations. This helps you keep your map content organized and easy to search."
-msgstr "Erstelle Schlagwoerter, um deinen Standorten leichte Beschriftungen zuzuweisen. Das hilft dir, Karteninhalte organisiert und leicht durchsuchbar zu halten."
+msgstr "Erstelle Schlagwörter, um deinen Standorten leichte Beschriftungen zuzuweisen. Das hilft dir, Karteninhalte organisiert und leicht durchsuchbar zu halten."
 
 #: src/admin/styles/CreateThemeModal.tsx:62
 msgid "Create Theme"
@@ -836,11 +836,11 @@ msgstr "Standortmarker aktualisiert."
 
 #: src/admin/locations/controller.tsx:564
 msgid "Location tags could not be updated."
-msgstr "Schlagwoerter des Standorts konnten nicht aktualisiert werden."
+msgstr "Schlagwörter des Standorts konnten nicht aktualisiert werden."
 
 #: src/admin/locations/controller.tsx:554
 msgid "Location tags updated."
-msgstr "Schlagwoerter des Standorts aktualisiert."
+msgstr "Schlagwörter des Standorts aktualisiert."
 
 #: src/admin/locations/controller.tsx:165
 msgid "Locations and collections could not be loaded."
@@ -993,11 +993,11 @@ msgstr "Keine Marker gefunden"
 
 #: src/admin/locations/AssignTagsModal.tsx:60
 msgid "No tags assigned yet."
-msgstr "Noch keine Schlagwoerter zugewiesen."
+msgstr "Noch keine Schlagwörter zugewiesen."
 
 #: src/admin/tags/TagsEmptyState.tsx:10
 msgid "No tags found"
-msgstr "Keine Schlagwoerter gefunden"
+msgstr "Keine Schlagwörter gefunden"
 
 #: src/admin/locations/CustomCsvImportModal.tsx:18
 msgid "None"
@@ -1025,7 +1025,7 @@ msgstr "Marker oeffnen"
 
 #: src/admin/index.tsx:110
 msgid "Open tags"
-msgstr "Schlagwoerter oeffnen"
+msgstr "Schlagwörter oeffnen"
 
 #: src/admin/locations/LocationDialogFields.tsx:18
 msgid "Optional"
@@ -1165,7 +1165,7 @@ msgstr "Marker speichern"
 
 #: src/admin/locations/AssignTagsModal.tsx:97
 msgid "Save Tags"
-msgstr "Schlagwoerter speichern"
+msgstr "Schlagwörter speichern"
 
 #: src/admin/styles/controller.tsx:260
 msgid "Save Theme"
@@ -1283,11 +1283,11 @@ msgstr "Schlagwort aktualisiert."
 
 #: src/admin/locations/LocationDialogFields.tsx:62
 msgid "Tags (optional)"
-msgstr "Schlagwoerter (optional)"
+msgstr "Schlagwörter (optional)"
 
 #: src/admin/tags/controller.tsx:57
 msgid "Tags could not be loaded."
-msgstr "Schlagwoerter konnten nicht geladen werden."
+msgstr "Schlagwörter konnten nicht geladen werden."
 
 #: src/admin/locations/LocationDialogFields.tsx:42
 msgid "Telephone"
