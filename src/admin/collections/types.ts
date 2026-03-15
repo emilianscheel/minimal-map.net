@@ -13,6 +13,11 @@ export interface CollectionsNotice {
 	message: string;
 }
 
+export interface DeleteCollectionOptions {
+	deleteLocations: boolean;
+	skipSharedLocations: boolean;
+}
+
 export type MergeCollectionsStep = 'selection' | 'details';
 
 export interface CollectionsController {
@@ -57,7 +62,10 @@ export interface CollectionsController {
 	onChangeView: (nextView: ViewGrid) => void;
 	onCloseAssignmentModal: () => void;
 	onConfirm: () => Promise<void>;
-	onDeleteCollection: (collection: CollectionRecord) => Promise<void>;
+	onDeleteCollection: (
+		collection: CollectionRecord,
+		options: DeleteCollectionOptions
+	) => Promise<void>;
 	onEditCollection: (collection: CollectionRecord) => void;
 	onOpenAssignmentModal: (collection: CollectionRecord) => void;
 	onSaveAssignments: () => Promise<void>;

@@ -436,6 +436,14 @@ msgstr "Sammlung erstellt."
 msgid "Collection deleted."
 msgstr "Sammlung geloescht."
 
+#: src/admin/collections/controller.tsx:70
+msgid "Collection deleted. %s."
+msgstr "Sammlung geloescht. %s."
+
+#: src/admin/collections/controller.tsx:77
+msgid "Collection deleted. %1$s. Shared locations kept: %2$d."
+msgstr "Sammlung geloescht. %1$s. Geteilte Standorte beibehalten: %2$d."
+
 #: src/admin/collections/controller.tsx:351
 msgid "Collection locations could not be saved."
 msgstr "Standorte der Sammlung konnten nicht gespeichert werden."
@@ -557,6 +565,10 @@ msgstr[1] "%d Standorte loeschen"
 msgid "Delete collection"
 msgstr "Sammlung loeschen"
 
+#: src/admin/collections/DeleteCollectionActionModal.tsx:94
+msgid "Delete locations"
+msgstr "Standorte loeschen"
+
 #: src/admin/styles/DeleteThemeButton.tsx:14
 msgid "Delete Current Theme"
 msgstr "Aktuelles Theme loeschen"
@@ -583,6 +595,12 @@ msgstr "Theme loeschen"
 msgid "Delete this collection and remove its saved location assignments?"
 msgstr "Diese Sammlung loeschen und ihre gespeicherten Standortzuweisungen entfernen?"
 
+#: src/admin/collections/controller.tsx:60
+msgid "%d assigned location deleted"
+msgid_plural "%d assigned locations deleted"
+msgstr[0] "%d zugewiesener Standort geloescht"
+msgstr[1] "%d zugewiesene Standorte geloescht"
+
 #: src/admin/locations/DeleteLocationActionModal.tsx:93
 msgid "Delete this location and remove its saved collection assignments?"
 msgstr "Diesen Standort loeschen und seine gespeicherten Sammlungszuweisungen entfernen?"
@@ -594,6 +612,10 @@ msgstr "Dieses Logo loeschen und aus allen zugewiesenen Standorten entfernen? Di
 #: src/admin/markers/MarkersGrid.tsx:37
 msgid "Download"
 msgstr "Herunterladen"
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:108
+msgid "Skip shared locations"
+msgstr "Geteilte Standorte ueberspringen"
 
 #: src/admin/locations/ExportLocationsDropdown.tsx:35
 msgid "Download as CSV"

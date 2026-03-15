@@ -1010,6 +1010,11 @@ svg.lucide {
   color: #b32d2e;
 }
 
+.minimal-map-admin__collection-delete-dialog-options {
+  display: grid;
+  gap: 8px;
+}
+
 .minimal-map-admin__collection-delete-dialog-actions {
   display: flex;
   justify-content: flex-end;

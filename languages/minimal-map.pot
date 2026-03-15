@@ -445,6 +445,14 @@ msgstr ""
 msgid "Collection deleted."
 msgstr ""
 
+#: src/admin/collections/controller.tsx:70
+msgid "Collection deleted. %s."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:77
+msgid "Collection deleted. %1$s. Shared locations kept: %2$d."
+msgstr ""
+
 #: src/admin/collections/controller.tsx:351
 msgid "Collection locations could not be saved."
 msgstr ""
@@ -572,6 +580,10 @@ msgstr[1] ""
 msgid "Delete collection"
 msgstr ""
 
+#: src/admin/collections/DeleteCollectionActionModal.tsx:94
+msgid "Delete locations"
+msgstr ""
+
 #: src/admin/styles/DeleteThemeButton.tsx:14
 msgid "Delete Current Theme"
 msgstr ""
@@ -598,6 +610,12 @@ msgstr ""
 msgid "Delete this collection and remove its saved location assignments?"
 msgstr ""
 
+#: src/admin/collections/controller.tsx:60
+msgid "%d assigned location deleted"
+msgid_plural "%d assigned locations deleted"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/admin/locations/DeleteLocationActionModal.tsx:93
 msgid "Delete this location and remove its saved collection assignments?"
 msgstr ""
@@ -610,6 +628,10 @@ msgstr ""
 
 #: src/admin/markers/MarkersGrid.tsx:37
 msgid "Download"
+msgstr ""
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:108
+msgid "Skip shared locations"
 msgstr ""
 
 #: src/admin/locations/ExportLocationsDropdown.tsx:35

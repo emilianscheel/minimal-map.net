@@ -21,14 +21,23 @@ import { fetchAllLocations } from "../../lib/locations/fetchAllLocations";
 import { paginateLocations } from "../../lib/locations/paginateLocations";
 import { createCollection } from "../../lib/collections/createCollection";
 import { deleteCollection } from "../../lib/collections/deleteCollection";
+import {
+  getCollectionsWithoutDeletedLocationIds,
+  getDeleteCollectionLocationPlan,
+} from "../../lib/collections/deleteCollectionLocations";
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
 import { importLocations } from '../../lib/locations/importLocations';
 import { filterLocationsForAssignment } from '../../lib/collections/filterLocationsForAssignment';
 import { paginateCollections } from "../../lib/collections/paginateCollections";
 import { updateCollection } from "../../lib/collections/updateCollection";
+import { deleteLocation } from "../../lib/locations/deleteLocation";
 import { ImportLocationsButton } from "../locations/ImportLocationsButton";
 import { ThemeSelector } from "../styles/ThemeSelector";
-import type { CollectionsController, MergeCollectionsStep } from "./types";
+import type {
+  CollectionsController,
+  DeleteCollectionOptions,
+  MergeCollectionsStep,
+} from "./types";
 
 export function useCollectionsController(
   collectionsConfig: CollectionsAdminConfig,
@@ -40,6 +49,42 @@ export function useCollectionsController(
     onSwitchTheme: (slug: string) => void;
   },
 ): CollectionsController {
+  const buildDeleteCollectionNotice = useCallback(
+    (
+      options: DeleteCollectionOptions,
+      deletedLocationCount: number,
+      sharedLocationCount: number,
+    ): string => {
+      if (!options.deleteLocations) {
+        return __("Collection deleted.", "minimal-map");
+      }
+
+      const deletedLocationsMessage = sprintf(
+        _n(
+          "%d assigned location deleted",
+          "%d assigned locations deleted",
+          deletedLocationCount,
+          "minimal-map",
+        ),
+        deletedLocationCount,
+      );
+
+      if (!options.skipSharedLocations) {
+        return sprintf(
+          __("Collection deleted. %s.", "minimal-map"),
+          deletedLocationsMessage,
+        );
+      }
+
+      return sprintf(
+        __("Collection deleted. %1$s. Shared locations kept: %2$d.", "minimal-map"),
+        deletedLocationsMessage,
+        sharedLocationCount,
+      );
+    },
+    [],
+  );
+
   const [actionNotice, setActionNotice] =
     useState<CollectionsController["actionNotice"]>(null);
   const [assignmentSearch, setAssignmentSearch] = useState("");
@@ -256,16 +301,60 @@ export function useCollectionsController(
   }, [form, formMode, editingCollection, collectionsConfig, loadCollections, resetDialogState]);
 
   const onDeleteCollection = useCallback(
-    async (collection: CollectionRecord): Promise<void> => {
+    async (
+      collection: CollectionRecord,
+      options: DeleteCollectionOptions,
+    ): Promise<void> => {
       setRowActionPending(true);
       setActionNotice(null);
 
       try {
+        let deletedLocationCount = 0;
+        let sharedLocationCount = 0;
+
+        if (options.deleteLocations) {
+          const { deletedLocationIds, sharedLocationIds } =
+            getDeleteCollectionLocationPlan(
+              collection,
+              collections,
+              options.skipSharedLocations,
+            );
+
+          sharedLocationCount = options.skipSharedLocations
+            ? sharedLocationIds.length
+            : 0;
+
+          for (const locationId of deletedLocationIds) {
+            await deleteLocation(locationsConfig, locationId);
+          }
+
+          deletedLocationCount = deletedLocationIds.length;
+
+          const collectionUpdates = getCollectionsWithoutDeletedLocationIds(
+            collections,
+            deletedLocationIds,
+            collection.id,
+          );
+
+          for (const collectionUpdate of collectionUpdates) {
+            await updateCollection(
+              collectionsConfig,
+              collectionUpdate.id,
+              collectionUpdate.title,
+              collectionUpdate.location_ids,
+            );
+          }
+        }
+
         await deleteCollection(collectionsConfig, collection.id);
-        await loadCollections();
+        await Promise.all([loadCollections(), loadLocations()]);
         setActionNotice({
           status: "success",
-          message: __("Collection deleted.", "minimal-map"),
+          message: buildDeleteCollectionNotice(
+            options,
+            deletedLocationCount,
+            sharedLocationCount,
+          ),
         });
       } catch (error) {
         setActionNotice({
@@ -280,7 +369,14 @@ export function useCollectionsController(
         setRowActionPending(false);
       }
     },
-    [collectionsConfig, loadCollections],
+    [
+      buildDeleteCollectionNotice,
+      collections,
+      collectionsConfig,
+      loadCollections,
+      loadLocations,
+      locationsConfig,
+    ],
   );
 
   const onOpenAssignmentModal = useCallback(

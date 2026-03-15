@@ -1,16 +1,20 @@
-import { Button } from "@wordpress/components";
+import { Button, CheckboxControl } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import { useEffect, useRef, useState } from "@wordpress/element";
 import type { KeyboardEvent } from "react";
 import type { CollectionRecord } from "../../types";
 import Kbd from "../../components/Kbd";
 import { shouldHandleDialogEnter } from "../../lib/locations/shouldHandleDialogEnter";
+import type { DeleteCollectionOptions } from "./types";
 
 interface DeleteCollectionActionModalProps {
   closeModal?: () => void;
   collection: CollectionRecord;
   onActionPerformed?: (items: CollectionRecord[]) => void;
-  onDelete: (collection: CollectionRecord) => Promise<void>;
+  onDelete: (
+    collection: CollectionRecord,
+    options: DeleteCollectionOptions,
+  ) => Promise<void>;
 }
 
 export default function DeleteCollectionActionModal({
@@ -21,6 +25,8 @@ export default function DeleteCollectionActionModal({
 }: DeleteCollectionActionModalProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDeleting, setDeleting] = useState(false);
+  const [deleteLocations, setDeleteLocations] = useState(false);
+  const [skipSharedLocations, setSkipSharedLocations] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,7 +38,10 @@ export default function DeleteCollectionActionModal({
     setErrorMessage(null);
 
     try {
-      await onDelete(collection);
+      await onDelete(collection, {
+        deleteLocations,
+        skipSharedLocations,
+      });
       onActionPerformed?.([collection]);
       closeModal?.();
     } catch (error) {
@@ -58,6 +67,7 @@ export default function DeleteCollectionActionModal({
 
         if (
           isDeleting ||
+          (target instanceof HTMLInputElement && target.type === "checkbox") ||
           (isHTMLElement &&
             target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
           !shouldHandleDialogEnter(event)
@@ -78,6 +88,32 @@ export default function DeleteCollectionActionModal({
       <p className="minimal-map-admin__collection-delete-dialog-title">
         {collection.title}
       </p>
+      <div className="minimal-map-admin__collection-delete-dialog-options">
+        <CheckboxControl
+          __nextHasNoMarginBottom
+          label={__("Delete locations", "minimal-map")}
+          checked={deleteLocations}
+          onChange={(checked) => {
+            setDeleteLocations(checked);
+
+            if (!checked) {
+              setSkipSharedLocations(false);
+            }
+          }}
+          disabled={isDeleting}
+          data-minimal-map-dialog-ignore-enter="true"
+        />
+        {deleteLocations ? (
+          <CheckboxControl
+            __nextHasNoMarginBottom
+            label={__("Skip shared locations", "minimal-map")}
+            checked={skipSharedLocations}
+            onChange={setSkipSharedLocations}
+            disabled={isDeleting}
+            data-minimal-map-dialog-ignore-enter="true"
+          />
+        ) : null}
+      </div>
       {errorMessage ? (
         <p className="minimal-map-admin__collection-delete-dialog-error">
           {errorMessage}

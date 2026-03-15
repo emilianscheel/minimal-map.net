@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { filterLocationsForAssignment } from '../../src/lib/collections/filterLocationsForAssignment';
+import {
+	getCollectionsWithoutDeletedLocationIds,
+	getDeleteCollectionLocationPlan,
+} from '../../src/lib/collections/deleteCollectionLocations';
 import { getCollectionPreviewLocations } from '../../src/lib/collections/getCollectionPreviewLocations';
 import { normalizeCollectionRecord } from '../../src/lib/collections/normalizeCollectionRecord';
 import { paginateCollections } from '../../src/lib/collections/paginateCollections';
@@ -80,6 +84,24 @@ const LOCATIONS: LocationRecord[] = [
 	},
 ];
 
+const COLLECTIONS: CollectionRecord[] = [
+	{
+		id: 10,
+		title: 'Primary Collection',
+		location_ids: [1, 2, 3],
+	},
+	{
+		id: 11,
+		title: 'Shared Collection',
+		location_ids: [2, 4],
+	},
+	{
+		id: 12,
+		title: 'Separate Collection',
+		location_ids: [5],
+	},
+];
+
 describe('collection helpers', () => {
 	test('normalizeCollectionRecord normalizes ids and title', () => {
 		expect(
@@ -119,6 +141,76 @@ describe('collection helpers', () => {
 	test('filterLocationsForAssignment searches title and address', () => {
 		expect(filterLocationsForAssignment(LOCATIONS, 'marienplatz')).toEqual([ LOCATIONS[1] ]);
 		expect(filterLocationsForAssignment(LOCATIONS, 'hamburg')).toEqual([ LOCATIONS[2] ]);
+	});
+
+	test('getDeleteCollectionLocationPlan deletes all assigned ids when shared locations are not skipped', () => {
+		expect(
+			getDeleteCollectionLocationPlan(COLLECTIONS[0], COLLECTIONS, false)
+		).toEqual({
+			deletedLocationIds: [1, 2, 3],
+			sharedLocationIds: [2],
+		});
+	});
+
+	test('getDeleteCollectionLocationPlan deletes only exclusive ids when shared locations are skipped', () => {
+		expect(
+			getDeleteCollectionLocationPlan(COLLECTIONS[0], COLLECTIONS, true)
+		).toEqual({
+			deletedLocationIds: [1, 3],
+			sharedLocationIds: [2],
+		});
+	});
+
+	test('getDeleteCollectionLocationPlan reports all shared ids for notice counts', () => {
+		expect(
+			getDeleteCollectionLocationPlan(
+				{
+					id: 20,
+					title: 'All Shared',
+					location_ids: [2, 4],
+				},
+				COLLECTIONS,
+				true
+			)
+		).toEqual({
+			deletedLocationIds: [],
+			sharedLocationIds: [2, 4],
+		});
+	});
+
+	test('getDeleteCollectionLocationPlan returns empty ids when a collection has no locations', () => {
+		expect(
+			getDeleteCollectionLocationPlan(
+				{
+					id: 30,
+					title: 'Empty',
+					location_ids: [],
+				},
+				COLLECTIONS,
+				true
+			)
+		).toEqual({
+			deletedLocationIds: [],
+			sharedLocationIds: [],
+		});
+	});
+
+	test('getCollectionsWithoutDeletedLocationIds removes deleted ids from other collections', () => {
+		expect(
+			getCollectionsWithoutDeletedLocationIds(COLLECTIONS, [2, 3], 10)
+		).toEqual([
+			{
+				id: 11,
+				title: 'Shared Collection',
+				location_ids: [4],
+			},
+		]);
+	});
+
+	test('getCollectionsWithoutDeletedLocationIds leaves skipped shared ids untouched', () => {
+		expect(
+			getCollectionsWithoutDeletedLocationIds(COLLECTIONS, [1, 3], 10)
+		).toEqual([]);
 	});
 
 	test('getCollectionPreviewLocations returns assigned points when available', () => {
