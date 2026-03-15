@@ -25,7 +25,7 @@ type SearchPanelConfig = Pick<
 	| 'openingHoursClosedColor'
 >;
 
-function parsePixelValue(value: string): number {
+export function parsePixelValue(value: string): number {
 	const match = value.trim().match(/^(-?\d*\.?\d+)px$/i);
 
 	return match ? Number(match[1]) : 0;

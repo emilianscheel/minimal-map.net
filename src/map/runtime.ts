@@ -1,5 +1,6 @@
 import maplibregl, { LngLatBounds, type Map as MapLibreMap } from 'maplibre-gl';
 import { createAttributionPill } from './attribution-pill';
+import { getDefaultFitBoundsPadding } from './default-fit-padding';
 import { normalizeMapConfig } from './defaults';
 import { syncTouchZoomInteraction } from './interactions';
 import { applyStyleTheme } from '../lib/styles/themeEngine';
@@ -235,9 +236,10 @@ function didRenderedMarkerContentChange(
 	});
 }
 
-function syncViewport(
+export function syncViewport(
 	map: MapLibreMap,
 	config: NormalizedMapConfig,
+	viewportWidth?: number | null,
 	zoomChanged = false
 ): void {
 	const points = getRenderedPoints(config);
@@ -272,7 +274,7 @@ function syncViewport(
 		{
 			duration: 180,
 			essential: true,
-			padding: 48,
+			padding: getDefaultFitBoundsPadding(config, viewportWidth),
 		},
 		{ isMinimalMapInternal: true }
 	);
@@ -542,7 +544,7 @@ export function createMinimalMap(
 
 		map.on('load', () => {
 			const activeConfig = state.config ?? config;
-			syncViewport(map, activeConfig);
+			syncViewport(map, activeConfig, context.win.innerWidth);
 			map.resize();
 
 			if (activeConfig.styleTheme) {
@@ -694,7 +696,7 @@ export function createMinimalMap(
 		const zoomChanged = !previousConfig || previousConfig.zoom !== nextConfig.zoom;
 
 		if (centerChanged || zoomChanged || didRenderedPointsChange(previousConfig, nextConfig)) {
-			syncViewport(state.map, nextConfig, zoomChanged);
+			syncViewport(state.map, nextConfig, context.win.innerWidth, zoomChanged);
 		}
 
 		if (
