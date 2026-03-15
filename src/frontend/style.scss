@@ -387,6 +387,9 @@
   cursor: pointer;
   color: var(--minimal-map-search-foreground-primary);
   transition: background 0.1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .minimal-map-search__result-item {
@@ -471,7 +474,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 2px;
+  width: 100%;
 }
 
 .minimal-map-search__result-footer--distance-only {

@@ -306,26 +306,6 @@ export const MapSearchControl = ({
 									) : null}
 								</div>
 							) : null}
-							{Array.isArray(location.tags) && location.tags.length > 0 ? (
-								<div className="minimal-map-search__result-footer">
-									<div className="minimal-map-search__result-tags">
-										{location.tags.map((tag) => (
-											<TagBadge key={tag.id} tag={tag} />
-										))}
-									</div>
-									{distanceLabel ? (
-										<div className="minimal-map-search__result-distance">
-											{sprintf(__('%s away', 'minimal-map'), distanceLabel)}
-										</div>
-									) : null}
-								</div>
-							) : distanceLabel ? (
-								<div className="minimal-map-search__result-footer minimal-map-search__result-footer--distance-only">
-									<div className="minimal-map-search__result-distance">
-										{sprintf(__('%s away', 'minimal-map'), distanceLabel)}
-									</div>
-								</div>
-							) : null}
 						</div>
 						{location.logo ? (
 							<div className="minimal-map-search__result-logo-column">
@@ -333,6 +313,26 @@ export const MapSearchControl = ({
 							</div>
 						) : null}
 					</div>
+					{Array.isArray(location.tags) && location.tags.length > 0 ? (
+						<div className="minimal-map-search__result-footer">
+							<div className="minimal-map-search__result-tags">
+								{location.tags.map((tag) => (
+									<TagBadge key={tag.id} tag={tag} />
+								))}
+							</div>
+							{distanceLabel ? (
+								<div className="minimal-map-search__result-distance">
+									{sprintf(__('%s away', 'minimal-map'), distanceLabel)}
+								</div>
+							) : null}
+						</div>
+					) : distanceLabel ? (
+						<div className="minimal-map-search__result-footer minimal-map-search__result-footer--distance-only">
+							<div className="minimal-map-search__result-distance">
+								{sprintf(__('%s away', 'minimal-map'), distanceLabel)}
+							</div>
+						</div>
+					) : null}
 				</button>
 			))}
 		</div>
