@@ -146,4 +146,46 @@ describe('map iframe document context', () => {
 		iframeDom.window.document.addEventListener = originalIframeAddEventListener;
 		document.addEventListener = originalOuterAddEventListener;
 	});
+
+	test('renders postal code in search result addresses', async () => {
+		const { host, iframeDom } = createMapHost();
+		Object.defineProperty(iframeDom.window.HTMLElement.prototype, 'scrollIntoView', {
+			value() {},
+			configurable: true,
+		});
+		const config = normalizeMapConfig({
+			allowSearch: true,
+			locations: [
+				{
+					id: 1,
+					title: 'Berlin Studio',
+					lat: 52.5,
+					lng: 13.4,
+					street: 'Unter den Linden',
+					house_number: '7',
+					postal_code: '10117',
+					city: 'Berlin',
+				},
+			],
+		});
+		const searchControl = createWordPressSearchControl(
+			host,
+			{
+				easeTo() {},
+				getZoom() {
+					return 10;
+				},
+			} as never,
+			config,
+			1,
+		);
+
+		await flushRender();
+		await flushRender();
+
+		const address = host.querySelector('.minimal-map-search__result-address span');
+		expect(address?.textContent).toContain('Unter den Linden 7, 10117 Berlin');
+
+		searchControl.destroy();
+	});
 });

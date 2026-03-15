@@ -33,6 +33,13 @@ const formatDisplayUrl = (url: string): string => {
 		.replace(/\/$/, '');
 };
 
+const formatLocationAddress = (location: MapLocationPoint): string => {
+	const streetLine = [location.street, location.house_number].filter(Boolean).join(' ');
+	const localityLine = [location.postal_code, location.city].filter(Boolean).join(' ');
+
+	return [streetLine, localityLine].filter(Boolean).join(', ');
+};
+
 const SearchResultLogo = ({ logo }: { logo: MapLocationLogo }) => {
 	const isSvgMarkup = logo.content.trim().startsWith('<svg');
 
@@ -189,12 +196,7 @@ const MapSearchControl = ({
 												</div>
 												<div className="minimal-map-search__result-address">
 													<MapPin size={12} />
-													<span>
-														{[location.street, location.house_number]
-															.filter(Boolean)
-															.join(' ')}
-														{location.city ? `, ${location.city}` : ''}
-													</span>
+													<span>{formatLocationAddress(location)}</span>
 												</div>
 												{location.telephone || location.email || location.website ? (
 													<div className="minimal-map-search__result-meta">
