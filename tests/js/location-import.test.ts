@@ -5,13 +5,17 @@ import type {
 	LocationsAdminConfig,
 } from '../../src/types';
 import {
+	analyzeCsvOpeningHoursColumn,
 	buildMappedLocationForm,
 	countMappedCsvGeocodeRequests,
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
+	createEmptyCsvOpeningHoursImportMapping,
 	detectCsvDelimiter,
+	getValidCsvOpeningHoursColumnIndexes,
 	isCommonCsvFormat,
 	parseCsvText,
+	parseCsvOpeningHoursValue,
 	runCommonCsvImport,
 	runMappedCsvImport,
 } from '../../src/lib/locations/importLocations';
@@ -78,13 +82,93 @@ describe('location import helpers', () => {
 		expect(form.country).toBe('Germany');
 	});
 
+	test('parses supported opening-hours formats into normalized values', () => {
+		expect(parseCsvOpeningHoursValue('8-12')).toEqual({
+			open: '08:00',
+			close: '12:00',
+		});
+		expect(parseCsvOpeningHoursValue('08:00-12:00')).toEqual({
+			open: '08:00',
+			close: '12:00',
+		});
+		expect(parseCsvOpeningHoursValue('8:00-14:00')).toEqual({
+			open: '08:00',
+			close: '14:00',
+		});
+		expect(parseCsvOpeningHoursValue('08:00 - 17:30')).toEqual({
+			open: '08:00',
+			close: '17:30',
+		});
+	});
+
+	test('analyzes opening-hours columns using non-empty values only', () => {
+		const rows = [
+			['Berlin', '8-12', 'Mon notes'],
+			['Hamburg', '', 'Tue notes'],
+			['Munich', '08:00-14:00', 'Wed notes'],
+		];
+
+		expect(analyzeCsvOpeningHoursColumn(rows, 1)).toEqual({
+			columnIndex: 1,
+			hasValues: true,
+			isValid: true,
+		});
+		expect(analyzeCsvOpeningHoursColumn(rows, 2)).toEqual({
+			columnIndex: 2,
+			hasValues: true,
+			isValid: false,
+		});
+		expect(analyzeCsvOpeningHoursColumn(rows, 3)).toEqual({
+			columnIndex: 3,
+			hasValues: false,
+			isValid: false,
+		});
+		expect(getValidCsvOpeningHoursColumnIndexes(rows, 3)).toEqual([1]);
+	});
+
+	test('builds mapped forms with imported opening hours and notes', () => {
+		const mapping = createEmptyCsvImportMapping();
+		mapping.title = 0;
+		const openingHoursMapping = createEmptyCsvOpeningHoursImportMapping();
+		openingHoursMapping.monday = 1;
+		openingHoursMapping.tuesday = 2;
+		openingHoursMapping.opening_hours_notes = 3;
+
+		const form = buildMappedLocationForm(
+			['Berlin Office', '8-12', '08:00-14:00', 'Summer schedule'],
+			mapping,
+			openingHoursMapping
+		);
+
+		expect(form.title).toBe('Berlin Office');
+		expect(form.opening_hours.monday).toEqual({
+			open: '08:00',
+			close: '12:00',
+			lunch_start: '',
+			lunch_duration_minutes: 0,
+		});
+		expect(form.opening_hours.tuesday).toEqual({
+			open: '08:00',
+			close: '14:00',
+			lunch_start: '',
+			lunch_duration_minutes: 0,
+		});
+		expect(form.opening_hours.wednesday).toEqual({
+			open: '',
+			close: '',
+			lunch_start: '',
+			lunch_duration_minutes: 0,
+		});
+		expect(form.opening_hours_notes).toBe('Summer schedule');
+	});
+
 	test('runs mapped imports with sequential throttled geocoding and keeps rows without coordinates', async () => {
 		const parsed = parseCsvText(
 			[
-				'name,street_name,house_no,zip_code,town,country_name,phone',
-				'Berlin Office,Unter den Linden,1,10117,Berlin,Germany,+49 30 123',
-				'No Coordinates,,,,Paris,France,',
-				'Broken Geocode,Main Street,5,10001,New York,USA,',
+				'name,street_name,house_no,zip_code,town,country_name,phone,monday_hours,hours_notes',
+				'Berlin Office,Unter den Linden,1,10117,Berlin,Germany,+49 30 123,8-12,Summer hours',
+				'No Coordinates,,,,Paris,France,,08:00-14:00,',
+				'Broken Geocode,Main Street,5,10001,New York,USA,,,',
 			].join('\n')
 		);
 		const mapping = createEmptyCsvImportMapping();
@@ -95,6 +179,9 @@ describe('location import helpers', () => {
 		mapping.city = 4;
 		mapping.country = 5;
 		mapping.telephone = 6;
+		const openingHoursMapping = createEmptyCsvOpeningHoursImportMapping();
+		openingHoursMapping.monday = 7;
+		openingHoursMapping.opening_hours_notes = 8;
 
 		const createdForms: LocationFormState[] = [];
 		const geocodeTitles: string[] = [];
@@ -111,6 +198,7 @@ describe('location import helpers', () => {
 		const result = await runMappedCsvImport(
 			parsed,
 			mapping,
+			openingHoursMapping,
 			assignments,
 			LOCATIONS_CONFIG,
 			COLLECTIONS_CONFIG,
@@ -164,16 +252,23 @@ describe('location import helpers', () => {
 		expect(createdForms[0].logo_id).toBe(9);
 		expect(createdForms[0].marker_id).toBe(11);
 		expect(createdForms[0].tag_ids).toEqual([3, 7]);
+		expect(createdForms[0].opening_hours.monday.open).toBe('08:00');
+		expect(createdForms[0].opening_hours.monday.close).toBe('12:00');
+		expect(createdForms[0].opening_hours_notes).toBe('Summer hours');
 		expect(createdForms[1].latitude).toBe('');
 		expect(createdForms[1].longitude).toBe('');
 		expect(createdForms[1].logo_id).toBe(9);
 		expect(createdForms[1].marker_id).toBe(11);
 		expect(createdForms[1].tag_ids).toEqual([3, 7]);
+		expect(createdForms[1].opening_hours.monday.open).toBe('08:00');
+		expect(createdForms[1].opening_hours.monday.close).toBe('14:00');
 		expect(createdForms[2].latitude).toBe('');
 		expect(createdForms[2].longitude).toBe('');
 		expect(createdForms[2].logo_id).toBe(9);
 		expect(createdForms[2].marker_id).toBe(11);
 		expect(createdForms[2].tag_ids).toEqual([3, 7]);
+		expect(createdForms[2].opening_hours.monday.open).toBe('');
+		expect(createdForms[2].opening_hours_notes).toBe('');
 		expect(collectionAssignments).toEqual([[101, 102, 103]]);
 	});
 

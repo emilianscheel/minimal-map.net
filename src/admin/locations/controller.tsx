@@ -45,10 +45,13 @@ import {
 	countMappedCsvGeocodeRequests,
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
+	createEmptyCsvOpeningHoursImportMapping,
+	getValidCsvOpeningHoursColumnIndexes,
 	isCommonCsvFormat,
 	parseCsvFile,
 	runCommonCsvImport,
 	runMappedCsvImport,
+	type CsvOpeningHoursImportMapping,
 } from '../../lib/locations/importLocations';
 import { geocodeAddress } from '../../lib/locations/geocodeAddress';
 import { hasFieldErrors } from '../../lib/locations/hasFieldErrors';
@@ -66,6 +69,7 @@ import {
 	getLocationsWithAssignedTags,
 	mergeLocationTagIds,
 } from './assignmentHelpers';
+import { buildCsvImportColumnOptions } from './customCsvImport';
 import type { LocationsController } from './types';
 
 const DEFAULT_MAP_CENTER: MapCoordinates = {
@@ -145,13 +149,17 @@ export function useLocationsController(
 	const [isImporting, setIsImporting] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
 	const [isCustomCsvImportModalOpen, setCustomCsvImportModalOpen] = useState(false);
-	const [customCsvImportStep, setCustomCsvImportStep] = useState<'mapping' | 'progress'>(
+	const [customCsvImportStep, setCustomCsvImportStep] = useState<
+		'mapping' | 'opening_hours' | 'progress'
+	>(
 		'mapping'
 	);
 	const [pendingCsvImport, setPendingCsvImport] = useState<ParsedCsvData | null>(null);
 	const [csvImportMapping, setCsvImportMapping] = useState<CsvImportMapping>(
 		createEmptyCsvImportMapping()
 	);
+	const [csvImportOpeningHoursMapping, setCsvImportOpeningHoursMapping] =
+		useState<CsvOpeningHoursImportMapping>(createEmptyCsvOpeningHoursImportMapping());
 	const [csvImportLogoId, setCsvImportLogoId] = useState('');
 	const [csvImportMarkerId, setCsvImportMarkerId] = useState('');
 	const [csvImportTagIds, setCsvImportTagIds] = useState<number[]>([]);
@@ -306,6 +314,7 @@ export function useLocationsController(
 		setCustomCsvImportStep('mapping');
 		setPendingCsvImport(null);
 		setCsvImportMapping(createEmptyCsvImportMapping());
+		setCsvImportOpeningHoursMapping(createEmptyCsvOpeningHoursImportMapping());
 		setCsvImportLogoId('');
 		setCsvImportMarkerId('');
 		setCsvImportTagIds([]);
@@ -1455,6 +1464,28 @@ export function useLocationsController(
 		[]
 	);
 
+	const onChangeCsvImportOpeningHoursMapping = useCallback(
+		(field: keyof CsvOpeningHoursImportMapping, columnIndex: string): void => {
+			setCsvImportOpeningHoursMapping((currentMapping) => ({
+				...currentMapping,
+				[field]: columnIndex === '' ? null : Number(columnIndex),
+			}));
+		},
+		[]
+	);
+
+	const onAdvanceCustomCsvImportStep = useCallback((): void => {
+		setCustomCsvImportStep((currentStep) =>
+			currentStep === 'mapping' ? 'opening_hours' : currentStep
+		);
+	}, []);
+
+	const onBackCustomCsvImportStep = useCallback((): void => {
+		setCustomCsvImportStep((currentStep) =>
+			currentStep === 'opening_hours' ? 'mapping' : currentStep
+		);
+	}, []);
+
 	const onImportLocations = useCallback(async (file: File) => {
 		setActionNotice(null);
 
@@ -1522,6 +1553,7 @@ export function useLocationsController(
 			const result = await runMappedCsvImport(
 				pendingCsvImport,
 				csvImportMapping,
+				csvImportOpeningHoursMapping,
 				csvImportAssignments,
 				config,
 				collectionsConfig,
@@ -1564,12 +1596,31 @@ export function useLocationsController(
 		config,
 		csvImportLogoId,
 		csvImportMapping,
+		csvImportOpeningHoursMapping,
 		csvImportMarkerId,
 		csvImportTagIds,
 		loadLocations,
 		pendingCsvImport,
 		resetCustomCsvImportState,
 	]);
+
+	const csvImportColumnOptions = useMemo(
+		() => buildCsvImportColumnOptions(pendingCsvImport),
+		[pendingCsvImport]
+	);
+
+	const csvImportOpeningHoursColumnOptions = useMemo(() => {
+		if (!pendingCsvImport) {
+			return buildCsvImportColumnOptions(null);
+		}
+
+		const validColumnIndexes = getValidCsvOpeningHoursColumnIndexes(
+			pendingCsvImport.rows,
+			pendingCsvImport.headers.length
+		);
+
+		return buildCsvImportColumnOptions(pendingCsvImport, validColumnIndexes);
+	}, [pendingCsvImport]);
 
 	const onExportLocations = useCallback(() => {
 		if (locations.length === 0) return;
@@ -1622,9 +1673,12 @@ export function useLocationsController(
 		assignmentLogoId,
 		assignmentMarkerId,
 		assignmentTagIds,
+		csvImportColumnOptions,
 		csvImportHeaders: pendingCsvImport?.headers ?? [],
 		csvImportLogoId,
 		csvImportMarkerId,
+		csvImportOpeningHoursColumnOptions,
+		csvImportOpeningHoursMapping,
 		csvImportRows: pendingCsvImport?.rows ?? [],
 		csvImportTagIds,
 		csvImportMapping,
@@ -1691,11 +1745,14 @@ export function useLocationsController(
 		onAssignLogoToLocation,
 		onAssignMarkerToLocation,
 		onAssignTagsToLocation,
+		onAdvanceCustomCsvImportStep,
 		onCancel,
 		onChangeCsvImportMapping,
+		onChangeCsvImportOpeningHoursMapping,
 		onChangeFormValue,
 		onChangeOpeningHoursDayValue,
 		onChangeOpeningHoursNotes,
+		onBackCustomCsvImportStep,
 		onCloseAssignToCollectionModal: closeAssignToCollectionModal,
 		onCloseCustomCsvImportModal: closeCustomCsvImportModal,
 		onCloseAssignLogoModal: closeAssignLogoModal,

@@ -4,6 +4,11 @@ import type {
 	LocationFormState,
 	LocationsAdminConfig,
 } from '../../types';
+import {
+	buildImportedOpeningHours,
+	createEmptyCsvOpeningHoursImportMapping,
+	type CsvOpeningHoursImportMapping,
+} from './csvOpeningHoursImport';
 import { createCollection } from '../collections/createCollection';
 import { createLocation } from './createLocation';
 import { geocodeAddress } from './geocodeAddress';
@@ -200,6 +205,15 @@ export async function parseCsvFile(file: File): Promise<ParsedCsvData> {
 	return parseCsvText(await file.text());
 }
 
+export {
+	analyzeCsvOpeningHoursColumn,
+	buildImportedOpeningHours,
+	createEmptyCsvOpeningHoursImportMapping,
+	getValidCsvOpeningHoursColumnIndexes,
+	parseCsvOpeningHoursValue,
+} from './csvOpeningHoursImport';
+export type { CsvOpeningHoursImportMapping } from './csvOpeningHoursImport';
+
 export function createEmptyCsvImportMapping(): CsvImportMapping {
 	return CUSTOM_CSV_MAPPING_FIELDS.reduce<CsvImportMapping>((mapping, field) => {
 		mapping[field.key] = null;
@@ -272,13 +286,18 @@ function getMappedValue(row: string[], columnIndex: number | null): string {
 
 export function buildMappedLocationForm(
 	row: string[],
-	mapping: CsvImportMapping
+	mapping: CsvImportMapping,
+	openingHoursMapping: CsvOpeningHoursImportMapping = createEmptyCsvOpeningHoursImportMapping()
 ): LocationFormState {
 	const form = createBaseImportForm();
 
 	CUSTOM_CSV_MAPPING_FIELDS.forEach((field) => {
 		form[field.key] = getMappedValue(row, mapping[field.key]);
 	});
+
+	const importedOpeningHours = buildImportedOpeningHours(row, openingHoursMapping);
+	form.opening_hours = importedOpeningHours.openingHours;
+	form.opening_hours_notes = importedOpeningHours.notes;
 
 	form.title = form.title || getImportedLocationFallbackTitle();
 
@@ -401,6 +420,7 @@ export async function runCommonCsvImport(
 export async function runMappedCsvImport(
 	parsedCsv: ParsedCsvData,
 	mapping: CsvImportMapping,
+	openingHoursMapping: CsvOpeningHoursImportMapping,
 	assignments: CsvImportAssignments,
 	locationsConfig: LocationsAdminConfig,
 	collectionsConfig: CollectionsAdminConfig,
@@ -421,7 +441,7 @@ export async function runMappedCsvImport(
 
 	for (const row of parsedCsv.rows) {
 		const form = applyCsvImportAssignments(
-			buildMappedLocationForm(row, mapping),
+			buildMappedLocationForm(row, mapping, openingHoursMapping),
 			assignments
 		);
 

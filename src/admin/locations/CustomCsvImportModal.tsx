@@ -4,6 +4,11 @@ import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
 import { CUSTOM_CSV_MAPPING_FIELDS } from '../../lib/locations/importLocations';
 import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import CustomCsvImportMappingGrid from './CustomCsvImportMappingGrid';
+import {
+	CSV_OPENING_HOURS_MAPPING_FIELDS,
+	CSV_OPENING_HOURS_NOTES_FIELD,
+} from './customCsvImport';
 import type { LocationsController } from './types';
 
 export default function CustomCsvImportModal({ controller }: { controller: LocationsController }) {
@@ -12,20 +17,7 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 	}
 
 	const modalTitle = __('Import custom CSV', 'minimal-map');
-	const columnOptions = [
-		{ label: __('None', 'minimal-map'), value: '' },
-		...controller.csvImportHeaders.map((header, index) => ({
-			label: (() => {
-				const baseLabel = header || `${__('Column', 'minimal-map')} ${index + 1}`;
-				const exampleValue = controller.csvImportRows
-					.map((row) => row[index]?.trim() ?? '')
-					.find((value) => value.length > 0);
-
-				return exampleValue ? `${baseLabel} (${exampleValue})` : baseLabel;
-			})(),
-			value: `${index}`,
-		})),
-	];
+	const allColumnOptions = controller.csvImportColumnOptions;
 	const logoOptions = [
 		{ label: __('None', 'minimal-map'), value: '' },
 		...controller.logos.map((logo) => ({
@@ -44,6 +36,23 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 		.map((id) => controller.tags.find((tag) => tag.id === id)?.name)
 		.filter((name): name is string => !!name);
 	const tagSuggestions = controller.tags.map((tag) => tag.name);
+	const baseMappingRows = CUSTOM_CSV_MAPPING_FIELDS.map((field) => ({
+		key: field.key,
+		label: field.label,
+		options: allColumnOptions,
+	}));
+	const openingHoursRows = [
+		...CSV_OPENING_HOURS_MAPPING_FIELDS.map((field) => ({
+			key: field.key,
+			label: field.label,
+			options: controller.csvImportOpeningHoursColumnOptions,
+		})),
+		{
+			key: CSV_OPENING_HOURS_NOTES_FIELD.key,
+			label: CSV_OPENING_HOURS_NOTES_FIELD.label,
+			options: allColumnOptions,
+		},
+	];
 
 	return (
 		<Modal
@@ -58,7 +67,7 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 			<div
 				className="minimal-map-admin__location-dialog minimal-map-admin__custom-csv-import-dialog"
 				onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-					if (controller.csvImportStep !== 'mapping' || controller.isImporting) {
+					if (controller.csvImportStep === 'progress' || controller.isImporting) {
 						return;
 					}
 
@@ -78,44 +87,40 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 					}
 
 					event.preventDefault();
+					if (controller.csvImportStep === 'mapping') {
+						controller.onAdvanceCustomCsvImportStep();
+						return;
+					}
+
 					void controller.onStartCustomCsvImport();
 				}}
 			>
-				{controller.csvImportStep === 'mapping' ? (
+				{controller.csvImportStep === 'progress' ? (
+					<div className="minimal-map-admin__custom-csv-import-progress">
+						<progress
+							className="minimal-map-admin__custom-csv-import-progress-bar"
+							max={Math.max(controller.csvImportProgressTotal, 1)}
+							value={
+								controller.csvImportProgressTotal === 0
+									? 1
+									: controller.csvImportProgressCompleted
+							}
+						/>
+					</div>
+				) : controller.csvImportStep === 'mapping' ? (
 					<>
+						<CustomCsvImportMappingGrid
+							rows={baseMappingRows}
+							selectedValues={controller.csvImportMapping}
+							onChange={(field, value) =>
+								controller.onChangeCsvImportMapping(
+									field as keyof typeof controller.csvImportMapping,
+									value
+								)
+							}
+							disabled={controller.isImporting}
+						/>
 						<div className="minimal-map-admin__custom-csv-import-grid">
-							{CUSTOM_CSV_MAPPING_FIELDS.map((field) => (
-								<div
-									key={field.key}
-									className="minimal-map-admin__custom-csv-import-row"
-								>
-									<SelectControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										hideLabelFromVision
-										label={field.label}
-										value={field.key}
-										options={[{ label: field.label, value: field.key }]}
-										disabled
-									/>
-									<SelectControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										hideLabelFromVision
-									label={field.label}
-									value={
-										controller.csvImportMapping[field.key] === null
-											? ''
-											: `${controller.csvImportMapping[field.key]}`
-									}
-									options={columnOptions}
-									onChange={(value) =>
-										controller.onChangeCsvImportMapping(field.key, value)
-									}
-									disabled={controller.isImporting}
-								/>
-								</div>
-							))}
 							<div className="minimal-map-admin__custom-csv-import-row">
 								<SelectControl
 									__next40pxDefaultSize
@@ -188,6 +193,56 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 								<Button
 									__next40pxDefaultSize
 									variant="primary"
+									onClick={controller.onAdvanceCustomCsvImportStep}
+									isBusy={controller.isImporting}
+									disabled={controller.isImporting}
+								>
+									<span className="minimal-map-admin__location-dialog-button-content">
+										<span>{__('Next', 'minimal-map')}</span>
+										<Kbd variant="blue">Enter</Kbd>
+									</span>
+								</Button>
+							</div>
+						</div>
+					</>
+				) : (
+					<>
+						<CustomCsvImportMappingGrid
+							rows={openingHoursRows}
+							selectedValues={controller.csvImportOpeningHoursMapping}
+							onChange={(field, value) =>
+								controller.onChangeCsvImportOpeningHoursMapping(
+									field as keyof typeof controller.csvImportOpeningHoursMapping,
+									value
+								)
+							}
+							disabled={controller.isImporting}
+						/>
+						<div className="minimal-map-admin__location-dialog-footer">
+							<div className="minimal-map-admin__location-dialog-footer-start">
+								<Button
+									__next40pxDefaultSize
+									variant="tertiary"
+									onClick={controller.onBackCustomCsvImportStep}
+									disabled={controller.isImporting}
+									data-minimal-map-dialog-ignore-enter="true"
+								>
+									{__('Back', 'minimal-map')}
+								</Button>
+							</div>
+							<div className="minimal-map-admin__location-dialog-actions">
+								<Button
+									__next40pxDefaultSize
+									variant="tertiary"
+									onClick={controller.onCloseCustomCsvImportModal}
+									disabled={controller.isImporting}
+									data-minimal-map-dialog-ignore-enter="true"
+								>
+									{__('Cancel', 'minimal-map')}
+								</Button>
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
 									onClick={() => {
 										void controller.onStartCustomCsvImport();
 									}}
@@ -202,18 +257,6 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 							</div>
 						</div>
 					</>
-				) : (
-					<div className="minimal-map-admin__custom-csv-import-progress">
-						<progress
-							className="minimal-map-admin__custom-csv-import-progress-bar"
-							max={Math.max(controller.csvImportProgressTotal, 1)}
-							value={
-								controller.csvImportProgressTotal === 0
-									? 1
-									: controller.csvImportProgressCompleted
-							}
-						/>
-					</div>
 				)}
 			</div>
 		</Modal>

@@ -1,6 +1,9 @@
 import type { ViewTable } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
-import type { CsvImportMapping } from '../../lib/locations/importLocations';
+import type {
+	CsvImportMapping,
+	CsvOpeningHoursImportMapping,
+} from '../../lib/locations/importLocations';
 import type {
 	CollectionRecord,
 	FieldErrors,
@@ -16,6 +19,7 @@ import type {
 	StyleThemeRecord,
 	TagRecord,
 } from '../../types';
+import type { CsvImportColumnOption } from './customCsvImport';
 
 export interface LocationsNotice {
 	status: 'success' | 'error';
@@ -30,14 +34,17 @@ export interface LocationsController {
 	assignmentMarkerId: string;
 	assignmentTagIds: number[];
 	csvImportHeaders: string[];
+	csvImportColumnOptions: CsvImportColumnOption[];
 	csvImportLogoId: string;
 	csvImportMarkerId: string;
+	csvImportOpeningHoursColumnOptions: CsvImportColumnOption[];
+	csvImportOpeningHoursMapping: CsvOpeningHoursImportMapping;
 	csvImportRows: string[][];
 	csvImportTagIds: number[];
 	csvImportMapping: CsvImportMapping;
 	csvImportProgressCompleted: number;
 	csvImportProgressTotal: number;
-	csvImportStep: 'mapping' | 'progress';
+	csvImportStep: 'mapping' | 'opening_hours' | 'progress';
 	collections: CollectionRecord[];
 	logos: LogoRecord[];
 	markers: MarkerRecord[];
@@ -104,6 +111,12 @@ export interface LocationsController {
 	) => void;
 	onChangeOpeningHoursNotes: (value: string) => void;
 	onChangeCsvImportMapping: (field: keyof CsvImportMapping, columnIndex: string) => void;
+	onChangeCsvImportOpeningHoursMapping: (
+		field: keyof CsvOpeningHoursImportMapping,
+		columnIndex: string
+	) => void;
+	onAdvanceCustomCsvImportStep: () => void;
+	onBackCustomCsvImportStep: () => void;
 	onMapLocationSelect: (coordinates: MapCoordinates) => void;
 	onCloseCustomCsvImportModal: () => void;
 	onCloseRemoveCollectionAssignmentModal: () => void;
