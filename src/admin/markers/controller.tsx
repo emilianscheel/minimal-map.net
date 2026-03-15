@@ -9,8 +9,10 @@ import type {
 	MarkersAdminConfig,
 	StyleThemeRecord,
 } from '../../types';
+import { formatFilename, hasFilenameBasename, parseFilenameParts } from '../../lib/filenames';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
+import { updateMarker } from '../../lib/markers/updateMarker';
 import { UploadMarkerButton } from './UploadMarkerButton';
 import { ThemeSelector } from '../styles/ThemeSelector';
 import type { MarkersController } from './types';
@@ -41,11 +43,17 @@ export function useMarkersController(
 	}
 ): MarkersController {
 	const [actionNotice, setActionNotice] = useState<MarkersController['actionNotice']>(null);
+	const [editFilenameBasename, setEditFilenameBasename] = useState('');
+	const [editFilenameExtension, setEditFilenameExtension] = useState('');
+	const [editingMarker, setEditingMarker] = useState<MarkerRecord | null>(null);
+	const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
 	const [isLoading, setLoading] = useState(enabled);
 	const [isRowActionPending, setRowActionPending] = useState(false);
+	const [isSubmitting, setSubmitting] = useState(false);
 	const [isUploading, setUploading] = useState(false);
 	const [loadError, setLoadError] = useState<string | null>(null);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 	const [view, setView] = useState<ViewGrid>(DEFAULT_GRID_VIEW);
 
 	const loadMarkers = useCallback(async (): Promise<void> => {
@@ -81,6 +89,37 @@ export function useMarkersController(
 
 	const dismissActionNotice = useCallback((): void => {
 		setActionNotice(null);
+	}, []);
+
+	const resetEditDialogState = useCallback((): void => {
+		setEditingMarker(null);
+		setEditFilenameBasename('');
+		setEditFilenameExtension('');
+		setSubmitError(null);
+	}, []);
+
+	const onEditMarker = useCallback((marker: MarkerRecord): void => {
+		const { basename, extension } = parseFilenameParts(marker.title);
+
+		setEditingMarker(marker);
+		setEditFilenameBasename(basename);
+		setEditFilenameExtension(extension);
+		setSubmitError(null);
+		setEditDialogOpen(true);
+	}, []);
+
+	const onCancelEditMarker = useCallback((): void => {
+		if (isSubmitting) {
+			return;
+		}
+
+		setEditDialogOpen(false);
+		resetEditDialogState();
+	}, [isSubmitting, resetEditDialogState]);
+
+	const onChangeEditFilename = useCallback((value: string): void => {
+		setEditFilenameBasename(value);
+		setSubmitError(null);
 	}, []);
 
 	const onDeleteMarker = useCallback(
@@ -125,6 +164,49 @@ export function useMarkersController(
 		document.body.removeChild(link);
 		URL.revokeObjectURL(url);
 	}, []);
+
+	const onConfirmEditMarker = useCallback(async (): Promise<void> => {
+		if (!editingMarker) {
+			return;
+		}
+
+		if (!hasFilenameBasename(editFilenameBasename)) {
+			setSubmitError(__('Filename is required.', 'minimal-map'));
+			return;
+		}
+
+		setSubmitting(true);
+		setSubmitError(null);
+		setActionNotice(null);
+
+		try {
+			await updateMarker(
+				config,
+				editingMarker.id,
+				formatFilename(editFilenameBasename, editFilenameExtension)
+			);
+			await loadMarkers();
+			setEditDialogOpen(false);
+			resetEditDialogState();
+			setActionNotice({
+				status: 'success',
+				message: __('Marker updated.', 'minimal-map'),
+			});
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error ? error.message : __('Marker could not be updated.', 'minimal-map')
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}, [
+		config,
+		editFilenameBasename,
+		editFilenameExtension,
+		editingMarker,
+		loadMarkers,
+		resetEditDialogState,
+	]);
 
 	const onUploadMarkers = useCallback(
 		async (files: FileList | File[]): Promise<void> => {
@@ -204,6 +286,9 @@ export function useMarkersController(
 		actionNotice,
 		activeTheme: themeData.activeTheme,
 		dismissActionNotice,
+		editFilenameBasename,
+		editFilenameExtension,
+		editingMarker,
 		headerAction: enabled ? (
 			<div className="minimal-map-admin__header-actions-group">
 				<ThemeSelector
@@ -214,16 +299,23 @@ export function useMarkersController(
 				<UploadMarkerButton onUpload={onUploadMarkers} isUploading={isUploading} />
 			</div>
 		) : null,
+		isEditDialogOpen,
 		isLoading,
 		isRowActionPending,
+		isSubmitting,
 		isUploading,
 		loadError,
 		markers,
+		onCancelEditMarker,
+		onChangeEditFilename,
 		onDeleteMarker,
 		onDownloadMarker,
+		onConfirmEditMarker,
+		onEditMarker,
 		onUploadMarkers,
 		onChangeView: (nextView: ViewGrid) => setView(nextView),
 		paginatedMarkers,
+		submitError,
 		totalPages,
 		view,
 	};

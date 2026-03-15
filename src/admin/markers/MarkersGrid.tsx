@@ -2,7 +2,7 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewGrid } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Download, Trash2 } from 'lucide-react';
+import { Download, Pencil, Trash2 } from 'lucide-react';
 import type { MarkerRecord } from '../../types';
 import MarkerMiniMap from '../../components/MarkerMiniMap';
 import type { MarkersController } from './types';
@@ -44,6 +44,18 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 				},
 			},
 			{
+				id: 'edit',
+				label: __('Edit', 'minimal-map'),
+				isPrimary: false,
+				icon: <Pencil size={18} />,
+				callback: (items) => {
+					if (items.length === 1) {
+						controller.onEditMarker(items[0]);
+					}
+				},
+				isEligible: () => !controller.isRowActionPending && !controller.isSubmitting,
+			},
+			{
 				id: 'delete',
 				label: __('Delete', 'minimal-map'),
 				isPrimary: false,
@@ -53,7 +65,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 						void controller.onDeleteMarker(items[0]);
 					}
 				},
-				isEligible: () => !controller.isRowActionPending,
+				isEligible: () => !controller.isRowActionPending && !controller.isSubmitting,
 			},
 		],
 		[controller]

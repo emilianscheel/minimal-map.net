@@ -1,5 +1,6 @@
 import { DropZone, Notice, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import EditMarkerDialog from './EditMarkerDialog';
 import MarkersEmptyState from './MarkersEmptyState';
 import MarkersGrid from './MarkersGrid';
 import type { MarkersController } from './types';
@@ -42,6 +43,8 @@ export default function MarkersView({ controller }: { controller: MarkersControl
 					<MarkersGrid controller={controller} />
 				)}
 			</div>
+
+			<EditMarkerDialog controller={controller} />
 		</div>
 	);
 }

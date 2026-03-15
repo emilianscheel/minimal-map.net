@@ -4,9 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { createLocationFormStateFromRecord } from '../../lib/locations/createLocationFormStateFromRecord';
+import { formatFilename, hasFilenameBasename, parseFilenameParts } from '../../lib/filenames';
 import { fetchAllLocations } from '../../lib/locations/fetchAllLocations';
 import { updateLocation } from '../../lib/locations/updateLocation';
 import { fetchAllLogos } from '../../lib/logos/fetchAllLogos';
+import { updateLogo } from '../../lib/logos/updateLogo';
 import type { LocationRecord, LogoRecord, LocationsAdminConfig, LogosAdminConfig } from '../../types';
 import { UploadLogoButton } from './UploadLogoButton';
 import type { LogosController } from './types';
@@ -61,13 +63,19 @@ export function useLogosController(
 	enabled: boolean
 ): LogosController {
 	const [actionNotice, setActionNotice] = useState<LogosController['actionNotice']>(null);
+	const [editFilenameBasename, setEditFilenameBasename] = useState('');
+	const [editFilenameExtension, setEditFilenameExtension] = useState('');
+	const [editingLogo, setEditingLogo] = useState<LogoRecord | null>(null);
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 	const [isLoading, setLoading] = useState(enabled);
 	const [isRowActionPending, setRowActionPending] = useState(false);
+	const [isSubmitting, setSubmitting] = useState(false);
 	const [isUploading, setUploading] = useState(false);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [logos, setLogos] = useState<LogoRecord[]>([]);
 	const [selectedLogo, setSelectedLogo] = useState<LogoRecord | null>(null);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 	const [view, setView] = useState<ViewGrid>(DEFAULT_GRID_VIEW);
 
 	const loadLogos = useCallback(async (): Promise<void> => {
@@ -102,6 +110,40 @@ export function useLogosController(
 
 	const dismissActionNotice = useCallback((): void => {
 		setActionNotice(null);
+	}, []);
+
+	const resetEditDialogState = useCallback((): void => {
+		setEditingLogo(null);
+		setEditFilenameBasename('');
+		setEditFilenameExtension('');
+		setSubmitError(null);
+	}, []);
+
+	const onEditLogo = useCallback(
+		(logo: LogoRecord): void => {
+			const { basename, extension } = parseFilenameParts(logo.title);
+
+			setEditingLogo(logo);
+			setEditFilenameBasename(basename);
+			setEditFilenameExtension(extension);
+			setSubmitError(null);
+			setEditDialogOpen(true);
+		},
+		[]
+	);
+
+	const onCancelEditLogo = useCallback((): void => {
+		if (isSubmitting) {
+			return;
+		}
+
+		setEditDialogOpen(false);
+		resetEditDialogState();
+	}, [isSubmitting, resetEditDialogState]);
+
+	const onChangeEditFilename = useCallback((value: string): void => {
+		setEditFilenameBasename(value);
+		setSubmitError(null);
 	}, []);
 
 	const onCloseDeleteModal = useCallback((): void => {
@@ -161,6 +203,49 @@ export function useLogosController(
 			setRowActionPending(false);
 		}
 	}, [config.restPath, loadLogos, locationsConfig, selectedLogo]);
+
+	const onConfirmEditLogo = useCallback(async (): Promise<void> => {
+		if (!editingLogo) {
+			return;
+		}
+
+		if (!hasFilenameBasename(editFilenameBasename)) {
+			setSubmitError(__('Filename is required.', 'minimal-map'));
+			return;
+		}
+
+		setSubmitting(true);
+		setSubmitError(null);
+		setActionNotice(null);
+
+		try {
+			await updateLogo(
+				config,
+				editingLogo.id,
+				formatFilename(editFilenameBasename, editFilenameExtension)
+			);
+			await loadLogos();
+			setEditDialogOpen(false);
+			resetEditDialogState();
+			setActionNotice({
+				status: 'success',
+				message: __('Logo updated.', 'minimal-map'),
+			});
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error ? error.message : __('Logo could not be updated.', 'minimal-map')
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}, [
+		config,
+		editFilenameBasename,
+		editFilenameExtension,
+		editingLogo,
+		loadLogos,
+		resetEditDialogState,
+	]);
 
 	const onUploadLogos = useCallback(
 		async (files: FileList | File[]): Promise<void> => {
@@ -239,24 +324,34 @@ export function useLogosController(
 	return {
 		actionNotice,
 		dismissActionNotice,
+		editFilenameBasename,
+		editFilenameExtension,
+		editingLogo,
 		headerAction: enabled ? (
 			<div className="minimal-map-admin__header-actions-group">
 				<UploadLogoButton onUpload={(files) => void onUploadLogos(files)} isUploading={isUploading} />
 			</div>
 		) : null,
 		isDeleteModalOpen,
+		isEditDialogOpen,
 		isLoading,
 		isRowActionPending,
+		isSubmitting,
 		isUploading,
 		loadError,
 		logos,
 		onChangeView: (nextView: ViewGrid) => setView(nextView),
+		onCancelEditLogo,
+		onChangeEditFilename,
 		onCloseDeleteModal,
 		onConfirmDeleteLogo,
+		onConfirmEditLogo,
+		onEditLogo,
 		onOpenDeleteModal,
 		onUploadLogos,
 		paginatedLogos,
 		selectedLogo,
+		submitError,
 		totalPages,
 		view,
 	};
