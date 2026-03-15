@@ -63,6 +63,8 @@ export interface MapDefaults {
 	googleMapsButtonForegroundColor: string;
 	googleMapsButtonBorderRadius: string;
 	googleMapsButtonShowIcon: boolean;
+	openingHoursOpenColor: string;
+	openingHoursClosedColor: string;
 	creditsPadding: BoxValue;
 	creditsOuterMargin: BoxValue;
 	creditsBackgroundColor: string;
@@ -185,6 +187,8 @@ export interface RawMapConfig {
 	googleMapsButtonForegroundColor?: string;
 	googleMapsButtonBorderRadius?: string | BoxValue | null;
 	googleMapsButtonShowIcon?: boolean;
+	openingHoursOpenColor?: string;
+	openingHoursClosedColor?: string;
 	creditsPadding?: BoxValue | null;
 	creditsOuterMargin?: BoxValue | null;
 	creditsBackgroundColor?: string;
@@ -404,6 +408,8 @@ export interface MapBlockAttributes {
 	googleMapsButtonForegroundColor: string;
 	googleMapsButtonBorderRadius: string;
 	googleMapsButtonShowIcon: boolean;
+	openingHoursOpenColor: string;
+	openingHoursClosedColor: string;
 	creditsPadding: BoxValue;
 	creditsOuterMargin: BoxValue;
 	creditsBackgroundColor: string;

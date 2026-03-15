@@ -470,6 +470,40 @@ function GoogleMapsButtonColorSettings({
   );
 }
 
+function OpeningHoursColorSettings({
+  openColor,
+  closedColor,
+  defaultOpenColor,
+  defaultClosedColor,
+  onChange,
+}: {
+  openColor: string;
+  closedColor: string;
+  defaultOpenColor: string;
+  defaultClosedColor: string;
+  onChange: (
+    key: "openingHoursOpenColor" | "openingHoursClosedColor",
+    value: string,
+  ) => void;
+}) {
+  return (
+    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
+      <CompactColorDropdown
+        label={__("Open", "minimal-map")}
+        value={openColor}
+        defaultValue={defaultOpenColor}
+        onChange={(value) => onChange("openingHoursOpenColor", value)}
+      />
+      <CompactColorDropdown
+        label={__("Closed", "minimal-map")}
+        value={closedColor}
+        defaultValue={defaultClosedColor}
+        onChange={(value) => onChange("openingHoursClosedColor", value)}
+      />
+    </div>
+  );
+}
+
 function CompactColorDropdown({
   label,
   value,
@@ -1434,6 +1468,22 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={(value: boolean) =>
               setAttributes({ googleMapsButtonShowIcon: value })
             }
+          />
+        </PanelBody>
+        <PanelBody
+          title={__("Opening Hours", "minimal-map")}
+          initialOpen={false}
+        >
+          <OpeningHoursColorSettings
+            openColor={attributes.openingHoursOpenColor}
+            closedColor={attributes.openingHoursClosedColor}
+            defaultOpenColor={
+              runtimeConfig.defaults?.openingHoursOpenColor ?? "#1a7f37"
+            }
+            defaultClosedColor={
+              runtimeConfig.defaults?.openingHoursClosedColor ?? "#b32d2e"
+            }
+            onChange={(key, value) => setAttributes({ [key]: value })}
           />
         </PanelBody>
       </InspectorControls>

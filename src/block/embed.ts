@@ -49,6 +49,8 @@ const EMBED_ATTRIBUTE_KEYS: Array<keyof EmbedAttributes> = [
 	'googleMapsButtonForegroundColor',
 	'googleMapsButtonBorderRadius',
 	'googleMapsButtonShowIcon',
+	'openingHoursOpenColor',
+	'openingHoursClosedColor',
 	'creditsPadding',
 	'creditsOuterMargin',
 	'creditsBackgroundColor',

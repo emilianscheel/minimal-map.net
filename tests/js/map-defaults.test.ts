@@ -56,6 +56,22 @@ describe('map defaults normalization', () => {
 		expect(config.heightMobileCssValue).toBe('50px');
 	});
 
+	test('preserves valid opening-hours status colors and falls back for invalid values', () => {
+		const explicitConfig = normalizeMapConfig({
+			openingHoursOpenColor: '#22863a',
+			openingHoursClosedColor: '#cf222e',
+		});
+		const fallbackConfig = normalizeMapConfig({
+			openingHoursOpenColor: 'green',
+			openingHoursClosedColor: 'red',
+		});
+
+		expect(explicitConfig.openingHoursOpenColor).toBe('#22863a');
+		expect(explicitConfig.openingHoursClosedColor).toBe('#cf222e');
+		expect(fallbackConfig.openingHoursOpenColor).toBe('#1a7f37');
+		expect(fallbackConfig.openingHoursClosedColor).toBe('#b32d2e');
+	});
+
 	test('allows raw config to override the runtime mobile two-finger zoom default', () => {
 		const config = normalizeMapConfig(
 			{

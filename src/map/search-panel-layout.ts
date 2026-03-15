@@ -21,6 +21,8 @@ type SearchPanelConfig = Pick<
 	| 'googleMapsButtonBackgroundColor'
 	| 'googleMapsButtonForegroundColor'
 	| 'googleMapsButtonBorderRadius'
+	| 'openingHoursOpenColor'
+	| 'openingHoursClosedColor'
 >;
 
 function parsePixelValue(value: string): number {
@@ -113,6 +115,14 @@ export function applySearchPanelCssVariables(
 	target.style.setProperty(
 		'--minimal-map-google-maps-button-border-radius',
 		config.googleMapsButtonBorderRadius
+	);
+	target.style.setProperty(
+		'--minimal-map-opening-hours-open-color',
+		config.openingHoursOpenColor
+	);
+	target.style.setProperty(
+		'--minimal-map-opening-hours-closed-color',
+		config.openingHoursClosedColor
 	);
 }
 

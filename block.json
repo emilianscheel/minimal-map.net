@@ -191,6 +191,14 @@
       "type": "boolean",
       "default": true
     },
+    "openingHoursOpenColor": {
+      "type": "string",
+      "default": "#1a7f37"
+    },
+    "openingHoursClosedColor": {
+      "type": "string",
+      "default": "#b32d2e"
+    },
     "creditsPadding": {
       "type": "object",
       "default": {

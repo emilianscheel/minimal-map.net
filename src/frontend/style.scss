@@ -527,11 +527,11 @@
 }
 
 .minimal-map-search__result-opening-hours-trigger.is-open {
-  color: #1a7f37;
+  color: var(--minimal-map-opening-hours-open-color, #1a7f37);
 }
 
 .minimal-map-search__result-opening-hours-trigger.is-closed {
-  color: var(--minimal-map-search-foreground-primary);
+  color: var(--minimal-map-opening-hours-closed-color, #b32d2e);
 }
 
 .minimal-map-search__result-opening-hours-trigger span {
