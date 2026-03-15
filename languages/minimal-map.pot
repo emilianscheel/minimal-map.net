@@ -1,5 +1,5 @@
 # Copyright (C) 2026 Emilian Scheel
-# This file is distributed under the same license as the Minimal Map plugin.
+# This file is distributed under the MIT.
 msgid ""
 msgstr ""
 "Project-Id-Version: Minimal Map 0.3.0\n"
@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-12T14:54:16+00:00\n"
+"POT-Creation-Date: 2026-03-15T19:12:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: minimal-map\n"
@@ -18,6 +18,7 @@ msgstr ""
 #: minimal-map.php includes/admin/class-admin-menu.php:106
 #: includes/admin/class-admin-menu.php:107
 #: includes/blocks/class-map-block.php:55
+#: includes/class-iframe-endpoint.php:106
 msgid "Minimal Map"
 msgstr ""
 
@@ -40,7 +41,7 @@ msgid "An overview of Minimal Map sections and upcoming data tools."
 msgstr ""
 
 #: includes/admin/class-admin-menu.php:41
-#: includes/locations/class-location-post-type.php:60
+#: includes/locations/class-location-post-type.php:76
 msgid "Locations"
 msgstr ""
 
@@ -97,27 +98,36 @@ msgstr ""
 msgid "Render a minimalist MapLibre-powered map."
 msgstr ""
 
-#: includes/class-config.php:45
+#: includes/class-config.php:47
 msgid "Liberty"
 msgstr ""
 
-#: includes/class-config.php:49
+#: includes/class-config.php:51
 msgid "Bright"
 msgstr ""
 
-#: includes/class-config.php:53
+#: includes/class-config.php:55
 msgid "Positron"
 msgstr ""
 
-#: includes/class-config.php:214 includes/class-config.php:234
+#: includes/class-config.php:248 includes/class-config.php:271
 msgid "Map preview unavailable because this browser does not support WebGL."
+msgstr ""
+
+#: includes/class-config.php:301 includes/class-config.php:310
+#: includes/class-config.php:319
+msgid "The map embed configuration is missing or invalid."
+msgstr ""
+
+#: includes/class-iframe-endpoint.php:94
+msgid "Invalid Minimal Map Embed"
 msgstr ""
 
 #: includes/collections/class-collection-post-type.php:45
 msgid "Collection"
 msgstr ""
 
-#: includes/locations/class-location-post-type.php:61
+#: includes/locations/class-location-post-type.php:77
 msgid "Location"
 msgstr ""
 
@@ -127,6 +137,12 @@ msgstr ""
 
 #: includes/markers/class-marker-post-type.php:40
 msgid "Marker"
+msgstr ""
+
+#: includes/rest/class-frontend-geocode-route.php:59
+#: includes/rest/class-frontend-geocode-route.php:83
+#: includes/rest/class-frontend-geocode-route.php:95
+msgid "No matching coordinates were found."
 msgstr ""
 
 #: includes/rest/class-geocode-route.php:88
@@ -157,41 +173,109 @@ msgstr ""
 msgid "Tag"
 msgstr ""
 
-#: src/admin/locations/controller.tsx:755
+#: src/map/location-opening-hours.ts:293
+msgid "%1$s-%2$s"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:309
+msgid "%1$s, Lunch %2$s-%3$s"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:63
+msgid "%d assigned location deleted"
+msgid_plural "%d assigned locations deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1000
+msgid "%d location cleared of its logo."
+msgid_plural "%d locations cleared of their logos."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1055
+msgid "%d location cleared of its marker."
+msgid_plural "%d locations cleared of their markers."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1110
+msgid "%d location cleared of its tags."
+msgid_plural "%d locations cleared of their tags."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1280
 msgid "%d location deleted."
 msgid_plural "%d locations deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/collections/controller.tsx:508
-#: src/admin/locations/controller.tsx:1060
-#: src/admin/locations/controller.tsx:1119
+#: src/admin/collections/controller.tsx:604
+#: src/admin/locations/controller.tsx:1625
+#: src/admin/locations/controller.tsx:1692
 msgid "%d location imported and assigned to a new collection."
 msgid_plural "%d locations imported and assigned to a new collection."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/logos/controller.tsx:205
+#: src/admin/locations/controller.tsx:708
+msgid "%d location updated with a logo."
+msgid_plural "%d locations updated with a logo."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:761
+msgid "%d location updated with a marker."
+msgid_plural "%d locations updated with a marker."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:917
+msgid "%d location updated with new opening hours."
+msgid_plural "%d locations updated with new opening hours."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:814
+msgid "%d location updated with new tags."
+msgid_plural "%d locations updated with new tags."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/logos/controller.tsx:310
 msgid "%d logo uploaded."
 msgid_plural "%d logos uploaded."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/markers/controller.tsx:167
+#: src/admin/markers/controller.tsx:249
 msgid "%d marker uploaded."
 msgid_plural "%d markers uploaded."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/map/location-card.tsx:274
+msgid "%s away"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:145
+msgid "+%d more"
+msgstr ""
 
 #: src/lib/locations/validateDetailsStep.ts:11
 msgid "A title is required."
 msgstr ""
 
 #: src/admin/collections/CollectionsEmptyState.tsx:13
-#: src/admin/collections/controller.tsx:570
-#: src/admin/collections/controller.tsx:593
-#: src/admin/collections/controller.tsx:600
+#: src/admin/collections/controller.tsx:666
+#: src/admin/collections/controller.tsx:689
+#: src/admin/collections/controller.tsx:696
 msgid "Add collection"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:125
+msgid "Add details such as seasonal opening hours or temporary exceptions."
 msgstr ""
 
 #: src/admin/sections/DashboardSection.tsx:16
@@ -201,8 +285,8 @@ msgid ""
 msgstr ""
 
 #: src/admin/locations/LocationsEmptyState.tsx:13
-#: src/admin/locations/controller.tsx:1233
-#: src/admin/locations/controller.tsx:1259
+#: src/admin/locations/controller.tsx:1846
+#: src/admin/locations/controller.tsx:1875
 msgid "Add location"
 msgstr ""
 
@@ -210,13 +294,13 @@ msgstr ""
 msgid "Add locations"
 msgstr ""
 
-#: src/admin/tags/TagsEmptyState.tsx:13 src/admin/tags/controller.tsx:211
-#: src/admin/tags/controller.tsx:223 src/admin/tags/controller.tsx:224
+#: src/admin/tags/TagsEmptyState.tsx:13 src/admin/tags/controller.tsx:241
+#: src/admin/tags/controller.tsx:254 src/admin/tags/controller.tsx:256
 msgid "Add tag"
 msgstr ""
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:25
-#: src/admin/locations/LocationsTable.tsx:115
+#: src/admin/locations/LocationsTable.tsx:162
 msgid "Address"
 msgstr ""
 
@@ -228,23 +312,35 @@ msgstr ""
 msgid "Airport Grounds"
 msgstr ""
 
-#: src/block/edit.tsx:552 src/block/edit.tsx:589
+#: src/admin/locations/AssignLogoModal.tsx:105
+msgid "All available logos are already assigned for this selection."
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:102
+msgid "All available markers are already assigned for this selection."
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:93
+msgid "All available tags are already assigned for this selection."
+msgstr ""
+
+#: src/block/edit.tsx:656 src/block/edit.tsx:693
 msgid "All locations"
 msgstr ""
 
-#: src/block/edit.tsx:889
+#: src/block/edit.tsx:1106
 msgid "Allow Search"
 msgstr ""
 
-#: src/block/edit.tsx:882
+#: src/block/edit.tsx:1089
 msgid "Allow Two-Finger Zoom on Mobile"
 msgstr ""
 
-#: src/block/edit.tsx:877
+#: src/block/edit.tsx:1084
 msgid "Allow Zoom via Scroll"
 msgstr ""
 
-#: src/block/edit.tsx:896
+#: src/block/edit.tsx:1166
 msgid "Appearance"
 msgstr ""
 
@@ -264,22 +360,72 @@ msgstr ""
 msgid "Assign"
 msgstr ""
 
+#: src/admin/locations/LocationsTable.tsx:326
+msgid "Assign %s as logo"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:368
+msgid "Assign %s as marker"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:428
+msgid "Assign %s as tag"
+msgstr ""
+
 #: src/admin/collections/CollectionAssignmentModal.tsx:46
 msgid "Assign locations"
 msgstr ""
 
-#: src/admin/locations/AssignLogoModal.tsx:46
-#: src/admin/locations/LocationsTable.tsx:267
+#: src/admin/locations/AssignLogoModal.tsx:60
+#: src/admin/locations/LocationsTable.tsx:348
 msgid "Assign Logo"
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:51
-#: src/admin/locations/LocationsTable.tsx:282
+#: src/admin/locations/LocationsTable.tsx:349
+msgid "Assign Logos"
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:59
+#: src/admin/locations/LocationsTable.tsx:390
 msgid "Assign Marker"
 msgstr ""
 
-#: src/admin/locations/AssignTagsModal.tsx:44
-#: src/admin/locations/LocationsTable.tsx:297
+#: src/admin/locations/LocationsTable.tsx:391
+msgid "Assign Markers"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:71
+msgid ""
+"Assign one new logo to %d selected location. %d currently have a logo "
+"assigned."
+msgid_plural ""
+"Assign one new logo to %d selected locations. %d currently have a logo "
+"assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:70
+msgid ""
+"Assign one new marker to %d selected location. %d currently use a custom "
+"marker."
+msgid_plural ""
+"Assign one new marker to %d selected locations. %d currently use a custom "
+"marker."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/AssignOpeningHoursModal.tsx:36
+#: src/admin/locations/LocationsTable.tsx:408
+#: src/admin/locations/LocationsTable.tsx:409
+msgid "Assign Opening Hours"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:450
+msgid "Assign Tag"
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:53
+#: src/admin/locations/LocationsTable.tsx:451
 msgid "Assign Tags"
 msgstr ""
 
@@ -288,17 +434,18 @@ msgid "Assign to collection"
 msgstr ""
 
 #: src/admin/locations/AssignToCollectionModal.tsx:69
-#: src/admin/locations/LocationsTable.tsx:252
+#: src/admin/locations/LocationsTable.tsx:307
 msgid "Assign to Collection"
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:140
-#: src/admin/locations/LocationDialog.tsx:95
+#: src/admin/locations/CustomCsvImportModal.tsx:230
+#: src/admin/locations/LocationDialog.tsx:103
 msgid "Back"
 msgstr ""
 
-#: src/admin/styles/constants.ts:5 src/block/edit.tsx:281
-#: src/block/edit.tsx:321
+#: src/admin/styles/constants.ts:5 src/block/edit.tsx:317
+#: src/block/edit.tsx:357 src/block/edit.tsx:458
 msgid "Background"
 msgstr ""
 
@@ -306,15 +453,15 @@ msgstr ""
 msgid "Background Color"
 msgstr ""
 
-#: src/block/edit.tsx:382
+#: src/block/edit.tsx:418
 msgid "Background Hover"
 msgstr ""
 
-#: src/block/edit.tsx:370
+#: src/block/edit.tsx:406
 msgid "Background Primary"
 msgstr ""
 
-#: src/block/edit.tsx:376
+#: src/block/edit.tsx:412
 msgid "Background Secondary"
 msgstr ""
 
@@ -322,23 +469,23 @@ msgstr ""
 msgid "Base Surfaces"
 msgstr ""
 
-#: src/block/edit.tsx:293
+#: src/block/edit.tsx:329
 msgid "Border"
 msgstr ""
 
-#: src/block/edit.tsx:1097
+#: src/block/edit.tsx:1386 src/block/edit.tsx:1448
 msgid "Border Radius"
 msgstr ""
 
-#: src/block/edit.tsx:1056
+#: src/block/edit.tsx:1345
 msgid "Border Radius Card"
 msgstr ""
 
-#: src/block/edit.tsx:1042
+#: src/block/edit.tsx:1331
 msgid "Border Radius Input"
 msgstr ""
 
-#: src/block/edit.tsx:997
+#: src/block/edit.tsx:1279
 msgid "Border Width"
 msgstr ""
 
@@ -366,41 +513,47 @@ msgstr ""
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:111
 #: src/admin/collections/CollectionDialog.tsx:59
-#: src/admin/collections/DeleteCollectionActionModal.tsx:93
+#: src/admin/collections/DeleteCollectionActionModal.tsx:129
 #: src/admin/collections/MergeCollectionsModal.tsx:152
-#: src/admin/locations/AssignLogoModal.tsx:89
-#: src/admin/locations/AssignMarkerModal.tsx:92
-#: src/admin/locations/AssignTagsModal.tsx:87
+#: src/admin/locations/AssignLogoModal.tsx:118
+#: src/admin/locations/AssignMarkerModal.tsx:115
+#: src/admin/locations/AssignOpeningHoursModal.tsx:81
+#: src/admin/locations/AssignTagsModal.tsx:105
 #: src/admin/locations/AssignToCollectionModal.tsx:110
-#: src/admin/locations/CustomCsvImportModal.tsx:109
+#: src/admin/locations/CustomCsvImportModal.tsx:191
+#: src/admin/locations/CustomCsvImportModal.tsx:241
 #: src/admin/locations/DeleteLocationActionModal.tsx:112
-#: src/admin/locations/DeleteLogoConfirmationModal.tsx:64
-#: src/admin/locations/LocationDialog.tsx:107
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:84
+#: src/admin/locations/LocationDialog.tsx:115
 #: src/admin/locations/RemoveCollectionAssignmentModal.tsx:61
-#: src/admin/logos/DeleteLogoModal.tsx:51
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:68
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:68
+#: src/admin/logos/DeleteLogoModal.tsx:51 src/admin/logos/EditLogoDialog.tsx:64
+#: src/admin/markers/EditMarkerDialog.tsx:64
 #: src/admin/styles/CreateThemeModal.tsx:53
-#: src/admin/styles/DeleteThemeModal.tsx:50 src/admin/tags/TagDialog.tsx:69
+#: src/admin/styles/DeleteThemeModal.tsx:50
+#: src/admin/tags/DeleteTagModal.tsx:48 src/admin/tags/TagDialog.tsx:69
 msgid "Cancel"
 msgstr ""
 
-#: src/block/edit.tsx:1069
+#: src/block/edit.tsx:1358
 msgid "Card Gap"
 msgstr ""
 
-#: src/block/edit.tsx:848
+#: src/block/edit.tsx:1055
 msgid "Center Latitude"
 msgstr ""
 
-#: src/block/edit.tsx:855
+#: src/block/edit.tsx:1062
 msgid "Center Longitude"
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:80
-msgid "Choose a custom SVG marker or switch back to the default marker."
+#: src/admin/locations/AssignMarkerModal.tsx:103
+msgid "Choose a custom SVG marker to apply to the selected locations."
 msgstr ""
 
 #: src/admin/locations/LocationDialogFields.tsx:105
-#: src/lib/locations/importLocations.ts:33
+#: src/lib/locations/importLocations.ts:170
 msgid "City"
 msgstr ""
 
@@ -408,7 +561,7 @@ msgstr ""
 msgid "City is required to geocode the address."
 msgstr ""
 
-#: src/map/SearchControl.tsx:166
+#: src/map/SearchControl.tsx:329
 msgid "Clear search"
 msgstr ""
 
@@ -416,81 +569,99 @@ msgstr ""
 msgid "Click on the map to place the location marker."
 msgstr ""
 
+#: src/admin/locations/OpeningHoursInput.tsx:50
+#: src/admin/locations/OpeningHoursInput.tsx:81
+msgid "Close"
+msgstr ""
+
 #: src/map/zoom-control-options.ts:95
 msgid "Close small"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:251
+#: src/block/edit.tsx:498 src/lib/locations/formatOpeningHoursSummary.ts:37
+#: src/map/location-opening-hours.ts:279 src/map/location-opening-hours.ts:289
+msgid "Closed"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:270
+msgid "Closed - opens %1$s %2$s"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:268
+msgid "Closed - opens %s"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:296
 msgid "Collection could not be created."
 msgstr ""
 
-#: src/admin/collections/DeleteCollectionActionModal.tsx:42
-#: src/admin/collections/controller.tsx:276
+#: src/admin/collections/DeleteCollectionActionModal.tsx:51
+#: src/admin/collections/controller.tsx:365
 msgid "Collection could not be deleted."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:865
+#: src/admin/locations/controller.tsx:1390
 msgid "Collection could not be removed from the location."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:250
+#: src/admin/collections/controller.tsx:295
 msgid "Collection could not be updated."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:243
+#: src/admin/collections/controller.tsx:288
 msgid "Collection created."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:268
+#: src/admin/collections/controller.tsx:59
 msgid "Collection deleted."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:70
-msgid "Collection deleted. %s."
-msgstr ""
-
-#: src/admin/collections/controller.tsx:77
+#: src/admin/collections/controller.tsx:80
 msgid "Collection deleted. %1$s. Shared locations kept: %2$d."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:351
+#: src/admin/collections/controller.tsx:74
+msgid "Collection deleted. %s."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:447
 msgid "Collection locations could not be saved."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:343
+#: src/admin/collections/controller.tsx:439
 msgid "Collection locations saved."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:856
+#: src/admin/locations/controller.tsx:1381
 msgid "Collection removed from location."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:215
-#: src/admin/collections/controller.tsx:392
+#: src/admin/collections/controller.tsx:260
+#: src/admin/collections/controller.tsx:488
 msgid "Collection title is required."
 msgstr ""
 
-#: src/block/edit.tsx:551
+#: src/block/edit.tsx:655
 msgid "Collection unavailable"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:242
+#: src/admin/collections/controller.tsx:287
 msgid "Collection updated."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:113
+#: src/admin/collections/controller.tsx:158
 msgid "Collections could not be loaded."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:442
+#: src/admin/collections/controller.tsx:538
 msgid "Collections could not be merged."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:436
+#: src/admin/collections/controller.tsx:532
 msgid "Collections merged successfully."
 msgstr ""
 
-#: src/admin/locations/CustomCsvImportModal.tsx:21
+#: src/admin/locations/customCsvImport.ts:52
 msgid "Column"
 msgstr ""
 
@@ -498,12 +669,24 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-#: src/admin/locations/LocationsTable.tsx:85
+#: src/admin/locations/LocationsTable.tsx:91
 msgid "Contact"
 msgstr ""
 
+#: src/block/edit.tsx:1157
+msgid "Copied"
+msgstr ""
+
+#: src/block/edit.tsx:1160
+msgid "Copy failed"
+msgstr ""
+
+#: src/block/edit.tsx:1154
+msgid "Copy Snippet"
+msgstr ""
+
 #: src/admin/locations/LocationDialogFields.tsx:118
-#: src/lib/locations/importLocations.ts:35
+#: src/lib/locations/importLocations.ts:172
 msgid "Country"
 msgstr ""
 
@@ -542,54 +725,54 @@ msgstr ""
 msgid "Create Theme"
 msgstr ""
 
-#: src/block/edit.tsx:1083
+#: src/block/edit.tsx:1372
 msgid "Credits"
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:346
+#: src/lib/locations/importLocations.ts:592
 msgid "CSV file does not match the supported import format."
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:178
+#: src/lib/locations/importLocations.ts:323
 msgid "CSV file is empty or missing headers."
 msgstr ""
 
-#: src/block/edit.tsx:477
-msgid "Default"
+#: src/admin/locations/OpeningHoursInput.tsx:48
+msgid "Day"
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:16
-msgid "Default marker"
+#: src/block/edit.tsx:581
+msgid "Default"
 msgstr ""
 
 #: src/admin/collections/CollectionsGrid.tsx:88
 #: src/admin/locations/DeleteLocationActionModal.tsx:122
-#: src/admin/locations/LocationsTable.tsx:312 src/admin/logos/LogosGrid.tsx:42
-#: src/admin/markers/MarkersGrid.tsx:48 src/admin/tags/TagsGrid.tsx:55
+#: src/admin/locations/LocationsTable.tsx:514 src/admin/logos/LogosGrid.tsx:68
+#: src/admin/markers/MarkersGrid.tsx:63 src/admin/tags/TagsGrid.tsx:55
 msgid "Delete"
 msgstr ""
 
-#: src/admin/locations/LocationsTable.tsx:321
+#: src/admin/locations/LocationsTable.tsx:523
 msgid "Delete %d location"
 msgid_plural "Delete %d locations"
 msgstr[0] ""
 msgstr[1] ""
 
 #: src/admin/collections/CollectionsGrid.tsx:93
-#: src/admin/collections/DeleteCollectionActionModal.tsx:103
+#: src/admin/collections/DeleteCollectionActionModal.tsx:139
 msgid "Delete collection"
-msgstr ""
-
-#: src/admin/collections/DeleteCollectionActionModal.tsx:94
-msgid "Delete locations"
 msgstr ""
 
 #: src/admin/styles/DeleteThemeButton.tsx:14
 msgid "Delete Current Theme"
 msgstr ""
 
-#: src/admin/locations/LocationsTable.tsx:319
+#: src/admin/locations/LocationsTable.tsx:521
 msgid "Delete location"
+msgstr ""
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:94
+msgid "Delete locations"
 msgstr ""
 
 #: src/admin/logos/DeleteLogoModal.tsx:28
@@ -601,20 +784,18 @@ msgstr ""
 msgid "Delete original collections after merge"
 msgstr ""
 
+#: src/admin/tags/DeleteTagModal.tsx:28 src/admin/tags/DeleteTagModal.tsx:58
+msgid "Delete Tag"
+msgstr ""
+
 #: src/admin/styles/DeleteThemeModal.tsx:39
 #: src/admin/styles/DeleteThemeModal.tsx:60
 msgid "Delete Theme"
 msgstr ""
 
-#: src/admin/collections/DeleteCollectionActionModal.tsx:73
+#: src/admin/collections/DeleteCollectionActionModal.tsx:83
 msgid "Delete this collection and remove its saved location assignments?"
 msgstr ""
-
-#: src/admin/collections/controller.tsx:60
-msgid "%d assigned location deleted"
-msgid_plural "%d assigned locations deleted"
-msgstr[0] ""
-msgstr[1] ""
 
 #: src/admin/locations/DeleteLocationActionModal.tsx:93
 msgid "Delete this location and remove its saved collection assignments?"
@@ -626,12 +807,12 @@ msgid ""
 "cannot be undone."
 msgstr ""
 
-#: src/admin/markers/MarkersGrid.tsx:37
-msgid "Download"
+#: src/admin/tags/DeleteTagModal.tsx:36
+msgid "Delete this tag? This action cannot be undone."
 msgstr ""
 
-#: src/admin/collections/DeleteCollectionActionModal.tsx:108
-msgid "Skip shared locations"
+#: src/admin/logos/LogosGrid.tsx:42 src/admin/markers/MarkersGrid.tsx:37
+msgid "Download"
 msgstr ""
 
 #: src/admin/locations/ExportLocationsDropdown.tsx:35
@@ -646,7 +827,7 @@ msgstr ""
 msgid "Download Theme Config"
 msgstr ""
 
-#: src/admin/collections/index.tsx:38 src/admin/locations/index.tsx:43
+#: src/admin/collections/index.tsx:38 src/admin/locations/index.tsx:46
 msgid "Drop CSV file here to import locations"
 msgstr ""
 
@@ -654,41 +835,54 @@ msgstr ""
 msgid "Drop Minimal Map or MapLibre JSON theme files here to upload"
 msgstr ""
 
-#: src/admin/markers/index.tsx:33
+#: src/admin/markers/index.tsx:34
 msgid "Drop SVG files here to upload"
 msgstr ""
 
-#: src/admin/logos/index.tsx:34
+#: src/admin/logos/index.tsx:35
 msgid "Drop SVG or PNG files here to upload"
 msgstr ""
 
-#: src/admin/locations/LocationsTable.tsx:207
+#: src/admin/locations/LocationsTable.tsx:262
 msgid "Duplicate"
 msgstr ""
 
 #: src/admin/collections/CollectionsGrid.tsx:73
-#: src/admin/locations/LocationsTable.tsx:222 src/admin/tags/TagsGrid.tsx:44
+#: src/admin/locations/LocationsTable.tsx:277 src/admin/logos/LogosGrid.tsx:55
+#: src/admin/markers/MarkersGrid.tsx:50 src/admin/tags/TagsGrid.tsx:44
 msgid "Edit"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:592
+#: src/admin/collections/controller.tsx:688
 msgid "Edit collection"
 msgstr ""
 
-#: src/admin/locations/controller.tsx:1258
+#: src/admin/locations/controller.tsx:1874
 msgid "Edit location"
 msgstr ""
 
-#: src/admin/tags/controller.tsx:223
+#: src/admin/logos/EditLogoDialog.tsx:16
+msgid "Edit logo filename"
+msgstr ""
+
+#: src/admin/markers/EditMarkerDialog.tsx:16
+msgid "Edit marker filename"
+msgstr ""
+
+#: src/admin/tags/controller.tsx:254
 msgid "Edit tag"
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:28
+#: src/lib/locations/importLocations.ts:165
 msgid "Email"
 msgstr ""
 
 #: src/admin/locations/LocationDialogFields.tsx:48
 msgid "Email address"
+msgstr ""
+
+#: src/block/edit.tsx:1126
+msgid "Embed via Iframe"
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:117
@@ -699,8 +893,24 @@ msgstr ""
 msgid "Enter a valid email address."
 msgstr ""
 
+#: src/lib/locations/validateOpeningHoursStep.ts:41
+msgid "Enter a valid lunch break start time in HH:MM format."
+msgstr ""
+
 #: src/lib/locations/validateDetailsStep.ts:19
 msgid "Enter a valid website URL."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:36
+msgid "Enter both lunch break start time and duration."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:21
+msgid "Enter both opening and closing times."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:26
+msgid "Enter valid opening hours in HH:MM format."
 msgstr ""
 
 #: src/admin/locations/ExportLocationsDropdown.tsx:20
@@ -711,9 +921,9 @@ msgstr ""
 msgid "Export Options"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:523
-#: src/admin/locations/controller.tsx:1083
-#: src/admin/locations/controller.tsx:1136
+#: src/admin/collections/controller.tsx:619
+#: src/admin/locations/controller.tsx:1648
+#: src/admin/locations/controller.tsx:1709
 msgid "Failed to import locations."
 msgstr ""
 
@@ -725,8 +935,13 @@ msgstr ""
 msgid "Failed to read the selected file."
 msgstr ""
 
-#: src/admin/logos/LogosGrid.tsx:15
+#: src/admin/logos/EditLogoDialog.tsx:42 src/admin/logos/LogosGrid.tsx:15
+#: src/admin/markers/EditMarkerDialog.tsx:42
 msgid "Filename"
+msgstr ""
+
+#: src/admin/logos/controller.tsx:213 src/admin/markers/controller.tsx:174
+msgid "Filename is required."
 msgstr ""
 
 #: src/map/zoom-control-options.ts:74
@@ -734,11 +949,11 @@ msgid "Filled plus circle"
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:170
-#: src/admin/locations/controller.tsx:1320
+#: src/admin/locations/controller.tsx:1959
 msgid "Finish"
 msgstr ""
 
-#: src/block/edit.tsx:287 src/block/edit.tsx:327
+#: src/block/edit.tsx:323 src/block/edit.tsx:363 src/block/edit.tsx:464
 msgid "Foreground"
 msgstr ""
 
@@ -746,11 +961,11 @@ msgstr ""
 msgid "Foreground Color"
 msgstr ""
 
-#: src/block/edit.tsx:388
+#: src/block/edit.tsx:424
 msgid "Foreground Primary"
 msgstr ""
 
-#: src/block/edit.tsx:394
+#: src/block/edit.tsx:430
 msgid "Foreground Secondary"
 msgstr ""
 
@@ -758,12 +973,35 @@ msgstr ""
 msgid "Forests"
 msgstr ""
 
-#: src/block/edit.tsx:899
+#: src/admin/locations/customCsvImport.ts:22
+#: src/lib/locations/formatOpeningHoursSummary.ts:14
+#: src/map/location-opening-hours.ts:38
+msgid "Fri"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:22
+#: src/map/location-opening-hours.ts:28
+msgid "Friday"
+msgstr ""
+
+#: src/block/edit.tsx:1425
+msgid "Google Maps Button"
+msgstr ""
+
+#: src/block/edit.tsx:1111
+msgid "Google Maps Navigation"
+msgstr ""
+
+#: src/block/edit.tsx:1169
 msgid "Height"
 msgstr ""
 
+#: src/block/edit.tsx:1180
+msgid "Height Mobile"
+msgstr ""
+
 #: src/admin/locations/LocationDialogFields.tsx:91
-#: src/lib/locations/importLocations.ts:32
+#: src/lib/locations/importLocations.ts:169
 msgid "House number"
 msgstr ""
 
@@ -775,7 +1013,11 @@ msgstr ""
 msgid "Ice & Glaciers"
 msgstr ""
 
-#: src/admin/locations/CustomCsvImportModal.tsx:16
+#: src/block/edit.tsx:1130
+msgid "Iframe Snippet"
+msgstr ""
+
+#: src/admin/locations/CustomCsvImportModal.tsx:19
 msgid "Import custom CSV"
 msgstr ""
 
@@ -783,11 +1025,11 @@ msgstr ""
 msgid "Import locations from CSV"
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:222
+#: src/lib/locations/importLocations.ts:389
 msgid "Import on"
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:226
+#: src/lib/locations/importLocations.ts:393
 msgid "Imported Location"
 msgstr ""
 
@@ -795,15 +1037,19 @@ msgstr ""
 msgid "Imported theme with fallback default colors for: %s"
 msgstr ""
 
+#: src/block/edit.tsx:1118
+msgid "In-map Location Card"
+msgstr ""
+
 #: src/admin/styles/controller.tsx:215
 msgid "Invalid JSON file."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:24
+#: src/admin/logos/controller.tsx:26
 msgid "Invalid PNG file."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:36 src/admin/markers/controller.tsx:146
+#: src/admin/logos/controller.tsx:38 src/admin/markers/controller.tsx:228
 msgid "Invalid SVG file."
 msgstr ""
 
@@ -811,111 +1057,134 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-#: src/admin/locations/controller.tsx:813
+#: src/map/SearchControl.tsx:358
+msgid "Loading results..."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1338
 msgid "Location assigned to collection."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:691
+#: src/admin/locations/controller.tsx:1216
 msgid "Location coordinates updated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:822
+#: src/admin/locations/controller.tsx:1347
 msgid "Location could not be assigned to the collection."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:1018
+#: src/admin/locations/controller.tsx:1557
 msgid "Location could not be created."
 msgstr ""
 
 #: src/admin/locations/DeleteLocationActionModal.tsx:50
-#: src/admin/locations/controller.tsx:729
+#: src/admin/locations/controller.tsx:1254
 msgid "Location could not be deleted."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:645
+#: src/admin/locations/controller.tsx:1170
 msgid "Location could not be duplicated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:700
+#: src/admin/locations/controller.tsx:1225
 msgid "Location could not be retrieved."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:1017
+#: src/admin/locations/controller.tsx:1556
 msgid "Location could not be updated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:721
-#: src/admin/locations/controller.tsx:753
+#: src/admin/locations/controller.tsx:1246
+#: src/admin/locations/controller.tsx:1278
 msgid "Location deleted."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:637
+#: src/admin/locations/controller.tsx:1162
 msgid "Location duplicated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:794
+#: src/admin/locations/controller.tsx:1319
 msgid "Location is already assigned to that collection."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:499
-msgid "Location logo could not be updated."
+#: src/admin/locations/controller.tsx:724
+msgid "Location logos could not be updated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:490
-msgid "Location logo updated."
+#: src/admin/locations/controller.tsx:777
+msgid "Location markers could not be updated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:531
-msgid "Location marker could not be updated."
-msgstr ""
-
-#: src/admin/locations/controller.tsx:522
-msgid "Location marker updated."
-msgstr ""
-
-#: src/admin/locations/controller.tsx:564
+#: src/admin/locations/controller.tsx:830
 msgid "Location tags could not be updated."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:554
-msgid "Location tags updated."
-msgstr ""
-
-#: src/admin/locations/controller.tsx:165
+#: src/admin/locations/controller.tsx:199
 msgid "Locations and collections could not be loaded."
 msgstr ""
 
 #: src/admin/locations/DeleteLocationActionModal.tsx:49
-#: src/admin/locations/controller.tsx:765
+#: src/admin/locations/controller.tsx:1290
 msgid "Locations could not be deleted."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:158
+#: src/admin/locations/controller.tsx:706
+msgid "Logo assigned to location."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:200
 msgid "Logo could not be deleted."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:602
-msgid "Logo could not be removed from the location."
+#: src/admin/logos/controller.tsx:236
+msgid "Logo could not be updated."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:150
+#: src/admin/logos/controller.tsx:192
 msgid "Logo deleted."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:593
+#: src/admin/locations/controller.tsx:998
 msgid "Logo removed from location."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:203
+#: src/admin/logos/controller.tsx:232
+msgid "Logo updated."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:308
 msgid "Logo uploaded."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:86
+#: src/admin/logos/controller.tsx:94
 msgid "Logos could not be loaded."
 msgstr ""
 
-#: src/admin/logos/controller.tsx:213
+#: src/admin/locations/controller.tsx:1011
+msgid "Logos could not be removed from the selected locations."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:318
 msgid "Logos could not be uploaded."
+msgstr ""
+
+#: src/lib/locations/formatOpeningHoursSummary.ts:34
+#: src/lib/locations/formatOpeningHoursSummary.ts:39
+msgid "Lunch"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:101
+#: src/admin/locations/OpeningHoursInput.tsx:55
+msgid "Lunch break duration (minutes)"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:52
+#: src/admin/locations/OpeningHoursInput.tsx:91
+msgid "Lunch break start"
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:31
+msgid "Lunch breaks require opening hours for that day."
 msgstr ""
 
 #: src/admin/styles/constants.ts:16
@@ -932,45 +1201,65 @@ msgid ""
 "block integrations."
 msgstr ""
 
-#: src/map/attribution-pill.ts:34
+#: src/map/attribution-pill.ts:43
 msgid "Map credits"
 msgstr ""
 
 #: src/admin/collections/CollectionsGrid.tsx:22
-#: src/admin/locations/LocationsTable.tsx:31
+#: src/admin/locations/LocationsTable.tsx:37
 msgid "Map preview"
 msgstr ""
 
-#: src/block/edit.tsx:836
+#: src/block/edit.tsx:1043
 msgid "Map Settings"
 msgstr ""
 
-#: src/admin/markers/controller.tsx:107
+#: src/admin/locations/controller.tsx:759
+msgid "Marker assigned to location."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:146
 msgid "Marker could not be deleted."
 msgstr ""
 
-#: src/admin/markers/controller.tsx:99
+#: src/admin/markers/controller.tsx:197
+msgid "Marker could not be updated."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:138
 msgid "Marker deleted."
 msgstr ""
 
-#: src/admin/markers/controller.tsx:165
+#: src/admin/locations/controller.tsx:1053
+msgid "Marker removed from location."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:193
+msgid "Marker updated."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:247
 msgid "Marker uploaded."
 msgstr ""
 
-#: src/admin/markers/controller.tsx:65 src/lib/markers/fetchAllMarkers.ts:18
+#: src/admin/markers/controller.tsx:73 src/lib/markers/fetchAllMarkers.ts:18
 msgid "Markers could not be loaded."
 msgstr ""
 
-#: src/admin/markers/controller.tsx:177
+#: src/admin/locations/controller.tsx:1066
+msgid "Markers could not be removed from the selected locations."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:259
 msgid "Markers could not be uploaded."
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:48
-#: src/admin/collections/controller.tsx:561
+#: src/admin/collections/controller.tsx:657
 msgid "Merge collections"
 msgstr ""
 
-#: src/block/edit.tsx:825
+#: src/block/edit.tsx:1032
 msgid "Minimal Map Preview"
 msgstr ""
 
@@ -980,6 +1269,17 @@ msgstr ""
 
 #: src/admin/styles/constants.ts:15
 msgid "Minor Roads"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:18
+#: src/lib/locations/formatOpeningHoursSummary.ts:10
+#: src/map/location-opening-hours.ts:34
+msgid "Mon"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:18
+#: src/map/location-opening-hours.ts:24
+msgid "Monday"
 msgstr ""
 
 #: src/admin/styles/constants.ts:18
@@ -999,12 +1299,13 @@ msgid "New collection title"
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:169
-#: src/admin/locations/CustomCsvImportModal.tsx:121
-#: src/admin/locations/LocationDialog.tsx:126
+#: src/admin/locations/CustomCsvImportModal.tsx:201
+#: src/admin/locations/CustomCsvImportModal.tsx:253
+#: src/admin/locations/LocationDialog.tsx:134
 msgid "Next"
 msgstr ""
 
-#: src/block/edit.tsx:634
+#: src/block/edit.tsx:738
 msgid "No collections available."
 msgstr ""
 
@@ -1012,15 +1313,16 @@ msgstr ""
 msgid "No collections found"
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:66
+#: src/admin/locations/AssignMarkerModal.tsx:87
 msgid "No custom marker assigned yet."
 msgstr ""
 
-#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:243
+#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:368
+#: src/map/SearchControl.tsx:414
 msgid "No locations found"
 msgstr ""
 
-#: src/admin/locations/AssignLogoModal.tsx:63
+#: src/admin/locations/AssignLogoModal.tsx:90
 msgid "No logo assigned yet."
 msgstr ""
 
@@ -1032,7 +1334,7 @@ msgstr ""
 msgid "No markers found"
 msgstr ""
 
-#: src/admin/locations/AssignTagsModal.tsx:60
+#: src/admin/locations/AssignTagsModal.tsx:69
 msgid "No tags assigned yet."
 msgstr ""
 
@@ -1040,16 +1342,65 @@ msgstr ""
 msgid "No tags found"
 msgstr ""
 
-#: src/admin/locations/CustomCsvImportModal.tsx:18
+#: src/admin/locations/CustomCsvImportModal.tsx:22
+#: src/admin/locations/CustomCsvImportModal.tsx:29
+#: src/admin/locations/customCsvImport.ts:41
 msgid "None"
+msgstr ""
+
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:49
+msgid ""
+"None of the selected locations have a custom marker assigned. Confirm to "
+"close this selection."
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:54
+msgid ""
+"None of the selected locations have a logo assigned. Confirm to close this "
+"selection."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1051
+msgid "None of the selected locations have custom markers assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:996
+msgid "None of the selected locations have logos assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1106
+msgid "None of the selected locations have tags assigned."
+msgstr ""
+
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:49
+msgid ""
+"None of the selected locations have tags assigned. Confirm to close this "
+"selection."
 msgstr ""
 
 #: src/admin/locations/AssignToCollectionModal.tsx:81
 msgid "Not assigned to any collection yet."
 msgstr ""
 
+#: src/admin/locations/LocationsTable.tsx:153
+msgid "Note"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:49
+#: src/admin/locations/OpeningHoursInput.tsx:71 src/block/edit.tsx:492
+msgid "Open"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:238
+msgid "Open - closes %s"
+msgstr ""
+
 #: src/admin/sections/DashboardSection.tsx:21
 msgid "Open collections"
+msgstr ""
+
+#: src/map/location-card.tsx:268
+msgid "Open in Google Maps"
 msgstr ""
 
 #: src/admin/sections/DashboardSection.tsx:20
@@ -1068,7 +1419,30 @@ msgstr ""
 msgid "Open tags"
 msgstr ""
 
+#: src/admin/locations/LocationsTable.tsx:121
+#: src/admin/locations/OpeningHoursInput.tsx:46
+msgid "Opening hours"
+msgstr ""
+
+#: src/block/edit.tsx:1484
+msgid "Opening Hours"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:933
+msgid "Opening hours could not be updated."
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:122
+#: src/admin/locations/customCsvImport.ts:34
+msgid "Opening hours notes"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:915
+msgid "Opening hours updated."
+msgstr ""
+
 #: src/admin/locations/LocationDialogFields.tsx:18
+#: src/admin/locations/OpeningHoursInput.tsx:32
 msgid "Optional"
 msgstr ""
 
@@ -1076,15 +1450,15 @@ msgstr ""
 msgid "Other Features"
 msgstr ""
 
-#: src/block/edit.tsx:1028 src/block/edit.tsx:1123 src/block/edit.tsx:972
+#: src/block/edit.tsx:1254 src/block/edit.tsx:1317 src/block/edit.tsx:1412
 msgid "Outer Margin"
 msgstr ""
 
-#: src/block/edit.tsx:1109 src/block/edit.tsx:958
+#: src/block/edit.tsx:1240 src/block/edit.tsx:1398 src/block/edit.tsx:1463
 msgid "Padding"
 msgstr ""
 
-#: src/block/edit.tsx:1076
+#: src/block/edit.tsx:1365
 msgid "Panel Width"
 msgstr ""
 
@@ -1096,7 +1470,7 @@ msgstr ""
 msgid "Pedestrian Paths"
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:29
+#: src/lib/locations/importLocations.ts:166
 msgid "Phone"
 msgstr ""
 
@@ -1116,11 +1490,11 @@ msgstr ""
 msgid "Plus circle"
 msgstr ""
 
-#: src/admin/logos/controller.tsx:27
+#: src/admin/logos/controller.tsx:29
 msgid "PNG file could not be read."
 msgstr ""
 
-#: src/block/edit.tsx:935
+#: src/block/edit.tsx:1217
 msgid "Position"
 msgstr ""
 
@@ -1130,6 +1504,10 @@ msgstr ""
 
 #: src/lib/locations/validateAddressStep.ts:17
 msgid "Postal code is required to geocode the address."
+msgstr ""
+
+#: src/map/SearchControl.tsx:347
+msgid "Press"
 msgstr ""
 
 #: src/admin/logos/LogosGrid.tsx:23 src/admin/markers/MarkersGrid.tsx:23
@@ -1150,20 +1528,70 @@ msgstr ""
 msgid "Remove collection"
 msgstr ""
 
-#: src/admin/locations/DeleteLogoConfirmationModal.tsx:41
-#: src/admin/locations/DeleteLogoConfirmationModal.tsx:74
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:44
 msgid "Remove Logo"
 msgstr ""
 
-#: src/admin/locations/DeleteLogoConfirmationModal.tsx:49
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:94
+#: src/admin/locations/LocationsTable.tsx:466
+msgid "Remove Logos"
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:58
+msgid ""
+"Remove logos from %d selected location? %d of them currently have a logo "
+"assigned."
+msgid_plural ""
+"Remove logos from %d selected locations? %d of them currently have a logo "
+"assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/LocationsTable.tsx:482
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:40
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:78
+msgid "Remove Markers"
+msgstr ""
+
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:51
+msgid ""
+"Remove markers from %d selected location? %d of them currently have a custom "
+"marker assigned."
+msgid_plural ""
+"Remove markers from %d selected locations? %d of them currently have a "
+"custom marker assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/LocationsTable.tsx:498
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:40
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:78
+msgid "Remove Tags"
+msgstr ""
+
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:51
+msgid ""
+"Remove tags from %d selected location? %d of them currently have tags "
+"assigned."
+msgid_plural ""
+"Remove tags from %d selected locations? %d of them currently have tags "
+"assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:67
 msgid "Remove this logo from the selected location?"
+msgstr ""
+
+#: src/block/edit.tsx:1096
+msgid "Require Two Fingers to Move on Mobile"
 msgstr ""
 
 #: src/admin/styles/constants.ts:7
 msgid "Residential Areas"
 msgstr ""
 
-#: src/admin/locations/LocationsTable.tsx:237
+#: src/admin/locations/LocationsTable.tsx:292
 msgid "Retrieve location"
 msgstr ""
 
@@ -1187,8 +1615,21 @@ msgstr ""
 msgid "Runway Lines"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:599
-#: src/admin/locations/controller.tsx:1319 src/admin/tags/controller.tsx:224
+#: src/admin/locations/customCsvImport.ts:23
+#: src/lib/locations/formatOpeningHoursSummary.ts:15
+#: src/map/location-opening-hours.ts:39
+msgid "Sat"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:23
+#: src/map/location-opening-hours.ts:29
+msgid "Saturday"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:695
+#: src/admin/locations/controller.tsx:1958
+#: src/admin/logos/EditLogoDialog.tsx:74
+#: src/admin/markers/EditMarkerDialog.tsx:74 src/admin/tags/controller.tsx:256
 msgid "Save changes"
 msgstr ""
 
@@ -1196,15 +1637,19 @@ msgstr ""
 msgid "Save locations"
 msgstr ""
 
-#: src/admin/locations/AssignLogoModal.tsx:99
+#: src/admin/locations/AssignLogoModal.tsx:128
 msgid "Save Logo"
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:102
+#: src/admin/locations/AssignMarkerModal.tsx:125
 msgid "Save Marker"
 msgstr ""
 
-#: src/admin/locations/AssignTagsModal.tsx:97
+#: src/admin/locations/AssignOpeningHoursModal.tsx:91
+msgid "Save Opening Hours"
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:115
 msgid "Save Tags"
 msgstr ""
 
@@ -1213,19 +1658,19 @@ msgid "Save Theme"
 msgstr ""
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:72
-#: src/map/SearchControl.tsx:159
+#: src/map/SearchControl.tsx:322
 msgid "Search locations"
 msgstr ""
 
-#: src/map/SearchControl.tsx:158
+#: src/map/SearchControl.tsx:321
 msgid "Search locations..."
 msgstr ""
 
-#: src/block/edit.tsx:1004
+#: src/block/edit.tsx:1287
 msgid "Search Panel"
 msgstr ""
 
-#: src/admin/locations/controller.tsx:990
+#: src/admin/locations/controller.tsx:1529
 msgid "Select a location on the map before finishing."
 msgstr ""
 
@@ -1233,7 +1678,7 @@ msgstr ""
 msgid "Select at least two collections to merge into a new one."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:380
+#: src/admin/collections/controller.tsx:476
 msgid "Select at least two collections to merge."
 msgstr ""
 
@@ -1241,11 +1686,15 @@ msgstr ""
 msgid "Select color"
 msgstr ""
 
+#: src/admin/locations/AssignTagsModal.tsx:94
+msgid "Select only new tags to add. Existing tags stay assigned."
+msgstr ""
+
 #: src/admin/styles/ThemeSelector.tsx:25
 msgid "Select theme"
 msgstr ""
 
-#: src/admin/locations/controller.tsx:786
+#: src/admin/locations/controller.tsx:1311
 msgid "Selected collection could not be found."
 msgstr ""
 
@@ -1253,8 +1702,26 @@ msgstr ""
 msgid "Separator"
 msgstr ""
 
-#: src/block/edit.tsx:870
+#: src/admin/locations/AssignOpeningHoursModal.tsx:59
+msgid "Set opening hours for \"%s\"."
+msgstr ""
+
+#: src/admin/locations/AssignOpeningHoursModal.tsx:47
+msgid "Set opening hours for %d selected location."
+msgid_plural "Set opening hours for %d selected locations."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/block/edit.tsx:1476
+msgid "Show icon"
+msgstr ""
+
+#: src/block/edit.tsx:1077
 msgid "Show Zoom Controls"
+msgstr ""
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:109
+msgid "Skip shared locations"
 msgstr ""
 
 #: src/admin/locations/LocationsEmptyState.tsx:11
@@ -1268,7 +1735,7 @@ msgid "State"
 msgstr ""
 
 #: src/admin/locations/LocationDialogFields.tsx:85
-#: src/lib/locations/importLocations.ts:31
+#: src/lib/locations/importLocations.ts:168
 msgid "Street"
 msgstr ""
 
@@ -1280,47 +1747,58 @@ msgstr ""
 msgid "Structures"
 msgstr ""
 
-#: src/block/edit.tsx:908
+#: src/block/edit.tsx:1190
 msgid "Style Preset"
 msgstr ""
 
-#: src/block/edit.tsx:481
+#: src/block/edit.tsx:585
 msgid "Style Theme"
 msgstr ""
 
-#: src/block/edit.tsx:581
+#: src/admin/locations/customCsvImport.ts:24
+#: src/lib/locations/formatOpeningHoursSummary.ts:16
+#: src/map/location-opening-hours.ts:40
+msgid "Sun"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:24
+#: src/map/location-opening-hours.ts:30
+msgid "Sunday"
+msgstr ""
+
+#: src/block/edit.tsx:685
 msgid "Switch Collection"
 msgstr ""
 
-#: src/admin/styles/ThemeSelector.tsx:31 src/block/edit.tsx:506
+#: src/admin/styles/ThemeSelector.tsx:31 src/block/edit.tsx:610
 msgid "Switch Theme"
 msgstr ""
 
-#: src/admin/tags/controller.tsx:147
+#: src/admin/tags/controller.tsx:163
 msgid "Tag could not be created."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:172
+#: src/admin/tags/controller.tsx:188
 msgid "Tag could not be deleted."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:146
+#: src/admin/tags/controller.tsx:162
 msgid "Tag could not be updated."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:139
+#: src/admin/tags/controller.tsx:155
 msgid "Tag created."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:164
+#: src/admin/tags/controller.tsx:180
 msgid "Tag deleted."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:116
+#: src/admin/tags/controller.tsx:132
 msgid "Tag name is required."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:138
+#: src/admin/tags/controller.tsx:154
 msgid "Tag updated."
 msgstr ""
 
@@ -1328,16 +1806,65 @@ msgstr ""
 msgid "Tags (optional)"
 msgstr ""
 
-#: src/admin/tags/controller.tsx:57
+#: src/admin/locations/controller.tsx:812
+msgid "Tags added to location."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:59
 msgid "Tags could not be loaded."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1121
+msgid "Tags could not be removed from the selected locations."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1108
+msgid "Tags removed from location."
 msgstr ""
 
 #: src/admin/locations/LocationDialogFields.tsx:42
 msgid "Telephone"
 msgstr ""
 
+#: src/admin/logos/EditLogoDialog.tsx:49
+#: src/admin/markers/EditMarkerDialog.tsx:49
+msgid "The %s extension will be preserved."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:995
+msgid "The selected location already has no logo assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1050
+msgid "The selected location already has no marker assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1105
+msgid "The selected location already has no tags assigned."
+msgstr ""
+
+#: src/block/edit.tsx:1134
+msgid ""
+"The snippet updates automatically when this block configuration changes."
+msgstr ""
+
 #: src/admin/styles/CreateThemeModal.tsx:46
 msgid "Theme Name"
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:55
+msgid "This location already has no logo assigned."
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:21
+#: src/lib/locations/formatOpeningHoursSummary.ts:13
+#: src/map/location-opening-hours.ts:37
+msgid "Thu"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:21
+#: src/map/location-opening-hours.ts:27
+msgid "Thursday"
 msgstr ""
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:18
@@ -1345,9 +1872,14 @@ msgstr ""
 #: src/admin/collections/CollectionsGrid.tsx:33
 #: src/admin/collections/MergeCollectionsModal.tsx:23
 #: src/admin/locations/LocationDialogFields.tsx:36
-#: src/admin/locations/LocationsTable.tsx:77
-#: src/admin/markers/MarkersGrid.tsx:15 src/lib/locations/importLocations.ts:27
+#: src/admin/locations/LocationsTable.tsx:83
+#: src/admin/markers/MarkersGrid.tsx:15
+#: src/lib/locations/importLocations.ts:164
 msgid "Title"
+msgstr ""
+
+#: src/map/SearchControl.tsx:348
+msgid "to load results"
 msgstr ""
 
 #: src/map/zoom-control-options.ts:54
@@ -1358,6 +1890,17 @@ msgstr ""
 msgid "Top right"
 msgstr ""
 
+#: src/admin/locations/customCsvImport.ts:19
+#: src/lib/locations/formatOpeningHoursSummary.ts:11
+#: src/map/location-opening-hours.ts:35
+msgid "Tue"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:19
+#: src/map/location-opening-hours.ts:25
+msgid "Tuesday"
+msgstr ""
+
 #: src/admin/styles/constants.ts:51
 msgid "Typography"
 msgstr ""
@@ -1366,12 +1909,20 @@ msgstr ""
 msgid "Untitled collection"
 msgstr ""
 
-#: src/admin/locations/AssignLogoModal.tsx:15
+#: src/admin/locations/AssignLogoModal.tsx:28
+#: src/admin/locations/CustomCsvImportModal.tsx:24
+#: src/admin/locations/LocationsTable.tsx:324
 msgid "Untitled logo"
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:20
+#: src/admin/locations/AssignMarkerModal.tsx:28
+#: src/admin/locations/CustomCsvImportModal.tsx:31
+#: src/admin/locations/LocationsTable.tsx:366
 msgid "Untitled marker"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:426
+msgid "Untitled tag"
 msgstr ""
 
 #: src/admin/logos/LogosEmptyState.tsx:16
@@ -1379,12 +1930,12 @@ msgstr ""
 msgid "Upload"
 msgstr ""
 
-#: src/admin/locations/AssignLogoModal.tsx:76
-msgid "Upload a logo first to assign one to this location."
+#: src/admin/locations/AssignLogoModal.tsx:104
+msgid "Upload a logo first to assign one to these locations."
 msgstr ""
 
-#: src/admin/locations/AssignMarkerModal.tsx:79
-msgid "Upload a marker first to assign one to this location."
+#: src/admin/locations/AssignMarkerModal.tsx:100
+msgid "Upload a marker first to assign one to these locations."
 msgstr ""
 
 #: src/admin/logos/UploadLogoButton.tsx:14
@@ -1430,26 +1981,43 @@ msgid "Water Surfaces"
 msgstr ""
 
 #: src/admin/locations/LocationDialogFields.tsx:55
-#: src/lib/locations/importLocations.ts:30
+#: src/lib/locations/importLocations.ts:167
 msgid "Website"
 msgstr ""
 
-#: src/lib/locations/importLocations.ts:34
+#: src/admin/locations/customCsvImport.ts:20
+#: src/lib/locations/formatOpeningHoursSummary.ts:12
+#: src/map/location-opening-hours.ts:36
+msgid "Wed"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:20
+#: src/map/location-opening-hours.ts:26
+msgid "Wednesday"
+msgstr ""
+
+#: src/block/edit.tsx:1097
+msgid ""
+"When enabled, one finger scrolls the page, while two fingers are required to "
+"move or zoom the map."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:171
 msgid "Zip code"
 msgstr ""
 
-#: src/block/edit.tsx:862
+#: src/block/edit.tsx:1069
 msgid "Zoom"
 msgstr ""
 
-#: src/block/edit.tsx:915
+#: src/block/edit.tsx:1197
 msgid "Zoom Controls"
 msgstr ""
 
-#: src/map/wp-controls.ts:50
+#: src/map/wp-controls.ts:58
 msgid "Zoom in"
 msgstr ""
 
-#: src/map/wp-controls.ts:55
+#: src/map/wp-controls.ts:64
 msgid "Zoom out"
 msgstr ""
