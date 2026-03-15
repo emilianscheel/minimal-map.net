@@ -21,6 +21,7 @@ const EMBED_ATTRIBUTE_KEYS: Array<keyof EmbedAttributes> = [
 	'showZoomControls',
 	'allowSearch',
 	'googleMapsNavigation',
+	'inMapLocationCard',
 	'scrollZoom',
 	'mobileTwoFingerZoom',
 	'zoomControlsPosition',

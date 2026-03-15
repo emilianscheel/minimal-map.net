@@ -6,7 +6,7 @@ import { createAttributionPill } from '../../src/map/attribution-pill';
 import { createWordPressZoomControls } from '../../src/map/wp-controls';
 import { getSearchPanelDesktopPadding } from '../../src/map/search-panel-layout';
 import { normalizeMapConfig } from '../../src/map/defaults';
-import type { GeocodeResponse, MapLocationPoint } from '../../src/types';
+import type { GeocodeResponse, MapLocationPoint, MapLocationSelection } from '../../src/types';
 
 const originalGlobals = {
 	document: globalThis.document,
@@ -80,7 +80,7 @@ function createAddressSearchControl(
 		googleMapsNavigation?: boolean;
 		googleMapsButtonShowIcon?: boolean;
 		locations?: MapLocationPoint[];
-		onSelect?: (location: { id?: number; title?: string }) => void;
+		onSelect?: (selection: MapLocationSelection) => void;
 	} = {},
 ) {
 	const dom = new JSDOM('<!doctype html><div id="host"></div>');
@@ -230,12 +230,6 @@ describe('map iframe document context', () => {
 		});
 		const searchControl = createWordPressSearchControl(
 			host,
-			{
-				easeTo() {},
-				getZoom() {
-					return 10;
-				},
-			} as never,
 			config,
 			undefined,
 		);
@@ -273,12 +267,6 @@ describe('map iframe document context', () => {
 		});
 		const searchControl = createWordPressSearchControl(
 			host,
-			{
-				easeTo() {},
-				getZoom() {
-					return 10;
-				},
-			} as never,
 			config,
 			undefined,
 			1,
@@ -356,7 +344,7 @@ describe('map iframe document context', () => {
 	});
 
 	test('renders distance-sorted address results with formatted distance labels', async () => {
-		const selections: string[] = [];
+		const selections: Array<{ distanceLabel?: string; title: string }> = [];
 		const { host, iframeDom, searchControl } = createAddressSearchControl(
 			async () => ({
 				success: true,
@@ -365,8 +353,11 @@ describe('map iframe document context', () => {
 				lng: 13.405,
 			}),
 			{
-				onSelect: (location) => {
-					selections.push(location.title ?? '');
+				onSelect: (selection) => {
+					selections.push({
+						distanceLabel: selection.distanceLabel,
+						title: selection.location.title ?? '',
+					});
 				},
 			},
 		);
@@ -399,7 +390,12 @@ describe('map iframe document context', () => {
 		expect(selectedResult?.querySelector('.minimal-map-search__result-title')?.textContent).toBe(
 			'Berlin Studio',
 		);
-		expect(selections).toEqual([ 'Berlin Studio' ]);
+		expect(selections).toEqual([
+			{
+				distanceLabel: '0 m',
+				title: 'Berlin Studio',
+			},
+		]);
 
 		searchControl.destroy();
 	});

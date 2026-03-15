@@ -35,6 +35,7 @@ export interface MapDefaults {
 	showZoomControls: boolean;
 	allowSearch: boolean;
 	googleMapsNavigation: boolean;
+	inMapLocationCard: boolean;
 	scrollZoom: boolean;
 	mobileTwoFingerZoom: boolean;
 	zoomControlsPosition: ZoomControlsPosition;
@@ -106,6 +107,16 @@ export interface MapLocationPoint {
 	country?: string;
 }
 
+export interface MapLocationSelection {
+	location: MapLocationPoint;
+	distanceLabel?: string;
+}
+
+export interface SelectedLocationPreview {
+	locationId: number;
+	distanceLabel?: string;
+}
+
 export interface MapCollectionOption {
 	id: number;
 	title: string;
@@ -142,6 +153,7 @@ export interface RawMapConfig {
 	showZoomControls?: boolean;
 	allowSearch?: boolean;
 	googleMapsNavigation?: boolean;
+	inMapLocationCard?: boolean;
 	scrollZoom?: boolean;
 	mobileTwoFingerZoom?: boolean;
 	zoomControlsPosition?: string;
@@ -213,6 +225,7 @@ export interface NormalizedMapConfig extends MapDefaults {
 	showAttribution: boolean;
 	allowSearch: boolean;
 	googleMapsNavigation: boolean;
+	inMapLocationCard: boolean;
 }
 
 export interface MinimalMapInstance {
@@ -355,6 +368,7 @@ export interface MapBlockAttributes {
 	showZoomControls: boolean;
 	allowSearch: boolean;
 	googleMapsNavigation: boolean;
+	inMapLocationCard: boolean;
 	scrollZoom: boolean;
 	mobileTwoFingerZoom: boolean;
 	zoomControlsPosition: ZoomControlsPosition;

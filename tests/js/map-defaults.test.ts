@@ -185,6 +185,7 @@ describe('map defaults normalization', () => {
 		expect(config.searchPanelBorderRadiusInput).toBe('10px');
 		expect(config.searchPanelWidth).toBe('320px');
 		expect(config.googleMapsNavigation).toBe(false);
+		expect(config.inMapLocationCard).toBe(false);
 		expect(config.googleMapsButtonShowIcon).toBe(true);
 		expect(config.googleMapsButtonBorderRadius).toBe('18px');
 		expect(config.googleMapsButtonPadding).toEqual({
@@ -234,6 +235,7 @@ describe('map defaults normalization', () => {
 	test('preserves valid Google Maps button styling values', () => {
 		const config = normalizeMapConfig({
 			googleMapsNavigation: true,
+			inMapLocationCard: true,
 			googleMapsButtonPadding: {
 				top: '6px',
 				right: '12px',
@@ -247,6 +249,7 @@ describe('map defaults normalization', () => {
 		});
 
 		expect(config.googleMapsNavigation).toBe(true);
+		expect(config.inMapLocationCard).toBe(true);
 		expect(config.googleMapsButtonPadding).toEqual({
 			top: '6px',
 			right: '12px',

@@ -1070,6 +1070,13 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
               setAttributes({ googleMapsNavigation: value })
             }
           />
+          <ToggleControl
+            label={__("In-map Location Card", "minimal-map")}
+            checked={attributes.inMapLocationCard}
+            onChange={(value: boolean) =>
+              setAttributes({ inMapLocationCard: value })
+            }
+          />
         </PanelBody>
         <PanelBody
           title={__("Embed via Iframe", "minimal-map")}

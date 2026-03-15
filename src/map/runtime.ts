@@ -6,15 +6,18 @@ import { applyStyleTheme } from '../lib/styles/themeEngine';
 import { createWordPressZoomControls } from './wp-controls';
 import { createWordPressSearchControl } from './SearchControl';
 import { getSearchPanelDesktopPadding } from './search-panel-layout';
-import { getActiveHeightCssValue } from './responsive';
+import { createLocationCardPreviewController, waitForInternalMapMovementToFinish, type LocationCardPreviewController } from './location-card-preview';
+import { getActiveHeightCssValue, isMobileViewport } from './responsive';
 import { createMarkerRenderer, type MarkerRenderer, type MarkerRendererConfig } from './marker-renderer';
 import { getMapDomContext, type MapDomContext } from './dom-context';
 import type {
+	MapLocationSelection,
 	MapRuntimeConfig,
 	MapLocationPoint,
 	MinimalMapInstance,
 	NormalizedMapConfig,
 	RawMapConfig,
+	SelectedLocationPreview,
 	WordPressAttributionControl,
 	WordPressZoomControls,
 	WordPressSearchControl,
@@ -24,13 +27,18 @@ interface MinimalMapState {
 	attribution: WordPressAttributionControl | null;
 	config: NormalizedMapConfig | null;
 	controls: WordPressZoomControls | null;
+	locationCardPreview: LocationCardPreviewController | null;
 	map: MapLibreMap | null;
 	markerRenderer: MarkerRenderer | null;
 	observer: ResizeObserver | null;
+	pendingPreviewCleanup: (() => void) | null;
 	resizeHandler: (() => void) | null;
 	searchControl: WordPressSearchControl | null;
-	selectedLocationId: number | null;
+	selectedLocation: SelectedLocationPreview | null;
 }
+
+const IN_MAP_LOCATION_CARD_TOP_PADDING = 160;
+const IN_MAP_LOCATION_CARD_TOP_PADDING_MOBILE = 144;
 
 function canCreateWebGLContext(context: MapDomContext): boolean {
 	const canvas = context.doc.createElement('canvas');
@@ -280,12 +288,14 @@ export function createMinimalMap(
 		attribution: null,
 		config: null,
 		controls: null,
+		locationCardPreview: null,
 		map: null,
 		markerRenderer: null,
 		observer: null,
+		pendingPreviewCleanup: null,
 		resizeHandler: null,
 		searchControl: null,
-		selectedLocationId: null,
+		selectedLocation: null,
 	};
 
 	function applyResponsiveHostHeight(config: NormalizedMapConfig): void {
@@ -296,30 +306,108 @@ export function createMinimalMap(
 		}
 	}
 
-	function focusLocation(locationId: number, config: NormalizedMapConfig): void {
+	function clearPendingLocationPreview(): void {
+		state.pendingPreviewCleanup?.();
+		state.pendingPreviewCleanup = null;
+	}
+
+	function getSelectedLocationId(): number | undefined {
+		return state.selectedLocation?.locationId;
+	}
+
+	function clearSelection(config: NormalizedMapConfig): void {
+		clearPendingLocationPreview();
+		state.selectedLocation = null;
+		state.searchControl?.update(config, undefined);
+		state.locationCardPreview?.hide();
+	}
+
+	function syncLocationCardPreview(
+		config: NormalizedMapConfig,
+		selection: SelectedLocationPreview | null = state.selectedLocation
+	): void {
+		if (
+			config.inMapLocationCard &&
+			config.locations.some((location) => typeof location.id === 'number') &&
+			state.map
+		) {
+			if (!state.locationCardPreview) {
+				state.locationCardPreview = createLocationCardPreviewController({
+					host,
+					map: state.map,
+				});
+			}
+		} else {
+			state.locationCardPreview?.destroy();
+			state.locationCardPreview = null;
+		}
+
+		if (!state.locationCardPreview) {
+			return;
+		}
+
+		state.locationCardPreview.render(config, selection);
+	}
+
+	function focusLocation(
+		selection: SelectedLocationPreview,
+		config: NormalizedMapConfig
+	): void {
 		if (!state.map) {
 			return;
 		}
 
-		const point = getRenderedPoints(config).find((candidate) => candidate.id === locationId);
+		const point = getRenderedPoints(config).find(
+			(candidate) => candidate.id === selection.locationId
+		);
 
 		if (!point) {
 			return;
 		}
 
-		state.selectedLocationId = locationId;
+		clearPendingLocationPreview();
+		state.selectedLocation = selection;
+		state.locationCardPreview?.hide();
+		state.searchControl?.update(config, selection.locationId);
+
+		if (config.inMapLocationCard) {
+			state.pendingPreviewCleanup = waitForInternalMapMovementToFinish(
+				state.map,
+				() => {
+					if (!state.config || state.selectedLocation?.locationId !== selection.locationId) {
+						return;
+					}
+
+					state.pendingPreviewCleanup = null;
+					syncLocationCardPreview(state.config, selection);
+				},
+				context.win.requestAnimationFrame.bind(context.win),
+				context.win.cancelAnimationFrame.bind(context.win),
+			);
+		}
+
+		const isMobile = isMobileViewport(context.win.innerWidth);
+		const topPadding = config.inMapLocationCard
+			? isMobile
+				? Math.max(80, IN_MAP_LOCATION_CARD_TOP_PADDING_MOBILE)
+				: IN_MAP_LOCATION_CARD_TOP_PADDING
+			: isMobile
+				? 80
+				: 0;
 		state.map.easeTo(
 			{
 				center: [point.lng, point.lat],
 				zoom: Math.max(state.map.getZoom(), 15),
 				padding: {
-					left: getSearchPanelDesktopPadding(
-						config,
-						state.searchControl
-							? host.querySelector<HTMLElement>('.minimal-map-search-host')
-							: null
-					),
-					top: 0,
+					left: !isMobile
+						? getSearchPanelDesktopPadding(
+								config,
+								state.searchControl
+									? host.querySelector<HTMLElement>('.minimal-map-search-host')
+									: null
+							)
+						: 0,
+					top: topPadding,
 					right: 0,
 					bottom: 0,
 				},
@@ -327,25 +415,23 @@ export function createMinimalMap(
 			},
 			{ isMinimalMapInternal: true }
 		);
-		state.searchControl?.update(config, locationId);
 	}
 
 	function setupUserInteractionListeners(map: MapLibreMap): void {
-		const clearSelection = (event: { isMinimalMapInternal?: boolean }) => {
+		const clearSelectionOnUserInteraction = (event: {
+			isMinimalMapInternal?: boolean;
+		}) => {
 			if (event.isMinimalMapInternal) {
 				return;
 			}
 
-			if (state.selectedLocationId) {
-				state.selectedLocationId = null;
-				if (state.config) {
-					state.searchControl?.update(state.config, undefined);
-				}
+			if (state.selectedLocation && state.config) {
+				clearSelection(state.config);
 			}
 		};
 
-		map.on('movestart', clearSelection);
-		map.on('zoomstart', clearSelection);
+		map.on('movestart', clearSelectionOnUserInteraction);
+		map.on('zoomstart', clearSelectionOnUserInteraction);
 	}
 
 	function syncControls(config: NormalizedMapConfig): void {
@@ -362,18 +448,23 @@ export function createMinimalMap(
 			if (!state.searchControl) {
 				state.searchControl = createWordPressSearchControl(
 					host,
-					state.map,
 					config,
 					runtimeConfig.frontendGeocodePath,
-					state.selectedLocationId ?? undefined,
-					(location) => {
-						if (location.id) {
-							state.selectedLocationId = location.id;
+					getSelectedLocationId(),
+					(selection: MapLocationSelection) => {
+						if (selection.location.id) {
+							focusLocation(
+								{
+									locationId: selection.location.id,
+									distanceLabel: selection.distanceLabel,
+								},
+								state.config ?? config
+							);
 						}
 					}
 				);
 			} else {
-				state.searchControl.update(config, state.selectedLocationId ?? undefined);
+				state.searchControl.update(config, getSelectedLocationId());
 			}
 		} else {
 			state.searchControl?.destroy();
@@ -434,7 +525,7 @@ export function createMinimalMap(
 			map,
 			onLocationSelect: (locationId) => {
 				const activeConfig = state.config ?? config;
-				focusLocation(locationId, activeConfig);
+				focusLocation({ locationId }, activeConfig);
 			},
 		});
 
@@ -526,6 +617,7 @@ export function createMinimalMap(
 		syncMarkers(config);
 		syncControls(config);
 		syncSearch(config);
+		syncLocationCardPreview(config, null);
 		syncAttribution(config);
 		setupUserInteractionListeners(map);
 	}
@@ -539,6 +631,10 @@ export function createMinimalMap(
 
 		state.searchControl?.destroy();
 		state.searchControl = null;
+
+		clearPendingLocationPreview();
+		state.locationCardPreview?.destroy();
+		state.locationCardPreview = null;
 
 		state.markerRenderer?.destroy();
 		state.markerRenderer = null;
@@ -572,6 +668,16 @@ export function createMinimalMap(
 			state.map.setStyle(nextConfig.styleUrl);
 		}
 
+		if (
+			state.selectedLocation &&
+			!getRenderedPoints(nextConfig).some(
+				(point) => point.id === state.selectedLocation?.locationId
+			)
+		) {
+			clearPendingLocationPreview();
+			state.selectedLocation = null;
+		}
+
 		if (JSON.stringify(previousConfig?.styleTheme) !== JSON.stringify(nextConfig.styleTheme)) {
 			try {
 				applyStyleTheme(state.map, nextConfig.styleTheme, nextConfig.stylePreset);
@@ -600,6 +706,7 @@ export function createMinimalMap(
 		}
 
 		syncSearch(nextConfig);
+		syncLocationCardPreview(nextConfig, state.selectedLocation);
 
 		if (
 			!previousConfig ||

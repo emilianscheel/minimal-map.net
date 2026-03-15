@@ -59,6 +59,10 @@
       "type": "boolean",
       "default": false
     },
+    "inMapLocationCard": {
+      "type": "boolean",
+      "default": false
+    },
     "scrollZoom": {
       "type": "boolean",
       "default": false

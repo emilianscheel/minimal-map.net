@@ -40,6 +40,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	showZoomControls: true,
 	allowSearch: true,
 	googleMapsNavigation: false,
+	inMapLocationCard: false,
 	scrollZoom: false,
 	mobileTwoFingerZoom: true,
 	zoomControlsPosition: DEFAULT_ZOOM_CONTROLS_POSITION,
@@ -209,6 +210,8 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 		allowSearch: runtimeConfig.defaults?.allowSearch ?? DEFAULT_MAP_DEFAULTS.allowSearch,
 		googleMapsNavigation:
 			runtimeConfig.defaults?.googleMapsNavigation ?? DEFAULT_MAP_DEFAULTS.googleMapsNavigation,
+		inMapLocationCard:
+			runtimeConfig.defaults?.inMapLocationCard ?? DEFAULT_MAP_DEFAULTS.inMapLocationCard,
 		scrollZoom: runtimeConfig.defaults?.scrollZoom ?? DEFAULT_MAP_DEFAULTS.scrollZoom,
 		mobileTwoFingerZoom:
 			runtimeConfig.defaults?.mobileTwoFingerZoom ?? DEFAULT_MAP_DEFAULTS.mobileTwoFingerZoom,
@@ -533,6 +536,9 @@ export function normalizeMapConfig(
 		allowSearch: Boolean(rawConfig.allowSearch ?? defaults.allowSearch),
 		googleMapsNavigation: Boolean(
 			rawConfig.googleMapsNavigation ?? defaults.googleMapsNavigation
+		),
+		inMapLocationCard: Boolean(
+			rawConfig.inMapLocationCard ?? defaults.inMapLocationCard
 		),
 		scrollZoom: Boolean(rawConfig.scrollZoom ?? defaults.scrollZoom),
 		mobileTwoFingerZoom: Boolean(

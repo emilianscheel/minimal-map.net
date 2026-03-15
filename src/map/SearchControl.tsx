@@ -1,13 +1,11 @@
 import { createRoot, useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-import { Globe, LoaderCircle, Mail, MapPin, Navigation, Phone, Search, SearchX, X } from 'lucide-react';
-import type { Map as MapLibreMap } from 'maplibre-gl';
+import { __ } from '@wordpress/i18n';
+import { LoaderCircle, Search, SearchX, X } from 'lucide-react';
 import type { FormEvent } from 'react';
 import Kbd from '../components/Kbd';
-import TagBadge from '../components/TagBadge';
 import type {
 	GeocodeResponse,
-	MapLocationLogo,
+	MapLocationSelection,
 	MapLocationPoint,
 	NormalizedMapConfig,
 } from '../types';
@@ -17,11 +15,8 @@ import {
 	buildDistanceSearchResults,
 	type DistanceSearchResult,
 } from './location-distance';
-import {
-	applySearchPanelCssVariables,
-	getSearchPanelDesktopPadding,
-} from './search-panel-layout';
-import { isMobileViewport } from './responsive';
+import { LocationResultCard } from './location-card';
+import { applySearchPanelCssVariables } from './search-panel-layout';
 
 type SearchMode =
 	| 'text-results'
@@ -49,60 +44,9 @@ interface SearchControlProps {
 	googleMapsNavigation: boolean;
 	googleMapsButtonShowIcon: boolean;
 	locations: MapLocationPoint[];
-	onSelect: (location: MapLocationPoint) => void;
+	onSelect: (selection: MapLocationSelection) => void;
 	selectedId?: number;
 }
-
-const formatDisplayUrl = (url: string): string => {
-	if (!url) {
-		return '';
-	}
-
-	return url
-		.replace(/^(https?:\/\/)/, '')
-		.replace(/^www\./, '')
-		.replace(/\/$/, '');
-};
-
-const formatLocationAddress = (location: MapLocationPoint): string => {
-	const streetLine = [location.street, location.house_number].filter(Boolean).join(' ');
-	const localityLine = [location.postal_code, location.city].filter(Boolean).join(' ');
-
-	return [streetLine, localityLine].filter(Boolean).join(', ');
-};
-
-const getGoogleMapsDirectionsUrl = (location: MapLocationPoint): string => {
-	const params = new URLSearchParams({
-		api: '1',
-		destination: `${location.lat},${location.lng}`,
-	});
-
-	return `https://www.google.com/maps/dir/?${params.toString()}`;
-};
-
-const hasLocationCoordinates = (location: MapLocationPoint): boolean =>
-	Number.isFinite(location.lat) && Number.isFinite(location.lng);
-
-const SearchResultLogo = ({ logo }: { logo: MapLocationLogo }) => {
-	const isSvgMarkup = logo.content.trim().startsWith('<svg');
-
-	return (
-		<div className="minimal-map-search__result-logo" aria-hidden="true">
-			{isSvgMarkup ? (
-				<div
-					className="minimal-map-search__result-logo-svg"
-					dangerouslySetInnerHTML={{ __html: logo.content }}
-				/>
-			) : (
-				<img
-					className="minimal-map-search__result-logo-image"
-					src={logo.content}
-					alt=""
-				/>
-			)}
-		</div>
-	);
-};
 
 export const MapSearchControl = ({
 	doc,
@@ -225,9 +169,9 @@ export const MapSearchControl = ({
 		element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 	}, [doc, selectedId]);
 
-	const handleSelect = (location: MapLocationPoint) => {
+	const handleSelect = (location: MapLocationPoint, distanceLabel?: string) => {
 		setSelectedId(location.id);
-		onSelect(location);
+		onSelect({ location, distanceLabel });
 	};
 
 	const resetAddressSearch = (nextTerm = '') => {
@@ -272,108 +216,28 @@ export const MapSearchControl = ({
 		setAddressResults(nextAddressResults);
 		setAddressSearchMode('results');
 
-		const bestResult = nextAddressResults[0]?.location;
+		const bestResult = nextAddressResults[0];
 
 		if (bestResult) {
-			handleSelect(bestResult);
+			handleSelect(bestResult.location, bestResult.distanceLabel);
 		}
 	};
 
 	const renderResultCards = () => (
 		<div className="minimal-map-search__results">
-			{renderedResults.map(({ location, distanceLabel }) => {
-				const hasTags =
-					Array.isArray(location.tags) && location.tags.length > 0;
-				const showGoogleMapsButton =
-					googleMapsNavigation && hasLocationCoordinates(location);
-				const showFooter = hasTags || showGoogleMapsButton || Boolean(distanceLabel);
-
-				return (
-					<div
-						key={location.id}
-						id={`minimal-map-result-${location.id}`}
-						className={`minimal-map-search__result-item ${
-							selectedId === location.id ? 'is-selected' : ''
-						}`}
-					>
-						<button
-							type="button"
-							className="minimal-map-search__result-select"
-							onClick={() => handleSelect(location)}
-						>
-							<div className="minimal-map-search__result-layout">
-								<div className="minimal-map-search__result-content">
-									<div className="minimal-map-search__result-title">
-										{location.title}
-									</div>
-									<div className="minimal-map-search__result-address">
-										<MapPin size={12} />
-										<span>{formatLocationAddress(location)}</span>
-									</div>
-									{location.telephone || location.email || location.website ? (
-										<div className="minimal-map-search__result-meta">
-											{location.telephone ? (
-												<div className="minimal-map-search__meta-item">
-													<Phone size={10} />
-													<span>{location.telephone}</span>
-												</div>
-											) : null}
-											{location.email ? (
-												<div className="minimal-map-search__meta-item">
-													<Mail size={10} />
-													<span>{location.email}</span>
-												</div>
-											) : null}
-											{location.website ? (
-												<div className="minimal-map-search__meta-item">
-													<Globe size={10} />
-													<span>{formatDisplayUrl(location.website)}</span>
-												</div>
-											) : null}
-										</div>
-									) : null}
-								</div>
-								{location.logo ? (
-									<div className="minimal-map-search__result-logo-column">
-										<SearchResultLogo logo={location.logo} />
-									</div>
-								) : null}
-							</div>
-						</button>
-						{showFooter ? (
-							<div className="minimal-map-search__result-footer">
-								<div className="minimal-map-search__result-footer-content">
-									{hasTags ? (
-										<div className="minimal-map-search__result-tags">
-											{location.tags?.map((tag) => (
-												<TagBadge key={tag.id} tag={tag} />
-											))}
-										</div>
-									) : null}
-									{showGoogleMapsButton ? (
-										<a
-											className="minimal-map-search__maps-link"
-											href={getGoogleMapsDirectionsUrl(location)}
-											target="_blank"
-											rel="noreferrer noopener"
-										>
-											{googleMapsButtonShowIcon ? (
-												<Navigation size={10} />
-											) : null}
-											<span>{__('Open in Google Maps', 'minimal-map')}</span>
-										</a>
-									) : null}
-								</div>
-								{distanceLabel ? (
-									<div className="minimal-map-search__result-distance">
-										{sprintf(__('%s away', 'minimal-map'), distanceLabel)}
-									</div>
-								) : null}
-							</div>
-						) : null}
-					</div>
-				);
-			})}
+			{renderedResults.map(({ location, distanceLabel }) => (
+				<LocationResultCard
+					key={location.id}
+					distanceLabel={distanceLabel}
+					googleMapsButtonShowIcon={googleMapsButtonShowIcon}
+					googleMapsNavigation={googleMapsNavigation}
+					id={`minimal-map-result-${location.id}`}
+					isSelected={selectedId === location.id}
+					location={location}
+					mode="search"
+					onSelect={() => handleSelect(location, distanceLabel)}
+				/>
+			))}
 		</div>
 	);
 
@@ -482,11 +346,10 @@ export interface WordPressSearchControl {
 
 export function createWordPressSearchControl(
 	host: HTMLElement,
-	map: MapLibreMap,
 	initialConfig: NormalizedMapConfig,
 	frontendGeocodePath?: string,
 	initialSelectedId?: number,
-	onLocationSelect?: (location: MapLocationPoint) => void,
+	onLocationSelect?: (selection: MapLocationSelection) => void,
 	geocodeSearchFn?: GeocodeSearchFn,
 ): WordPressSearchControl {
 	const context = getMapDomContext(host);
@@ -518,26 +381,8 @@ export function createWordPressSearchControl(
 			return geocodeSearchQuery(frontendGeocodePath, query);
 		});
 
-	const onSelect = (location: MapLocationPoint) => {
-		onLocationSelect?.(location);
-		const isMobile = isMobileViewport(context.win.innerWidth);
-
-		map.easeTo(
-			{
-				center: [location.lng, location.lat],
-				zoom: Math.max(map.getZoom(), 15),
-				padding: {
-					left: !isMobile
-						? getSearchPanelDesktopPadding(currentConfig, container)
-						: 0,
-					top: isMobile ? 80 : 0,
-					right: 0,
-					bottom: 0,
-				},
-				essential: true,
-			},
-			{ isMinimalMapInternal: true },
-		);
+	const onSelect = (selection: MapLocationSelection) => {
+		onLocationSelect?.(selection);
 	};
 
 	const render = (config: NormalizedMapConfig, selectedId?: number) => {
