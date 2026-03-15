@@ -29,6 +29,29 @@ export function getNodeWindow(node?: Node | null): (Window & typeof globalThis) 
 	return null;
 }
 
+export function getDocumentFontFamily(node?: Node | null): string {
+	const doc = getNodeDocument(node);
+	const win = getNodeWindow(node);
+
+	if (!doc || !win) {
+		return '';
+	}
+
+	for (const element of [ doc.body, doc.documentElement ]) {
+		if (!element) {
+			continue;
+		}
+
+		const fontFamily = win.getComputedStyle(element).fontFamily.trim();
+
+		if (fontFamily) {
+			return fontFamily;
+		}
+	}
+
+	return '';
+}
+
 export function getMapDomContext(host: HTMLElement): MapDomContext {
 	const doc = getNodeDocument(host);
 	const win = getNodeWindow(host);

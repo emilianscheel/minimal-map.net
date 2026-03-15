@@ -33,7 +33,9 @@ afterEach(() => {
 
 describe('location card preview controller', () => {
 	test('renders the popup-backed in-map card only when the feature is enabled', async () => {
-		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		const dom = new JSDOM(
+			'<!doctype html><body style="font-family: Georgia, serif;"><div id="host"></div></body>'
+		);
 		setGlobalDom(dom);
 		const host = dom.window.document.getElementById('host') as HTMLDivElement;
 		const popupState = {
@@ -125,6 +127,11 @@ describe('location card preview controller', () => {
 		expect((popupState.contentNode as HTMLElement)?.textContent).toContain(
 			'Open in Google Maps',
 		);
+		expect(
+			(popupState.contentNode as HTMLElement)?.style.getPropertyValue(
+				'--minimal-map-location-card-font-family'
+			)
+		).toBe(dom.window.getComputedStyle(dom.window.document.body).fontFamily);
 
 		controller.hide();
 		expect(popupState.removeCalls).toBe(1);

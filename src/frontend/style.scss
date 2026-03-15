@@ -595,6 +595,10 @@
   max-width: min(320px, calc(100vw - 32px));
   box-shadow: 0 16px 36px rgb(0 0 0 / 18%);
   animation: minimal-map-location-card-fade-in 0.18s ease-out both;
+  font-family: var(
+    --minimal-map-location-card-font-family,
+    var(--wp--style--global--font-family, inherit)
+  );
 }
 
 .minimal-map-location-card--in-map:hover,

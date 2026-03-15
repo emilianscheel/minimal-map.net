@@ -1,6 +1,7 @@
 import { createRoot } from '@wordpress/element';
 import maplibregl, { type Map as MapLibreMap, type PopupOptions } from 'maplibre-gl';
 import { LocationResultCard } from './location-card';
+import { getDocumentFontFamily } from './dom-context';
 import { applySearchPanelCssVariables } from './search-panel-layout';
 import type {
 	MapLocationPoint,
@@ -159,6 +160,11 @@ export function createLocationCardPreviewController({
 			}
 
 			applySearchPanelCssVariables(container, config);
+			const documentFontFamily = getDocumentFontFamily(host);
+			container.style.setProperty(
+				'--minimal-map-location-card-font-family',
+				documentFontFamily || 'inherit'
+			);
 			root.render(
 				<LocationResultCard
 					distanceLabel={selection?.distanceLabel}
