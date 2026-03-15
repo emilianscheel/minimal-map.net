@@ -7,6 +7,7 @@ import { applyStyleTheme } from '../lib/styles/themeEngine';
 import { createWordPressZoomControls } from './wp-controls';
 import { createWordPressSearchControl } from './SearchControl';
 import { getSearchPanelDesktopPadding } from './search-panel-layout';
+import { getSelectedLocationTopPadding } from './selected-location-focus-padding';
 import { createLocationCardPreviewController, waitForInternalMapMovementToFinish, type LocationCardPreviewController } from './location-card-preview';
 import { getActiveHeightCssValue, isMobileViewport } from './responsive';
 import { createMarkerRenderer, type MarkerRenderer, type MarkerRendererConfig } from './marker-renderer';
@@ -37,9 +38,6 @@ interface MinimalMapState {
 	searchControl: WordPressSearchControl | null;
 	selectedLocation: SelectedLocationPreview | null;
 }
-
-const IN_MAP_LOCATION_CARD_TOP_PADDING = 160;
-const IN_MAP_LOCATION_CARD_TOP_PADDING_MOBILE = 144;
 
 function canCreateWebGLContext(context: MapDomContext): boolean {
 	const canvas = context.doc.createElement('canvas');
@@ -389,13 +387,7 @@ export function createMinimalMap(
 		}
 
 		const isMobile = isMobileViewport(context.win.innerWidth);
-		const topPadding = config.inMapLocationCard
-			? isMobile
-				? Math.max(80, IN_MAP_LOCATION_CARD_TOP_PADDING_MOBILE)
-				: IN_MAP_LOCATION_CARD_TOP_PADDING
-			: isMobile
-				? 80
-				: 0;
+		const topPadding = getSelectedLocationTopPadding(config, context.win.innerWidth);
 		state.map.easeTo(
 			{
 				center: [point.lng, point.lat],

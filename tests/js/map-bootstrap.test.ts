@@ -4,6 +4,7 @@ import { normalizeMapConfig } from '../../src/map/defaults';
 import { syncTouchZoomInteraction } from '../../src/map/interactions';
 import { syncViewport } from '../../src/map/runtime';
 import { getSearchPanelDesktopPadding } from '../../src/map/search-panel-layout';
+import { getSelectedLocationTopPadding } from '../../src/map/selected-location-focus-padding';
 
 function createTouchZoomRotateSpy() {
 	const calls: string[] = [];
@@ -252,5 +253,29 @@ describe('map touch zoom interaction', () => {
 				},
 			},
 		]);
+	});
+
+	test('uses a much larger top padding for mobile selected locations with preview cards', () => {
+		const config = normalizeMapConfig({
+			inMapLocationCard: true,
+		});
+
+		expect(getSelectedLocationTopPadding(config, 500)).toBe(240);
+	});
+
+	test('preserves desktop selected-location top padding with preview cards', () => {
+		const config = normalizeMapConfig({
+			inMapLocationCard: true,
+		});
+
+		expect(getSelectedLocationTopPadding(config, 1024)).toBe(160);
+	});
+
+	test('keeps the existing smaller mobile top padding when no preview card is shown', () => {
+		const config = normalizeMapConfig({
+			inMapLocationCard: false,
+		});
+
+		expect(getSelectedLocationTopPadding(config, 500)).toBe(80);
 	});
 });
