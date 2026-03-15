@@ -1,6 +1,30 @@
-import type { LocationRecord, TagRecord } from '../../types';
+import type {
+	LocationRecord,
+	LogoRecord,
+	MarkerRecord,
+	TagRecord,
+} from '../../types';
 
 type LocationValueKey = 'logo_id' | 'marker_id';
+
+function getQuickAssignmentCandidate<Item>(
+	title: string,
+	candidates: Item[],
+	getSearchValue: (candidate: Item) => string
+): Item | null {
+	if (candidates.length === 0) {
+		return null;
+	}
+
+	const titleTokens = getLocationTitleTokens(title);
+	const matchingCandidate = candidates.find((candidate) => {
+		const searchValue = getSearchValue(candidate).toLowerCase();
+
+		return titleTokens.some((token) => searchValue.includes(token));
+	});
+
+	return matchingCandidate ?? candidates[0] ?? null;
+}
 
 function sortNumeric(values: Iterable<number>): number[] {
 	return Array.from(values).sort((left, right) => left - right);
@@ -23,6 +47,17 @@ function getSharedPositiveValue(
 	const firstValue = firstLocation[key];
 
 	return locations.every((location) => location[key] === firstValue) ? firstValue : null;
+}
+
+export function getLocationTitleTokens(title: string): string[] {
+	return Array.from(
+		new Set(
+			title
+				.toLowerCase()
+				.split(/[^\p{L}\p{N}]+/u)
+				.filter(Boolean)
+		)
+	);
 }
 
 export function mergeLocationTagIds(
@@ -94,6 +129,41 @@ export function getAssignableMarkerIds(
 
 	return sortNumeric(
 		markerIds.filter((markerId) => markerId > 0 && markerId !== sharedMarkerId)
+	);
+}
+
+export function getQuickAssignableLogo(
+	location: LocationRecord,
+	logos: LogoRecord[]
+): LogoRecord | null {
+	return getQuickAssignmentCandidate(
+		location.title,
+		logos.filter((logo) => logo.id > 0 && logo.id !== location.logo_id),
+		(logo) => logo.title
+	);
+}
+
+export function getQuickAssignableMarker(
+	location: LocationRecord,
+	markers: MarkerRecord[]
+): MarkerRecord | null {
+	return getQuickAssignmentCandidate(
+		location.title,
+		markers.filter((marker) => marker.id > 0 && marker.id !== location.marker_id),
+		(marker) => marker.title
+	);
+}
+
+export function getQuickAssignableTag(
+	location: LocationRecord,
+	tags: TagRecord[]
+): TagRecord | null {
+	const assignedTagIds = new Set(location.tag_ids);
+
+	return getQuickAssignmentCandidate(
+		location.title,
+		tags.filter((tag) => !assignedTagIds.has(tag.id)),
+		(tag) => tag.name
 	);
 }
 

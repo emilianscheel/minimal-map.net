@@ -561,52 +561,178 @@ export function useLocationsController(
 		setRemoveTagsConfirmationModalOpen(true);
 	}, []);
 
+	const assignLogoToLocations = useCallback(
+		async (
+			targetLocations: LocationRecord[],
+			logoId: number,
+			onSuccess?: () => void
+		): Promise<void> => {
+			if (targetLocations.length === 0 || logoId <= 0) {
+				return;
+			}
+
+			setAssignmentSaving(true);
+			setActionNotice(null);
+
+			try {
+				for (const location of targetLocations) {
+					await updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						logo_id: logoId,
+					});
+				}
+				await loadLocations();
+				clearSelectionAfterBulkAction(targetLocations);
+				setActionNotice({
+					status: 'success',
+					message:
+						targetLocations.length === 1
+							? __('Logo assigned to location.', 'minimal-map')
+							: sprintf(
+								_n(
+									'%d location updated with a logo.',
+									'%d locations updated with a logo.',
+									targetLocations.length,
+									'minimal-map'
+								),
+								targetLocations.length
+							),
+				});
+				onSuccess?.();
+			} catch (error) {
+				setActionNotice({
+					status: 'error',
+					message:
+						error instanceof Error
+							? error.message
+							: __('Location logos could not be updated.', 'minimal-map'),
+				});
+			} finally {
+				setAssignmentSaving(false);
+			}
+		},
+		[clearSelectionAfterBulkAction, config, loadLocations]
+	);
+
+	const assignMarkerToLocations = useCallback(
+		async (
+			targetLocations: LocationRecord[],
+			markerId: number,
+			onSuccess?: () => void
+		): Promise<void> => {
+			if (targetLocations.length === 0 || markerId <= 0) {
+				return;
+			}
+
+			setAssignmentSaving(true);
+			setActionNotice(null);
+
+			try {
+				for (const location of targetLocations) {
+					await updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						marker_id: markerId,
+					});
+				}
+				await loadLocations();
+				clearSelectionAfterBulkAction(targetLocations);
+				setActionNotice({
+					status: 'success',
+					message:
+						targetLocations.length === 1
+							? __('Marker assigned to location.', 'minimal-map')
+							: sprintf(
+								_n(
+									'%d location updated with a marker.',
+									'%d locations updated with a marker.',
+									targetLocations.length,
+									'minimal-map'
+								),
+								targetLocations.length
+							),
+				});
+				onSuccess?.();
+			} catch (error) {
+				setActionNotice({
+					status: 'error',
+					message:
+						error instanceof Error
+							? error.message
+							: __('Location markers could not be updated.', 'minimal-map'),
+				});
+			} finally {
+				setAssignmentSaving(false);
+			}
+		},
+		[clearSelectionAfterBulkAction, config, loadLocations]
+	);
+
+	const assignTagsToLocations = useCallback(
+		async (
+			targetLocations: LocationRecord[],
+			tagIds: number[],
+			onSuccess?: () => void
+		): Promise<void> => {
+			if (targetLocations.length === 0 || tagIds.length === 0) {
+				return;
+			}
+
+			setAssignmentSaving(true);
+			setActionNotice(null);
+
+			try {
+				for (const location of targetLocations) {
+					await updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						tag_ids: mergeLocationTagIds(location.tag_ids, tagIds),
+					});
+				}
+				await loadLocations();
+				clearSelectionAfterBulkAction(targetLocations);
+				setActionNotice({
+					status: 'success',
+					message:
+						targetLocations.length === 1
+							? __('Tags added to location.', 'minimal-map')
+							: sprintf(
+								_n(
+									'%d location updated with new tags.',
+									'%d locations updated with new tags.',
+									targetLocations.length,
+									'minimal-map'
+								),
+								targetLocations.length
+							),
+				});
+				onSuccess?.();
+			} catch (error) {
+				setActionNotice({
+					status: 'error',
+					message:
+						error instanceof Error
+							? error.message
+							: __('Location tags could not be updated.', 'minimal-map'),
+				});
+			} finally {
+				setAssignmentSaving(false);
+			}
+		},
+		[clearSelectionAfterBulkAction, config, loadLocations]
+	);
+
 	const onAssignLogoToLocation = useCallback(async (): Promise<void> => {
 		if (selectedLogoLocations.length === 0 || !assignmentLogoId) {
 			return;
 		}
 
-		const nextLogoId = Number(assignmentLogoId);
-
-		setAssignmentSaving(true);
-		setActionNotice(null);
-
-		try {
-			for (const location of selectedLogoLocations) {
-				await updateLocation(config, location.id, {
-					...createLocationFormStateFromRecord(location),
-					logo_id: nextLogoId,
-				});
-			}
-			await loadLocations();
-			clearSelectionAfterBulkAction(selectedLogoLocations);
-			setActionNotice({
-				status: 'success',
-				message:
-					selectedLogoLocations.length === 1
-						? __('Logo assigned to location.', 'minimal-map')
-						: sprintf(
-							_n('%d location updated with a logo.', '%d locations updated with a logo.', selectedLogoLocations.length, 'minimal-map'),
-							selectedLogoLocations.length
-						),
-			});
-			resetAssignLogoState();
-		} catch (error) {
-			setActionNotice({
-				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: __('Location logos could not be updated.', 'minimal-map'),
-			});
-		} finally {
-			setAssignmentSaving(false);
-		}
+		await assignLogoToLocations(
+			selectedLogoLocations,
+			Number(assignmentLogoId),
+			resetAssignLogoState
+		);
 	}, [
+		assignLogoToLocations,
 		assignmentLogoId,
-		clearSelectionAfterBulkAction,
-		config,
-		loadLocations,
 		resetAssignLogoState,
 		selectedLogoLocations,
 	]);
@@ -616,47 +742,14 @@ export function useLocationsController(
 			return;
 		}
 
-		const nextMarkerId = Number(assignmentMarkerId);
-
-		setAssignmentSaving(true);
-		setActionNotice(null);
-
-		try {
-			for (const location of selectedMarkerLocations) {
-				await updateLocation(config, location.id, {
-					...createLocationFormStateFromRecord(location),
-					marker_id: nextMarkerId,
-				});
-			}
-			await loadLocations();
-			clearSelectionAfterBulkAction(selectedMarkerLocations);
-			setActionNotice({
-				status: 'success',
-				message:
-					selectedMarkerLocations.length === 1
-						? __('Marker assigned to location.', 'minimal-map')
-						: sprintf(
-							_n('%d location updated with a marker.', '%d locations updated with a marker.', selectedMarkerLocations.length, 'minimal-map'),
-							selectedMarkerLocations.length
-						),
-			});
-			resetAssignMarkerState();
-		} catch (error) {
-			setActionNotice({
-				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: __('Location markers could not be updated.', 'minimal-map'),
-			});
-		} finally {
-			setAssignmentSaving(false);
-		}
+		await assignMarkerToLocations(
+			selectedMarkerLocations,
+			Number(assignmentMarkerId),
+			resetAssignMarkerState
+		);
 	}, [
+		assignMarkerToLocations,
 		assignmentMarkerId,
-		clearSelectionAfterBulkAction,
-		config,
-		loadLocations,
 		resetAssignMarkerState,
 		selectedMarkerLocations,
 	]);
@@ -666,48 +759,34 @@ export function useLocationsController(
 			return;
 		}
 
-		setAssignmentSaving(true);
-		setActionNotice(null);
-
-		try {
-			for (const location of selectedTagsLocations) {
-				await updateLocation(config, location.id, {
-					...createLocationFormStateFromRecord(location),
-					tag_ids: mergeLocationTagIds(location.tag_ids, assignmentTagIds),
-				});
-			}
-			await loadLocations();
-			clearSelectionAfterBulkAction(selectedTagsLocations);
-			setActionNotice({
-				status: 'success',
-				message:
-					selectedTagsLocations.length === 1
-						? __('Tags added to location.', 'minimal-map')
-						: sprintf(
-							_n('%d location updated with new tags.', '%d locations updated with new tags.', selectedTagsLocations.length, 'minimal-map'),
-							selectedTagsLocations.length
-						),
-			});
-			resetAssignTagsState();
-		} catch (error) {
-			setActionNotice({
-				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: __('Location tags could not be updated.', 'minimal-map'),
-			});
-		} finally {
-			setAssignmentSaving(false);
-		}
+		await assignTagsToLocations(selectedTagsLocations, assignmentTagIds, resetAssignTagsState);
 	}, [
 		assignmentTagIds,
-		clearSelectionAfterBulkAction,
-		config,
-		loadLocations,
+		assignTagsToLocations,
 		resetAssignTagsState,
 		selectedTagsLocations,
 	]);
+
+	const onQuickAssignLogo = useCallback(
+		async (location: LocationRecord, logoId: number): Promise<void> => {
+			await assignLogoToLocations([location], logoId);
+		},
+		[assignLogoToLocations]
+	);
+
+	const onQuickAssignMarker = useCallback(
+		async (location: LocationRecord, markerId: number): Promise<void> => {
+			await assignMarkerToLocations([location], markerId);
+		},
+		[assignMarkerToLocations]
+	);
+
+	const onQuickAssignTag = useCallback(
+		async (location: LocationRecord, tagId: number): Promise<void> => {
+			await assignTagsToLocations([location], [tagId]);
+		},
+		[assignTagsToLocations]
+	);
 
 	const onClearLogosFromLocations = useCallback(async (): Promise<void> => {
 		if (selectedLogoRemovalLocations.length === 0) {
@@ -1548,6 +1627,9 @@ export function useLocationsController(
 		onOpenAssignLogoModal,
 		onOpenAssignMarkerModal,
 		onOpenAssignTagsModal,
+		onQuickAssignLogo,
+		onQuickAssignMarker,
+		onQuickAssignTag,
 		onOpenDeleteLogoConfirmationModal,
 		onOpenRemoveMarkerConfirmationModal,
 		onOpenRemoveTagsConfirmationModal,

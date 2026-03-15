@@ -114,6 +114,9 @@ export interface LocationsController {
 	onOpenAssignLogoModal: (locations: LocationRecord | LocationRecord[]) => void;
 	onOpenAssignMarkerModal: (locations: LocationRecord | LocationRecord[]) => void;
 	onOpenAssignTagsModal: (locations: LocationRecord | LocationRecord[]) => void;
+	onQuickAssignLogo: (location: LocationRecord, logoId: number) => Promise<void>;
+	onQuickAssignMarker: (location: LocationRecord, markerId: number) => Promise<void>;
+	onQuickAssignTag: (location: LocationRecord, tagId: number) => Promise<void>;
 	onOpenDeleteLogoConfirmationModal: (locations: LocationRecord | LocationRecord[]) => void;
 	onOpenRemoveMarkerConfirmationModal: (locations: LocationRecord[]) => void;
 	onOpenRemoveTagsConfirmationModal: (locations: LocationRecord[]) => void;

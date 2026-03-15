@@ -10,6 +10,11 @@ import TagBadge from '../../components/TagBadge';
 import type { LocationRecord } from '../../types';
 import { formatLocationAddressLines } from '../../lib/locations/formatLocationAddressLines';
 import DeleteLocationActionModal from './DeleteLocationActionModal';
+import {
+	getQuickAssignableLogo,
+	getQuickAssignableMarker,
+	getQuickAssignableTag,
+} from './assignmentHelpers';
 import { LOCATIONS_TABLE_PER_PAGE } from './constants';
 import type { LocationsController } from './types';
 
@@ -201,196 +206,277 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 
 function useLocationActions(controller: LocationsController): Action<LocationRecord>[] {
 	return useMemo<Action<LocationRecord>[]>(
-		() => [
-			{
-				id: 'duplicate-location',
-				label: __('Duplicate', 'minimal-map'),
-				icon: <Copy size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending,
-				supportsBulk: false,
-				callback: (items) => {
-					if (!items[0]) {
-						return;
-					}
+		() => {
+			const getQuickLogo = (location: LocationRecord) =>
+				getQuickAssignableLogo(location, controller.logos);
+			const getQuickMarker = (location: LocationRecord) =>
+				getQuickAssignableMarker(location, controller.markers);
+			const getQuickTag = (location: LocationRecord) =>
+				getQuickAssignableTag(location, controller.tags);
 
-					void controller.onDuplicateLocation(items[0]).catch(() => {});
-				},
-			},
-			{
-				id: 'edit-location',
-				label: __('Edit', 'minimal-map'),
-				icon: <Pencil size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending,
-				supportsBulk: false,
-				callback: (items) => {
-					if (!items[0]) {
-						return;
-					}
+			return [
+				{
+					id: 'duplicate-location',
+					label: __('Duplicate', 'minimal-map'),
+					icon: <Copy size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending,
+					supportsBulk: false,
+					callback: (items) => {
+						if (!items[0]) {
+							return;
+						}
 
-					controller.onEditLocation(items[0]);
+						void controller.onDuplicateLocation(items[0]).catch(() => {});
+					},
 				},
-			},
-			{
-				id: 'retrieve-location',
-				label: __('Retrieve location', 'minimal-map'),
-				icon: <LocateFixed size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending,
-				supportsBulk: false,
-				callback: (items) => {
-					if (!items[0]) {
-						return;
-					}
+				{
+					id: 'edit-location',
+					label: __('Edit', 'minimal-map'),
+					icon: <Pencil size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending,
+					supportsBulk: false,
+					callback: (items) => {
+						if (!items[0]) {
+							return;
+						}
 
-					void controller.onRetrieveLocation(items[0]).catch(() => {});
+						controller.onEditLocation(items[0]);
+					},
 				},
-			},
-			{
-				id: 'assign-location-to-collection',
-				label: __('Assign to Collection', 'minimal-map'),
-				icon: <Layers3 size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: false,
-				callback: (items) => {
-					if (!items[0]) {
-						return;
-					}
+				{
+					id: 'retrieve-location',
+					label: __('Retrieve location', 'minimal-map'),
+					icon: <LocateFixed size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending,
+					supportsBulk: false,
+					callback: (items) => {
+						if (!items[0]) {
+							return;
+						}
 
-					controller.onOpenAssignToCollectionModal(items[0]);
+						void controller.onRetrieveLocation(items[0]).catch(() => {});
+					},
 				},
-			},
-			{
-				id: 'assign-logo',
-				label: (items) =>
-					items.length === 1
-						? __('Assign Logo', 'minimal-map')
-						: __('Assign Logos', 'minimal-map'),
-				icon: <Image size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
+				{
+					id: 'assign-location-to-collection',
+					label: __('Assign to Collection', 'minimal-map'),
+					icon: <Layers3 size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					supportsBulk: false,
+					callback: (items) => {
+						if (!items[0]) {
+							return;
+						}
 
-					controller.onOpenAssignLogoModal(items.length === 1 ? items[0] : items);
+						controller.onOpenAssignToCollectionModal(items[0]);
+					},
 				},
-			},
-			{
-				id: 'assign-marker',
-				label: (items) =>
-					items.length === 1
-						? __('Assign Marker', 'minimal-map')
-						: __('Assign Markers', 'minimal-map'),
-				icon: <MapPin size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
+				{
+					id: 'quick-assign-logo',
+					label: (items) => {
+						const quickLogo = items[0] ? getQuickLogo(items[0]) : null;
+						const logoLabel = quickLogo?.title || __('Untitled logo', 'minimal-map');
 
-					controller.onOpenAssignMarkerModal(items.length === 1 ? items[0] : items);
-				},
-			},
-			{
-				id: 'assign-tags',
-				label: (items) =>
-					items.length === 1
-						? __('Assign Tag', 'minimal-map')
-						: __('Assign Tags', 'minimal-map'),
-				icon: <Tags size={16} strokeWidth={2} />,
-				context: 'single',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
+						return sprintf(__('Assign %s as logo', 'minimal-map'), logoLabel);
+					},
+					icon: <Image size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					isEligible: (item) => getQuickLogo(item) !== null,
+					supportsBulk: false,
+					callback: (items) => {
+						const location = items[0];
+						const quickLogo = location ? getQuickLogo(location) : null;
 
-					controller.onOpenAssignTagsModal(items.length === 1 ? items[0] : items);
-				},
-			},
-			{
-				id: 'bulk-remove-logo',
-				label: __('Remove Logos', 'minimal-map'),
-				icon: <Image size={16} strokeWidth={2} />,
-				context: 'list',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				isEligible: () => controller.selection.length > 1,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
+						if (!location || !quickLogo) {
+							return;
+						}
 
-					controller.onOpenDeleteLogoConfirmationModal(items);
+						void controller.onQuickAssignLogo(location, quickLogo.id).catch(() => {});
+					},
 				},
-			},
-			{
-				id: 'bulk-remove-marker',
-				label: __('Remove Markers', 'minimal-map'),
-				icon: <MapPin size={16} strokeWidth={2} />,
-				context: 'list',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				isEligible: () => controller.selection.length > 1,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
+				{
+					id: 'assign-logo',
+					label: (items) =>
+						items.length === 1
+							? __('Assign Logo', 'minimal-map')
+							: __('Assign Logos', 'minimal-map'),
+					icon: <Image size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					supportsBulk: true,
+					callback: (items) => {
+						if (items.length === 0) {
+							return;
+						}
 
-					controller.onOpenRemoveMarkerConfirmationModal(items);
+						controller.onOpenAssignLogoModal(items.length === 1 ? items[0] : items);
+					},
 				},
-			},
-			{
-				id: 'bulk-remove-tags',
-				label: __('Remove Tags', 'minimal-map'),
-				icon: <Tags size={16} strokeWidth={2} />,
-				context: 'list',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				isEligible: () => controller.selection.length > 1,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
+				{
+					id: 'quick-assign-marker',
+					label: (items) => {
+						const quickMarker = items[0] ? getQuickMarker(items[0]) : null;
+						const markerLabel = quickMarker?.title || __('Untitled marker', 'minimal-map');
 
-					controller.onOpenRemoveTagsConfirmationModal(items);
+						return sprintf(__('Assign %s as marker', 'minimal-map'), markerLabel);
+					},
+					icon: <MapPin size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					isEligible: (item) => getQuickMarker(item) !== null,
+					supportsBulk: false,
+					callback: (items) => {
+						const location = items[0];
+						const quickMarker = location ? getQuickMarker(location) : null;
+
+						if (!location || !quickMarker) {
+							return;
+						}
+
+						void controller.onQuickAssignMarker(location, quickMarker.id).catch(() => {});
+					},
 				},
-			},
-			{
-				id: 'delete-location',
-				label: __('Delete', 'minimal-map'),
-				icon: <Trash2 size={16} strokeWidth={2} />,
-				isDestructive: true,
-				disabled: controller.isRowActionPending,
-				supportsBulk: true,
-				modalHeader: (items) =>
-					items.length === 1
-						? __('Delete location', 'minimal-map')
-						: sprintf(
-							_n( 'Delete %d location', 'Delete %d locations', items.length, 'minimal-map' ),
-							items.length
-						),
-				RenderModal: ({ items, closeModal, onActionPerformed }) => {
-					return (
-						<DeleteLocationActionModal
-							items={items}
-							onDelete={controller.onDeleteLocation}
-							onDeleteBulk={controller.onDeleteLocations}
-							closeModal={closeModal}
-							onActionPerformed={onActionPerformed}
-						/>
-					);
+				{
+					id: 'assign-marker',
+					label: (items) =>
+						items.length === 1
+							? __('Assign Marker', 'minimal-map')
+							: __('Assign Markers', 'minimal-map'),
+					icon: <MapPin size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					supportsBulk: true,
+					callback: (items) => {
+						if (items.length === 0) {
+							return;
+						}
+
+						controller.onOpenAssignMarkerModal(items.length === 1 ? items[0] : items);
+					},
 				},
-			},
-		],
+				{
+					id: 'quick-assign-tags',
+					label: (items) => {
+						const quickTag = items[0] ? getQuickTag(items[0]) : null;
+						const tagLabel = quickTag?.name || __('Untitled tag', 'minimal-map');
+
+						return sprintf(__('Assign %s as tag', 'minimal-map'), tagLabel);
+					},
+					icon: <Tags size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					isEligible: (item) => getQuickTag(item) !== null,
+					supportsBulk: false,
+					callback: (items) => {
+						const location = items[0];
+						const quickTag = location ? getQuickTag(location) : null;
+
+						if (!location || !quickTag) {
+							return;
+						}
+
+						void controller.onQuickAssignTag(location, quickTag.id).catch(() => {});
+					},
+				},
+				{
+					id: 'assign-tags',
+					label: (items) =>
+						items.length === 1
+							? __('Assign Tag', 'minimal-map')
+							: __('Assign Tags', 'minimal-map'),
+					icon: <Tags size={16} strokeWidth={2} />,
+					context: 'single',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					supportsBulk: true,
+					callback: (items) => {
+						if (items.length === 0) {
+							return;
+						}
+
+						controller.onOpenAssignTagsModal(items.length === 1 ? items[0] : items);
+					},
+				},
+				{
+					id: 'bulk-remove-logo',
+					label: __('Remove Logos', 'minimal-map'),
+					icon: <Image size={16} strokeWidth={2} />,
+					context: 'list',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					isEligible: () => controller.selection.length > 1,
+					supportsBulk: true,
+					callback: (items) => {
+						if (items.length === 0) {
+							return;
+						}
+
+						controller.onOpenDeleteLogoConfirmationModal(items);
+					},
+				},
+				{
+					id: 'bulk-remove-marker',
+					label: __('Remove Markers', 'minimal-map'),
+					icon: <MapPin size={16} strokeWidth={2} />,
+					context: 'list',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					isEligible: () => controller.selection.length > 1,
+					supportsBulk: true,
+					callback: (items) => {
+						if (items.length === 0) {
+							return;
+						}
+
+						controller.onOpenRemoveMarkerConfirmationModal(items);
+					},
+				},
+				{
+					id: 'bulk-remove-tags',
+					label: __('Remove Tags', 'minimal-map'),
+					icon: <Tags size={16} strokeWidth={2} />,
+					context: 'list',
+					disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+					isEligible: () => controller.selection.length > 1,
+					supportsBulk: true,
+					callback: (items) => {
+						if (items.length === 0) {
+							return;
+						}
+
+						controller.onOpenRemoveTagsConfirmationModal(items);
+					},
+				},
+				{
+					id: 'delete-location',
+					label: __('Delete', 'minimal-map'),
+					icon: <Trash2 size={16} strokeWidth={2} />,
+					isDestructive: true,
+					disabled: controller.isRowActionPending,
+					supportsBulk: true,
+					modalHeader: (items) =>
+						items.length === 1
+							? __('Delete location', 'minimal-map')
+							: sprintf(
+								_n( 'Delete %d location', 'Delete %d locations', items.length, 'minimal-map' ),
+								items.length
+							),
+					RenderModal: ({ items, closeModal, onActionPerformed }) => {
+						return (
+							<DeleteLocationActionModal
+								items={items}
+								onDelete={controller.onDeleteLocation}
+								onDeleteBulk={controller.onDeleteLocations}
+								closeModal={closeModal}
+								onActionPerformed={onActionPerformed}
+							/>
+						);
+					},
+				},
+			];
+		},
 		[controller]
 	);
 }
