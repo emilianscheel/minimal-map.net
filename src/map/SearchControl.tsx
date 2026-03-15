@@ -344,7 +344,7 @@ export const MapSearchControl = ({
 									className="minimal-map-search__state-spinner"
 								/>
 								<div className="minimal-map-search__state-message">
-									{__('Press', 'minimal-map')} <Kbd>Enter</Kbd>{' '}
+									{__('Press', 'minimal-map')} <Kbd variant="search">Enter</Kbd>{' '}
 									{__('to load results', 'minimal-map')}
 								</div>
 							</div>
