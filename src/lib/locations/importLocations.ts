@@ -12,7 +12,15 @@ import {
 import { createCollection } from '../collections/createCollection';
 import { createLocation } from './createLocation';
 import { geocodeAddress } from './geocodeAddress';
-import { createDefaultOpeningHours } from './openingHours';
+import {
+	createDefaultOpeningHours,
+	getLunchDuration,
+	getLunchEnd,
+	hasLunchBreakForDay,
+	hasOpeningHoursForDay,
+	normalizeOpeningHours,
+	OPENING_HOURS_DAY_ORDER,
+} from './openingHours';
 
 export const COMMON_CSV_HEADERS = [
 	'title',
@@ -27,7 +35,130 @@ export const COMMON_CSV_HEADERS = [
 	'website',
 	'latitude',
 	'longitude',
+	'opening_hours',
+	'opening_hours_notes',
+	'additional information opening hours',
+	'monday',
+	'monday lunch break',
+	'tuesday',
+	'tuesday lunch break',
+	'wednesday',
+	'wednesday lunch break',
+	'thursday',
+	'thursday lunch break',
+	'friday',
+	'friday lunch break',
+	'saturday',
+	'saturday lunch break',
+	'sunday',
+	'sunday lunch break',
+	'logo',
+	'marker',
+	'tags',
 ] as const;
+
+export function exportLocations(
+	locations: any[],
+	logos: any[],
+	markers: any[],
+	tags: any[]
+): string {
+	const activeDays = new Set<string>();
+	const activeLunchBreaks = new Set<string>();
+	let hasNotes = false;
+
+	for (const loc of locations) {
+		if (loc.opening_hours_notes?.trim()) {
+			hasNotes = true;
+		}
+
+		for (const dayKey of OPENING_HOURS_DAY_ORDER) {
+			const day = loc.opening_hours?.[dayKey];
+			if (day) {
+				if (hasOpeningHoursForDay(day)) {
+					activeDays.add(dayKey);
+				}
+				if (hasLunchBreakForDay(day)) {
+					activeLunchBreaks.add(dayKey);
+				}
+			}
+		}
+	}
+
+	const headers: string[] = [
+		'title',
+		'street',
+		'house_number',
+		'postal_code',
+		'city',
+		'state',
+		'country',
+		'telephone',
+		'email',
+		'website',
+		'latitude',
+		'longitude',
+	];
+
+	if (hasNotes) {
+		headers.push('additional information opening hours');
+	}
+
+	for (const dayKey of OPENING_HOURS_DAY_ORDER) {
+		if (activeDays.has(dayKey)) {
+			headers.push(dayKey);
+		}
+		if (activeLunchBreaks.has(dayKey)) {
+			headers.push(`${dayKey} lunch break`);
+		}
+	}
+
+	headers.push('logo', 'marker', 'tags');
+
+	const csvRows = [headers.join(',')];
+
+	const logosById = new Map(logos.map((l) => [l.id, l.title]));
+	const markersById = new Map(markers.map((m) => [m.id, m.title]));
+	const tagsById = new Map(tags.map((t) => [t.id, t.name]));
+
+	for (const loc of locations) {
+		const values = headers.map((header) => {
+			let val = '';
+
+			if (header === 'additional information opening hours') {
+				val = loc.opening_hours_notes || '';
+			} else if (OPENING_HOURS_DAY_ORDER.includes(header as any)) {
+				const day = loc.opening_hours?.[header as OpeningHoursDayKey];
+				if (day && hasOpeningHoursForDay(day)) {
+					val = `${day.open}-${day.close}`;
+				}
+			} else if (header.endsWith(' lunch break')) {
+				const dayKey = header.replace(' lunch break', '') as OpeningHoursDayKey;
+				const day = loc.opening_hours?.[dayKey];
+				if (day && hasLunchBreakForDay(day)) {
+					const lunchEnd = getLunchEnd(day.lunch_start, day.lunch_duration_minutes);
+					val = `${day.lunch_start}-${lunchEnd}`;
+				}
+			} else if (header === 'logo') {
+				val = logosById.get(loc.logo_id) || '';
+			} else if (header === 'marker') {
+				val = markersById.get(loc.marker_id) || '';
+			} else if (header === 'tags') {
+				val = (loc.tag_ids || [])
+					.map((id: number) => tagsById.get(id))
+					.filter(Boolean)
+					.join('|');
+			} else {
+				val = loc[header] || '';
+			}
+
+			return `"${val.toString().replace(/"/g, '""')}"`;
+		});
+		csvRows.push(values.join(','));
+	}
+
+	return csvRows.join('\n');
+}
 
 export const CUSTOM_CSV_MAPPING_FIELDS = [
 	{ key: 'title', label: __('Title', 'minimal-map') },
@@ -71,6 +202,9 @@ interface ImportDependencies {
 	geocodeAddressFn?: typeof geocodeAddress;
 	now?: () => Date;
 	sleep?: (ms: number) => Promise<void>;
+	logos?: any[];
+	markers?: any[];
+	tags?: any[];
 }
 
 function sleep(ms: number): Promise<void> {
@@ -229,15 +363,20 @@ export function createEmptyCsvImportAssignments(): CsvImportAssignments {
 	};
 }
 
+export const REQUIRED_COMMON_CSV_HEADERS = [
+	'title',
+	'street',
+	'house_number',
+	'postal_code',
+	'city',
+	'country',
+	'latitude',
+	'longitude',
+] as const;
+
 export function isCommonCsvFormat(parsedCsv: ParsedCsvData): boolean {
-	if (parsedCsv.normalizedHeaders.length !== COMMON_CSV_HEADERS.length) {
-		return false;
-	}
-
-	const sortedHeaders = [ ...parsedCsv.normalizedHeaders ].sort();
-	const sortedCommonHeaders = [ ...COMMON_CSV_HEADERS ].sort();
-
-	return sortedHeaders.every((header, index) => header === sortedCommonHeaders[index]);
+	const headers = new Set(parsedCsv.normalizedHeaders);
+	return REQUIRED_COMMON_CSV_HEADERS.every((header) => headers.has(header));
 }
 
 function createImportCollectionTitle(now: () => Date): string {
@@ -317,8 +456,63 @@ function applyCsvImportAssignments(
 }
 
 function buildCommonLocationForm(
-	rowRecord: Record<CommonCsvHeader, string | undefined>
+	rowRecord: Record<CommonCsvHeader, string | undefined>,
+	logos: any[] = [],
+	markers: any[] = [],
+	tags: any[] = []
 ): LocationFormState {
+	const logosByTitle = new Map(logos.map((l) => [l.title, l.id]));
+	const markersByTitle = new Map(markers.map((m) => [m.title, m.id]));
+	const tagsByName = new Map(tags.map((t) => [t.name, t.id]));
+
+	let openingHours = createDefaultOpeningHours();
+	let openingHoursNotes = rowRecord.opening_hours_notes || rowRecord['additional information opening hours'] || '';
+
+	// Backward compatibility: check for JSON opening_hours column first
+	if (rowRecord.opening_hours) {
+		try {
+			openingHours = normalizeOpeningHours(JSON.parse(rowRecord.opening_hours));
+		} catch {
+			// Ignore invalid JSON.
+		}
+	}
+
+	// Override with per-day columns if they exist
+	const parseRange = (value: string | undefined) => {
+		if (!value) return null;
+		const parts = value.split('-');
+		if (parts.length !== 2) return null;
+		return { start: parts[0].trim(), end: parts[1].trim() };
+	};
+
+	OPENING_HOURS_DAY_ORDER.forEach((dayKey) => {
+		const dayValue = rowRecord[dayKey as CommonCsvHeader];
+		const lunchValue = rowRecord[`${dayKey} lunch break` as CommonCsvHeader];
+
+		if (dayValue) {
+			const range = parseRange(dayValue);
+			if (range) {
+				openingHours[dayKey].open = range.start;
+				openingHours[dayKey].close = range.end;
+			}
+		}
+
+		if (lunchValue) {
+			const range = parseRange(lunchValue);
+			if (range) {
+				openingHours[dayKey].lunch_start = range.start;
+				openingHours[dayKey].lunch_duration_minutes = getLunchDuration(range.start, range.end);
+			}
+		}
+	});
+
+	const logoId = rowRecord.logo ? logosByTitle.get(rowRecord.logo) || 0 : 0;
+	const markerId = rowRecord.marker ? markersByTitle.get(rowRecord.marker) || 0 : 0;
+	const tagIds = (rowRecord.tags || '')
+		.split('|')
+		.map((name) => tagsByName.get(name.trim()))
+		.filter((id): id is number => !!id);
+
 	return {
 		...createBaseImportForm(),
 		title: rowRecord.title || getImportedLocationFallbackTitle(),
@@ -333,6 +527,11 @@ function buildCommonLocationForm(
 		website: rowRecord.website || '',
 		latitude: rowRecord.latitude || '',
 		longitude: rowRecord.longitude || '',
+		opening_hours: openingHours,
+		opening_hours_notes: openingHoursNotes,
+		logo_id: logoId,
+		marker_id: markerId,
+		tag_ids: tagIds,
 	};
 }
 
@@ -397,7 +596,12 @@ export async function runCommonCsvImport(
 		const record = createRowRecord(parsedCsv, row) as Record<CommonCsvHeader, string | undefined>;
 		const createdLocation = await createLocationFn(
 			locationsConfig,
-			buildCommonLocationForm(record)
+			buildCommonLocationForm(
+				record,
+				dependencies.logos || [],
+				dependencies.markers || [],
+				dependencies.tags || []
+			)
 		);
 		importedLocationIds.push(createdLocation.id);
 	}
@@ -487,10 +691,15 @@ export async function runMappedCsvImport(
 export async function importLocations(
 	file: File,
 	locationsConfig: LocationsAdminConfig,
-	collectionsConfig: CollectionsAdminConfig
+	collectionsConfig: CollectionsAdminConfig,
+	dependencies: {
+		logos?: any[];
+		markers?: any[];
+		tags?: any[];
+	} = {}
 ): Promise<number> {
 	const parsedCsv = await parseCsvFile(file);
-	const result = await runCommonCsvImport(parsedCsv, locationsConfig, collectionsConfig);
+	const result = await runCommonCsvImport(parsedCsv, locationsConfig, collectionsConfig, dependencies);
 
 	return result.importedCount;
 }

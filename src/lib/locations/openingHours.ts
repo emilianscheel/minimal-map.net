@@ -75,6 +75,45 @@ export function hasOpeningHoursForDay(day: LocationOpeningHoursDay): boolean {
 	return day.open.trim() !== '' || day.close.trim() !== '';
 }
 
+export function parseOpeningHoursTime(time: string): { hours: number; minutes: number } | null {
+	const match = time.match(/^(\d{2}):(\d{2})$/);
+	if (!match) return null;
+	return {
+		hours: Number.parseInt(match[1], 10),
+		minutes: Number.parseInt(match[2], 10),
+	};
+}
+
+export function formatOpeningHoursTime(hours: number, minutes: number): string {
+	return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+export function getLunchEnd(lunchStart: string, durationMinutes: number): string {
+	const parsed = parseOpeningHoursTime(lunchStart);
+	if (!parsed) return '';
+
+	let totalMinutes = parsed.hours * 60 + parsed.minutes + durationMinutes;
+	const hours = Math.floor(totalMinutes / 60) % 24;
+	const minutes = totalMinutes % 60;
+
+	return formatOpeningHoursTime(hours, minutes);
+}
+
+export function getLunchDuration(lunchStart: string, lunchEnd: string): number {
+	const start = parseOpeningHoursTime(lunchStart);
+	const end = parseOpeningHoursTime(lunchEnd);
+	if (!start || !end) return 0;
+
+	const startMinutes = start.hours * 60 + start.minutes;
+	let endMinutes = end.hours * 60 + end.minutes;
+
+	if (endMinutes < startMinutes) {
+		endMinutes += 24 * 60;
+	}
+
+	return endMinutes - startMinutes;
+}
+
 export function hasLunchBreakForDay(day: LocationOpeningHoursDay): boolean {
 	return day.lunch_start.trim() !== '' || day.lunch_duration_minutes > 0;
 }

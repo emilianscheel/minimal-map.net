@@ -42,10 +42,12 @@ import { deleteLocation } from '../../lib/locations/deleteLocation';
 import { duplicateLocation } from '../../lib/locations/duplicateLocation';
 import { fetchAllLocations } from '../../lib/locations/fetchAllLocations';
 import {
+	COMMON_CSV_HEADERS,
 	countMappedCsvGeocodeRequests,
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
 	createEmptyCsvOpeningHoursImportMapping,
+	exportLocations,
 	getValidCsvOpeningHoursColumnIndexes,
 	isCommonCsvFormat,
 	parseCsvFile,
@@ -1610,7 +1612,11 @@ export function useLocationsController(
 				setIsImporting(true);
 
 				try {
-					const result = await runCommonCsvImport(parsedCsv, config, collectionsConfig);
+					const result = await runCommonCsvImport(parsedCsv, config, collectionsConfig, {
+						logos,
+						markers,
+						tags,
+					});
 
 					await loadLocations();
 					setActionNotice({
@@ -1739,18 +1745,7 @@ export function useLocationsController(
 	const onExportLocations = useCallback(() => {
 		if (locations.length === 0) return;
 
-		const headers = ['title', 'street', 'house_number', 'postal_code', 'city', 'state', 'country', 'telephone', 'email', 'website', 'latitude', 'longitude'];
-		const csvRows = [headers.join(',')];
-
-		for (const loc of locations) {
-			const values = headers.map(header => {
-				const val = (loc as any)[header] || '';
-				return `"${val.toString().replace(/"/g, '""')}"`;
-			});
-			csvRows.push(values.join(','));
-		}
-
-		const csvContent = csvRows.join('\n');
+		const csvContent = exportLocations(locations, logos, markers, tags);
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement('a');
@@ -1763,11 +1758,34 @@ export function useLocationsController(
 	}, [locations]);
 
 	const onExportExample = useCallback(() => {
-		const headers = ['title', 'street', 'house_number', 'postal_code', 'city', 'state', 'country', 'telephone', 'email', 'website', 'latitude', 'longitude'];
+		const headers = [...COMMON_CSV_HEADERS];
+		// Headers are:
+		// 0: title, 1: street, 2: house_number, 3: postal_code, 4: city, 5: state, 6: country, 7: telephone, 8: email, 9: website, 10: latitude, 11: longitude,
+		// 12: opening_hours, 13: opening_hours_notes, 14: additional information opening hours,
+		// 15: monday, 16: monday lunch break, 17: tuesday, 18: tuesday lunch break, 19: wednesday, 20: wednesday lunch break,
+		// 21: thursday, 22: thursday lunch break, 23: friday, 24: friday lunch break, 25: saturday, 26: saturday lunch break, 27: sunday, 28: sunday lunch break,
+		// 29: logo, 30: marker, 31: tags
+
 		const exampleData = [
-			'Brandenburg Gate,Pariser Platz,,10117,Berlin,Berlin,Germany,,,52.5162,13.3777',
-			'Eiffel Tower,Champ de Mars,5 Avenue Anatole France,75007,Paris,,France,,,48.8584,2.2945'
+			// Brandenburg Gate: Full info with lunch breaks and notes
+			[
+				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '', '52.5162', '13.3777',
+				'', '', 'Seasonal opening: March-October 9am-6pm',
+				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00',
+				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '10:00-16:00', '', '', '',
+				'', '', 'landmark|historical'
+			].map(v => `"${v.replace(/"/g, '""')}"`).join(','),
+
+			// Eiffel Tower: Basic info
+			[
+				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '', '48.8584', '2.2945',
+				'', '', '',
+				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
+				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
+				'', '', 'popular'
+			].map(v => `"${v.replace(/"/g, '""')}"`).join(',')
 		];
+
 		const csvContent = [headers.join(','), ...exampleData].join('\n');
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
