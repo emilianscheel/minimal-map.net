@@ -382,15 +382,18 @@
 
 .minimal-map-search__results {
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--minimal-map-search-card-gap);
   background: var(--minimal-map-search-background-primary);
+  min-width: 0;
 }
 
 .minimal-map-search__result-item {
   width: 100%;
   padding: 12px;
+  box-sizing: border-box;
   text-align: left;
   background: var(--minimal-map-search-background-primary);
   border: none;
@@ -400,6 +403,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .minimal-map-search__result-item {
@@ -412,6 +416,7 @@
   display: block;
   width: 100%;
   padding: 0;
+  box-sizing: border-box;
   text-align: left;
   background: transparent;
   border: 0;
@@ -420,6 +425,7 @@
   color: inherit;
   cursor: pointer;
   font: inherit;
+  min-width: 0;
 }
 
 .minimal-map-search__result-select:focus {
@@ -449,6 +455,7 @@
   justify-content: space-between;
   gap: 12px;
   width: 100%;
+  min-width: 0;
 }
 
 .minimal-map-search__result-content {
@@ -470,17 +477,24 @@
   color: var(--minimal-map-search-foreground-primary);
 }
 
+.minimal-map-search__result-address span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .minimal-map-search__result-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 2px;
+  min-width: 0;
 }
 
 .minimal-map-search__meta-item {
   display: flex;
   align-items: center;
   gap: 4px;
+  max-width: 100%;
   font-size: 11px;
   color: var(--minimal-map-search-foreground-secondary);
   background: var(--minimal-map-search-background-secondary);
@@ -488,7 +502,8 @@
     var(--minimal-map-search-pill-padding-x);
   border-radius: var(--minimal-map-search-pill-border-radius);
   font-weight: 600;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .minimal-map-search__result-tags {
@@ -527,6 +542,7 @@
   align-items: center;
   gap: 4px;
   max-width: 100%;
+  min-width: 0;
   padding: var(--minimal-map-google-maps-button-padding-top)
     var(--minimal-map-google-maps-button-padding-right)
     var(--minimal-map-google-maps-button-padding-bottom)
@@ -538,7 +554,7 @@
   font-weight: 600;
   line-height: 1.4;
   text-decoration: none;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .minimal-map-search__maps-link:hover,
