@@ -264,92 +264,56 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 			},
 			{
 				id: 'assign-logo',
-				label: __('Assign Logo', 'minimal-map'),
+				label: (items) =>
+					items.length === 1
+						? __('Assign Logo', 'minimal-map')
+						: __('Assign Logos', 'minimal-map'),
 				icon: <Image size={16} strokeWidth={2} />,
 				context: 'single',
 				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: false,
+				supportsBulk: true,
 				callback: (items) => {
-					if (!items[0]) {
+					if (items.length === 0) {
 						return;
 					}
 
-					controller.onOpenAssignLogoModal(items[0]);
+					controller.onOpenAssignLogoModal(items.length === 1 ? items[0] : items);
 				},
 			},
 			{
 				id: 'assign-marker',
-				label: __('Assign Marker', 'minimal-map'),
+				label: (items) =>
+					items.length === 1
+						? __('Assign Marker', 'minimal-map')
+						: __('Assign Markers', 'minimal-map'),
 				icon: <MapPin size={16} strokeWidth={2} />,
 				context: 'single',
 				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: false,
+				supportsBulk: true,
 				callback: (items) => {
-					if (!items[0]) {
+					if (items.length === 0) {
 						return;
 					}
 
-					controller.onOpenAssignMarkerModal(items[0]);
+					controller.onOpenAssignMarkerModal(items.length === 1 ? items[0] : items);
 				},
 			},
 			{
 				id: 'assign-tags',
-				label: __('Assign Tags', 'minimal-map'),
+				label: (items) =>
+					items.length === 1
+						? __('Assign Tag', 'minimal-map')
+						: __('Assign Tags', 'minimal-map'),
 				icon: <Tags size={16} strokeWidth={2} />,
 				context: 'single',
 				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: false,
-				callback: (items) => {
-					if (!items[0]) {
-						return;
-					}
-
-					controller.onOpenAssignTagsModal(items[0]);
-				},
-			},
-			{
-				id: 'bulk-assign-logo',
-				label: __('Assign Logos', 'minimal-map'),
-				icon: <Image size={16} strokeWidth={2} />,
-				context: 'list',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
 				supportsBulk: true,
 				callback: (items) => {
 					if (items.length === 0) {
 						return;
 					}
 
-					controller.onOpenAssignLogoModal(items);
-				},
-			},
-			{
-				id: 'bulk-assign-marker',
-				label: __('Assign Markers', 'minimal-map'),
-				icon: <MapPin size={16} strokeWidth={2} />,
-				context: 'list',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
-
-					controller.onOpenAssignMarkerModal(items);
-				},
-			},
-			{
-				id: 'bulk-assign-tags',
-				label: __('Assign Tags', 'minimal-map'),
-				icon: <Tags size={16} strokeWidth={2} />,
-				context: 'list',
-				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
-				supportsBulk: true,
-				callback: (items) => {
-					if (items.length === 0) {
-						return;
-					}
-
-					controller.onOpenAssignTagsModal(items);
+					controller.onOpenAssignTagsModal(items.length === 1 ? items[0] : items);
 				},
 			},
 			{
@@ -358,6 +322,7 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 				icon: <Image size={16} strokeWidth={2} />,
 				context: 'list',
 				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				isEligible: () => controller.selection.length > 1,
 				supportsBulk: true,
 				callback: (items) => {
 					if (items.length === 0) {
@@ -373,6 +338,7 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 				icon: <MapPin size={16} strokeWidth={2} />,
 				context: 'list',
 				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				isEligible: () => controller.selection.length > 1,
 				supportsBulk: true,
 				callback: (items) => {
 					if (items.length === 0) {
@@ -388,6 +354,7 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 				icon: <Tags size={16} strokeWidth={2} />,
 				context: 'list',
 				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				isEligible: () => controller.selection.length > 1,
 				supportsBulk: true,
 				callback: (items) => {
 					if (items.length === 0) {
