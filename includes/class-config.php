@@ -12,6 +12,7 @@ use MinimalMap\Logos\Logo_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Markers\Marker_Post_Type;
 use MinimalMap\Tags\Tag_Taxonomy;
+use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
 use MinimalMap\Rest\Styles_Route;
 use WP_Post;
@@ -242,6 +243,7 @@ class Config {
 			'styleThemes'   => array_values( $styles_route->get_themes() ),
 			'locations'     => $this->get_map_locations(),
 			'collections'   => $this->get_map_collections(),
+			'frontendGeocodePath' => Frontend_Geocode_Route::get_rest_path(),
 			'messages'      => array(
 				'fallback' => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 			),

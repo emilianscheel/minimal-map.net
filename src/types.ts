@@ -113,6 +113,7 @@ export interface MapRuntimeConfig {
 	styleThemes?: StyleThemeRecord[];
 	locations?: MapLocationPoint[];
 	collections?: MapCollectionOption[];
+	frontendGeocodePath?: string;
 	messages?: MapMessages;
 	embedBaseUrl?: string;
 	previewImageUrl?: string;

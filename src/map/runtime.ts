@@ -364,6 +364,7 @@ export function createMinimalMap(
 					host,
 					state.map,
 					config,
+					runtimeConfig.frontendGeocodePath,
 					state.selectedLocationId ?? undefined,
 					(location) => {
 						if (location.id) {

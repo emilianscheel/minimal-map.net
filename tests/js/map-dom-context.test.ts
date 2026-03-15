@@ -1,16 +1,20 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { JSDOM } from 'jsdom';
-import { createWordPressSearchControl } from '../../src/map/SearchControl';
+import { createElement, createRoot } from '@wordpress/element';
+import { MapSearchControl, createWordPressSearchControl } from '../../src/map/SearchControl';
 import { createAttributionPill } from '../../src/map/attribution-pill';
 import { createWordPressZoomControls } from '../../src/map/wp-controls';
 import { getSearchPanelDesktopPadding } from '../../src/map/search-panel-layout';
 import { normalizeMapConfig } from '../../src/map/defaults';
+import type { GeocodeResponse } from '../../src/types';
 
 const originalGlobals = {
 	document: globalThis.document,
 	Event: globalThis.Event,
 	FocusEvent: globalThis.FocusEvent,
 	HTMLElement: globalThis.HTMLElement,
+	HTMLIFrameElement: globalThis.HTMLIFrameElement,
+	KeyboardEvent: globalThis.KeyboardEvent,
 	MouseEvent: globalThis.MouseEvent,
 	Node: globalThis.Node,
 	navigator: globalThis.navigator,
@@ -22,10 +26,12 @@ function setGlobalDom(dom: JSDOM): void {
 	globalThis.document = dom.window.document as never;
 	globalThis.navigator = dom.window.navigator as never;
 	globalThis.HTMLElement = dom.window.HTMLElement as never;
+	globalThis.HTMLIFrameElement = dom.window.HTMLIFrameElement as never;
 	globalThis.Node = dom.window.Node as never;
 	globalThis.Event = dom.window.Event as never;
 	globalThis.MouseEvent = dom.window.MouseEvent as never;
 	globalThis.FocusEvent = dom.window.FocusEvent as never;
+	globalThis.KeyboardEvent = dom.window.KeyboardEvent as never;
 }
 
 function createMapHost() {
@@ -46,15 +52,91 @@ async function flushRender(): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, 10));
 }
 
+function focusInput(input: HTMLInputElement, iframeDom: JSDOM): void {
+	input.focus();
+	input.dispatchEvent(new iframeDom.window.FocusEvent('focus', { bubbles: true }));
+}
+
+function setInputValue(input: HTMLInputElement, iframeDom: JSDOM, value: string): void {
+	const descriptor = Object.getOwnPropertyDescriptor(
+		iframeDom.window.HTMLInputElement.prototype,
+		'value',
+	);
+
+	descriptor?.set?.call(input, value);
+	input.dispatchEvent(new iframeDom.window.Event('input', { bubbles: true }));
+	input.dispatchEvent(new iframeDom.window.Event('change', { bubbles: true }));
+}
+
+function createAddressSearchControl(
+	geocodeSearchFn: (query: string) => Promise<GeocodeResponse>,
+) {
+	const dom = new JSDOM('<!doctype html><div id="host"></div>');
+	setGlobalDom(dom);
+	Object.defineProperty(dom.window, 'innerWidth', { value: 1024, configurable: true });
+	Object.defineProperty(dom.window.HTMLElement.prototype, 'scrollIntoView', {
+		value() {},
+		configurable: true,
+	});
+	Object.defineProperty(dom.window.HTMLElement.prototype, 'attachEvent', {
+		value() {},
+		configurable: true,
+	});
+	Object.defineProperty(dom.window.HTMLElement.prototype, 'detachEvent', {
+		value() {},
+		configurable: true,
+	});
+
+	const host = dom.window.document.getElementById('host') as HTMLDivElement;
+	const root = createRoot(host);
+
+	root.render(
+		createElement(MapSearchControl, {
+			doc: dom.window.document,
+			frontendGeocodePath: '/minimal-map/v1/frontend-geocode',
+			geocodeSearch: geocodeSearchFn,
+			locations: [
+				{
+					id: 1,
+					title: 'Berlin Studio',
+					lat: 52.52,
+					lng: 13.405,
+					city: 'Berlin',
+				},
+				{
+					id: 2,
+					title: 'Hamburg Office',
+					lat: 53.5511,
+					lng: 9.9937,
+					city: 'Hamburg',
+				},
+			],
+			onSelect() {},
+		}),
+	);
+
+	return {
+		host,
+		iframeDom: dom,
+		searchControl: {
+			destroy() {
+				root.unmount();
+			},
+		},
+	};
+}
+
 afterEach(() => {
 	globalThis.window = originalGlobals.window;
 	globalThis.document = originalGlobals.document;
 	globalThis.navigator = originalGlobals.navigator;
 	globalThis.HTMLElement = originalGlobals.HTMLElement;
+	globalThis.HTMLIFrameElement = originalGlobals.HTMLIFrameElement;
 	globalThis.Node = originalGlobals.Node;
 	globalThis.Event = originalGlobals.Event;
 	globalThis.MouseEvent = originalGlobals.MouseEvent;
 	globalThis.FocusEvent = originalGlobals.FocusEvent;
+	globalThis.KeyboardEvent = originalGlobals.KeyboardEvent;
 });
 
 describe('map iframe document context', () => {
@@ -135,6 +217,7 @@ describe('map iframe document context', () => {
 				},
 			} as never,
 			config,
+			undefined,
 		);
 
 		await flushRender();
@@ -177,6 +260,7 @@ describe('map iframe document context', () => {
 				},
 			} as never,
 			config,
+			undefined,
 			1,
 		);
 
@@ -185,6 +269,130 @@ describe('map iframe document context', () => {
 
 		const address = host.querySelector('.minimal-map-search__result-address span');
 		expect(address?.textContent).toContain('Unter den Linden 7, 10117 Berlin');
+
+		searchControl.destroy();
+	});
+
+	test('shows the address prompt for zero text matches without showing a no-results message', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
+			success: true,
+			label: 'Berlin',
+			lat: 52.52,
+			lng: 13.405,
+		}));
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+
+		focusInput(input, iframeDom);
+		setInputValue(input, iframeDom, '1600 Pennsylvania Avenue');
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search__state-spinner')).not.toBeNull();
+		expect(host.textContent).toContain('Press');
+		expect(host.textContent).toContain('Enter');
+		expect(host.textContent).toContain('to load results');
+		expect(host.textContent).not.toContain('No locations found');
+
+		searchControl.destroy();
+	});
+
+	test('only geocodes on Enter when the text search has zero matches', async () => {
+		const calls: string[] = [];
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async (query) => {
+			calls.push(query);
+
+			return {
+				success: true,
+				label: 'Berlin',
+				lat: 52.52,
+				lng: 13.405,
+			};
+		});
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+
+		focusInput(input, iframeDom);
+		setInputValue(input, iframeDom, 'Berlin');
+		await flushRender();
+		input.dispatchEvent(new iframeDom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+		await flushRender();
+
+		setInputValue(input, iframeDom, '1600 Pennsylvania Avenue');
+		await flushRender();
+		input.dispatchEvent(new iframeDom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+		await flushRender();
+		await flushRender();
+
+		expect(calls).toEqual([ '1600 Pennsylvania Avenue' ]);
+
+		searchControl.destroy();
+	});
+
+	test('renders distance-sorted address results with formatted distance labels', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
+			success: true,
+			label: 'Berlin',
+			lat: 52.52,
+			lng: 13.405,
+		}));
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+
+		focusInput(input, iframeDom);
+		setInputValue(input, iframeDom, '1600 Pennsylvania Avenue');
+		await flushRender();
+		input.dispatchEvent(new iframeDom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+		await flushRender();
+		await flushRender();
+		await flushRender();
+		await flushRender();
+
+		const titles = Array.from(host.querySelectorAll('.minimal-map-search__result-title')).map(
+			(element) => element.textContent,
+		);
+		const distances = Array.from(host.querySelectorAll('.minimal-map-search__result-distance')).map(
+			(element) => element.textContent,
+		);
+
+		expect(titles).toEqual([ 'Berlin Studio', 'Hamburg Office' ]);
+		expect(distances[0]).toBe('0 m away');
+		expect(distances[1]).toContain('km away');
+
+		searchControl.destroy();
+	});
+
+	test('shows the centered empty state when geocoding returns no coordinates', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
+			success: false,
+			message: 'No coordinates',
+		}));
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+
+		focusInput(input, iframeDom);
+		setInputValue(input, iframeDom, '1600 Pennsylvania Avenue');
+		await flushRender();
+		input.dispatchEvent(new iframeDom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+		await flushRender();
+		await flushRender();
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search__state-icon')).not.toBeNull();
+		expect(host.textContent).toContain('No locations found');
 
 		searchControl.destroy();
 	});
