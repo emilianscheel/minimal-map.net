@@ -9,7 +9,9 @@ import DeleteLogoConfirmationModal from './DeleteLogoConfirmationModal';
 import LocationDialog from './LocationDialog';
 import LocationsEmptyState from './LocationsEmptyState';
 import LocationsTable from './LocationsTable';
+import RemoveMarkerConfirmationModal from './RemoveMarkerConfirmationModal';
 import RemoveCollectionAssignmentModal from './RemoveCollectionAssignmentModal';
+import RemoveTagsConfirmationModal from './RemoveTagsConfirmationModal';
 import type { LocationsController } from './types';
 
 export { useLocationsController } from './controller';
@@ -59,6 +61,8 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 			<AssignTagsModal controller={controller} />
 			<CustomCsvImportModal controller={controller} />
 			<DeleteLogoConfirmationModal controller={controller} />
+			<RemoveMarkerConfirmationModal controller={controller} />
+			<RemoveTagsConfirmationModal controller={controller} />
 			<RemoveCollectionAssignmentModal controller={controller} />
 		</div>
 	);

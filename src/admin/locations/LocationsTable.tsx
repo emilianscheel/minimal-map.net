@@ -308,6 +308,96 @@ function useLocationActions(controller: LocationsController): Action<LocationRec
 				},
 			},
 			{
+				id: 'bulk-assign-logo',
+				label: __('Assign Logos', 'minimal-map'),
+				icon: <Image size={16} strokeWidth={2} />,
+				context: 'list',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: true,
+				callback: (items) => {
+					if (items.length === 0) {
+						return;
+					}
+
+					controller.onOpenAssignLogoModal(items);
+				},
+			},
+			{
+				id: 'bulk-assign-marker',
+				label: __('Assign Markers', 'minimal-map'),
+				icon: <MapPin size={16} strokeWidth={2} />,
+				context: 'list',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: true,
+				callback: (items) => {
+					if (items.length === 0) {
+						return;
+					}
+
+					controller.onOpenAssignMarkerModal(items);
+				},
+			},
+			{
+				id: 'bulk-assign-tags',
+				label: __('Assign Tags', 'minimal-map'),
+				icon: <Tags size={16} strokeWidth={2} />,
+				context: 'list',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: true,
+				callback: (items) => {
+					if (items.length === 0) {
+						return;
+					}
+
+					controller.onOpenAssignTagsModal(items);
+				},
+			},
+			{
+				id: 'bulk-remove-logo',
+				label: __('Remove Logos', 'minimal-map'),
+				icon: <Image size={16} strokeWidth={2} />,
+				context: 'list',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: true,
+				callback: (items) => {
+					if (items.length === 0) {
+						return;
+					}
+
+					controller.onOpenDeleteLogoConfirmationModal(items);
+				},
+			},
+			{
+				id: 'bulk-remove-marker',
+				label: __('Remove Markers', 'minimal-map'),
+				icon: <MapPin size={16} strokeWidth={2} />,
+				context: 'list',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: true,
+				callback: (items) => {
+					if (items.length === 0) {
+						return;
+					}
+
+					controller.onOpenRemoveMarkerConfirmationModal(items);
+				},
+			},
+			{
+				id: 'bulk-remove-tags',
+				label: __('Remove Tags', 'minimal-map'),
+				icon: <Tags size={16} strokeWidth={2} />,
+				context: 'list',
+				disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+				supportsBulk: true,
+				callback: (items) => {
+					if (items.length === 0) {
+						return;
+					}
+
+					controller.onOpenRemoveTagsConfirmationModal(items);
+				},
+			},
+			{
 				id: 'delete-location',
 				label: __('Delete', 'minimal-map'),
 				icon: <Trash2 size={16} strokeWidth={2} />,

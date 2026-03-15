@@ -55,6 +55,12 @@ import { updateLocation } from '../../lib/locations/updateLocation';
 import { validateAddressStep } from '../../lib/locations/validateAddressStep';
 import { validateDetailsStep } from '../../lib/locations/validateDetailsStep';
 import { DEFAULT_FORM_STATE, DEFAULT_VIEW, LOCATIONS_TABLE_PER_PAGE } from './constants';
+import {
+	getLocationsWithAssignedLogos,
+	getLocationsWithAssignedMarkers,
+	getLocationsWithAssignedTags,
+	mergeLocationTagIds,
+} from './assignmentHelpers';
 import type { LocationsController } from './types';
 
 const DEFAULT_MAP_CENTER: MapCoordinates = {
@@ -103,18 +109,26 @@ export function useLocationsController(
 	const [selectedAssignmentLocation, setSelectedAssignmentLocation] = useState<LocationRecord | null>(null);
 	const [assignmentCollectionId, setAssignmentCollectionId] = useState('');
 	const [isAssignLogoModalOpen, setAssignLogoModalOpen] = useState(false);
-	const [selectedLogoLocation, setSelectedLogoLocation] = useState<LocationRecord | null>(null);
+	const [selectedLogoLocations, setSelectedLogoLocations] = useState<LocationRecord[]>([]);
 	const [assignmentLogoId, setAssignmentLogoId] = useState('');
 	const [isAssignMarkerModalOpen, setAssignMarkerModalOpen] = useState(false);
-	const [selectedMarkerLocation, setSelectedMarkerLocation] = useState<LocationRecord | null>(null);
+	const [selectedMarkerLocations, setSelectedMarkerLocations] = useState<LocationRecord[]>([]);
 	const [assignmentMarkerId, setAssignmentMarkerId] = useState('');
 	const [isAssignTagsModalOpen, setAssignTagsModalOpen] = useState(false);
-	const [selectedTagsLocation, setSelectedTagsLocation] = useState<LocationRecord | null>(null);
+	const [selectedTagsLocations, setSelectedTagsLocations] = useState<LocationRecord[]>([]);
 	const [assignmentTagIds, setAssignmentTagIds] = useState<number[]>([]);
 	const [isAssignmentSaving, setAssignmentSaving] = useState(false);
 	const [isDeleteLogoConfirmationModalOpen, setDeleteLogoConfirmationModalOpen] = useState(false);
-	const [selectedLogoRemovalLocation, setSelectedLogoRemovalLocation] =
-		useState<LocationRecord | null>(null);
+	const [selectedLogoRemovalLocations, setSelectedLogoRemovalLocations] =
+		useState<LocationRecord[]>([]);
+	const [isRemoveMarkerConfirmationModalOpen, setRemoveMarkerConfirmationModalOpen] =
+		useState(false);
+	const [selectedMarkerRemovalLocations, setSelectedMarkerRemovalLocations] =
+		useState<LocationRecord[]>([]);
+	const [isRemoveTagsConfirmationModalOpen, setRemoveTagsConfirmationModalOpen] =
+		useState(false);
+	const [selectedTagRemovalLocations, setSelectedTagRemovalLocations] =
+		useState<LocationRecord[]>([]);
 	const [isRemoveCollectionAssignmentModalOpen, setRemoveCollectionAssignmentModalOpen] =
 		useState(false);
 	const [selectedRemovalLocation, setSelectedRemovalLocation] = useState<LocationRecord | null>(
@@ -253,6 +267,18 @@ export function useLocationsController(
 		[locations, markersById]
 	);
 
+	const normalizeLocationSelection = useCallback(
+		(selectedLocations: LocationRecord | LocationRecord[]): LocationRecord[] =>
+			Array.isArray(selectedLocations) ? selectedLocations : [selectedLocations],
+		[]
+	);
+
+	const clearSelectionAfterBulkAction = useCallback((selectedLocations: LocationRecord[]): void => {
+		if (selectedLocations.length > 1) {
+			setSelection([]);
+		}
+	}, []);
+
 	const resetDialogState = (): void => {
 		setFormMode('create');
 		setEditingLocation(null);
@@ -284,19 +310,19 @@ export function useLocationsController(
 
 	const resetAssignLogoState = useCallback((): void => {
 		setAssignLogoModalOpen(false);
-		setSelectedLogoLocation(null);
+		setSelectedLogoLocations([]);
 		setAssignmentLogoId('');
 	}, []);
 
 	const resetAssignMarkerState = useCallback((): void => {
 		setAssignMarkerModalOpen(false);
-		setSelectedMarkerLocation(null);
+		setSelectedMarkerLocations([]);
 		setAssignmentMarkerId('');
 	}, []);
 
 	const resetAssignTagsState = useCallback((): void => {
 		setAssignTagsModalOpen(false);
-		setSelectedTagsLocation(null);
+		setSelectedTagsLocations([]);
 		setAssignmentTagIds([]);
 	}, []);
 
@@ -334,7 +360,7 @@ export function useLocationsController(
 
 	const resetDeleteLogoConfirmationState = useCallback((): void => {
 		setDeleteLogoConfirmationModalOpen(false);
-		setSelectedLogoRemovalLocation(null);
+		setSelectedLogoRemovalLocations([]);
 	}, []);
 
 	const closeDeleteLogoConfirmationModal = useCallback((): void => {
@@ -344,6 +370,32 @@ export function useLocationsController(
 
 		resetDeleteLogoConfirmationState();
 	}, [isAssignmentSaving, resetDeleteLogoConfirmationState]);
+
+	const resetRemoveMarkerConfirmationState = useCallback((): void => {
+		setRemoveMarkerConfirmationModalOpen(false);
+		setSelectedMarkerRemovalLocations([]);
+	}, []);
+
+	const closeRemoveMarkerConfirmationModal = useCallback((): void => {
+		if (isAssignmentSaving) {
+			return;
+		}
+
+		resetRemoveMarkerConfirmationState();
+	}, [isAssignmentSaving, resetRemoveMarkerConfirmationState]);
+
+	const resetRemoveTagsConfirmationState = useCallback((): void => {
+		setRemoveTagsConfirmationModalOpen(false);
+		setSelectedTagRemovalLocations([]);
+	}, []);
+
+	const closeRemoveTagsConfirmationModal = useCallback((): void => {
+		if (isAssignmentSaving) {
+			return;
+		}
+
+		resetRemoveTagsConfirmationState();
+	}, [isAssignmentSaving, resetRemoveTagsConfirmationState]);
 
 	const resetRemoveCollectionAssignmentState = useCallback((): void => {
 		setRemoveCollectionAssignmentModalOpen(false);
@@ -444,50 +496,99 @@ export function useLocationsController(
 		setAssignToCollectionModalOpen(true);
 	}, []);
 
-	const onOpenAssignLogoModal = useCallback((location: LocationRecord): void => {
-		setSelectedLogoLocation(location);
-		setAssignmentLogoId(location.logo_id > 0 ? `${location.logo_id}` : '');
-		setAssignLogoModalOpen(true);
-	}, []);
+	const onOpenAssignLogoModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
+		const nextLocations = normalizeLocationSelection(selectedLocations);
 
-	const onOpenAssignMarkerModal = useCallback((location: LocationRecord): void => {
-		setSelectedMarkerLocation(location);
-		setAssignmentMarkerId(location.marker_id > 0 ? `${location.marker_id}` : '');
-		setAssignMarkerModalOpen(true);
-	}, []);
-
-	const onOpenAssignTagsModal = useCallback((location: LocationRecord): void => {
-		setSelectedTagsLocation(location);
-		setAssignmentTagIds(location.tag_ids);
-		setAssignTagsModalOpen(true);
-	}, []);
-
-	const onOpenDeleteLogoConfirmationModal = useCallback((location: LocationRecord): void => {
-		if (location.logo_id <= 0) {
+		if (nextLocations.length === 0) {
 			return;
 		}
 
-		setSelectedLogoRemovalLocation(location);
+		setSelectedLogoLocations(nextLocations);
+		setAssignmentLogoId('');
+		setAssignLogoModalOpen(true);
+	}, [normalizeLocationSelection]);
+
+	const onOpenAssignMarkerModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
+		const nextLocations = normalizeLocationSelection(selectedLocations);
+
+		if (nextLocations.length === 0) {
+			return;
+		}
+
+		setSelectedMarkerLocations(nextLocations);
+		setAssignmentMarkerId('');
+		setAssignMarkerModalOpen(true);
+	}, [normalizeLocationSelection]);
+
+	const onOpenAssignTagsModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
+		const nextLocations = normalizeLocationSelection(selectedLocations);
+
+		if (nextLocations.length === 0) {
+			return;
+		}
+
+		setSelectedTagsLocations(nextLocations);
+		setAssignmentTagIds([]);
+		setAssignTagsModalOpen(true);
+	}, [normalizeLocationSelection]);
+
+	const onOpenDeleteLogoConfirmationModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
+		const nextLocations = normalizeLocationSelection(selectedLocations);
+
+		if (nextLocations.length === 0) {
+			return;
+		}
+
+		setSelectedLogoRemovalLocations(nextLocations);
 		setDeleteLogoConfirmationModalOpen(true);
+	}, [normalizeLocationSelection]);
+
+	const onOpenRemoveMarkerConfirmationModal = useCallback((selectedLocations: LocationRecord[]): void => {
+		if (selectedLocations.length === 0) {
+			return;
+		}
+
+		setSelectedMarkerRemovalLocations(selectedLocations);
+		setRemoveMarkerConfirmationModalOpen(true);
+	}, []);
+
+	const onOpenRemoveTagsConfirmationModal = useCallback((selectedLocations: LocationRecord[]): void => {
+		if (selectedLocations.length === 0) {
+			return;
+		}
+
+		setSelectedTagRemovalLocations(selectedLocations);
+		setRemoveTagsConfirmationModalOpen(true);
 	}, []);
 
 	const onAssignLogoToLocation = useCallback(async (): Promise<void> => {
-		if (!selectedLogoLocation || !assignmentLogoId) {
+		if (selectedLogoLocations.length === 0 || !assignmentLogoId) {
 			return;
 		}
+
+		const nextLogoId = Number(assignmentLogoId);
 
 		setAssignmentSaving(true);
 		setActionNotice(null);
 
 		try {
-			await updateLocation(config, selectedLogoLocation.id, {
-				...createLocationFormStateFromRecord(selectedLogoLocation),
-				logo_id: Number(assignmentLogoId),
-			});
+			for (const location of selectedLogoLocations) {
+				await updateLocation(config, location.id, {
+					...createLocationFormStateFromRecord(location),
+					logo_id: nextLogoId,
+				});
+			}
 			await loadLocations();
+			clearSelectionAfterBulkAction(selectedLogoLocations);
 			setActionNotice({
 				status: 'success',
-				message: __('Location logo updated.', 'minimal-map'),
+				message:
+					selectedLogoLocations.length === 1
+						? __('Logo assigned to location.', 'minimal-map')
+						: sprintf(
+							_n('%d location updated with a logo.', '%d locations updated with a logo.', selectedLogoLocations.length, 'minimal-map'),
+							selectedLogoLocations.length
+						),
 			});
 			resetAssignLogoState();
 		} catch (error) {
@@ -496,30 +597,48 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Location logo could not be updated.', 'minimal-map'),
+						: __('Location logos could not be updated.', 'minimal-map'),
 			});
 		} finally {
 			setAssignmentSaving(false);
 		}
-	}, [assignmentLogoId, config, loadLocations, resetAssignLogoState, selectedLogoLocation]);
+	}, [
+		assignmentLogoId,
+		clearSelectionAfterBulkAction,
+		config,
+		loadLocations,
+		resetAssignLogoState,
+		selectedLogoLocations,
+	]);
 
 	const onAssignMarkerToLocation = useCallback(async (): Promise<void> => {
-		if (!selectedMarkerLocation) {
+		if (selectedMarkerLocations.length === 0 || !assignmentMarkerId) {
 			return;
 		}
+
+		const nextMarkerId = Number(assignmentMarkerId);
 
 		setAssignmentSaving(true);
 		setActionNotice(null);
 
 		try {
-			await updateLocation(config, selectedMarkerLocation.id, {
-				...createLocationFormStateFromRecord(selectedMarkerLocation),
-				marker_id: Number(assignmentMarkerId) || 0,
-			});
+			for (const location of selectedMarkerLocations) {
+				await updateLocation(config, location.id, {
+					...createLocationFormStateFromRecord(location),
+					marker_id: nextMarkerId,
+				});
+			}
 			await loadLocations();
+			clearSelectionAfterBulkAction(selectedMarkerLocations);
 			setActionNotice({
 				status: 'success',
-				message: __('Location marker updated.', 'minimal-map'),
+				message:
+					selectedMarkerLocations.length === 1
+						? __('Marker assigned to location.', 'minimal-map')
+						: sprintf(
+							_n('%d location updated with a marker.', '%d locations updated with a marker.', selectedMarkerLocations.length, 'minimal-map'),
+							selectedMarkerLocations.length
+						),
 			});
 			resetAssignMarkerState();
 		} catch (error) {
@@ -528,15 +647,22 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Location marker could not be updated.', 'minimal-map'),
+						: __('Location markers could not be updated.', 'minimal-map'),
 			});
 		} finally {
 			setAssignmentSaving(false);
 		}
-	}, [assignmentMarkerId, config, loadLocations, resetAssignMarkerState, selectedMarkerLocation]);
+	}, [
+		assignmentMarkerId,
+		clearSelectionAfterBulkAction,
+		config,
+		loadLocations,
+		resetAssignMarkerState,
+		selectedMarkerLocations,
+	]);
 
 	const onAssignTagsToLocation = useCallback(async (): Promise<void> => {
-		if (!selectedTagsLocation) {
+		if (selectedTagsLocations.length === 0 || assignmentTagIds.length === 0) {
 			return;
 		}
 
@@ -544,18 +670,26 @@ export function useLocationsController(
 		setActionNotice(null);
 
 		try {
-			await updateLocation(config, selectedTagsLocation.id, {
-				...createLocationFormStateFromRecord(selectedTagsLocation),
-				tag_ids: assignmentTagIds,
-			});
+			for (const location of selectedTagsLocations) {
+				await updateLocation(config, location.id, {
+					...createLocationFormStateFromRecord(location),
+					tag_ids: mergeLocationTagIds(location.tag_ids, assignmentTagIds),
+				});
+			}
 			await loadLocations();
+			clearSelectionAfterBulkAction(selectedTagsLocations);
 			setActionNotice({
 				status: 'success',
-				message: __('Location tags updated.', 'minimal-map'),
+				message:
+					selectedTagsLocations.length === 1
+						? __('Tags added to location.', 'minimal-map')
+						: sprintf(
+							_n('%d location updated with new tags.', '%d locations updated with new tags.', selectedTagsLocations.length, 'minimal-map'),
+							selectedTagsLocations.length
+						),
 			});
 			resetAssignTagsState();
 		} catch (error) {
-			console.error('Failed to update tags:', error);
 			setActionNotice({
 				status: 'error',
 				message:
@@ -568,29 +702,47 @@ export function useLocationsController(
 		}
 	}, [
 		assignmentTagIds,
+		clearSelectionAfterBulkAction,
 		config,
 		loadLocations,
 		resetAssignTagsState,
-		selectedTagsLocation,
+		selectedTagsLocations,
 	]);
 
-	const onClearLogoFromLocation = useCallback(async (): Promise<void> => {
-		if (!selectedLogoRemovalLocation) {
+	const onClearLogosFromLocations = useCallback(async (): Promise<void> => {
+		if (selectedLogoRemovalLocations.length === 0) {
 			return;
 		}
+
+		const affectedLocations = getLocationsWithAssignedLogos(selectedLogoRemovalLocations);
 
 		setAssignmentSaving(true);
 		setActionNotice(null);
 
 		try {
-			await updateLocation(config, selectedLogoRemovalLocation.id, {
-				...createLocationFormStateFromRecord(selectedLogoRemovalLocation),
-				logo_id: 0,
-			});
-			await loadLocations();
+			if (affectedLocations.length > 0) {
+				for (const location of affectedLocations) {
+					await updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						logo_id: 0,
+					});
+				}
+				await loadLocations();
+			}
+			clearSelectionAfterBulkAction(selectedLogoRemovalLocations);
 			setActionNotice({
 				status: 'success',
-				message: __('Logo removed from location.', 'minimal-map'),
+				message:
+					affectedLocations.length === 0
+						? selectedLogoRemovalLocations.length === 1
+							? __('The selected location already has no logo assigned.', 'minimal-map')
+							: __('None of the selected locations have logos assigned.', 'minimal-map')
+						: affectedLocations.length === 1
+							? __('Logo removed from location.', 'minimal-map')
+							: sprintf(
+								_n('%d location cleared of its logo.', '%d locations cleared of their logos.', affectedLocations.length, 'minimal-map'),
+								affectedLocations.length
+							),
 			});
 			resetDeleteLogoConfirmationState();
 		} catch (error) {
@@ -599,12 +751,128 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Logo could not be removed from the location.', 'minimal-map'),
+						: __('Logos could not be removed from the selected locations.', 'minimal-map'),
 			});
 		} finally {
 			setAssignmentSaving(false);
 		}
-	}, [config, loadLocations, resetDeleteLogoConfirmationState, selectedLogoRemovalLocation]);
+	}, [
+		clearSelectionAfterBulkAction,
+		config,
+		loadLocations,
+		resetDeleteLogoConfirmationState,
+		selectedLogoRemovalLocations,
+	]);
+
+	const onClearMarkersFromLocations = useCallback(async (): Promise<void> => {
+		if (selectedMarkerRemovalLocations.length === 0) {
+			return;
+		}
+
+		const affectedLocations = getLocationsWithAssignedMarkers(selectedMarkerRemovalLocations);
+
+		setAssignmentSaving(true);
+		setActionNotice(null);
+
+		try {
+			if (affectedLocations.length > 0) {
+				for (const location of affectedLocations) {
+					await updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						marker_id: 0,
+					});
+				}
+				await loadLocations();
+			}
+			clearSelectionAfterBulkAction(selectedMarkerRemovalLocations);
+			setActionNotice({
+				status: 'success',
+				message:
+					affectedLocations.length === 0
+						? selectedMarkerRemovalLocations.length === 1
+							? __('The selected location already has no marker assigned.', 'minimal-map')
+							: __('None of the selected locations have custom markers assigned.', 'minimal-map')
+						: affectedLocations.length === 1
+							? __('Marker removed from location.', 'minimal-map')
+							: sprintf(
+								_n('%d location cleared of its marker.', '%d locations cleared of their markers.', affectedLocations.length, 'minimal-map'),
+								affectedLocations.length
+							),
+			});
+			resetRemoveMarkerConfirmationState();
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Markers could not be removed from the selected locations.', 'minimal-map'),
+			});
+		} finally {
+			setAssignmentSaving(false);
+		}
+	}, [
+		clearSelectionAfterBulkAction,
+		config,
+		loadLocations,
+		resetRemoveMarkerConfirmationState,
+		selectedMarkerRemovalLocations,
+	]);
+
+	const onClearTagsFromLocations = useCallback(async (): Promise<void> => {
+		if (selectedTagRemovalLocations.length === 0) {
+			return;
+		}
+
+		const affectedLocations = getLocationsWithAssignedTags(selectedTagRemovalLocations);
+
+		setAssignmentSaving(true);
+		setActionNotice(null);
+
+		try {
+			if (affectedLocations.length > 0) {
+				for (const location of affectedLocations) {
+					await updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						tag_ids: [],
+					});
+				}
+				await loadLocations();
+			}
+			clearSelectionAfterBulkAction(selectedTagRemovalLocations);
+			setActionNotice({
+				status: 'success',
+				message:
+					affectedLocations.length === 0
+						? selectedTagRemovalLocations.length === 1
+							? __('The selected location already has no tags assigned.', 'minimal-map')
+							: __('None of the selected locations have tags assigned.', 'minimal-map')
+						: affectedLocations.length === 1
+							? __('Tags removed from location.', 'minimal-map')
+							: sprintf(
+								_n('%d location cleared of its tags.', '%d locations cleared of their tags.', affectedLocations.length, 'minimal-map'),
+								affectedLocations.length
+							),
+			});
+			resetRemoveTagsConfirmationState();
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Tags could not be removed from the selected locations.', 'minimal-map'),
+			});
+		} finally {
+			setAssignmentSaving(false);
+		}
+	}, [
+		clearSelectionAfterBulkAction,
+		config,
+		loadLocations,
+		resetRemoveTagsConfirmationState,
+		selectedTagRemovalLocations,
+	]);
 
 	const onOpenRemoveCollectionAssignmentModal = useCallback(
 		(location: LocationRecord, collection: CollectionRecord): void => {
@@ -1240,6 +1508,8 @@ export function useLocationsController(
 		isAssignTagsModalOpen,
 		isAssignmentSaving,
 		isDeleteLogoConfirmationModalOpen,
+		isRemoveMarkerConfirmationModalOpen,
+		isRemoveTagsConfirmationModalOpen,
 		isDialogOpen,
 		isCustomCsvImportModalOpen,
 		isGeocoding,
@@ -1271,12 +1541,16 @@ export function useLocationsController(
 		onCloseAssignMarkerModal: closeAssignMarkerModal,
 		onCloseAssignTagsModal: closeAssignTagsModal,
 		onCloseDeleteLogoConfirmationModal: closeDeleteLogoConfirmationModal,
+		onCloseRemoveMarkerConfirmationModal: closeRemoveMarkerConfirmationModal,
+		onCloseRemoveTagsConfirmationModal: closeRemoveTagsConfirmationModal,
 		onCloseRemoveCollectionAssignmentModal: closeRemoveCollectionAssignmentModal,
 		onOpenAssignToCollectionModal,
 		onOpenAssignLogoModal,
 		onOpenAssignMarkerModal,
 		onOpenAssignTagsModal,
 		onOpenDeleteLogoConfirmationModal,
+		onOpenRemoveMarkerConfirmationModal,
+		onOpenRemoveTagsConfirmationModal,
 		onOpenRemoveCollectionAssignmentModal,
 		onChangeView: (nextView) => {
 			setView({
@@ -1296,7 +1570,9 @@ export function useLocationsController(
 		onExportLocations,
 		onExportExample,
 		onMapLocationSelect,
-		onClearLogoFromLocation,
+		onClearLogosFromLocations,
+		onClearMarkersFromLocations,
+		onClearTagsFromLocations,
 		onRemoveCollectionAssignment,
 		onRetrieveLocation,
 		onSelectAssignmentCollection: setAssignmentCollectionId,
@@ -1307,10 +1583,12 @@ export function useLocationsController(
 		paginatedLocations,
 		selection,
 		selectedAssignmentLocation,
-		selectedMarkerLocation,
-		selectedLogoLocation,
-		selectedLogoRemovalLocation,
-		selectedTagsLocation,
+		selectedMarkerLocations,
+		selectedLogoLocations,
+		selectedLogoRemovalLocations,
+		selectedMarkerRemovalLocations,
+		selectedTagRemovalLocations,
+		selectedTagsLocations,
 		selectedCoordinates,
 		selectedRemovalCollection,
 		selectedRemovalLocation,

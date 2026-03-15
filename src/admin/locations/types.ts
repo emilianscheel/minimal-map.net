@@ -49,6 +49,8 @@ export interface LocationsController {
 	isAssignTagsModalOpen: boolean;
 	isAssignmentSaving: boolean;
 	isDeleteLogoConfirmationModalOpen: boolean;
+	isRemoveMarkerConfirmationModalOpen: boolean;
+	isRemoveTagsConfirmationModalOpen: boolean;
 	isDialogOpen: boolean;
 	isGeocoding: boolean;
 	isLoading: boolean;
@@ -67,11 +69,13 @@ export interface LocationsController {
 	getLogoForLocation: (locationId: number) => LogoRecord | null;
 	getMarkerForLocation: (locationId: number) => MarkerRecord | null;
 	getTagsForLocation: (locationId: number) => TagRecord[];
-	selectedLogoLocation: LocationRecord | null;
-	selectedMarkerLocation: LocationRecord | null;
+	selectedLogoLocations: LocationRecord[];
+	selectedMarkerLocations: LocationRecord[];
 	selectedAssignmentLocation: LocationRecord | null;
-	selectedTagsLocation: LocationRecord | null;
-	selectedLogoRemovalLocation: LocationRecord | null;
+	selectedTagsLocations: LocationRecord[];
+	selectedLogoRemovalLocations: LocationRecord[];
+	selectedMarkerRemovalLocations: LocationRecord[];
+	selectedTagRemovalLocations: LocationRecord[];
 	selectedRemovalCollection: CollectionRecord | null;
 	selectedRemovalLocation: LocationRecord | null;
 	selectedCoordinates: MapCoordinates | null;
@@ -97,6 +101,8 @@ export interface LocationsController {
 	onCloseAssignMarkerModal: () => void;
 	onCloseAssignTagsModal: () => void;
 	onCloseDeleteLogoConfirmationModal: () => void;
+	onCloseRemoveMarkerConfirmationModal: () => void;
+	onCloseRemoveTagsConfirmationModal: () => void;
 	onChangeView: (nextView: ViewTable) => void;
 	onChangeSelection: (selection: string[]) => void;
 	onConfirm: () => Promise<void>;
@@ -105,15 +111,19 @@ export interface LocationsController {
 	onDuplicateLocation: (location: LocationRecord) => Promise<void>;
 	onEditLocation: (location: LocationRecord) => void;
 	onOpenAssignToCollectionModal: (location: LocationRecord) => void;
-	onOpenAssignLogoModal: (location: LocationRecord) => void;
-	onOpenAssignMarkerModal: (location: LocationRecord) => void;
-	onOpenAssignTagsModal: (location: LocationRecord) => void;
-	onOpenDeleteLogoConfirmationModal: (location: LocationRecord) => void;
+	onOpenAssignLogoModal: (locations: LocationRecord | LocationRecord[]) => void;
+	onOpenAssignMarkerModal: (locations: LocationRecord | LocationRecord[]) => void;
+	onOpenAssignTagsModal: (locations: LocationRecord | LocationRecord[]) => void;
+	onOpenDeleteLogoConfirmationModal: (locations: LocationRecord | LocationRecord[]) => void;
+	onOpenRemoveMarkerConfirmationModal: (locations: LocationRecord[]) => void;
+	onOpenRemoveTagsConfirmationModal: (locations: LocationRecord[]) => void;
 	onOpenRemoveCollectionAssignmentModal: (
 		location: LocationRecord,
 		collection: CollectionRecord
 	) => void;
-	onClearLogoFromLocation: () => Promise<void>;
+	onClearLogosFromLocations: () => Promise<void>;
+	onClearMarkersFromLocations: () => Promise<void>;
+	onClearTagsFromLocations: () => Promise<void>;
 	onRemoveCollectionAssignment: () => Promise<void>;
 	onRetrieveLocation: (location: LocationRecord) => Promise<void>;
 	onSelectAssignmentCollection: (collectionId: string) => void;

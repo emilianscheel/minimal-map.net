@@ -3,15 +3,24 @@ import { __ } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
 import TagBadge from '../../components/TagBadge';
+import { getAssignableTagIds, getDisplayedAssignedTags } from './assignmentHelpers';
 import type { LocationsController } from './types';
 
 export default function AssignTagsModal({ controller }: { controller: LocationsController }) {
-	if (!controller.isAssignTagsModalOpen || !controller.selectedTagsLocation) {
+	if (!controller.isAssignTagsModalOpen || controller.selectedTagsLocations.length === 0) {
 		return null;
 	}
 
-	const assignedTags = controller.getTagsForLocation(controller.selectedTagsLocation.id);
-	const tagSuggestions = controller.tags.map((tag) => tag.name);
+	const assignedTags = getDisplayedAssignedTags(controller.selectedTagsLocations, controller.tags);
+	const assignableTagIds = new Set(
+		getAssignableTagIds(
+			controller.selectedTagsLocations,
+			controller.tags.map((tag) => tag.id)
+		)
+	);
+	const tagSuggestions = controller.tags
+		.filter((tag) => assignableTagIds.has(tag.id))
+		.map((tag) => tag.name);
 	const currentTagNames = controller.assignmentTagIds
 		.map((id) => controller.tags.find((t) => t.id === id)?.name)
 		.filter((name): name is string => !!name);
@@ -68,13 +77,22 @@ export default function AssignTagsModal({ controller }: { controller: LocationsC
 					suggestions={tagSuggestions}
 					onChange={(tokenNames) => {
 						const nextTagIds = tokenNames
-							.map((name) => controller.tags.find((t) => t.name === name)?.id)
+							.map((name) =>
+								controller.tags.find(
+									(tag) => tag.name === name && assignableTagIds.has(tag.id)
+								)?.id
+							)
 							.filter((id): id is number => id !== undefined);
 						controller.onSelectAssignmentTags(nextTagIds);
 					}}
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				/>
+				<p className="components-base-control__help">
+					{tagSuggestions.length === 0
+						? __('All available tags are already assigned for this selection.', 'minimal-map')
+						: __('Select only new tags to add. Existing tags stay assigned.', 'minimal-map')}
+				</p>
 
 				<div className="minimal-map-admin__assign-to-collection-actions">
 					<Button
@@ -91,7 +109,7 @@ export default function AssignTagsModal({ controller }: { controller: LocationsC
 						variant="primary"
 						onClick={() => void controller.onAssignTagsToLocation()}
 						isBusy={controller.isAssignmentSaving}
-						disabled={controller.isAssignmentSaving}
+						disabled={controller.isAssignmentSaving || controller.assignmentTagIds.length === 0}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
 							<span>{__('Save Tags', 'minimal-map')}</span>

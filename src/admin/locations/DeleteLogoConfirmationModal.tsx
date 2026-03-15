@@ -1,8 +1,9 @@
 import { Button, Modal } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import LogoPreview from '../../components/LogoPreview';
 import Kbd from '../../components/Kbd';
+import { getLocationsWithAssignedLogos } from './assignmentHelpers';
 import type { LocationsController } from './types';
 
 export default function DeleteLogoConfirmationModal({
@@ -10,15 +11,17 @@ export default function DeleteLogoConfirmationModal({
 }: {
 	controller: LocationsController;
 }) {
-	if (!controller.isDeleteLogoConfirmationModalOpen || !controller.selectedLogoRemovalLocation) {
+	if (
+		!controller.isDeleteLogoConfirmationModalOpen ||
+		controller.selectedLogoRemovalLocations.length === 0
+	) {
 		return null;
 	}
 
-	const logo = controller.getLogoForLocation(controller.selectedLogoRemovalLocation.id);
-
-	if (!logo) {
-		return null;
-	}
+	const isBulk = controller.selectedLogoRemovalLocations.length > 1;
+	const affectedLocations = getLocationsWithAssignedLogos(controller.selectedLogoRemovalLocations);
+	const firstLogoLocation = affectedLocations[0];
+	const logo = firstLogoLocation ? controller.getLogoForLocation(firstLogoLocation.id) : null;
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		const target = event.target;
@@ -33,7 +36,7 @@ export default function DeleteLogoConfirmationModal({
 		}
 
 		event.preventDefault();
-		void controller.onClearLogoFromLocation();
+		void controller.onClearLogosFromLocations();
 	};
 
 	return (
@@ -46,14 +49,31 @@ export default function DeleteLogoConfirmationModal({
 		>
 			<div className="minimal-map-admin__collection-delete-dialog">
 				<p className="minimal-map-admin__collection-delete-dialog-copy">
-					{__('Remove this logo from the selected location?', 'minimal-map')}
+					{affectedLocations.length === 0
+						? isBulk
+							? __('None of the selected locations have a logo assigned. Confirm to close this selection.', 'minimal-map')
+							: __('This location already has no logo assigned.', 'minimal-map')
+						: isBulk
+							? sprintf(
+								_n(
+									'Remove logos from %d selected location? %d of them currently have a logo assigned.',
+									'Remove logos from %d selected locations? %d of them currently have a logo assigned.',
+									controller.selectedLogoRemovalLocations.length,
+									'minimal-map'
+								),
+								controller.selectedLogoRemovalLocations.length,
+								affectedLocations.length
+							)
+							: __('Remove this logo from the selected location?', 'minimal-map')}
 				</p>
-				<div className="minimal-map-admin__assigned-logo-card">
-					<div className="minimal-map-admin__assigned-logo-surface">
-						<LogoPreview logo={logo} className="minimal-map-admin__assigned-logo-preview" />
+				{logo && !isBulk && (
+					<div className="minimal-map-admin__assigned-logo-card">
+						<div className="minimal-map-admin__assigned-logo-surface">
+							<LogoPreview logo={logo} className="minimal-map-admin__assigned-logo-preview" />
+						</div>
+						<code className="minimal-map-admin__logo-filename">{logo.title}</code>
 					</div>
-					<code className="minimal-map-admin__logo-filename">{logo.title}</code>
-				</div>
+				)}
 				<div className="minimal-map-admin__collection-delete-dialog-actions">
 					<Button
 						variant="tertiary"
@@ -66,12 +86,12 @@ export default function DeleteLogoConfirmationModal({
 					<Button
 						variant="primary"
 						isDestructive
-						onClick={() => void controller.onClearLogoFromLocation()}
+						onClick={() => void controller.onClearLogosFromLocations()}
 						isBusy={controller.isAssignmentSaving}
 						disabled={controller.isAssignmentSaving}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Remove Logo', 'minimal-map')}</span>
+							<span>{__('Remove Logos', 'minimal-map')}</span>
 							<Kbd variant="red">Enter</Kbd>
 						</span>
 					</Button>

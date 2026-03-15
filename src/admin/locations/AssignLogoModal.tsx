@@ -1,20 +1,34 @@
 import { Button, ComboboxControl, Modal } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import LogoPreview from '../../components/LogoPreview';
 import Kbd from '../../components/Kbd';
+import { getAssignableLogoIds, getLocationsWithAssignedLogos } from './assignmentHelpers';
 import type { LocationsController } from './types';
 
 export default function AssignLogoModal({ controller }: { controller: LocationsController }) {
-	if (!controller.isAssignLogoModalOpen || !controller.selectedLogoLocation) {
+	if (!controller.isAssignLogoModalOpen || controller.selectedLogoLocations.length === 0) {
 		return null;
 	}
 
-	const assignedLogo = controller.getLogoForLocation(controller.selectedLogoLocation.id);
-	const options = controller.logos.map((logo) => ({
-		label: logo.title || __('Untitled logo', 'minimal-map'),
-		value: `${logo.id}`,
-	}));
+	const isBulk = controller.selectedLogoLocations.length > 1;
+	const firstLocation = controller.selectedLogoLocations[0];
+	const assignedLogo = !isBulk && firstLocation
+		? controller.getLogoForLocation(firstLocation.id)
+		: null;
+	const assignableLogoIds = new Set(
+		getAssignableLogoIds(
+			controller.selectedLogoLocations,
+			controller.logos.map((logo) => logo.id)
+		)
+	);
+	const options = controller.logos
+		.filter((logo) => assignableLogoIds.has(logo.id))
+		.map((logo) => ({
+			label: logo.title || __('Untitled logo', 'minimal-map'),
+			value: `${logo.id}`,
+		}));
+	const assignedLocationCount = getLocationsWithAssignedLogos(controller.selectedLogoLocations).length;
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		const target = event.target;
@@ -51,7 +65,20 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 		>
 			<div className="minimal-map-admin__assign-to-collection-dialog">
 				<div className="minimal-map-admin__assign-to-collection-copy">
-					{assignedLogo ? (
+					{isBulk ? (
+						<p className="minimal-map-admin__assign-to-collection-empty">
+							{sprintf(
+								_n(
+									'Assign one new logo to %d selected location. %d currently have a logo assigned.',
+									'Assign one new logo to %d selected locations. %d currently have a logo assigned.',
+									controller.selectedLogoLocations.length,
+									'minimal-map'
+								),
+								controller.selectedLogoLocations.length,
+								assignedLocationCount
+							)}
+						</p>
+					) : assignedLogo ? (
 						<div className="minimal-map-admin__assigned-logo-card">
 							<div className="minimal-map-admin__assigned-logo-surface">
 								<LogoPreview logo={assignedLogo} className="minimal-map-admin__assigned-logo-preview" />
@@ -73,7 +100,9 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 					onChange={(value) => controller.onSelectAssignmentLogo(value ?? '')}
 					help={
 						options.length === 0
-							? __('Upload a logo first to assign one to this location.', 'minimal-map')
+							? controller.logos.length === 0
+								? __('Upload a logo first to assign one to these locations.', 'minimal-map')
+								: __('All available logos are already assigned for this selection.', 'minimal-map')
 							: undefined
 					}
 				/>
