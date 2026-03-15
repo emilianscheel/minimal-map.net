@@ -76,6 +76,7 @@ function submitSearchForm(host: HTMLDivElement, iframeDom: JSDOM): void {
 
 function createAddressSearchControl(
 	geocodeSearchFn: (query: string) => Promise<GeocodeResponse>,
+	onSelect: (location: { id?: number; title?: string }) => void = () => {},
 ) {
 	const dom = new JSDOM('<!doctype html><div id="host"></div>');
 	setGlobalDom(dom);
@@ -117,7 +118,7 @@ function createAddressSearchControl(
 					city: 'Hamburg',
 				},
 			],
-			onSelect() {},
+			onSelect,
 		}),
 	);
 
@@ -342,12 +343,18 @@ describe('map iframe document context', () => {
 	});
 
 	test('renders distance-sorted address results with formatted distance labels', async () => {
-		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
-			success: true,
-			label: 'Berlin',
-			lat: 52.52,
-			lng: 13.405,
-		}));
+		const selections: string[] = [];
+		const { host, iframeDom, searchControl } = createAddressSearchControl(
+			async () => ({
+				success: true,
+				label: 'Berlin',
+				lat: 52.52,
+				lng: 13.405,
+			}),
+			(location) => {
+				selections.push(location.title ?? '');
+			},
+		);
 
 		await flushRender();
 		await flushRender();
@@ -369,10 +376,15 @@ describe('map iframe document context', () => {
 		const distances = Array.from(host.querySelectorAll('.minimal-map-search__result-distance')).map(
 			(element) => element.textContent,
 		);
+		const selectedResult = host.querySelector('.minimal-map-search__result-item.is-selected');
 
 		expect(titles).toEqual([ 'Berlin Studio', 'Hamburg Office' ]);
 		expect(distances[0]).toBe('0 m away');
 		expect(distances[1]).toContain('km away');
+		expect(selectedResult?.querySelector('.minimal-map-search__result-title')?.textContent).toBe(
+			'Berlin Studio',
+		);
+		expect(selections).toEqual([ 'Berlin Studio' ]);
 
 		searchControl.destroy();
 	});

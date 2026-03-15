@@ -245,16 +245,22 @@ export const MapSearchControl = ({
 			return;
 		}
 
-		setAddressResults(
-			buildDistanceSearchResults(
-				{
-					lat: result.lat,
-					lng: result.lng,
-				},
-				locations,
-			),
+		const nextAddressResults = buildDistanceSearchResults(
+			{
+				lat: result.lat,
+				lng: result.lng,
+			},
+			locations,
 		);
+
+		setAddressResults(nextAddressResults);
 		setAddressSearchMode('results');
+
+		const bestResult = nextAddressResults[0]?.location;
+
+		if (bestResult) {
+			handleSelect(bestResult);
+		}
 	};
 
 	const renderResultCards = () => (
