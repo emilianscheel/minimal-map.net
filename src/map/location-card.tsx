@@ -73,6 +73,46 @@ const SearchResultLogo = ({ logo }: { logo: MapLocationLogo }) => {
 	);
 };
 
+function LocationContactMeta({ location }: { location: MapLocationPoint }) {
+	if (!location.telephone && !location.email && !location.website) {
+		return null;
+	}
+
+	return (
+		<div className="minimal-map-search__result-meta">
+			{location.telephone ? (
+				<a
+					className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
+					href={`tel:${location.telephone}`}
+				>
+					<Phone size={10} />
+					<span>{location.telephone}</span>
+				</a>
+			) : null}
+			{location.email ? (
+				<a
+					className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
+					href={`mailto:${location.email}`}
+				>
+					<Mail size={10} />
+					<span>{location.email}</span>
+				</a>
+			) : null}
+			{location.website ? (
+				<a
+					className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
+					href={location.website}
+					rel="noreferrer noopener"
+					target="_blank"
+				>
+					<Globe size={10} />
+					<span>{formatDisplayUrl(location.website)}</span>
+				</a>
+			) : null}
+		</div>
+	);
+}
+
 export function LocationResultCard({
 	distanceLabel,
 	googleMapsButtonShowIcon,
@@ -108,28 +148,6 @@ export function LocationResultCard({
 					<MapPin size={12} />
 					<span>{formatLocationAddress(location)}</span>
 				</div>
-				{location.telephone || location.email || location.website ? (
-					<div className="minimal-map-search__result-meta">
-						{location.telephone ? (
-							<div className="minimal-map-search__meta-item">
-								<Phone size={10} />
-								<span>{location.telephone}</span>
-							</div>
-						) : null}
-						{location.email ? (
-							<div className="minimal-map-search__meta-item">
-								<Mail size={10} />
-								<span>{location.email}</span>
-							</div>
-						) : null}
-						{location.website ? (
-							<div className="minimal-map-search__meta-item">
-								<Globe size={10} />
-								<span>{formatDisplayUrl(location.website)}</span>
-							</div>
-						) : null}
-					</div>
-				) : null}
 			</div>
 			{location.logo ? (
 				<div className="minimal-map-search__result-logo-column">
@@ -216,6 +234,7 @@ export function LocationResultCard({
 			) : (
 				<div className="minimal-map-location-card__body">{layout}</div>
 			)}
+			<LocationContactMeta location={location} />
 			{openingHoursSection}
 			{showFooter ? (
 				<div className="minimal-map-search__result-footer">

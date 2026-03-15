@@ -50,6 +50,8 @@ describe('location result card', () => {
 				street: 'Unter den Linden',
 				house_number: '7',
 				postal_code: '10117',
+				telephone: '+49 30 123456',
+				email: 'info@example.com',
 				website: 'https://example.com',
 				opening_hours: {
 					monday: {
@@ -118,6 +120,15 @@ describe('location result card', () => {
 		expect(host.querySelector('.minimal-map-search__maps-link')?.textContent).toContain(
 			'Open in Google Maps',
 		);
+		expect(
+			host.querySelector('.minimal-map-search__meta-item--link[href="tel:+49 30 123456"]')
+		).not.toBeNull();
+		expect(
+			host.querySelector('.minimal-map-search__meta-item--link[href="mailto:info@example.com"]')
+		).not.toBeNull();
+		expect(
+			host.querySelector('.minimal-map-search__meta-item--link[href="https://example.com"]')
+		).not.toBeNull();
 		expect(host.querySelector('.minimal-map-search__result-distance')?.textContent).toBe(
 			'500 m away',
 		);
@@ -158,6 +169,9 @@ describe('location result card', () => {
 				lat: 53.5511,
 				lng: 9.9937,
 				city: 'Hamburg',
+				telephone: '+49 40 987654',
+				email: 'hamburg@example.com',
+				website: 'https://hamburg.example.com',
 			},
 			mode: 'in-map',
 			siteLocale: 'en-US',
@@ -171,6 +185,19 @@ describe('location result card', () => {
 		expect(host.querySelector('.minimal-map-location-card--in-map')).not.toBeNull();
 		expect(host.querySelector('.minimal-map-search__maps-link svg')).toBeNull();
 		expect(host.querySelector('.minimal-map-search__result-opening-hours-trigger')).toBeNull();
+		expect(
+			host.querySelector('.minimal-map-search__meta-item--link[href="tel:+49 40 987654"]')
+		).not.toBeNull();
+		expect(
+			host.querySelector(
+				'.minimal-map-search__meta-item--link[href="mailto:hamburg@example.com"]'
+			)
+		).not.toBeNull();
+		expect(
+			host.querySelector(
+				'.minimal-map-search__meta-item--link[href="https://hamburg.example.com"]'
+			)
+		).not.toBeNull();
 
 		root.unmount();
 	});

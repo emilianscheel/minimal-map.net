@@ -624,6 +624,21 @@
   line-height: 1.4;
 }
 
+.minimal-map-search__meta-item--link {
+  text-decoration: none;
+}
+
+.minimal-map-search__meta-item--link:hover,
+.minimal-map-search__meta-item--link:focus {
+  color: var(--minimal-map-search-foreground-secondary);
+  text-decoration: none;
+  opacity: 0.92;
+}
+
+.minimal-map-search__meta-item--link:visited {
+  color: var(--minimal-map-search-foreground-secondary);
+}
+
 .minimal-map-search__result-tags {
   display: flex;
   flex-wrap: wrap;
