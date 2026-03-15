@@ -81,11 +81,16 @@ function createAddressSearchControl(
 		googleMapsButtonShowIcon?: boolean;
 		locations?: MapLocationPoint[];
 		onSelect?: (selection: MapLocationSelection) => void;
+		selectedId?: number;
+		viewportWidth?: number;
 	} = {},
 ) {
 	const dom = new JSDOM('<!doctype html><div id="host"></div>');
 	setGlobalDom(dom);
-	Object.defineProperty(dom.window, 'innerWidth', { value: 1024, configurable: true });
+	Object.defineProperty(dom.window, 'innerWidth', {
+		value: options.viewportWidth ?? 1024,
+		configurable: true,
+	});
 	Object.defineProperty(dom.window.HTMLElement.prototype, 'scrollIntoView', {
 		value() {},
 		configurable: true,
@@ -121,6 +126,7 @@ function createAddressSearchControl(
 			},
 		],
 		onSelect = () => {},
+		selectedId,
 	} = options;
 
 	root.render(
@@ -132,6 +138,7 @@ function createAddressSearchControl(
 			googleMapsButtonShowIcon,
 			locations,
 			onSelect,
+			selectedId,
 			siteLocale: 'en-US',
 			siteTimezone: 'Europe/Berlin',
 		}),
@@ -143,6 +150,22 @@ function createAddressSearchControl(
 		searchControl: {
 			destroy() {
 				root.unmount();
+			},
+			update(nextSelectedId?: number) {
+				root.render(
+					createElement(MapSearchControl, {
+						doc: dom.window.document,
+						frontendGeocodePath: '/minimal-map/v1/frontend-geocode',
+						geocodeSearch: geocodeSearchFn,
+						googleMapsNavigation,
+						googleMapsButtonShowIcon,
+						locations,
+						onSelect,
+						selectedId: nextSelectedId,
+						siteLocale: 'en-US',
+						siteTimezone: 'Europe/Berlin',
+					}),
+				);
 			},
 		},
 	};
@@ -398,6 +421,140 @@ describe('map iframe document context', () => {
 				title: 'Berlin Studio',
 			},
 		]);
+
+		searchControl.destroy();
+	});
+
+	test('closes the search panel on mobile after tapping a result card and still selects the location', async () => {
+		const selections: Array<{ title: string }> = [];
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
+			success: true,
+			label: 'Berlin',
+			lat: 52.52,
+			lng: 13.405,
+		}), {
+			onSelect: (selection) => {
+				selections.push({
+					title: selection.location.title ?? '',
+				});
+			},
+			viewportWidth: 500,
+		});
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		await flushRender();
+
+		const resultButton = host.querySelector(
+			'.minimal-map-search__result-select'
+		) as HTMLButtonElement;
+		resultButton.click();
+		await flushRender();
+		await flushRender();
+
+		expect(selections).toEqual([{ title: 'Berlin Studio' }]);
+		expect(host.querySelector('.minimal-map-search-backdrop')).toBeNull();
+		expect(host.querySelector('.minimal-map-search__results-container')).toBeNull();
+
+		searchControl.destroy();
+	});
+
+	test('keeps the search panel open on desktop after tapping a result card', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
+			success: true,
+			label: 'Berlin',
+			lat: 52.52,
+			lng: 13.405,
+		}), {
+			viewportWidth: 1024,
+		});
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		await flushRender();
+
+		const resultButton = host.querySelector(
+			'.minimal-map-search__result-select'
+		) as HTMLButtonElement;
+		resultButton.click();
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search-backdrop')).not.toBeNull();
+		expect(host.querySelector('.minimal-map-search__results-container')).not.toBeNull();
+
+		searchControl.destroy();
+	});
+
+	test('keeps the mobile panel open after address-search auto-selection', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(
+			async () => ({
+				success: true,
+				label: 'Berlin',
+				lat: 52.52,
+				lng: 13.405,
+			}),
+			{
+				viewportWidth: 500,
+			},
+		);
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		setInputValue(input, iframeDom, '1600 Pennsylvania Avenue');
+		await flushRender();
+		submitSearchForm(host, iframeDom);
+		await flushRender();
+		await flushRender();
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search-backdrop')).not.toBeNull();
+		expect(host.querySelector('.minimal-map-search__results-container')).not.toBeNull();
+		expect(host.querySelector('.minimal-map-search__result-item.is-selected')).not.toBeNull();
+
+		searchControl.destroy();
+	});
+
+	test('does not reopen a mobile-closed panel on selectedId updates alone', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(async () => ({
+			success: true,
+			label: 'Berlin',
+			lat: 52.52,
+			lng: 13.405,
+		}), {
+			viewportWidth: 500,
+		});
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		await flushRender();
+
+		const resultButton = host.querySelector(
+			'.minimal-map-search__result-select'
+		) as HTMLButtonElement;
+		resultButton.click();
+		await flushRender();
+		await flushRender();
+
+		searchControl.update(1);
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search-backdrop')).toBeNull();
+		expect(host.querySelector('.minimal-map-search__results-container')).toBeNull();
 
 		searchControl.destroy();
 	});

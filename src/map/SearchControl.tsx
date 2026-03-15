@@ -17,6 +17,7 @@ import {
 } from './location-distance';
 import { LocationResultCard } from './location-card';
 import { applySearchPanelCssVariables } from './search-panel-layout';
+import { isMobileViewport } from './responsive';
 
 type SearchMode =
 	| 'text-results'
@@ -63,15 +64,17 @@ export const MapSearchControl = ({
 	siteTimezone,
 }: SearchControlProps) => {
 	const [searchTerm, setSearchTerm] = useState('');
-	const [isFocused, setIsFocused] = useState(false);
+	const [isPanelOpen, setPanelOpen] = useState(false);
 	const [addressSearchMode, setAddressSearchMode] = useState<
 		'idle' | 'loading' | 'results' | 'empty'
 	>('idle');
 	const [addressResults, setAddressResults] = useState<DistanceSearchResult[]>([]);
 	const [selectedId, setSelectedId] = useState<number | undefined>(selectedIdProp);
+	const [viewportWidth, setViewportWidth] = useState<number | null>(doc.defaultView?.innerWidth ?? null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const searchTermRef = useRef(searchTerm);
-	const isOpen = isFocused || typeof selectedId === 'number';
+	const isMobile = isMobileViewport(viewportWidth);
+	const isOpen = isPanelOpen || (!isMobile && typeof selectedId === 'number');
 	const trimmedSearchTerm = searchTerm.trim();
 
 	useEffect(() => {
@@ -81,6 +84,25 @@ export const MapSearchControl = ({
 	useEffect(() => {
 		setSelectedId(selectedIdProp);
 	}, [selectedIdProp]);
+
+	useEffect(() => {
+		const view = doc.defaultView;
+
+		if (!view) {
+			return;
+		}
+
+		const handleResize = () => {
+			setViewportWidth(view.innerWidth);
+		};
+
+		handleResize();
+		view.addEventListener('resize', handleResize);
+
+		return () => {
+			view.removeEventListener('resize', handleResize);
+		};
+	}, [doc]);
 
 	const filteredLocations = useMemo(() => {
 		if (!isOpen) {
@@ -153,7 +175,7 @@ export const MapSearchControl = ({
 				containerRef.current &&
 				!containerRef.current.contains(event.target as Node)
 			) {
-				setIsFocused(false);
+				setPanelOpen(false);
 			}
 		};
 
@@ -173,8 +195,17 @@ export const MapSearchControl = ({
 		element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 	}, [doc, selectedId]);
 
-	const handleSelect = (location: MapLocationPoint, distanceLabel?: string) => {
+	const handleSelect = (
+		location: MapLocationPoint,
+		distanceLabel?: string,
+		selectionOrigin: 'tap' | 'auto' = 'tap'
+	) => {
 		setSelectedId(location.id);
+
+		if (isMobile && selectionOrigin === 'tap') {
+			setPanelOpen(false);
+		}
+
 		onSelect({ location, distanceLabel });
 	};
 
@@ -223,7 +254,7 @@ export const MapSearchControl = ({
 		const bestResult = nextAddressResults[0];
 
 		if (bestResult) {
-			handleSelect(bestResult.location, bestResult.distanceLabel);
+			handleSelect(bestResult.location, bestResult.distanceLabel, 'auto');
 		}
 	};
 
@@ -239,7 +270,7 @@ export const MapSearchControl = ({
 					isSelected={selectedId === location.id}
 					location={location}
 					mode="search"
-					onSelect={() => handleSelect(location, distanceLabel)}
+					onSelect={() => handleSelect(location, distanceLabel, 'tap')}
 					siteLocale={siteLocale}
 					siteTimezone={siteTimezone}
 				/>
@@ -261,7 +292,7 @@ export const MapSearchControl = ({
 			{isOpen ? (
 				<div
 					className="minimal-map-search-backdrop"
-					onClick={() => setIsFocused(false)}
+					onClick={() => setPanelOpen(false)}
 				/>
 			) : null}
 			<div
@@ -285,7 +316,7 @@ export const MapSearchControl = ({
 								(event.target as HTMLInputElement | null)?.value ?? '',
 							)
 						}
-						onFocus={() => setIsFocused(true)}
+						onFocus={() => setPanelOpen(true)}
 						enterKeyHint="search"
 						placeholder={__('Search locations...', 'minimal-map')}
 						aria-label={__('Search locations', 'minimal-map')}
