@@ -1446,7 +1446,7 @@ msgstr "Schlagwörter öffnen"
 
 #: src/map/location-opening-hours.ts:238
 msgid "Open - closes %s"
-msgstr "Logos öffnen"
+msgstr "Geöffnet - schließt %s"
 
 #: src/admin/sections/DashboardSection.tsx:21
 msgid "Open collections"
@@ -1475,11 +1475,11 @@ msgstr "Schlagwörter öffnen"
 #: src/admin/locations/LocationsTable.tsx:121
 #: src/admin/locations/OpeningHoursInput.tsx:46
 msgid "Opening hours"
-msgstr "Logos öffnen"
+msgstr "Öffnungszeiten"
 
 #: src/block/edit.tsx:1484
 msgid "Opening Hours"
-msgstr "Logos öffnen"
+msgstr "Öffnungszeiten"
 
 #: src/admin/locations/controller.tsx:933
 msgid "Opening hours could not be updated."
@@ -1672,7 +1672,7 @@ msgstr "Start- und Landebahnlinien"
 #: src/lib/locations/formatOpeningHoursSummary.ts:15
 #: src/map/location-opening-hours.ts:39
 msgid "Sat"
-msgstr "Bundesland"
+msgstr "Sa"
 
 #: src/admin/locations/OpeningHoursInput.tsx:23
 #: src/map/location-opening-hours.ts:29
