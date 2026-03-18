@@ -437,7 +437,7 @@ class Config {
 
 			$collections[] = array(
 				'id'        => $post->ID,
-				'title'     => get_the_title( $post ),
+				'title'     => $this->get_payload_post_title( $post ),
 				'locations' => $this->filter_locations_by_ids(
 					$locations,
 					$this->normalize_location_ids(
@@ -487,7 +487,7 @@ class Config {
 
 			$location = array(
 				'id'           => (int) $post->ID,
-				'title'        => get_the_title( $post ),
+				'title'        => $this->get_payload_post_title( $post ),
 				'lat'          => $normalized['lat'],
 				'lng'          => $normalized['lng'],
 				'telephone'    => (string) get_post_meta( $post->ID, 'telephone', true ),
@@ -846,9 +846,29 @@ class Config {
 
 		return array(
 			'id'      => $logo_post->ID,
-			'title'   => (string) get_the_title( $logo_post ),
+			'title'   => $this->get_payload_post_title( $logo_post ),
 			'content' => $content,
 		);
+	}
+
+	/**
+	 * Get one frontend-safe raw post title for JSON payloads.
+	 *
+	 * Avoid `get_the_title()` here because it runs display formatting such as
+	 * `wptexturize()`, which can introduce HTML entities like `&#8217;` into the
+	 * API payload. The frontend needs the original text content instead.
+	 *
+	 * @param WP_Post $post Post object.
+	 * @return string
+	 */
+	private function get_payload_post_title( WP_Post $post ) {
+		$charset = get_bloginfo( 'charset' );
+
+		if ( ! is_string( $charset ) || '' === $charset ) {
+			$charset = 'UTF-8';
+		}
+
+		return html_entity_decode( (string) $post->post_title, ENT_QUOTES | ENT_HTML5, $charset );
 	}
 
 	/**

@@ -43,11 +43,11 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	 * @param mixed $longitude Longitude meta value.
 	 * @return int
 	 */
-	private function create_location( $latitude, $longitude ) {
+	private function create_location( $latitude, $longitude, $title = null ) {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_status' => 'publish',
-				'post_title'  => 'Location ' . wp_generate_uuid4(),
+				'post_title'  => is_string( $title ) ? $title : 'Location ' . wp_generate_uuid4(),
 				'post_type'   => \MinimalMap\Locations\Location_Post_Type::POST_TYPE,
 			)
 		);
@@ -250,6 +250,22 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			),
 			$config->get_map_locations()
 		);
+	}
+
+	/**
+	 * Streamed frontend location payloads should expose raw titles instead of HTML entities.
+	 *
+	 * @return void
+	 */
+	public function test_get_optimized_map_data_preserves_raw_location_titles() {
+		$config      = new \MinimalMap\Config();
+		$location_id = $this->create_location( '52.517', '13.388', "denn's" );
+		$data        = $config->get_optimized_map_data();
+
+		$this->assertArrayHasKey( 'locations', $data );
+		$this->assertCount( 1, $data['locations'] );
+		$this->assertSame( $location_id, $data['locations'][0]['id'] );
+		$this->assertSame( "denn's", $data['locations'][0]['title'] );
 	}
 
 	/**
