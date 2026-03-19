@@ -245,6 +245,7 @@
   --minimal-map-search-margin-bottom: 24px;
   --minimal-map-search-margin-left: 24px;
   --minimal-map-search-gap: 24px;
+  --minimal-map-search-category-gap: calc(var(--minimal-map-search-margin-top) / 2);
   --minimal-map-search-input-radius: 10px;
   --minimal-map-search-card-radius: 2px;
   --minimal-map-search-card-gap: 12px;
@@ -340,6 +341,7 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: flex-start;
+  margin-top: calc(var(--minimal-map-search-category-gap) - var(--minimal-map-search-gap));
 }
 
 .minimal-map-search__category-pill {
