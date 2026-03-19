@@ -93,6 +93,7 @@ describe('location card preview controller', () => {
 			],
 		});
 		const enabledConfig = normalizeMapConfig({
+			fontFamily: '"Figtree", sans-serif',
 			inMapLocationCard: true,
 			googleMapsNavigation: true,
 			siteLocale: 'en-US',
@@ -184,9 +185,9 @@ describe('location card preview controller', () => {
 		).toBeNull();
 		expect(
 			(popupState.contentNode as HTMLElement)?.style.getPropertyValue(
-				'--minimal-map-location-card-font-family'
+				'--minimal-map-font-family'
 			)
-		).toBe(dom.window.getComputedStyle(dom.window.document.body).fontFamily);
+		).toBe('"Figtree", sans-serif');
 
 		controller.hide();
 		expect(popupState.removeCalls).toBe(1);

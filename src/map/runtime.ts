@@ -63,10 +63,20 @@ function createFallback(host: HTMLElement, message: string, context: MapDomConte
 	host.appendChild(notice);
 }
 
+function applyHostFontFamily(host: HTMLElement, config: NormalizedMapConfig): void {
+	if (config.fontFamily) {
+		host.style.setProperty('--minimal-map-font-family', config.fontFamily);
+		return;
+	}
+
+	host.style.removeProperty('--minimal-map-font-family');
+}
+
 function createShell(host: HTMLElement, config: NormalizedMapConfig, context: MapDomContext): HTMLElement {
 	host.innerHTML = '';
 	host.classList.add('minimal-map-runtime');
 	host.style.height = getActiveHeightCssValue(config, context.win.innerWidth);
+	applyHostFontFamily(host, config);
 
 	const viewport = context.doc.createElement('div');
 	viewport.className = 'minimal-map-runtime__viewport';
@@ -767,6 +777,7 @@ export function createMinimalMap(
 			return;
 		}
 
+		applyHostFontFamily(host, nextConfig);
 		applyResponsiveHostHeight(nextConfig);
 
 		if (!previousConfig || previousConfig.styleUrl !== nextConfig.styleUrl) {

@@ -47,6 +47,10 @@
       "type": "string",
       "default": "default"
     },
+    "fontFamily": {
+      "type": "string",
+      "default": ""
+    },
     "showZoomControls": {
       "type": "boolean",
       "default": true

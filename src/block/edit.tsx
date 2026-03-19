@@ -769,19 +769,30 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         : null,
     [attributes.collectionId],
   );
+  const effectiveFontFamily =
+    typeof attributes.fontFamily === "string" && attributes.fontFamily.trim() !== ""
+      ? attributes.fontFamily
+      : runtimeConfig.defaults?.fontFamily ?? "";
+  const effectiveAttributes = useMemo(
+    () => ({
+      ...attributes,
+      fontFamily: effectiveFontFamily,
+    }),
+    [attributes, effectiveFontFamily],
+  );
   const config = useMemo(
     () =>
       normalizeMapConfig(
         {
-          ...attributes,
+          ...effectiveAttributes,
           locations:
-            attributes.collectionId > 0
+            effectiveAttributes.collectionId > 0
               ? selectedCollection?.locations ?? []
               : undefined,
         },
         runtimeConfig,
       ),
-    [attributes, selectedCollection],
+    [effectiveAttributes, selectedCollection],
   );
   const [previewHeightCssValue, setPreviewHeightCssValue] = useState(() =>
     getActiveHeightCssValue(
@@ -790,8 +801,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     ),
   );
   const iframeSnippet = useMemo(
-    () => buildIframeSnippet(attributes, runtimeConfig),
-    [attributes],
+    () => buildIframeSnippet(effectiveAttributes, runtimeConfig),
+    [effectiveAttributes],
   );
   const blockProps = useBlockProps({ className: "minimal-map-editor" });
 
@@ -1133,6 +1144,15 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           />
         </PanelBody>
         <PanelBody title={__("Embed", "minimal-map")} initialOpen={false}>
+          <TextControl
+            label={__("Iframe Font Family", "minimal-map")}
+            value={effectiveFontFamily}
+            help={__(
+              "Iframes cannot inherit the font family from the parent page automatically. Paste a CSS font-family stack here to match it, or clear the field to use the WordPress theme default.",
+              "minimal-map",
+            )}
+            onChange={(value: string) => setAttributes({ fontFamily: value })}
+          />
           <TextareaControl
             label={__("Iframe Snippet", "minimal-map")}
             value={iframeSnippet}

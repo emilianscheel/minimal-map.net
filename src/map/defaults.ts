@@ -38,6 +38,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	heightUnit: 'px',
 	stylePreset: 'liberty',
 	styleThemeSlug: 'default',
+	fontFamily: '',
 	showZoomControls: true,
 	allowSearch: true,
 	googleMapsNavigation: false,
@@ -155,6 +156,17 @@ function normalizeColor(value: string | undefined, fallback: string): string {
 	return trimmed;
 }
 
+function normalizeFontFamily(value: string | undefined, fallback: string): string {
+	if (typeof value !== 'string') {
+		return fallback;
+	}
+
+	const [firstSegment = ''] = value.split(/[;{}<>]/u);
+	const trimmed = firstSegment.trim().replace(/\s+/gu, ' ');
+
+	return trimmed || fallback;
+}
+
 function normalizeZoomControlsPosition(value: string | undefined, fallback: ZoomControlsPosition): ZoomControlsPosition {
 	return [ 'top-right', 'top-left', 'bottom-right', 'bottom-left' ].includes(`${value}`)
 		? (value as ZoomControlsPosition)
@@ -210,6 +222,10 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 				? normalizeHeightUnit(runtimeConfig.defaults?.heightMobileUnit ?? heightUnit)
 				: undefined,
 		stylePreset: `${runtimeConfig.defaults?.stylePreset ?? DEFAULT_MAP_DEFAULTS.stylePreset}`,
+		fontFamily: normalizeFontFamily(
+			runtimeConfig.defaults?.fontFamily,
+			DEFAULT_MAP_DEFAULTS.fontFamily
+		),
 		showZoomControls: runtimeConfig.defaults?.showZoomControls ?? DEFAULT_MAP_DEFAULTS.showZoomControls,
 		allowSearch: runtimeConfig.defaults?.allowSearch ?? DEFAULT_MAP_DEFAULTS.allowSearch,
 		googleMapsNavigation:
@@ -373,6 +389,7 @@ export function normalizeMapConfig(
 		stylePresets[ defaults.stylePreset ]?.style_url ||
 		'https://tiles.openfreemap.org/styles/liberty';
 	const styleThemeSlug = `${rawConfig.styleThemeSlug ?? defaults.styleThemeSlug}`;
+	const fontFamily = normalizeFontFamily(rawConfig.fontFamily, defaults.fontFamily);
 	const centerLat = clampNumber(rawConfig.centerLat ?? defaults.centerLat, -90, 90);
 	const centerLng = clampNumber(rawConfig.centerLng ?? defaults.centerLng, -180, 180);
 	const zoom = clampNumber(rawConfig.zoom ?? defaults.zoom, 0, 22);
@@ -552,6 +569,7 @@ export function normalizeMapConfig(
 		styleUrl,
 		styleTheme,
 		styleThemeSlug,
+		fontFamily,
 		showZoomControls: Boolean(rawConfig.showZoomControls ?? defaults.showZoomControls),
 		allowSearch: Boolean(rawConfig.allowSearch ?? defaults.allowSearch),
 		googleMapsNavigation: Boolean(

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-19T17:07:13+00:00\n"
+"POT-Creation-Date: 2026-03-19T17:45:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: minimal-map\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: minimal-map.php includes/admin/class-admin-menu.php:106
 #: includes/admin/class-admin-menu.php:107
 #: includes/blocks/class-map-block.php:55
-#: includes/class-iframe-endpoint.php:108
+#: includes/class-iframe-endpoint.php:109
 msgid "Minimal Map"
 msgstr ""
 
@@ -110,12 +110,12 @@ msgstr ""
 msgid "Positron"
 msgstr ""
 
-#: includes/class-config.php:254 includes/class-config.php:278
+#: includes/class-config.php:261 includes/class-config.php:285
 msgid "Map preview unavailable because this browser does not support WebGL."
 msgstr ""
 
-#: includes/class-config.php:371 includes/class-config.php:380
-#: includes/class-config.php:389
+#: includes/class-config.php:378 includes/class-config.php:387
+#: includes/class-config.php:396
 msgid "The map embed configuration is missing or invalid."
 msgstr ""
 
@@ -328,19 +328,19 @@ msgstr ""
 msgid "All locations"
 msgstr ""
 
-#: src/block/edit.tsx:1116
+#: src/block/edit.tsx:1127
 msgid "Allow Search"
 msgstr ""
 
-#: src/block/edit.tsx:1094
+#: src/block/edit.tsx:1105
 msgid "Allow Two-Finger Zoom"
 msgstr ""
 
-#: src/block/edit.tsx:1089
+#: src/block/edit.tsx:1100
 msgid "Allow Zoom via Scroll"
 msgstr ""
 
-#: src/block/edit.tsx:1173
+#: src/block/edit.tsx:1193
 msgid "Appearance"
 msgstr ""
 
@@ -473,19 +473,19 @@ msgstr ""
 msgid "Border"
 msgstr ""
 
-#: src/block/edit.tsx:1393 src/block/edit.tsx:1452
+#: src/block/edit.tsx:1413 src/block/edit.tsx:1472
 msgid "Border Radius"
 msgstr ""
 
-#: src/block/edit.tsx:1352
+#: src/block/edit.tsx:1372
 msgid "Border Radius Card"
 msgstr ""
 
-#: src/block/edit.tsx:1338
+#: src/block/edit.tsx:1358
 msgid "Border Radius Input"
 msgstr ""
 
-#: src/block/edit.tsx:1286
+#: src/block/edit.tsx:1306
 msgid "Border Width"
 msgstr ""
 
@@ -536,15 +536,15 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/block/edit.tsx:1365
+#: src/block/edit.tsx:1385
 msgid "Card Gap"
 msgstr ""
 
-#: src/block/edit.tsx:1058
+#: src/block/edit.tsx:1069
 msgid "Center Latitude"
 msgstr ""
 
-#: src/block/edit.tsx:1065
+#: src/block/edit.tsx:1076
 msgid "Center Longitude"
 msgstr ""
 
@@ -673,15 +673,15 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: src/block/edit.tsx:1164
+#: src/block/edit.tsx:1184
 msgid "Copied"
 msgstr ""
 
-#: src/block/edit.tsx:1167
+#: src/block/edit.tsx:1187
 msgid "Copy failed"
 msgstr ""
 
-#: src/block/edit.tsx:1161
+#: src/block/edit.tsx:1181
 msgid "Copy Snippet"
 msgstr ""
 
@@ -725,7 +725,7 @@ msgstr ""
 msgid "Create Theme"
 msgstr ""
 
-#: src/block/edit.tsx:1379
+#: src/block/edit.tsx:1399
 msgid "Credits"
 msgstr ""
 
@@ -881,7 +881,7 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
-#: src/block/edit.tsx:1135
+#: src/block/edit.tsx:1146
 msgid "Embed"
 msgstr ""
 
@@ -935,7 +935,7 @@ msgstr ""
 msgid "Failed to read the selected file."
 msgstr ""
 
-#: src/block/edit.tsx:1080
+#: src/block/edit.tsx:1091
 msgid "Features"
 msgstr ""
 
@@ -988,19 +988,19 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-#: src/block/edit.tsx:1432
+#: src/block/edit.tsx:1452
 msgid "Google Maps Button"
 msgstr ""
 
-#: src/block/edit.tsx:1121
+#: src/block/edit.tsx:1132
 msgid "Google Maps Navigation"
 msgstr ""
 
-#: src/block/edit.tsx:1176
+#: src/block/edit.tsx:1196
 msgid "Height"
 msgstr ""
 
-#: src/block/edit.tsx:1187
+#: src/block/edit.tsx:1207
 msgid "Height Mobile"
 msgstr ""
 
@@ -1017,8 +1017,19 @@ msgstr ""
 msgid "Ice & Glaciers"
 msgstr ""
 
-#: src/block/edit.tsx:1137
+#: src/block/edit.tsx:1148
+msgid "Iframe Font Family"
+msgstr ""
+
+#: src/block/edit.tsx:1157
 msgid "Iframe Snippet"
+msgstr ""
+
+#: src/block/edit.tsx:1150
+msgid ""
+"Iframes cannot inherit the font family from the parent page automatically. "
+"Paste a CSS font-family stack here to match it, or clear the field to use "
+"the WordPress theme default."
 msgstr ""
 
 #: src/admin/locations/CustomCsvImportModal.tsx:19
@@ -1041,7 +1052,7 @@ msgstr ""
 msgid "Imported theme with fallback default colors for: %s"
 msgstr ""
 
-#: src/block/edit.tsx:1128
+#: src/block/edit.tsx:1139
 msgid "In-map Location Card"
 msgstr ""
 
@@ -1259,7 +1270,7 @@ msgstr ""
 msgid "Merge collections"
 msgstr ""
 
-#: src/block/edit.tsx:1035
+#: src/block/edit.tsx:1046
 msgid "Minimal Map Preview"
 msgstr ""
 
@@ -1424,7 +1435,7 @@ msgstr ""
 msgid "Opening hours"
 msgstr ""
 
-#: src/block/edit.tsx:1488
+#: src/block/edit.tsx:1508
 msgid "Opening Hours"
 msgstr ""
 
@@ -1450,15 +1461,15 @@ msgstr ""
 msgid "Other Features"
 msgstr ""
 
-#: src/block/edit.tsx:1261 src/block/edit.tsx:1324 src/block/edit.tsx:1419
+#: src/block/edit.tsx:1281 src/block/edit.tsx:1344 src/block/edit.tsx:1439
 msgid "Outer Margin"
 msgstr ""
 
-#: src/block/edit.tsx:1247 src/block/edit.tsx:1405 src/block/edit.tsx:1467
+#: src/block/edit.tsx:1267 src/block/edit.tsx:1425 src/block/edit.tsx:1487
 msgid "Padding"
 msgstr ""
 
-#: src/block/edit.tsx:1372
+#: src/block/edit.tsx:1392
 msgid "Panel Width"
 msgstr ""
 
@@ -1494,7 +1505,7 @@ msgstr ""
 msgid "PNG file could not be read."
 msgstr ""
 
-#: src/block/edit.tsx:1224
+#: src/block/edit.tsx:1244
 msgid "Position"
 msgstr ""
 
@@ -1583,7 +1594,7 @@ msgstr[1] ""
 msgid "Remove this logo from the selected location?"
 msgstr ""
 
-#: src/block/edit.tsx:1105
+#: src/block/edit.tsx:1116
 msgid "Require Two Fingers to Move"
 msgstr ""
 
@@ -1666,7 +1677,7 @@ msgstr ""
 msgid "Search locations..."
 msgstr ""
 
-#: src/block/edit.tsx:1294
+#: src/block/edit.tsx:1314
 msgid "Search Panel"
 msgstr ""
 
@@ -1712,15 +1723,15 @@ msgid_plural "Set opening hours for %d selected locations."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/block/edit.tsx:1046
+#: src/block/edit.tsx:1057
 msgid "Settings"
 msgstr ""
 
-#: src/block/edit.tsx:1480
+#: src/block/edit.tsx:1500
 msgid "Show icon"
 msgstr ""
 
-#: src/block/edit.tsx:1082
+#: src/block/edit.tsx:1093
 msgid "Show Zoom Controls"
 msgstr ""
 
@@ -1751,7 +1762,7 @@ msgstr ""
 msgid "Structures"
 msgstr ""
 
-#: src/block/edit.tsx:1197
+#: src/block/edit.tsx:1217
 msgid "Style Preset"
 msgstr ""
 
@@ -1847,7 +1858,7 @@ msgstr ""
 msgid "The selected location already has no tags assigned."
 msgstr ""
 
-#: src/block/edit.tsx:1141
+#: src/block/edit.tsx:1161
 msgid ""
 "The snippet updates automatically when this block configuration changes."
 msgstr ""
@@ -2000,11 +2011,11 @@ msgstr ""
 msgid "Wednesday"
 msgstr ""
 
-#: src/block/edit.tsx:1096
+#: src/block/edit.tsx:1107
 msgid "When enabled, one can zoom the map using two fingers on mobile devices."
 msgstr ""
 
-#: src/block/edit.tsx:1106
+#: src/block/edit.tsx:1117
 msgid ""
 "When enabled, one finger scrolls the page, while two fingers are required to "
 "move the map."
@@ -2014,11 +2025,11 @@ msgstr ""
 msgid "Zip code"
 msgstr ""
 
-#: src/block/edit.tsx:1072
+#: src/block/edit.tsx:1083
 msgid "Zoom"
 msgstr ""
 
-#: src/block/edit.tsx:1204
+#: src/block/edit.tsx:1224
 msgid "Zoom Controls"
 msgstr ""
 

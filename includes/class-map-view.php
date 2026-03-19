@@ -49,9 +49,15 @@ class Map_View {
 	 * @return string
 	 */
 	public function render_surface( $config ) {
+		$surface_style = 'height: ' . $config['heightCssValue'] . ';';
+
+		if ( ! empty( $config['fontFamily'] ) ) {
+			$surface_style .= ' --minimal-map-font-family: ' . $config['fontFamily'] . ';';
+		}
+
 		$surface_attributes = array(
 			'class'                   => 'minimal-map-surface',
-			'style'                   => 'height: ' . $config['heightCssValue'] . ';',
+			'style'                   => $surface_style,
 			'data-minimal-map-config' => wp_json_encode( $config ),
 		);
 

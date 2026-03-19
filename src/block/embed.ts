@@ -18,6 +18,7 @@ const EMBED_ATTRIBUTE_KEYS: Array<keyof EmbedAttributes> = [
 	'heightMobileUnit',
 	'stylePreset',
 	'styleThemeSlug',
+	'fontFamily',
 	'showZoomControls',
 	'allowSearch',
 	'googleMapsNavigation',

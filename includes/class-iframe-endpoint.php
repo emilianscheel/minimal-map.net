@@ -94,6 +94,7 @@ class Iframe_Endpoint {
 				'html'   => $this->render_document(
 					array(
 						'document_title'    => __( 'Invalid Minimal Map Embed', 'minimal-map' ),
+						'document_font_family' => $this->config->get_default_block_attributes()['fontFamily'],
 						'error_message'     => $normalized_config->get_error_message(),
 						'map_surface_markup' => '',
 					)
@@ -106,6 +107,7 @@ class Iframe_Endpoint {
 			'html'   => $this->render_document(
 				array(
 					'document_title'    => __( 'Minimal Map', 'minimal-map' ),
+					'document_font_family' => $normalized_config['fontFamily'],
 					'error_message'     => '',
 					'map_surface_markup' => $this->map_view->render_surface( $normalized_config ),
 				)
@@ -126,6 +128,7 @@ class Iframe_Endpoint {
 		}
 
 		$document_title    = $context['document_title'];
+		$document_font_family = $context['document_font_family'];
 		$error_message     = $context['error_message'];
 		$map_surface_markup = $context['map_surface_markup'];
 		$language_attributes = get_language_attributes();

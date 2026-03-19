@@ -42,6 +42,38 @@ describe('map defaults normalization', () => {
 		expect(config.cooperativeGestures).toBe(false);
 	});
 
+	test('uses the runtime font family default when raw config leaves it blank', () => {
+		const config = normalizeMapConfig(
+			{
+				fontFamily: '   ',
+			},
+			{
+				defaults: {
+					fontFamily: '"Fraunces", serif',
+				},
+			}
+		);
+
+		expect(config.fontFamily).toBe('"Fraunces", serif');
+	});
+
+	test('preserves an explicit font family override', () => {
+		const config = normalizeMapConfig(
+			{
+				fontFamily: 'var(--font-body), "Helvetica Neue", sans-serif',
+			},
+			{
+				defaults: {
+					fontFamily: '"Fraunces", serif',
+				},
+			}
+		);
+
+		expect(config.fontFamily).toBe(
+			'var(--font-body), "Helvetica Neue", sans-serif'
+		);
+	});
+
 	test('falls back to the desktop height when no mobile height override is set', () => {
 		const config = normalizeMapConfig({
 			height: 480,

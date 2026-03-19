@@ -178,6 +178,39 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Global styles should feed the default iframe font family.
+	 *
+	 * @return void
+	 */
+	public function test_default_block_attributes_use_global_font_family_when_available() {
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => 3,
+					'styles'  => array(
+						'typography' => array(
+							'fontFamily' => '"Fraunces", serif',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_user', $filter );
+		wp_clean_theme_json_cache();
+
+		try {
+			$config   = new \MinimalMap\Config();
+			$defaults = $config->get_default_block_attributes();
+
+			$this->assertSame( '"Fraunces", serif', $defaults['fontFamily'] );
+		} finally {
+			remove_filter( 'wp_theme_json_data_user', $filter );
+			wp_clean_theme_json_cache();
+		}
+	}
+
+	/**
 	 * Mobile two-finger zoom should default off for blocks and accept explicit enablement.
 	 *
 	 * @return void
@@ -388,6 +421,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 				'heightMobileUnit'         => 'rem',
 				'zoom'                     => 11,
 				'collectionId'             => 999999,
+				'fontFamily'               => '"Inter", sans-serif; color:red;',
 				'zoomControlsBorderColor' => 'invalid',
 			),
 		);
@@ -397,6 +431,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertIsArray( $normalized );
 		$this->assertSame( '320vh', $normalized['heightCssValue'] );
 		$this->assertSame( '44rem', $normalized['heightMobileCssValue'] );
+		$this->assertSame( '"Inter", sans-serif', $normalized['fontFamily'] );
 		$this->assertSame( '#dcdcde', $normalized['zoomControlsBorderColor'] );
 		$this->assertSame( array(), $normalized['locations'] );
 	}
@@ -434,8 +469,9 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			array(
 				'v'          => \MinimalMap\Config::EMBED_PAYLOAD_VERSION,
 				'attributes' => array(
-					'height' => 360,
-					'zoom'   => 8,
+					'height'     => 360,
+					'zoom'       => 8,
+					'fontFamily' => '"Figtree", sans-serif',
 				),
 			)
 		);
@@ -446,6 +482,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'minimal-map-surface', $response['html'] );
 		$this->assertStringContainsString( 'data-minimal-map-config=', $response['html'] );
 		$this->assertStringContainsString( '360px', $response['html'] );
+		$this->assertStringContainsString( '--minimal-map-font-family', $response['html'] );
 		$this->assertStringContainsString( 'margin-top: 0 !important;', $response['html'] );
 	}
 

@@ -65,6 +65,8 @@ class Config {
 	 * @return array<string, mixed>
 	 */
 	public function get_default_block_attributes() {
+		$font_family = $this->get_default_font_family();
+
 		return array(
 			'centerLat'        => 52.517,
 			'centerLng'        => 13.388,
@@ -73,6 +75,7 @@ class Config {
 			'height'           => 420,
 			'heightUnit'       => 'px',
 			'stylePreset'      => self::DEFAULT_STYLE_PRESET,
+			'fontFamily'       => $font_family,
 			'showZoomControls' => true,
 			'allowSearch'      => true,
 			'googleMapsNavigation' => false,
@@ -153,7 +156,8 @@ class Config {
 	 * @return array<string, mixed>
 	 */
 	public function normalize_block_attributes( $attributes, $include_locations = true ) {
-		$attributes = wp_parse_args( $attributes, $this->get_default_block_attributes() );
+		$defaults   = $this->get_default_block_attributes();
+		$attributes = wp_parse_args( $attributes, $defaults );
 		$presets    = $this->get_style_presets();
 		$preset     = isset( $attributes['stylePreset'] ) ? sanitize_key( (string) $attributes['stylePreset'] ) : self::DEFAULT_STYLE_PRESET;
 
@@ -166,7 +170,7 @@ class Config {
 		$zoom       = isset( $attributes['zoom'] ) ? (float) $attributes['zoom'] : 0.0;
 		$collection_id = isset( $attributes['collectionId'] ) ? absint( $attributes['collectionId'] ) : 0;
 		$height     = isset( $attributes['height'] ) ? (float) $attributes['height'] : 0.0;
-		$height     = $height > 0 ? $height : (float) $this->get_default_block_attributes()['height'];
+		$height     = $height > 0 ? $height : (float) $defaults['height'];
 		$height_unit = isset( $attributes['heightUnit'] ) ? sanitize_text_field( (string) $attributes['heightUnit'] ) : 'px';
 		$height_unit = in_array( $height_unit, self::HEIGHT_UNITS, true ) ? $height_unit : 'px';
 		$height_mobile = isset( $attributes['heightMobile'] ) ? (float) $attributes['heightMobile'] : 0.0;
@@ -198,6 +202,8 @@ class Config {
 			}
 		}
 
+		$font_family = $this->sanitize_font_family( $attributes['fontFamily'] ?? '', $defaults['fontFamily'] );
+
 		return array(
 			'centerLat'        => max( -90, min( 90, $center_lat ) ),
 			'centerLng'        => max( -180, min( 180, $center_lng ) ),
@@ -213,6 +219,7 @@ class Config {
 			'styleUrl'         => $presets[ $preset ]['style_url'],
 			'styleTheme'       => $style_theme,
 			'styleThemeSlug'   => $style_theme_slug,
+			'fontFamily'       => $font_family,
 			'showZoomControls' => ! empty( $attributes['showZoomControls'] ),
 			'allowSearch'      => ! empty( $attributes['allowSearch'] ),
 			'googleMapsNavigation' => ! empty( $attributes['googleMapsNavigation'] ),
@@ -221,35 +228,35 @@ class Config {
 			'mobileTwoFingerZoom' => ! empty( $attributes['mobileTwoFingerZoom'] ),
 			'cooperativeGestures' => ! empty( $attributes['cooperativeGestures'] ),
 			'zoomControlsPosition'        => $this->sanitize_zoom_controls_position( $attributes['zoomControlsPosition'] ?? '' ),
-			'zoomControlsPadding'         => $this->sanitize_box_value( $attributes['zoomControlsPadding'] ?? array(), $this->get_default_block_attributes()['zoomControlsPadding'] ),
-			'zoomControlsOuterMargin'     => $this->sanitize_box_value( $attributes['zoomControlsOuterMargin'] ?? array(), $this->get_default_block_attributes()['zoomControlsOuterMargin'] ),
-			'zoomControlsBackgroundColor' => $this->sanitize_color( $attributes['zoomControlsBackgroundColor'] ?? '', $this->get_default_block_attributes()['zoomControlsBackgroundColor'] ),
-			'zoomControlsIconColor'       => $this->sanitize_color( $attributes['zoomControlsIconColor'] ?? '', $this->get_default_block_attributes()['zoomControlsIconColor'] ),
-			'zoomControlsBorderRadius'    => $this->sanitize_border_radius_value( $attributes['zoomControlsBorderRadius'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderRadius'] ),
-			'zoomControlsBorderColor'     => $this->sanitize_color( $attributes['zoomControlsBorderColor'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderColor'] ),
-			'zoomControlsBorderWidth'     => $this->sanitize_dimension_value( $attributes['zoomControlsBorderWidth'] ?? '', $this->get_default_block_attributes()['zoomControlsBorderWidth'] ),
-			'zoomControlsPlusIcon'        => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsPlusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsPlusIcon'] ),
-			'zoomControlsMinusIcon'       => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsMinusIcon'] ?? '', $this->get_default_block_attributes()['zoomControlsMinusIcon'] ),
-			'searchPanelBackgroundPrimary'   => $this->sanitize_color( $attributes['searchPanelBackgroundPrimary'] ?? '', $this->get_default_block_attributes()['searchPanelBackgroundPrimary'] ),
-			'searchPanelBackgroundSecondary' => $this->sanitize_color( $attributes['searchPanelBackgroundSecondary'] ?? '', $this->get_default_block_attributes()['searchPanelBackgroundSecondary'] ),
-			'searchPanelBackgroundHover'     => $this->sanitize_color( $attributes['searchPanelBackgroundHover'] ?? '', $this->get_default_block_attributes()['searchPanelBackgroundHover'] ),
-			'searchPanelForegroundPrimary'   => $this->sanitize_color( $attributes['searchPanelForegroundPrimary'] ?? '', $this->get_default_block_attributes()['searchPanelForegroundPrimary'] ),
-			'searchPanelForegroundSecondary' => $this->sanitize_color( $attributes['searchPanelForegroundSecondary'] ?? '', $this->get_default_block_attributes()['searchPanelForegroundSecondary'] ),
-			'searchPanelOuterMargin'         => $this->sanitize_box_value( $attributes['searchPanelOuterMargin'] ?? array(), $this->get_default_block_attributes()['searchPanelOuterMargin'] ),
-			'searchPanelBorderRadiusInput'   => $this->sanitize_border_radius_value( $attributes['searchPanelBorderRadiusInput'] ?? '', $this->get_default_block_attributes()['searchPanelBorderRadiusInput'] ),
-			'searchPanelBorderRadiusCard'    => $this->sanitize_border_radius_value( $attributes['searchPanelBorderRadiusCard'] ?? '', $this->get_default_block_attributes()['searchPanelBorderRadiusCard'] ),
-			'searchPanelCardGap'             => $this->sanitize_dimension_value( $attributes['searchPanelCardGap'] ?? '', $this->get_default_block_attributes()['searchPanelCardGap'] ),
-			'searchPanelWidth'               => $this->sanitize_dimension_value( $attributes['searchPanelWidth'] ?? '', $this->get_default_block_attributes()['searchPanelWidth'] ),
-			'googleMapsButtonPadding'        => $this->sanitize_box_value( $attributes['googleMapsButtonPadding'] ?? array(), $this->get_default_block_attributes()['googleMapsButtonPadding'] ),
-			'googleMapsButtonBackgroundColor' => $this->sanitize_color( $attributes['googleMapsButtonBackgroundColor'] ?? '', $this->get_default_block_attributes()['googleMapsButtonBackgroundColor'] ),
-			'googleMapsButtonForegroundColor' => $this->sanitize_color( $attributes['googleMapsButtonForegroundColor'] ?? '', $this->get_default_block_attributes()['googleMapsButtonForegroundColor'] ),
-			'googleMapsButtonBorderRadius'    => $this->sanitize_border_radius_value( $attributes['googleMapsButtonBorderRadius'] ?? '', $this->get_default_block_attributes()['googleMapsButtonBorderRadius'] ),
+			'zoomControlsPadding'         => $this->sanitize_box_value( $attributes['zoomControlsPadding'] ?? array(), $defaults['zoomControlsPadding'] ),
+			'zoomControlsOuterMargin'     => $this->sanitize_box_value( $attributes['zoomControlsOuterMargin'] ?? array(), $defaults['zoomControlsOuterMargin'] ),
+			'zoomControlsBackgroundColor' => $this->sanitize_color( $attributes['zoomControlsBackgroundColor'] ?? '', $defaults['zoomControlsBackgroundColor'] ),
+			'zoomControlsIconColor'       => $this->sanitize_color( $attributes['zoomControlsIconColor'] ?? '', $defaults['zoomControlsIconColor'] ),
+			'zoomControlsBorderRadius'    => $this->sanitize_border_radius_value( $attributes['zoomControlsBorderRadius'] ?? '', $defaults['zoomControlsBorderRadius'] ),
+			'zoomControlsBorderColor'     => $this->sanitize_color( $attributes['zoomControlsBorderColor'] ?? '', $defaults['zoomControlsBorderColor'] ),
+			'zoomControlsBorderWidth'     => $this->sanitize_dimension_value( $attributes['zoomControlsBorderWidth'] ?? '', $defaults['zoomControlsBorderWidth'] ),
+			'zoomControlsPlusIcon'        => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsPlusIcon'] ?? '', $defaults['zoomControlsPlusIcon'] ),
+			'zoomControlsMinusIcon'       => $this->sanitize_zoom_controls_icon( $attributes['zoomControlsMinusIcon'] ?? '', $defaults['zoomControlsMinusIcon'] ),
+			'searchPanelBackgroundPrimary'   => $this->sanitize_color( $attributes['searchPanelBackgroundPrimary'] ?? '', $defaults['searchPanelBackgroundPrimary'] ),
+			'searchPanelBackgroundSecondary' => $this->sanitize_color( $attributes['searchPanelBackgroundSecondary'] ?? '', $defaults['searchPanelBackgroundSecondary'] ),
+			'searchPanelBackgroundHover'     => $this->sanitize_color( $attributes['searchPanelBackgroundHover'] ?? '', $defaults['searchPanelBackgroundHover'] ),
+			'searchPanelForegroundPrimary'   => $this->sanitize_color( $attributes['searchPanelForegroundPrimary'] ?? '', $defaults['searchPanelForegroundPrimary'] ),
+			'searchPanelForegroundSecondary' => $this->sanitize_color( $attributes['searchPanelForegroundSecondary'] ?? '', $defaults['searchPanelForegroundSecondary'] ),
+			'searchPanelOuterMargin'         => $this->sanitize_box_value( $attributes['searchPanelOuterMargin'] ?? array(), $defaults['searchPanelOuterMargin'] ),
+			'searchPanelBorderRadiusInput'   => $this->sanitize_border_radius_value( $attributes['searchPanelBorderRadiusInput'] ?? '', $defaults['searchPanelBorderRadiusInput'] ),
+			'searchPanelBorderRadiusCard'    => $this->sanitize_border_radius_value( $attributes['searchPanelBorderRadiusCard'] ?? '', $defaults['searchPanelBorderRadiusCard'] ),
+			'searchPanelCardGap'             => $this->sanitize_dimension_value( $attributes['searchPanelCardGap'] ?? '', $defaults['searchPanelCardGap'] ),
+			'searchPanelWidth'               => $this->sanitize_dimension_value( $attributes['searchPanelWidth'] ?? '', $defaults['searchPanelWidth'] ),
+			'googleMapsButtonPadding'        => $this->sanitize_box_value( $attributes['googleMapsButtonPadding'] ?? array(), $defaults['googleMapsButtonPadding'] ),
+			'googleMapsButtonBackgroundColor' => $this->sanitize_color( $attributes['googleMapsButtonBackgroundColor'] ?? '', $defaults['googleMapsButtonBackgroundColor'] ),
+			'googleMapsButtonForegroundColor' => $this->sanitize_color( $attributes['googleMapsButtonForegroundColor'] ?? '', $defaults['googleMapsButtonForegroundColor'] ),
+			'googleMapsButtonBorderRadius'    => $this->sanitize_border_radius_value( $attributes['googleMapsButtonBorderRadius'] ?? '', $defaults['googleMapsButtonBorderRadius'] ),
 			'googleMapsButtonShowIcon'        => ! empty( $attributes['googleMapsButtonShowIcon'] ),
-			'creditsPadding'             => $this->sanitize_box_value( $attributes['creditsPadding'] ?? array(), $this->get_default_block_attributes()['creditsPadding'] ),
-			'creditsOuterMargin'         => $this->sanitize_box_value( $attributes['creditsOuterMargin'] ?? array(), $this->get_default_block_attributes()['creditsOuterMargin'] ),
-			'creditsBackgroundColor'     => $this->sanitize_color( $attributes['creditsBackgroundColor'] ?? '', $this->get_default_block_attributes()['creditsBackgroundColor'] ),
-			'creditsForegroundColor'     => $this->sanitize_color( $attributes['creditsForegroundColor'] ?? '', $this->get_default_block_attributes()['creditsForegroundColor'] ),
-			'creditsBorderRadius'        => $this->sanitize_border_radius_value( $attributes['creditsBorderRadius'] ?? '', $this->get_default_block_attributes()['creditsBorderRadius'] ),
+			'creditsPadding'             => $this->sanitize_box_value( $attributes['creditsPadding'] ?? array(), $defaults['creditsPadding'] ),
+			'creditsOuterMargin'         => $this->sanitize_box_value( $attributes['creditsOuterMargin'] ?? array(), $defaults['creditsOuterMargin'] ),
+			'creditsBackgroundColor'     => $this->sanitize_color( $attributes['creditsBackgroundColor'] ?? '', $defaults['creditsBackgroundColor'] ),
+			'creditsForegroundColor'     => $this->sanitize_color( $attributes['creditsForegroundColor'] ?? '', $defaults['creditsForegroundColor'] ),
+			'creditsBorderRadius'        => $this->sanitize_border_radius_value( $attributes['creditsBorderRadius'] ?? '', $defaults['creditsBorderRadius'] ),
 			'locations'       => $locations,
 			'fallbackMessage'  => __( 'Map preview unavailable because this browser does not support WebGL.', 'minimal-map' ),
 		);
@@ -546,6 +553,38 @@ class Config {
 		}
 
 		return 'UTC';
+	}
+
+	/**
+	 * Get the effective global font family configured for the site.
+	 *
+	 * @return string
+	 */
+	private function get_default_font_family() {
+		$font_family = '';
+
+		if ( function_exists( 'wp_get_global_styles' ) ) {
+			$global_style_font_family = wp_get_global_styles(
+				array( 'typography', 'fontFamily' ),
+				array(
+					'transforms' => array( 'resolve-variables' ),
+				)
+			);
+
+			if ( is_string( $global_style_font_family ) ) {
+				$font_family = $global_style_font_family;
+			}
+		}
+
+		if ( '' === $font_family && function_exists( 'wp_get_global_settings' ) ) {
+			$global_settings_font_family = wp_get_global_settings( array( 'typography', 'fontFamily' ) );
+
+			if ( is_string( $global_settings_font_family ) ) {
+				$font_family = $global_settings_font_family;
+			}
+		}
+
+		return $this->sanitize_font_family( $font_family, '' );
 	}
 
 	/**
@@ -938,6 +977,26 @@ class Config {
 		$sanitized = sanitize_hex_color( is_string( $value ) ? $value : '' );
 
 		return $sanitized ? $sanitized : $fallback;
+	}
+
+	/**
+	 * Sanitize a CSS font-family value.
+	 *
+	 * @param mixed  $value Raw value.
+	 * @param string $fallback Fallback value.
+	 * @return string
+	 */
+	private function sanitize_font_family( $value, $fallback ) {
+		if ( ! is_string( $value ) ) {
+			return $fallback;
+		}
+
+		$sanitized = sanitize_text_field( $value );
+		$segments  = preg_split( '/[;{}<>]/', $sanitized );
+		$sanitized = is_array( $segments ) ? (string) ( $segments[0] ?? '' ) : '';
+		$sanitized = preg_replace( '/\s+/', ' ', trim( $sanitized ) );
+
+		return '' !== $sanitized ? $sanitized : $fallback;
 	}
 
 	/**

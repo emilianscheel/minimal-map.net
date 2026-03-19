@@ -32,6 +32,7 @@ export interface MapDefaults {
 	heightMobileUnit?: HeightUnit;
 	stylePreset: string;
 	styleThemeSlug: string;
+	fontFamily: string;
 	showZoomControls: boolean;
 	allowSearch: boolean;
 	googleMapsNavigation: boolean;
@@ -161,6 +162,7 @@ export interface RawMapConfig {
 	styleUrl?: string;
 	styleTheme?: Partial<StyleThemeColors>;
 	styleThemeSlug?: string;
+	fontFamily?: string;
 	showZoomControls?: boolean;
 	allowSearch?: boolean;
 	googleMapsNavigation?: boolean;
@@ -384,6 +386,7 @@ export interface MapBlockAttributes {
 	heightMobileUnit?: HeightUnit;
 	stylePreset: string;
 	styleThemeSlug: string;
+	fontFamily: string;
 	showZoomControls: boolean;
 	allowSearch: boolean;
 	googleMapsNavigation: boolean;
