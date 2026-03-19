@@ -12,6 +12,10 @@ import { createLocationCardPreviewController, waitForInternalMapMovementToFinish
 import { getActiveHeightCssValue, isMobileViewport } from './responsive';
 import { createMarkerRenderer, type MarkerRenderer, type MarkerRendererConfig } from './marker-renderer';
 import { getMapDomContext, type MapDomContext } from './dom-context';
+import {
+	filterLocationsByCategoryTagIds,
+	pruneActiveCategoryTagIds,
+} from './category-filter';
 import type {
 	MapLocationSelection,
 	MapRuntimeConfig,
@@ -26,6 +30,7 @@ import type {
 } from '../types';
 
 interface MinimalMapState {
+	activeCategoryTagIds: number[];
 	attribution: WordPressAttributionControl | null;
 	config: NormalizedMapConfig | null;
 	controls: WordPressZoomControls | null;
@@ -191,12 +196,61 @@ function getRenderedPoints(config: NormalizedMapConfig): MapLocationPoint[] {
 	];
 }
 
-function getMarkerRendererConfig(config: NormalizedMapConfig): MarkerRendererConfig {
+function getEffectiveActiveCategoryTagIds(
+	config: NormalizedMapConfig,
+	activeCategoryTagIds: number[]
+): number[] {
+	if (!config.allowSearch || !config.enableCategoryFilter) {
+		return [];
+	}
+
+	return pruneActiveCategoryTagIds(activeCategoryTagIds, config.locations);
+}
+
+function getVisibleRenderedPoints(
+	config: NormalizedMapConfig,
+	activeCategoryTagIds: number[] = []
+): MapLocationPoint[] {
+	const renderedPoints = getRenderedPoints(config);
+	const effectiveActiveCategoryTagIds = getEffectiveActiveCategoryTagIds(
+		config,
+		activeCategoryTagIds
+	);
+
+	if (effectiveActiveCategoryTagIds.length === 0) {
+		return renderedPoints;
+	}
+
+	return filterLocationsByCategoryTagIds(
+		renderedPoints,
+		effectiveActiveCategoryTagIds
+	);
+}
+
+function didPointsChange(
+	previousPoints: MapLocationPoint[],
+	nextPoints: MapLocationPoint[]
+): boolean {
+	if (previousPoints.length !== nextPoints.length) {
+		return true;
+	}
+
+	return previousPoints.some((point, index) => {
+		const nextPoint = nextPoints[index];
+
+		return point.lat !== nextPoint.lat || point.lng !== nextPoint.lng || point.id !== nextPoint.id;
+	});
+}
+
+function getMarkerRendererConfig(
+	config: NormalizedMapConfig,
+	activeCategoryTagIds: number[] = []
+): MarkerRendererConfig {
 	return {
 		markerContent: config.markerContent,
 		markerOffsetY: config.markerOffsetY,
 		markerScale: config.markerScale,
-		points: getRenderedPoints(config),
+		points: getVisibleRenderedPoints(config, activeCategoryTagIds),
 	};
 }
 
@@ -207,15 +261,23 @@ function didRenderedPointsChange(
 	const previousPoints = previousConfig ? getRenderedPoints(previousConfig) : [];
 	const nextPoints = getRenderedPoints(nextConfig);
 
-	if (previousPoints.length !== nextPoints.length) {
+	return didPointsChange(previousPoints, nextPoints);
+}
+
+function didVisibleRenderedPointsChange(
+	previousConfig: NormalizedMapConfig | null,
+	nextConfig: NormalizedMapConfig,
+	previousActiveCategoryTagIds: number[] = [],
+	nextActiveCategoryTagIds: number[] = []
+): boolean {
+	if (!previousConfig) {
 		return true;
 	}
 
-	return previousPoints.some((point, index) => {
-		const nextPoint = nextPoints[index];
-
-		return point.lat !== nextPoint.lat || point.lng !== nextPoint.lng || point.id !== nextPoint.id;
-	});
+	return didPointsChange(
+		getVisibleRenderedPoints(previousConfig, previousActiveCategoryTagIds),
+		getVisibleRenderedPoints(nextConfig, nextActiveCategoryTagIds)
+	);
 }
 
 function didRenderedMarkerContentChange(
@@ -248,9 +310,10 @@ export function syncViewport(
 	map: MapLibreMap,
 	config: NormalizedMapConfig,
 	viewportWidth?: number | null,
-	zoomChanged = false
+	zoomChanged = false,
+	activeCategoryTagIds: number[] = []
 ): void {
-	const points = getRenderedPoints(config);
+	const points = getVisibleRenderedPoints(config, activeCategoryTagIds);
 
 	if (points.length === 0) {
 		syncCenter(map, config, zoomChanged);
@@ -340,6 +403,7 @@ export function createMinimalMap(
 ): MinimalMapInstance {
 	const context = getMapDomContext(host);
 	const state: MinimalMapState = {
+		activeCategoryTagIds: [],
 		attribution: null,
 		config: null,
 		controls: null,
@@ -411,7 +475,7 @@ export function createMinimalMap(
 	function clearSelection(config: NormalizedMapConfig): void {
 		clearPendingLocationPreview();
 		state.selectedLocation = null;
-		state.searchControl?.update(config, undefined);
+		state.searchControl?.update(config, undefined, state.activeCategoryTagIds);
 		state.locationCardPreview?.hide();
 	}
 
@@ -450,7 +514,7 @@ export function createMinimalMap(
 			return;
 		}
 
-		const point = getRenderedPoints(config).find(
+		const point = getVisibleRenderedPoints(config, state.activeCategoryTagIds).find(
 			(candidate) => candidate.id === selection.locationId
 		);
 
@@ -461,7 +525,11 @@ export function createMinimalMap(
 		clearPendingLocationPreview();
 		state.selectedLocation = selection;
 		state.locationCardPreview?.hide();
-		state.searchControl?.update(config, selection.locationId);
+		state.searchControl?.update(
+			config,
+			selection.locationId,
+			state.activeCategoryTagIds
+		);
 
 		if (config.inMapLocationCard) {
 			state.pendingPreviewCleanup = waitForInternalMapMovementToFinish(
@@ -548,10 +616,61 @@ export function createMinimalMap(
 								state.config ?? config
 							);
 						}
+					},
+					undefined,
+					state.activeCategoryTagIds,
+					(activeCategoryTagIds: number[]) => {
+						if (!state.config || !state.map) {
+							return;
+						}
+
+						const nextActiveCategoryTagIds = getEffectiveActiveCategoryTagIds(
+							state.config,
+							activeCategoryTagIds
+						);
+
+						if (
+							JSON.stringify(nextActiveCategoryTagIds) ===
+							JSON.stringify(state.activeCategoryTagIds)
+						) {
+							return;
+						}
+
+						state.activeCategoryTagIds = nextActiveCategoryTagIds;
+
+						if (
+							state.selectedLocation &&
+							!getVisibleRenderedPoints(
+								state.config,
+								state.activeCategoryTagIds
+							).some((point) => point.id === state.selectedLocation?.locationId)
+						) {
+							clearSelection(state.config);
+						} else {
+							state.searchControl?.update(
+								state.config,
+								getSelectedLocationId(),
+								state.activeCategoryTagIds
+							);
+						}
+
+						syncMarkers(state.config);
+						syncLocationCardPreview(state.config, state.selectedLocation);
+						syncViewport(
+							state.map,
+							state.config,
+							context.win.innerWidth,
+							false,
+							state.activeCategoryTagIds
+						);
 					}
 				);
 			} else {
-				state.searchControl.update(config, getSelectedLocationId());
+				state.searchControl.update(
+					config,
+					getSelectedLocationId(),
+					state.activeCategoryTagIds
+				);
 			}
 		} else {
 			state.searchControl?.destroy();
@@ -573,7 +692,9 @@ export function createMinimalMap(
 			return;
 		}
 
-		void state.markerRenderer.update(getMarkerRendererConfig(config));
+		void state.markerRenderer.update(
+			getMarkerRendererConfig(config, state.activeCategoryTagIds)
+		);
 	}
 
 	function build(rawConfig: RawMapConfig): void {
@@ -630,7 +751,13 @@ export function createMinimalMap(
 
 		map.on('load', () => {
 			const activeConfig = state.config ?? config;
-			syncViewport(map, activeConfig, context.win.innerWidth);
+			syncViewport(
+				map,
+				activeConfig,
+				context.win.innerWidth,
+				false,
+				state.activeCategoryTagIds
+			);
 			map.resize();
 
 			if (activeConfig.styleTheme) {
@@ -732,6 +859,7 @@ export function createMinimalMap(
 
 	function destroy(): void {
 		destroyed = true;
+		state.activeCategoryTagIds = [];
 
 		if (styleRebuildTimeout) {
 			clearTimeout(styleRebuildTimeout);
@@ -770,6 +898,11 @@ export function createMinimalMap(
 	function update(rawConfig: RawMapConfig = {}): void {
 		const nextConfig = normalizeMapConfig(rawConfig, runtimeConfig);
 		const previousConfig = state.config;
+		const previousActiveCategoryTagIds = state.activeCategoryTagIds;
+		const nextActiveCategoryTagIds = getEffectiveActiveCategoryTagIds(
+			nextConfig,
+			state.activeCategoryTagIds
+		);
 
 		if (!state.map) {
 			destroy();
@@ -786,7 +919,7 @@ export function createMinimalMap(
 
 		if (
 			state.selectedLocation &&
-			!getRenderedPoints(nextConfig).some(
+			!getVisibleRenderedPoints(nextConfig, nextActiveCategoryTagIds).some(
 				(point) => point.id === state.selectedLocation?.locationId
 			)
 		) {
@@ -808,9 +941,23 @@ export function createMinimalMap(
 			previousConfig.centerLng !== nextConfig.centerLng ||
 			previousConfig.centerOffsetY !== nextConfig.centerOffsetY;
 		const zoomChanged = !previousConfig || previousConfig.zoom !== nextConfig.zoom;
+		const visiblePointsChanged = didVisibleRenderedPointsChange(
+			previousConfig,
+			nextConfig,
+			previousActiveCategoryTagIds,
+			nextActiveCategoryTagIds
+		);
 
-		if (centerChanged || zoomChanged || didRenderedPointsChange(previousConfig, nextConfig)) {
-			syncViewport(state.map, nextConfig, context.win.innerWidth, zoomChanged);
+		state.activeCategoryTagIds = nextActiveCategoryTagIds;
+
+		if (centerChanged || zoomChanged || visiblePointsChanged) {
+			syncViewport(
+				state.map,
+				nextConfig,
+				context.win.innerWidth,
+				zoomChanged,
+				state.activeCategoryTagIds
+			);
 		}
 
 		if (
@@ -852,6 +999,7 @@ export function createMinimalMap(
 			previousConfig.markerContent !== nextConfig.markerContent ||
 			previousConfig.markerOffsetY !== nextConfig.markerOffsetY ||
 			previousConfig.markerScale !== nextConfig.markerScale ||
+			visiblePointsChanged ||
 			didRenderedPointsChange(previousConfig, nextConfig) ||
 			didRenderedMarkerContentChange(previousConfig, nextConfig)
 		) {

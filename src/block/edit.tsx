@@ -1129,6 +1129,13 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={(value: boolean) => setAttributes({ allowSearch: value })}
           />
           <ToggleControl
+            label={__("Enable Category Filter", "minimal-map")}
+            checked={attributes.enableCategoryFilter}
+            onChange={(value: boolean) =>
+              setAttributes({ enableCategoryFilter: value })
+            }
+          />
+          <ToggleControl
             label={__("Google Maps Navigation", "minimal-map")}
             checked={attributes.googleMapsNavigation}
             onChange={(value: boolean) =>

@@ -16,6 +16,10 @@ import {
 	type DistanceSearchResult,
 } from './location-distance';
 import { LocationResultCard } from './location-card';
+import {
+	collectLocationTags,
+	filterLocationsByCategoryTagIds,
+} from './category-filter';
 import { applySearchPanelCssVariables } from './search-panel-layout';
 import { isMobileViewport } from './responsive';
 
@@ -44,7 +48,10 @@ interface SearchControlProps {
 	geocodeSearch: GeocodeSearchFn;
 	googleMapsNavigation: boolean;
 	googleMapsButtonShowIcon: boolean;
+	enableCategoryFilter: boolean;
 	locations: MapLocationPoint[];
+	activeCategoryTagIds: number[];
+	onCategoryFilterChange: (tagIds: number[]) => void;
 	onSelect: (selection: MapLocationSelection) => void;
 	selectedId?: number;
 	siteLocale: string;
@@ -57,7 +64,10 @@ export const MapSearchControl = ({
 	geocodeSearch,
 	googleMapsNavigation,
 	googleMapsButtonShowIcon,
+	enableCategoryFilter,
 	locations,
+	activeCategoryTagIds,
+	onCategoryFilterChange,
 	onSelect,
 	selectedId: selectedIdProp,
 	siteLocale,
@@ -76,6 +86,17 @@ export const MapSearchControl = ({
 	const isMobile = isMobileViewport(viewportWidth);
 	const isOpen = isPanelOpen || (!isMobile && typeof selectedId === 'number');
 	const trimmedSearchTerm = searchTerm.trim();
+	const availableTags = useMemo(
+		() => collectLocationTags(locations),
+		[locations]
+	);
+	const categoryFilteredLocations = useMemo(
+		() =>
+			enableCategoryFilter
+				? filterLocationsByCategoryTagIds(locations, activeCategoryTagIds)
+				: locations,
+		[activeCategoryTagIds, enableCategoryFilter, locations]
+	);
 
 	useEffect(() => {
 		searchTermRef.current = searchTerm;
@@ -116,10 +137,10 @@ export const MapSearchControl = ({
 			// unless we have more logic here. For now, showing all can be slow.
 			// But let's try to just return all for now and see if memoization is enough.
 			// Actually, let's limit to 50 if empty to be safe.
-			return locations.slice(0, 50);
+			return categoryFilteredLocations.slice(0, 50);
 		}
 
-		return locations.filter((location) => {
+		return categoryFilteredLocations.filter((location) => {
 			const searchableValues = [
 				location.title,
 				location.city,
@@ -136,7 +157,12 @@ export const MapSearchControl = ({
 
 			return searchableValues.some((value) => value?.toLowerCase().includes(term));
 		});
-	}, [isOpen, locations, trimmedSearchTerm]);
+	}, [categoryFilteredLocations, isOpen, trimmedSearchTerm]);
+
+	useEffect(() => {
+		setAddressSearchMode('idle');
+		setAddressResults([]);
+	}, [categoryFilteredLocations]);
 
 	const searchMode = useMemo<SearchMode>(() => {
 		if (!trimmedSearchTerm) {
@@ -249,7 +275,7 @@ export const MapSearchControl = ({
 				lat: result.lat,
 				lng: result.lng,
 			},
-			locations,
+			categoryFilteredLocations,
 		);
 
 		setAddressResults(nextAddressResults);
@@ -260,6 +286,42 @@ export const MapSearchControl = ({
 		if (bestResult) {
 			handleSelect(bestResult.location, bestResult.distanceLabel, 'auto');
 		}
+	};
+
+	const toggleCategoryTagId = (tagId: number) => {
+		const nextActiveTagIds = activeCategoryTagIds.includes(tagId)
+			? activeCategoryTagIds.filter((activeTagId) => activeTagId !== tagId)
+			: [ ...activeCategoryTagIds, tagId ];
+
+		onCategoryFilterChange(nextActiveTagIds);
+	};
+
+	const renderCategoryFilters = () => {
+		if (
+			isOpen ||
+			!enableCategoryFilter ||
+			availableTags.length === 0
+		) {
+			return null;
+		}
+
+		return (
+			<div className="minimal-map-search__category-filters">
+				{availableTags.map((tag) => (
+					<button
+						key={tag.id}
+						type="button"
+						className={`minimal-map-search__category-pill${
+							activeCategoryTagIds.includes(tag.id) ? ' is-selected' : ''
+						}`}
+						aria-pressed={activeCategoryTagIds.includes(tag.id)}
+						onClick={() => toggleCategoryTagId(tag.id)}
+					>
+						{tag.name}
+					</button>
+				))}
+			</div>
+		);
 	};
 
 	const renderResultCards = () => (
@@ -337,6 +399,8 @@ export const MapSearchControl = ({
 					) : null}
 				</form>
 
+				{renderCategoryFilters()}
+
 				{isOpen ? (
 					<div className="minimal-map-search__results-container">
 						{renderedResults.length > 0 ? (
@@ -382,7 +446,11 @@ export const MapSearchControl = ({
 
 export interface WordPressSearchControl {
 	destroy: () => void;
-	update: (config: NormalizedMapConfig, selectedId?: number) => void;
+	update: (
+		config: NormalizedMapConfig,
+		selectedId?: number,
+		activeCategoryTagIds?: number[]
+	) => void;
 }
 
 export function createWordPressSearchControl(
@@ -392,6 +460,8 @@ export function createWordPressSearchControl(
 	initialSelectedId?: number,
 	onLocationSelect?: (selection: MapLocationSelection) => void,
 	geocodeSearchFn?: GeocodeSearchFn,
+	initialActiveCategoryTagIds: number[] = [],
+	onCategoryFilterChange?: (tagIds: number[]) => void,
 ): WordPressSearchControl {
 	const context = getMapDomContext(host);
 	const container = context.doc.createElement('div');
@@ -408,7 +478,6 @@ export function createWordPressSearchControl(
 	host.appendChild(container);
 
 	const root = createRoot(container);
-	let currentConfig = initialConfig;
 	const geocodeSearch =
 		geocodeSearchFn ??
 		((query: string) => {
@@ -426,17 +495,23 @@ export function createWordPressSearchControl(
 		onLocationSelect?.(selection);
 	};
 
-	const render = (config: NormalizedMapConfig, selectedId?: number) => {
-		currentConfig = config;
+	const render = (
+		config: NormalizedMapConfig,
+		selectedId?: number,
+		activeCategoryTagIds: number[] = []
+	) => {
 		applySearchPanelCssVariables(container, config);
 		root.render(
 			<MapSearchControl
+				activeCategoryTagIds={activeCategoryTagIds}
 				doc={context.doc}
+				enableCategoryFilter={config.enableCategoryFilter}
 				frontendGeocodePath={frontendGeocodePath}
 				geocodeSearch={geocodeSearch}
 				googleMapsNavigation={config.googleMapsNavigation}
 				googleMapsButtonShowIcon={config.googleMapsButtonShowIcon}
 				locations={config.locations}
+				onCategoryFilterChange={onCategoryFilterChange ?? (() => {})}
 				onSelect={onSelect}
 				selectedId={selectedId}
 				siteLocale={config.siteLocale}
@@ -445,15 +520,15 @@ export function createWordPressSearchControl(
 		);
 	};
 
-	render(initialConfig, initialSelectedId);
+	render(initialConfig, initialSelectedId, initialActiveCategoryTagIds);
 
 	return {
 		destroy() {
 			root.unmount();
 			container.remove();
 		},
-		update(config, selectedId) {
-			render(config, selectedId);
+		update(config, selectedId, activeCategoryTagIds = []) {
+			render(config, selectedId, activeCategoryTagIds);
 		},
 	};
 }

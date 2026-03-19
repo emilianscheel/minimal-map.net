@@ -335,6 +335,52 @@
   background: var(--minimal-map-search-background-secondary) !important;
 }
 
+.minimal-map-search__category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.minimal-map-search__category-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  margin: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--minimal-map-search-background-primary);
+  color: var(--minimal-map-search-foreground-primary);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.3;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.minimal-map-search__category-pill:hover,
+.minimal-map-search__category-pill:focus {
+  background: var(--minimal-map-search-background-hover);
+  color: var(--minimal-map-search-foreground-primary);
+}
+
+.minimal-map-search__category-pill.is-selected {
+  background: var(--minimal-map-search-background-secondary);
+  color: var(--minimal-map-search-foreground-secondary);
+}
+
+.minimal-map-search__category-pill.is-selected:hover,
+.minimal-map-search__category-pill.is-selected:focus {
+  background: var(--minimal-map-search-background-secondary);
+  color: var(--minimal-map-search-foreground-secondary);
+  opacity: 0.92;
+}
+
 .minimal-map-search__icon-container {
   position: absolute;
   left: 12px;

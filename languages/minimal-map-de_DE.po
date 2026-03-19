@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Minimal Map 0.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map\n"
-"POT-Creation-Date: 2026-03-19T17:42:29+00:00\n"
+"POT-Creation-Date: 2026-03-19T18:13:46+00:00\n"
 "PO-Revision-Date: 2026-03-19 18:15+0100\n"
 "Last-Translator: Emilian Scheel\n"
 "Language-Team: German\n"
@@ -123,13 +123,13 @@ msgstr "Bright"
 msgid "Positron"
 msgstr "Positron"
 
-#: includes/class-config.php:261 includes/class-config.php:285
+#: includes/class-config.php:269 includes/class-config.php:293
 msgid "Map preview unavailable because this browser does not support WebGL."
 msgstr ""
 "Kartenvorschau nicht verfügbar, da dieser Browser WebGL nicht unterstützt."
 
-#: includes/class-config.php:378 includes/class-config.php:387
-#: includes/class-config.php:396
+#: includes/class-config.php:386 includes/class-config.php:395
+#: includes/class-config.php:404
 msgid "The map embed configuration is missing or invalid."
 msgstr "Die Karten-Einbettungskonfiguration fehlt oder ist ungültig."
 
@@ -369,7 +369,7 @@ msgstr "Zwei-Finger-Zoom erlauben"
 msgid "Allow Zoom via Scroll"
 msgstr "Zoom per Scrollen erlauben"
 
-#: src/block/edit.tsx:1193
+#: src/block/edit.tsx:1200
 msgid "Appearance"
 msgstr "Darstellung"
 
@@ -506,19 +506,19 @@ msgstr "Grundflächen"
 msgid "Border"
 msgstr "Rand"
 
-#: src/block/edit.tsx:1413 src/block/edit.tsx:1472
+#: src/block/edit.tsx:1420 src/block/edit.tsx:1479
 msgid "Border Radius"
 msgstr "Eckenradius"
 
-#: src/block/edit.tsx:1372
+#: src/block/edit.tsx:1379
 msgid "Border Radius Card"
 msgstr "Eckenradius Karte"
 
-#: src/block/edit.tsx:1358
+#: src/block/edit.tsx:1365
 msgid "Border Radius Input"
 msgstr "Eckenradius Eingabefeld"
 
-#: src/block/edit.tsx:1306
+#: src/block/edit.tsx:1313
 msgid "Border Width"
 msgstr "Randbreite"
 
@@ -571,7 +571,7 @@ msgstr "Gebäude"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/block/edit.tsx:1385
+#: src/block/edit.tsx:1392
 msgid "Card Gap"
 msgstr "Kartenabstand"
 
@@ -599,7 +599,7 @@ msgstr "Ort"
 msgid "City is required to geocode the address."
 msgstr "Der Ort ist erforderlich, um die Adresse zu geokodieren."
 
-#: src/map/SearchControl.tsx:333
+#: src/map/SearchControl.tsx:395
 msgid "Clear search"
 msgstr "Suche löschen"
 
@@ -711,15 +711,15 @@ msgstr "Bestätigen"
 msgid "Contact"
 msgstr "Kontakt"
 
-#: src/block/edit.tsx:1184
+#: src/block/edit.tsx:1191
 msgid "Copied"
 msgstr "Kopiert"
 
-#: src/block/edit.tsx:1187
+#: src/block/edit.tsx:1194
 msgid "Copy failed"
 msgstr "Kopieren fehlgeschlagen"
 
-#: src/block/edit.tsx:1181
+#: src/block/edit.tsx:1188
 msgid "Copy Snippet"
 msgstr "Snippet kopieren"
 
@@ -771,7 +771,7 @@ msgstr ""
 msgid "Create Theme"
 msgstr "Theme erstellen"
 
-#: src/block/edit.tsx:1399
+#: src/block/edit.tsx:1406
 msgid "Credits"
 msgstr "Quellenangaben"
 
@@ -936,9 +936,13 @@ msgstr "E-Mail"
 msgid "Email address"
 msgstr "E-Mail-Adresse"
 
-#: src/block/edit.tsx:1146
+#: src/block/edit.tsx:1153
 msgid "Embed"
 msgstr ""
+
+#: src/block/edit.tsx:1132
+msgid "Enable Category Filter"
+msgstr "Kategoriefilter aktivieren"
 
 #: src/admin/collections/MergeCollectionsModal.tsx:117
 msgid "Enter a name for the merged collection..."
@@ -1044,19 +1048,19 @@ msgstr "Fr"
 msgid "Friday"
 msgstr "Freitag"
 
-#: src/block/edit.tsx:1452
+#: src/block/edit.tsx:1459
 msgid "Google Maps Button"
 msgstr "Google Maps Button"
 
-#: src/block/edit.tsx:1132
+#: src/block/edit.tsx:1139
 msgid "Google Maps Navigation"
 msgstr "Google Maps Navigation"
 
-#: src/block/edit.tsx:1196
+#: src/block/edit.tsx:1203
 msgid "Height"
 msgstr "Höhe"
 
-#: src/block/edit.tsx:1207
+#: src/block/edit.tsx:1214
 msgid "Height Mobile"
 msgstr "Höhe"
 
@@ -1073,19 +1077,19 @@ msgstr "Die Hausnummer ist erforderlich, um die Adresse zu geokodieren."
 msgid "Ice & Glaciers"
 msgstr "Eis & Gletscher"
 
-#: src/block/edit.tsx:1148
+#: src/block/edit.tsx:1155
 msgid "Iframe Font Family"
 msgstr "Iframe-Schriftfamilie"
 
-#: src/block/edit.tsx:1157
+#: src/block/edit.tsx:1164
 msgid "Iframe Snippet"
 msgstr "Iframe Snippet"
 
-#: src/block/edit.tsx:1150
+#: src/block/edit.tsx:1157
 msgid ""
-"Iframes cannot inherit the font family from the parent page "
-"automatically. Paste a CSS font-family stack here to match it, or clear the "
-"field to use the WordPress theme default."
+"Iframes cannot inherit the font family from the parent page automatically. "
+"Paste a CSS font-family stack here to match it, or clear the field to use "
+"the WordPress theme default."
 msgstr ""
 "Iframes können die Schriftfamilie nicht automatisch von der übergeordneten "
 "Seite übernehmen. Füge hier einen CSS-Schriftstapel für font-family ein, um "
@@ -1112,7 +1116,7 @@ msgstr "Importierter Standort"
 msgid "Imported theme with fallback default colors for: %s"
 msgstr "Theme mit ersatzweisen Standardfarben importiert für: %s"
 
-#: src/block/edit.tsx:1139
+#: src/block/edit.tsx:1146
 msgid "In-map Location Card"
 msgstr "Importierter Standort"
 
@@ -1132,7 +1136,7 @@ msgstr "Ungültige SVG-Datei."
 msgid "Line"
 msgstr "Linie"
 
-#: src/map/SearchControl.tsx:362
+#: src/map/SearchControl.tsx:426
 msgid "Loading results..."
 msgstr "Ergebnisse werden geladen..."
 
@@ -1390,8 +1394,8 @@ msgstr "Keine Sammlungen gefunden"
 msgid "No custom marker assigned yet."
 msgstr "Noch kein benutzerdefinierter Marker zugewiesen."
 
-#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:372
-#: src/map/SearchControl.tsx:418
+#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:436
+#: src/map/SearchControl.tsx:487
 msgid "No locations found"
 msgstr "Keine Standorte gefunden"
 
@@ -1498,7 +1502,7 @@ msgstr "Schlagwörter öffnen"
 msgid "Opening hours"
 msgstr "Öffnungszeiten"
 
-#: src/block/edit.tsx:1508
+#: src/block/edit.tsx:1515
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
@@ -1524,15 +1528,15 @@ msgstr "Optional"
 msgid "Other Features"
 msgstr "Weitere Elemente"
 
-#: src/block/edit.tsx:1281 src/block/edit.tsx:1344 src/block/edit.tsx:1439
+#: src/block/edit.tsx:1288 src/block/edit.tsx:1351 src/block/edit.tsx:1446
 msgid "Outer Margin"
 msgstr "Aussenabstand"
 
-#: src/block/edit.tsx:1267 src/block/edit.tsx:1425 src/block/edit.tsx:1487
+#: src/block/edit.tsx:1274 src/block/edit.tsx:1432 src/block/edit.tsx:1494
 msgid "Padding"
 msgstr "Innenabstand"
 
-#: src/block/edit.tsx:1392
+#: src/block/edit.tsx:1399
 msgid "Panel Width"
 msgstr "Panelbreite"
 
@@ -1568,7 +1572,7 @@ msgstr "Plus-Kreis"
 msgid "PNG file could not be read."
 msgstr "PNG-Datei konnte nicht gelesen werden."
 
-#: src/block/edit.tsx:1244
+#: src/block/edit.tsx:1251
 msgid "Position"
 msgstr "Position"
 
@@ -1580,7 +1584,7 @@ msgstr "Postleitzahl"
 msgid "Postal code is required to geocode the address."
 msgstr "Die Postleitzahl ist erforderlich, um die Adresse zu geokodieren."
 
-#: src/map/SearchControl.tsx:351
+#: src/map/SearchControl.tsx:415
 msgid "Press"
 msgstr "Adresse"
 
@@ -1732,15 +1736,15 @@ msgid "Save Theme"
 msgstr "Theme speichern"
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:72
-#: src/map/SearchControl.tsx:326
+#: src/map/SearchControl.tsx:388
 msgid "Search locations"
 msgstr "Standorte suchen"
 
-#: src/map/SearchControl.tsx:325
+#: src/map/SearchControl.tsx:387
 msgid "Search locations..."
 msgstr "Standorte suchen..."
 
-#: src/block/edit.tsx:1314
+#: src/block/edit.tsx:1321
 msgid "Search Panel"
 msgstr "Suchpanel"
 
@@ -1793,7 +1797,7 @@ msgstr[1] "Öffnungszeiten für %d ausgewählte Standorte festlegen."
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: src/block/edit.tsx:1500
+#: src/block/edit.tsx:1507
 msgid "Show icon"
 msgstr "Icon anzeigen"
 
@@ -1830,7 +1834,7 @@ msgstr "Die Strasse ist erforderlich, um die Adresse zu geokodieren."
 msgid "Structures"
 msgstr "Strukturen"
 
-#: src/block/edit.tsx:1217
+#: src/block/edit.tsx:1224
 msgid "Style Preset"
 msgstr "Stilvorgabe"
 
@@ -1926,7 +1930,7 @@ msgstr "Der ausgewählte Standort hat bereits keinen zugewiesenen Marker."
 msgid "The selected location already has no tags assigned."
 msgstr "Der ausgewählte Standort hat bereits keine zugewiesenen Schlagwörter."
 
-#: src/block/edit.tsx:1161
+#: src/block/edit.tsx:1168
 msgid ""
 "The snippet updates automatically when this block configuration changes."
 msgstr ""
@@ -1961,7 +1965,7 @@ msgstr "Donnerstag"
 msgid "Title"
 msgstr "Titel"
 
-#: src/map/SearchControl.tsx:352
+#: src/map/SearchControl.tsx:416
 msgid "to load results"
 msgstr "um Ergebnisse zu laden"
 
@@ -2109,7 +2113,7 @@ msgstr "Postleitzahl"
 msgid "Zoom"
 msgstr "Zoom"
 
-#: src/block/edit.tsx:1224
+#: src/block/edit.tsx:1231
 msgid "Zoom Controls"
 msgstr "Zoom-Steuerelemente"
 

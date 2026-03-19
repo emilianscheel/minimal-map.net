@@ -27,6 +27,12 @@ describe('map defaults normalization', () => {
 		expect(config.cooperativeGestures).toBe(true);
 	});
 
+	test('falls back to a disabled category filter for shared maps without overrides', () => {
+		const config = normalizeMapConfig();
+
+		expect(config.enableCategoryFilter).toBe(false);
+	});
+
 	test('allows raw config to override the runtime cooperative gestures default', () => {
 		const config = normalizeMapConfig(
 			{
@@ -40,6 +46,19 @@ describe('map defaults normalization', () => {
 		);
 
 		expect(config.cooperativeGestures).toBe(false);
+	});
+
+	test('uses the runtime category filter default when provided', () => {
+		const config = normalizeMapConfig(
+			{},
+			{
+				defaults: {
+					enableCategoryFilter: true,
+				},
+			}
+		);
+
+		expect(config.enableCategoryFilter).toBe(true);
 	});
 
 	test('uses the runtime font family default when raw config leaves it blank', () => {

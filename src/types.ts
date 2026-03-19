@@ -43,6 +43,7 @@ export interface MapDefaults {
 	borderRadius: string;
 	showZoomControls: boolean;
 	allowSearch: boolean;
+	enableCategoryFilter: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
 	scrollZoom: boolean;
@@ -174,6 +175,7 @@ export interface RawMapConfig {
 	borderRadius?: string | BorderRadiusValue | null;
 	showZoomControls?: boolean;
 	allowSearch?: boolean;
+	enableCategoryFilter?: boolean;
 	googleMapsNavigation?: boolean;
 	inMapLocationCard?: boolean;
 	scrollZoom?: boolean;
@@ -252,6 +254,7 @@ export interface NormalizedMapConfig extends MapDefaults {
 	cooperativeGestures: boolean;
 	showAttribution: boolean;
 	allowSearch: boolean;
+	enableCategoryFilter: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
 	siteTimezone: string;
@@ -398,6 +401,7 @@ export interface MapBlockAttributes {
 	fontFamily: string;
 	showZoomControls: boolean;
 	allowSearch: boolean;
+	enableCategoryFilter: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
 	scrollZoom: boolean;
@@ -449,7 +453,11 @@ export interface WordPressZoomControls {
 
 export interface WordPressSearchControl {
 	destroy: () => void;
-	update: (config: NormalizedMapConfig, selectedId?: number) => void;
+	update: (
+		config: NormalizedMapConfig,
+		selectedId?: number,
+		activeCategoryTagIds?: number[]
+	) => void;
 }
 
 export interface WordPressAttributionControl {

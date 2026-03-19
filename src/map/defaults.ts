@@ -42,6 +42,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	borderRadius: '',
 	showZoomControls: true,
 	allowSearch: true,
+	enableCategoryFilter: false,
 	googleMapsNavigation: false,
 	inMapLocationCard: false,
 	scrollZoom: false,
@@ -242,6 +243,8 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 		),
 		showZoomControls: runtimeConfig.defaults?.showZoomControls ?? DEFAULT_MAP_DEFAULTS.showZoomControls,
 		allowSearch: runtimeConfig.defaults?.allowSearch ?? DEFAULT_MAP_DEFAULTS.allowSearch,
+		enableCategoryFilter:
+			runtimeConfig.defaults?.enableCategoryFilter ?? DEFAULT_MAP_DEFAULTS.enableCategoryFilter,
 		googleMapsNavigation:
 			runtimeConfig.defaults?.googleMapsNavigation ?? DEFAULT_MAP_DEFAULTS.googleMapsNavigation,
 		inMapLocationCard:
@@ -591,6 +594,9 @@ export function normalizeMapConfig(
 		borderRadius,
 		showZoomControls: Boolean(rawConfig.showZoomControls ?? defaults.showZoomControls),
 		allowSearch: Boolean(rawConfig.allowSearch ?? defaults.allowSearch),
+		enableCategoryFilter: Boolean(
+			rawConfig.enableCategoryFilter ?? defaults.enableCategoryFilter
+		),
 		googleMapsNavigation: Boolean(
 			rawConfig.googleMapsNavigation ?? defaults.googleMapsNavigation
 		),

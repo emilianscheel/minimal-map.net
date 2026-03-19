@@ -24,6 +24,7 @@ const EMBED_ATTRIBUTE_KEYS: Array<keyof EmbedAttributes> = [
 	'borderRadius',
 	'showZoomControls',
 	'allowSearch',
+	'enableCategoryFilter',
 	'googleMapsNavigation',
 	'inMapLocationCard',
 	'scrollZoom',

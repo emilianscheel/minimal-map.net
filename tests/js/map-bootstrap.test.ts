@@ -255,6 +255,71 @@ describe('map touch zoom interaction', () => {
 		]);
 	});
 
+	test('syncViewport only includes locations from selected category tags', () => {
+		const easeToCalls: Array<{ center: [number, number]; zoom: number }> = [];
+		const fitBoundsCalls: Array<{ padding: unknown }> = [];
+		const config = normalizeMapConfig({
+			enableCategoryFilter: true,
+			locations: [
+				{
+					id: 1,
+					title: 'Berlin',
+					lat: 52.52,
+					lng: 13.405,
+					tags: [
+						{
+							id: 10,
+							name: 'Studio',
+							background_color: '#000000',
+							foreground_color: '#ffffff',
+						},
+					],
+				},
+				{
+					id: 2,
+					title: 'Hamburg',
+					lat: 53.5511,
+					lng: 9.9937,
+					tags: [
+						{
+							id: 20,
+							name: 'Office',
+							background_color: '#000000',
+							foreground_color: '#ffffff',
+						},
+					],
+				},
+			],
+		});
+
+		syncViewport(
+			{
+				easeTo(options) {
+					easeToCalls.push({
+						center: options.center,
+						zoom: options.zoom,
+					});
+				},
+				fitBounds(_bounds, options) {
+					fitBoundsCalls.push({ padding: options.padding });
+				},
+				jumpTo() {},
+			} as never,
+			config,
+			1024,
+			false,
+			[20]
+		);
+
+		expect(fitBoundsCalls).toHaveLength(0);
+		expect(easeToCalls).toEqual([
+			{
+				center: [9.9937, 53.5511],
+				zoom: 9.5,
+			},
+		]);
+	});
+
 	test('uses a much larger top padding for mobile selected locations with preview cards', () => {
 		const config = normalizeMapConfig({
 			inMapLocationCard: true,

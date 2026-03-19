@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { JSDOM } from 'jsdom';
-import { createElement, createRoot } from '@wordpress/element';
+import { createElement, createRoot, useState } from '@wordpress/element';
 import { MapSearchControl, createWordPressSearchControl } from '../../src/map/SearchControl';
 import { createAttributionPill } from '../../src/map/attribution-pill';
 import { createWordPressZoomControls } from '../../src/map/wp-controls';
@@ -77,9 +77,11 @@ function submitSearchForm(host: HTMLDivElement, iframeDom: JSDOM): void {
 function createAddressSearchControl(
 	geocodeSearchFn: (query: string) => Promise<GeocodeResponse>,
 	options: {
+		enableCategoryFilter?: boolean;
 		googleMapsNavigation?: boolean;
 		googleMapsButtonShowIcon?: boolean;
 		locations?: MapLocationPoint[];
+		activeCategoryTagIds?: number[];
 		onSelect?: (selection: MapLocationSelection) => void;
 		selectedId?: number;
 		viewportWidth?: number;
@@ -109,6 +111,7 @@ function createAddressSearchControl(
 	const {
 		googleMapsNavigation = false,
 		googleMapsButtonShowIcon = true,
+		enableCategoryFilter = false,
 		locations = [
 			{
 				id: 1,
@@ -126,23 +129,31 @@ function createAddressSearchControl(
 			},
 		],
 		onSelect = () => {},
+		activeCategoryTagIds = [],
 		selectedId,
 	} = options;
 
-	root.render(
-		createElement(MapSearchControl, {
+	const SearchControlHarness = ({ selectedId: harnessSelectedId }: { selectedId?: number }) => {
+		const [activeTags, setActiveTags] = useState<number[]>(activeCategoryTagIds);
+
+		return createElement(MapSearchControl, {
+			activeCategoryTagIds: activeTags,
 			doc: dom.window.document,
+			enableCategoryFilter,
 			frontendGeocodePath: '/minimal-map/v1/frontend-geocode',
 			geocodeSearch: geocodeSearchFn,
 			googleMapsNavigation,
 			googleMapsButtonShowIcon,
 			locations,
+			onCategoryFilterChange: setActiveTags,
 			onSelect,
-			selectedId,
+			selectedId: harnessSelectedId,
 			siteLocale: 'en-US',
 			siteTimezone: 'Europe/Berlin',
-		}),
-	);
+		});
+	};
+
+	root.render(createElement(SearchControlHarness, { selectedId }));
 
 	return {
 		host,
@@ -152,20 +163,7 @@ function createAddressSearchControl(
 				root.unmount();
 			},
 			update(nextSelectedId?: number) {
-				root.render(
-					createElement(MapSearchControl, {
-						doc: dom.window.document,
-						frontendGeocodePath: '/minimal-map/v1/frontend-geocode',
-						geocodeSearch: geocodeSearchFn,
-						googleMapsNavigation,
-						googleMapsButtonShowIcon,
-						locations,
-						onSelect,
-						selectedId: nextSelectedId,
-						siteLocale: 'en-US',
-						siteTimezone: 'Europe/Berlin',
-					}),
-				);
+				root.render(createElement(SearchControlHarness, { selectedId: nextSelectedId }));
 			},
 		},
 	};
@@ -302,6 +300,263 @@ describe('map iframe document context', () => {
 
 		const address = host.querySelector('.minimal-map-search__result-address-content');
 		expect(address?.textContent).toContain('Unter den Linden 7, 10117 Berlin');
+
+		searchControl.destroy();
+	});
+
+	test('renders unique category pills from the current map tags in name order', async () => {
+		const { host, searchControl } = createAddressSearchControl(async () => ({
+			success: true,
+			label: 'Berlin',
+			lat: 52.52,
+			lng: 13.405,
+		}), {
+			enableCategoryFilter: true,
+			locations: [
+				{
+					id: 1,
+					title: 'Berlin Studio',
+					lat: 52.52,
+					lng: 13.405,
+					tags: [
+						{ id: 2, name: 'Office', background_color: '#000', foreground_color: '#fff' },
+						{ id: 1, name: 'Cafe', background_color: '#000', foreground_color: '#fff' },
+					],
+				},
+				{
+					id: 2,
+					title: 'Hamburg Office',
+					lat: 53.5511,
+					lng: 9.9937,
+					tags: [
+						{ id: 2, name: 'Office', background_color: '#000', foreground_color: '#fff' },
+					],
+				},
+			],
+		});
+
+		await flushRender();
+		await flushRender();
+
+		const pills = Array.from(
+			host.querySelectorAll('.minimal-map-search__category-pill')
+		).map((pill) => pill.textContent?.trim());
+
+		expect(pills).toEqual([ 'Cafe', 'Office' ]);
+
+		searchControl.destroy();
+	});
+
+	test('filters search results with category pills and allows deselection', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(
+			async () => ({
+				success: true,
+				label: 'Berlin',
+				lat: 52.52,
+				lng: 13.405,
+			}),
+			{
+				enableCategoryFilter: true,
+				locations: [
+					{
+						id: 1,
+						title: 'Berlin Studio',
+						lat: 52.52,
+						lng: 13.405,
+						tags: [
+							{ id: 10, name: 'Studio', background_color: '#000', foreground_color: '#fff' },
+						],
+					},
+					{
+						id: 2,
+						title: 'Hamburg Office',
+						lat: 53.5511,
+						lng: 9.9937,
+						tags: [
+							{ id: 20, name: 'Office', background_color: '#000', foreground_color: '#fff' },
+						],
+					},
+					{
+						id: 3,
+						title: 'Munich Untagged',
+						lat: 48.1374,
+						lng: 11.5755,
+					},
+				],
+			}
+		);
+
+		await flushRender();
+		await flushRender();
+
+		const clickPill = (label: string) => {
+			const pill = Array.from(
+				host.querySelectorAll<HTMLButtonElement>('.minimal-map-search__category-pill')
+			).find((candidate) => candidate.textContent?.trim() === label);
+
+			if (!pill) {
+				throw new Error(`Missing category pill: ${label}`);
+			}
+
+			pill.click();
+		};
+
+		clickPill('Office');
+		await flushRender();
+		await flushRender();
+
+		expect(
+			Array.from(
+				host.querySelectorAll<HTMLButtonElement>('.minimal-map-search__category-pill')
+			).find((pill) => pill.textContent?.trim() === 'Office')?.getAttribute('aria-pressed')
+		).toBe('true');
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelectorAll('.minimal-map-search__result-item')).toHaveLength(1);
+		expect(host.textContent).toContain('Hamburg Office');
+		expect(host.textContent).not.toContain('Berlin Studio');
+		expect(host.textContent).not.toContain('Munich Untagged');
+
+		(host.querySelector('.minimal-map-search-backdrop') as HTMLDivElement).click();
+		await flushRender();
+		await flushRender();
+
+		clickPill('Studio');
+		await flushRender();
+		await flushRender();
+
+		clickPill('Office');
+		await flushRender();
+		await flushRender();
+
+		const reopenedInput = host.querySelector(
+			'.minimal-map-search__input'
+		) as HTMLInputElement;
+		reopenedInput.blur();
+		focusInput(reopenedInput, iframeDom);
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelectorAll('.minimal-map-search__result-item')).toHaveLength(1);
+		expect(host.textContent).toContain('Berlin Studio');
+		expect(host.textContent).not.toContain('Hamburg Office');
+
+		(host.querySelector('.minimal-map-search-backdrop') as HTMLDivElement).click();
+		await flushRender();
+		await flushRender();
+
+		clickPill('Studio');
+		await flushRender();
+		await flushRender();
+
+		const restoredInput = host.querySelector(
+			'.minimal-map-search__input'
+		) as HTMLInputElement;
+		restoredInput.blur();
+		focusInput(restoredInput, iframeDom);
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelectorAll('.minimal-map-search__result-item')).toHaveLength(3);
+
+		searchControl.destroy();
+	});
+
+	test('supports OR matching when multiple category pills are selected', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(
+			async () => ({
+				success: true,
+				label: 'Berlin',
+				lat: 52.52,
+				lng: 13.405,
+			}),
+			{
+				enableCategoryFilter: true,
+				activeCategoryTagIds: [10, 20],
+				locations: [
+					{
+						id: 1,
+						title: 'Berlin Studio',
+						lat: 52.52,
+						lng: 13.405,
+						tags: [
+							{ id: 10, name: 'Studio', background_color: '#000', foreground_color: '#fff' },
+						],
+					},
+					{
+						id: 2,
+						title: 'Hamburg Office',
+						lat: 53.5511,
+						lng: 9.9937,
+						tags: [
+							{ id: 20, name: 'Office', background_color: '#000', foreground_color: '#fff' },
+						],
+					},
+					{
+						id: 3,
+						title: 'Munich Untagged',
+						lat: 48.1374,
+						lng: 11.5755,
+					},
+				],
+			}
+		);
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelectorAll('.minimal-map-search__result-item')).toHaveLength(2);
+		expect(host.textContent).toContain('Berlin Studio');
+		expect(host.textContent).toContain('Hamburg Office');
+		expect(host.textContent).not.toContain('Munich Untagged');
+
+		searchControl.destroy();
+	});
+
+	test('hides the category pill row while the search panel is open', async () => {
+		const { host, iframeDom, searchControl } = createAddressSearchControl(
+			async () => ({
+				success: true,
+				label: 'Berlin',
+				lat: 52.52,
+				lng: 13.405,
+			}),
+			{
+				enableCategoryFilter: true,
+				locations: [
+					{
+						id: 1,
+						title: 'Berlin Studio',
+						lat: 52.52,
+						lng: 13.405,
+						tags: [
+							{ id: 10, name: 'Studio', background_color: '#000', foreground_color: '#fff' },
+						],
+					},
+				],
+			}
+		);
+
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search__category-filters')).not.toBeNull();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+		focusInput(input, iframeDom);
+		await flushRender();
+		await flushRender();
+
+		expect(host.querySelector('.minimal-map-search__category-filters')).toBeNull();
 
 		searchControl.destroy();
 	});

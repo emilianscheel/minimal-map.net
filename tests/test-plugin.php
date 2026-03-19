@@ -448,6 +448,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 				'collectionId'             => 999999,
 				'fontFamily'               => '"Inter", sans-serif; color:red;',
 				'borderRadius'             => '18px',
+				'enableCategoryFilter'     => true,
 				'zoomControlsBorderColor' => 'invalid',
 			),
 		);
@@ -459,6 +460,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertSame( '44rem', $normalized['heightMobileCssValue'] );
 		$this->assertSame( '"Inter", sans-serif', $normalized['fontFamily'] );
 		$this->assertSame( '18px', $normalized['borderRadius'] );
+		$this->assertTrue( $normalized['enableCategoryFilter'] );
 		$this->assertSame( '#dcdcde', $normalized['zoomControlsBorderColor'] );
 		$this->assertSame( array(), $normalized['locations'] );
 	}
