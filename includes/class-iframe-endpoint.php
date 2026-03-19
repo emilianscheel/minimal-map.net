@@ -57,6 +57,8 @@ class Iframe_Endpoint {
 		}
 
 		add_filter( 'show_admin_bar', '__return_false' );
+		remove_action( 'wp_head', '_admin_bar_bump_cb' );
+		remove_action( 'admin_head', '_admin_bar_bump_cb' );
 
 		$encoded_config = isset( $_GET[ self::CONFIG_QUERY_VAR ] ) ? wp_unslash( (string) $_GET[ self::CONFIG_QUERY_VAR ] ) : '';
 		$response       = $this->build_response( $encoded_config );

@@ -446,6 +446,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'minimal-map-surface', $response['html'] );
 		$this->assertStringContainsString( 'data-minimal-map-config=', $response['html'] );
 		$this->assertStringContainsString( '360px', $response['html'] );
+		$this->assertStringContainsString( 'margin-top: 0 !important;', $response['html'] );
 	}
 
 	/**

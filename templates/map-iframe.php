@@ -35,6 +35,11 @@
 		}
 	</style>
 	<?php wp_head(); ?>
+	<style>
+		html {
+			margin-top: 0 !important;
+		}
+	</style>
 </head>
 <body class="minimal-map-iframe-page">
 	<?php if ( '' !== $error_message ) : ?>
