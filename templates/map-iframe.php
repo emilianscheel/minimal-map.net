@@ -37,7 +37,7 @@
 			line-height: 1.5;
 		}
 	</style>
-	<?php wp_head(); ?>
+	<?php echo $head_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	<style>
 		html {
 			margin-top: 0 !important;
@@ -55,6 +55,6 @@
 	<?php else : ?>
 		<?php echo $map_surface_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	<?php endif; ?>
-	<?php wp_footer(); ?>
+	<?php echo $footer_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </body>
 </html>

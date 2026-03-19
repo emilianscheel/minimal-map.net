@@ -514,7 +514,103 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( '360px', $response['html'] );
 		$this->assertStringContainsString( '--minimal-map-font-family', $response['html'] );
 		$this->assertStringContainsString( 'border-radius: 24px;', $response['html'] );
+		$this->assertStringContainsString( 'window.MinimalMapFrontConfig = ', $response['html'] );
+		$this->assertStringContainsString( 'minimal-map-frontend-js', $response['html'] );
+		$this->assertStringContainsString( 'minimal-map-style-css', $response['html'] );
+		$this->assertStringNotContainsString( 'frontendGeocodePath', $response['html'] );
 		$this->assertStringContainsString( 'margin-top: 0 !important;', $response['html'] );
+	}
+
+	/**
+	 * The privacy-safe iframe document should not run wp_head/wp_footer hooks.
+	 *
+	 * @return void
+	 */
+	public function test_iframe_endpoint_does_not_render_wp_head_or_wp_footer_in_privacy_mode() {
+		$config         = new \MinimalMap\Config();
+		$view           = new \MinimalMap\Map_View( $config );
+		$endpoint       = new \MinimalMap\Iframe_Endpoint( $config, $view );
+		$encoded_payload = $this->encode_embed_payload(
+			array(
+				'v'          => \MinimalMap\Config::EMBED_PAYLOAD_VERSION,
+				'attributes' => array(),
+			)
+		);
+
+		add_action(
+			'wp_head',
+			array( $this, 'echo_iframe_head_leak_marker' )
+		);
+		add_action(
+			'wp_footer',
+			array( $this, 'echo_iframe_footer_leak_marker' )
+		);
+
+		$response = $endpoint->build_response( $encoded_payload );
+
+		remove_action( 'wp_head', array( $this, 'echo_iframe_head_leak_marker' ) );
+		remove_action( 'wp_footer', array( $this, 'echo_iframe_footer_leak_marker' ) );
+
+		$this->assertStringNotContainsString( 'minimal-map-head-leak', $response['html'] );
+		$this->assertStringNotContainsString( 'minimal-map-footer-leak', $response['html'] );
+	}
+
+	/**
+	 * Complianz should be suppressed automatically on privacy-safe iframe requests.
+	 *
+	 * @return void
+	 */
+	public function test_iframe_endpoint_suppresses_complianz_banner_for_privacy_safe_requests() {
+		$config   = new \MinimalMap\Config();
+		$view     = new \MinimalMap\Map_View( $config );
+		$endpoint = new \MinimalMap\Iframe_Endpoint( $config, $view );
+		$encoded_payload = $this->encode_embed_payload(
+			array(
+				'v'          => \MinimalMap\Config::EMBED_PAYLOAD_VERSION,
+				'attributes' => array(),
+			)
+		);
+		$previous_get = $_GET;
+		$_GET = array(
+			\MinimalMap\Iframe_Endpoint::QUERY_VAR => '1',
+			\MinimalMap\Iframe_Endpoint::CONFIG_QUERY_VAR => $encoded_payload,
+		);
+
+		$result = $endpoint->filter_complianz_site_needs_cookiewarning( true );
+
+		$_GET = $previous_get;
+
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Complianz suppression should fail closed when iframe styles are not privacy-safe.
+	 *
+	 * @return void
+	 */
+	public function test_iframe_endpoint_keeps_complianz_banner_for_non_safe_style_sources() {
+		$config   = new \MinimalMap\Config();
+		$view     = new \MinimalMap\Map_View( $config );
+		$endpoint = new \MinimalMap\Iframe_Endpoint( $config, $view );
+		$encoded_payload = $this->encode_embed_payload(
+			array(
+				'v'          => \MinimalMap\Config::EMBED_PAYLOAD_VERSION,
+				'attributes' => array(),
+			)
+		);
+		$previous_get = $_GET;
+		$_GET = array(
+			\MinimalMap\Iframe_Endpoint::QUERY_VAR => '1',
+			\MinimalMap\Iframe_Endpoint::CONFIG_QUERY_VAR => $encoded_payload,
+		);
+
+		add_filter( 'minimal_map_iframe_privacy_safe_style_url', '__return_false' );
+		$result = $endpoint->filter_complianz_site_needs_cookiewarning( true );
+		remove_filter( 'minimal_map_iframe_privacy_safe_style_url', '__return_false' );
+
+		$_GET = $previous_get;
+
+		$this->assertTrue( $result );
 	}
 
 	/**
@@ -732,5 +828,23 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			add_query_arg( 'minimal-map-iframe', '1', home_url( '/' ) ),
 			$client_config['embedBaseUrl']
 		);
+	}
+
+	/**
+	 * Echo a marker used to verify wp_head is not rendered for iframe privacy mode.
+	 *
+	 * @return void
+	 */
+	public function echo_iframe_head_leak_marker() {
+		echo 'minimal-map-head-leak';
+	}
+
+	/**
+	 * Echo a marker used to verify wp_footer is not rendered for iframe privacy mode.
+	 *
+	 * @return void
+	 */
+	public function echo_iframe_footer_leak_marker() {
+		echo 'minimal-map-footer-leak';
 	}
 }

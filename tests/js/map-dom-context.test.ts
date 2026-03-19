@@ -88,6 +88,7 @@ function createAddressSearchControl(
 	geocodeSearchFn: (query: string) => Promise<GeocodeResponse>,
 	options: {
 		enableCategoryFilter?: boolean;
+		frontendGeocodePath?: string | null;
 		googleMapsNavigation?: boolean;
 		googleMapsButtonShowIcon?: boolean;
 		locations?: MapLocationPoint[];
@@ -119,6 +120,9 @@ function createAddressSearchControl(
 
 	const host = dom.window.document.getElementById('host') as HTMLDivElement;
 	const root = createRoot(host);
+	const frontendGeocodePath = Object.prototype.hasOwnProperty.call(options, 'frontendGeocodePath')
+		? options.frontendGeocodePath ?? undefined
+		: '/minimal-map/v1/frontend-geocode';
 	const {
 		googleMapsNavigation = false,
 		googleMapsButtonShowIcon = true,
@@ -152,7 +156,7 @@ function createAddressSearchControl(
 			activeCategoryTagIds: activeTags,
 			doc: dom.window.document,
 			enableCategoryFilter,
-			frontendGeocodePath: '/minimal-map/v1/frontend-geocode',
+			frontendGeocodePath,
 			geocodeSearch: geocodeSearchFn,
 			googleMapsNavigation,
 			googleMapsButtonShowIcon,
@@ -865,6 +869,68 @@ describe('map iframe document context', () => {
 		await flushRender();
 
 		expect(calls).toEqual([ '1600 Pennsylvania Avenue' ]);
+
+		searchControl.destroy();
+	});
+
+	test('keeps iframe search local-only when frontend geocoding is disabled', async () => {
+		const calls: string[] = [];
+		const { host, iframeDom, searchControl } = createAddressSearchControl(
+			async (query) => {
+				calls.push(query);
+
+				return {
+					success: true,
+					label: 'Berlin',
+					lat: 52.52,
+					lng: 13.405,
+				};
+			},
+			{
+				frontendGeocodePath: null,
+				locations: [
+					{
+						id: 1,
+						title: 'Berlin Studio',
+						lat: 52.52,
+						lng: 13.405,
+						street: 'Moosdorfstraße',
+						house_number: '10',
+						postal_code: '12345',
+						city: 'Berlin',
+					},
+				],
+			},
+		);
+
+		await flushRender();
+		await flushRender();
+
+		const input = host.querySelector('.minimal-map-search__input') as HTMLInputElement;
+
+		focusInput(input, iframeDom);
+		setInputValue(input, iframeDom, '1600 Pennsylvania Avenue');
+		await flushRender();
+		await flushRender();
+
+		expect(host.textContent).toContain('No locations found');
+		expect(host.textContent).not.toContain('Press');
+
+		submitSearchForm(host, iframeDom);
+		await flushRender();
+		await flushRender();
+
+		expect(calls).toEqual([]);
+
+		setInputValue(input, iframeDom, 'Moosdorfstraße 10');
+		await flushRender();
+		await flushRender();
+
+		const titles = Array.from(host.querySelectorAll('.minimal-map-search__result-title')).map(
+			(element) => element.textContent,
+		);
+
+		expect(titles).toEqual([ 'Berlin Studio' ]);
 
 		searchControl.destroy();
 	});

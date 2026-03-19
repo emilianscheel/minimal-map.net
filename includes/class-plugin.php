@@ -172,6 +172,7 @@ final class Plugin {
 		add_action( 'init', array( $this->assets, 'register' ) );
 		add_action( 'init', array( $this->map_block, 'register' ) );
 		add_action( 'template_redirect', array( $this->iframe_endpoint, 'maybe_render' ) );
+		add_filter( 'cmplz_site_needs_cookiewarning', array( $this->iframe_endpoint, 'filter_complianz_site_needs_cookiewarning' ) );
 		add_action( 'admin_menu', array( $this->admin_menu, 'register' ) );
 		add_action( 'admin_enqueue_scripts', array( $this->assets, 'enqueue_admin_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this->assets, 'enqueue_frontend_assets' ) );

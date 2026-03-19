@@ -191,6 +191,10 @@ export const MapSearchControl = ({
 			return 'text-results';
 		}
 
+		if (!frontendGeocodePath) {
+			return 'address-empty';
+		}
+
 		if (addressSearchMode === 'loading') {
 			return 'address-loading';
 		}
@@ -204,7 +208,13 @@ export const MapSearchControl = ({
 		}
 
 		return 'address-prompt';
-	}, [addressResults.length, addressSearchMode, filteredLocations.length, trimmedSearchTerm]);
+	}, [
+		addressResults.length,
+		addressSearchMode,
+		filteredLocations.length,
+		frontendGeocodePath,
+		trimmedSearchTerm,
+	]);
 
 	const renderedResults = useMemo<SearchResultView[]>(() => {
 		if (searchMode === 'address-results') {

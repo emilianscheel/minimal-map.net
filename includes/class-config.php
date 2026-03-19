@@ -276,7 +276,14 @@ class Config {
 	 * @param bool $include_all_locations Whether to include the full locations and collections list.
 	 * @return array<string, mixed>
 	 */
-	public function get_client_config( $include_all_locations = true ) {
+	public function get_client_config( $include_all_locations = true, $options = array() ) {
+		$options = wp_parse_args(
+			$options,
+			array(
+				'include_frontend_geocode' => true,
+			)
+		);
+
 		$styles_route = new Styles_Route();
 
 		$config = array(
@@ -284,7 +291,6 @@ class Config {
 			'heightUnits'   => self::HEIGHT_UNITS,
 			'stylePresets'  => $this->get_style_presets(),
 			'styleThemes'   => array_values( $styles_route->get_themes() ),
-			'frontendGeocodePath' => Frontend_Geocode_Route::get_rest_path(),
 			'locationsPath' => Locations_Route::get_rest_path(),
 			'locationsUrl' => get_rest_url( null, Locations_Route::REST_NAMESPACE . Locations_Route::REST_ROUTE ),
 			'siteTimezone' => $this->get_site_timezone_string(),
@@ -295,6 +301,10 @@ class Config {
 			'embedBaseUrl' => $this->get_embed_base_url(),
 			'previewImageUrl' => plugins_url( 'assets/preview.png', MINIMAL_MAP_FILE ),
 		);
+
+		if ( ! empty( $options['include_frontend_geocode'] ) ) {
+			$config['frontendGeocodePath'] = Frontend_Geocode_Route::get_rest_path();
+		}
 
 		if ( $include_all_locations ) {
 			$config['locations']   = $this->get_map_locations();
