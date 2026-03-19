@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-16T18:40:05+00:00\n"
+"POT-Creation-Date: 2026-03-19T17:07:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: minimal-map\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: minimal-map.php includes/admin/class-admin-menu.php:106
 #: includes/admin/class-admin-menu.php:107
 #: includes/blocks/class-map-block.php:55
-#: includes/class-iframe-endpoint.php:106
+#: includes/class-iframe-endpoint.php:108
 msgid "Minimal Map"
 msgstr ""
 
@@ -98,28 +98,28 @@ msgstr ""
 msgid "Render a minimalist MapLibre-powered map."
 msgstr ""
 
-#: includes/class-config.php:47
+#: includes/class-config.php:48
 msgid "Liberty"
 msgstr ""
 
-#: includes/class-config.php:51
+#: includes/class-config.php:52
 msgid "Bright"
 msgstr ""
 
-#: includes/class-config.php:55
+#: includes/class-config.php:56
 msgid "Positron"
 msgstr ""
 
-#: includes/class-config.php:248 includes/class-config.php:271
+#: includes/class-config.php:254 includes/class-config.php:278
 msgid "Map preview unavailable because this browser does not support WebGL."
 msgstr ""
 
-#: includes/class-config.php:301 includes/class-config.php:310
-#: includes/class-config.php:319
+#: includes/class-config.php:371 includes/class-config.php:380
+#: includes/class-config.php:389
 msgid "The map embed configuration is missing or invalid."
 msgstr ""
 
-#: includes/class-iframe-endpoint.php:94
+#: includes/class-iframe-endpoint.php:96
 msgid "Invalid Minimal Map Embed"
 msgstr ""
 
@@ -173,11 +173,11 @@ msgstr ""
 msgid "Tag"
 msgstr ""
 
-#: src/map/location-opening-hours.ts:293
+#: src/map/location-opening-hours.ts:310
 msgid "%1$s-%2$s"
 msgstr ""
 
-#: src/map/location-opening-hours.ts:309
+#: src/map/location-opening-hours.ts:326
 msgid "%1$s, Lunch %2$s-%3$s"
 msgstr ""
 
@@ -255,7 +255,7 @@ msgid_plural "%d markers uploaded."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/map/location-card.tsx:274
+#: src/map/location-card.tsx:295
 msgid "%s away"
 msgstr ""
 
@@ -328,19 +328,19 @@ msgstr ""
 msgid "All locations"
 msgstr ""
 
-#: src/block/edit.tsx:1106
+#: src/block/edit.tsx:1116
 msgid "Allow Search"
 msgstr ""
 
-#: src/block/edit.tsx:1089
-msgid "Allow Two-Finger Zoom on Mobile"
+#: src/block/edit.tsx:1094
+msgid "Allow Two-Finger Zoom"
 msgstr ""
 
-#: src/block/edit.tsx:1084
+#: src/block/edit.tsx:1089
 msgid "Allow Zoom via Scroll"
 msgstr ""
 
-#: src/block/edit.tsx:1166
+#: src/block/edit.tsx:1173
 msgid "Appearance"
 msgstr ""
 
@@ -473,19 +473,19 @@ msgstr ""
 msgid "Border"
 msgstr ""
 
-#: src/block/edit.tsx:1386 src/block/edit.tsx:1448
+#: src/block/edit.tsx:1393 src/block/edit.tsx:1452
 msgid "Border Radius"
 msgstr ""
 
-#: src/block/edit.tsx:1345
+#: src/block/edit.tsx:1352
 msgid "Border Radius Card"
 msgstr ""
 
-#: src/block/edit.tsx:1331
+#: src/block/edit.tsx:1338
 msgid "Border Radius Input"
 msgstr ""
 
-#: src/block/edit.tsx:1279
+#: src/block/edit.tsx:1286
 msgid "Border Width"
 msgstr ""
 
@@ -536,15 +536,15 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/block/edit.tsx:1358
+#: src/block/edit.tsx:1365
 msgid "Card Gap"
 msgstr ""
 
-#: src/block/edit.tsx:1055
+#: src/block/edit.tsx:1058
 msgid "Center Latitude"
 msgstr ""
 
-#: src/block/edit.tsx:1062
+#: src/block/edit.tsx:1065
 msgid "Center Longitude"
 msgstr ""
 
@@ -561,7 +561,7 @@ msgstr ""
 msgid "City is required to geocode the address."
 msgstr ""
 
-#: src/map/SearchControl.tsx:329
+#: src/map/SearchControl.tsx:333
 msgid "Clear search"
 msgstr ""
 
@@ -579,15 +579,15 @@ msgid "Close small"
 msgstr ""
 
 #: src/block/edit.tsx:498 src/lib/locations/formatOpeningHoursSummary.ts:37
-#: src/map/location-opening-hours.ts:279 src/map/location-opening-hours.ts:289
+#: src/map/location-opening-hours.ts:296 src/map/location-opening-hours.ts:306
 msgid "Closed"
 msgstr ""
 
-#: src/map/location-opening-hours.ts:270
+#: src/map/location-opening-hours.ts:287
 msgid "Closed - opens %1$s %2$s"
 msgstr ""
 
-#: src/map/location-opening-hours.ts:268
+#: src/map/location-opening-hours.ts:285
 msgid "Closed - opens %s"
 msgstr ""
 
@@ -673,15 +673,15 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: src/block/edit.tsx:1157
+#: src/block/edit.tsx:1164
 msgid "Copied"
 msgstr ""
 
-#: src/block/edit.tsx:1160
+#: src/block/edit.tsx:1167
 msgid "Copy failed"
 msgstr ""
 
-#: src/block/edit.tsx:1154
+#: src/block/edit.tsx:1161
 msgid "Copy Snippet"
 msgstr ""
 
@@ -725,7 +725,7 @@ msgstr ""
 msgid "Create Theme"
 msgstr ""
 
-#: src/block/edit.tsx:1372
+#: src/block/edit.tsx:1379
 msgid "Credits"
 msgstr ""
 
@@ -881,8 +881,8 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
-#: src/block/edit.tsx:1126
-msgid "Embed via Iframe"
+#: src/block/edit.tsx:1135
+msgid "Embed"
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:117
@@ -935,6 +935,10 @@ msgstr ""
 msgid "Failed to read the selected file."
 msgstr ""
 
+#: src/block/edit.tsx:1080
+msgid "Features"
+msgstr ""
+
 #: src/admin/logos/EditLogoDialog.tsx:42 src/admin/logos/LogosGrid.tsx:15
 #: src/admin/markers/EditMarkerDialog.tsx:42
 msgid "Filename"
@@ -984,19 +988,19 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-#: src/block/edit.tsx:1425
+#: src/block/edit.tsx:1432
 msgid "Google Maps Button"
 msgstr ""
 
-#: src/block/edit.tsx:1111
+#: src/block/edit.tsx:1121
 msgid "Google Maps Navigation"
 msgstr ""
 
-#: src/block/edit.tsx:1169
+#: src/block/edit.tsx:1176
 msgid "Height"
 msgstr ""
 
-#: src/block/edit.tsx:1180
+#: src/block/edit.tsx:1187
 msgid "Height Mobile"
 msgstr ""
 
@@ -1013,7 +1017,7 @@ msgstr ""
 msgid "Ice & Glaciers"
 msgstr ""
 
-#: src/block/edit.tsx:1130
+#: src/block/edit.tsx:1137
 msgid "Iframe Snippet"
 msgstr ""
 
@@ -1037,7 +1041,7 @@ msgstr ""
 msgid "Imported theme with fallback default colors for: %s"
 msgstr ""
 
-#: src/block/edit.tsx:1118
+#: src/block/edit.tsx:1128
 msgid "In-map Location Card"
 msgstr ""
 
@@ -1057,7 +1061,7 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-#: src/map/SearchControl.tsx:358
+#: src/map/SearchControl.tsx:362
 msgid "Loading results..."
 msgstr ""
 
@@ -1210,10 +1214,6 @@ msgstr ""
 msgid "Map preview"
 msgstr ""
 
-#: src/block/edit.tsx:1043
-msgid "Settings"
-msgstr ""
-
 #: src/admin/locations/controller.tsx:759
 msgid "Marker assigned to location."
 msgstr ""
@@ -1259,7 +1259,7 @@ msgstr ""
 msgid "Merge collections"
 msgstr ""
 
-#: src/block/edit.tsx:1032
+#: src/block/edit.tsx:1035
 msgid "Minimal Map Preview"
 msgstr ""
 
@@ -1317,8 +1317,8 @@ msgstr ""
 msgid "No custom marker assigned yet."
 msgstr ""
 
-#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:368
-#: src/map/SearchControl.tsx:414
+#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:372
+#: src/map/SearchControl.tsx:418
 msgid "No locations found"
 msgstr ""
 
@@ -1391,7 +1391,7 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: src/map/location-opening-hours.ts:238
+#: src/map/location-opening-hours.ts:255
 msgid "Open - closes %s"
 msgstr ""
 
@@ -1399,7 +1399,7 @@ msgstr ""
 msgid "Open collections"
 msgstr ""
 
-#: src/map/location-card.tsx:268
+#: src/map/location-card.tsx:289
 msgid "Open in Google Maps"
 msgstr ""
 
@@ -1424,7 +1424,7 @@ msgstr ""
 msgid "Opening hours"
 msgstr ""
 
-#: src/block/edit.tsx:1484
+#: src/block/edit.tsx:1488
 msgid "Opening Hours"
 msgstr ""
 
@@ -1450,15 +1450,15 @@ msgstr ""
 msgid "Other Features"
 msgstr ""
 
-#: src/block/edit.tsx:1254 src/block/edit.tsx:1317 src/block/edit.tsx:1412
+#: src/block/edit.tsx:1261 src/block/edit.tsx:1324 src/block/edit.tsx:1419
 msgid "Outer Margin"
 msgstr ""
 
-#: src/block/edit.tsx:1240 src/block/edit.tsx:1398 src/block/edit.tsx:1463
+#: src/block/edit.tsx:1247 src/block/edit.tsx:1405 src/block/edit.tsx:1467
 msgid "Padding"
 msgstr ""
 
-#: src/block/edit.tsx:1365
+#: src/block/edit.tsx:1372
 msgid "Panel Width"
 msgstr ""
 
@@ -1494,7 +1494,7 @@ msgstr ""
 msgid "PNG file could not be read."
 msgstr ""
 
-#: src/block/edit.tsx:1217
+#: src/block/edit.tsx:1224
 msgid "Position"
 msgstr ""
 
@@ -1506,7 +1506,7 @@ msgstr ""
 msgid "Postal code is required to geocode the address."
 msgstr ""
 
-#: src/map/SearchControl.tsx:347
+#: src/map/SearchControl.tsx:351
 msgid "Press"
 msgstr ""
 
@@ -1583,8 +1583,8 @@ msgstr[1] ""
 msgid "Remove this logo from the selected location?"
 msgstr ""
 
-#: src/block/edit.tsx:1096
-msgid "Require Two Fingers to Move on Mobile"
+#: src/block/edit.tsx:1105
+msgid "Require Two Fingers to Move"
 msgstr ""
 
 #: src/admin/styles/constants.ts:7
@@ -1658,15 +1658,15 @@ msgid "Save Theme"
 msgstr ""
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:72
-#: src/map/SearchControl.tsx:322
+#: src/map/SearchControl.tsx:326
 msgid "Search locations"
 msgstr ""
 
-#: src/map/SearchControl.tsx:321
+#: src/map/SearchControl.tsx:325
 msgid "Search locations..."
 msgstr ""
 
-#: src/block/edit.tsx:1287
+#: src/block/edit.tsx:1294
 msgid "Search Panel"
 msgstr ""
 
@@ -1712,11 +1712,15 @@ msgid_plural "Set opening hours for %d selected locations."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/block/edit.tsx:1476
+#: src/block/edit.tsx:1046
+msgid "Settings"
+msgstr ""
+
+#: src/block/edit.tsx:1480
 msgid "Show icon"
 msgstr ""
 
-#: src/block/edit.tsx:1077
+#: src/block/edit.tsx:1082
 msgid "Show Zoom Controls"
 msgstr ""
 
@@ -1747,7 +1751,7 @@ msgstr ""
 msgid "Structures"
 msgstr ""
 
-#: src/block/edit.tsx:1190
+#: src/block/edit.tsx:1197
 msgid "Style Preset"
 msgstr ""
 
@@ -1843,7 +1847,7 @@ msgstr ""
 msgid "The selected location already has no tags assigned."
 msgstr ""
 
-#: src/block/edit.tsx:1134
+#: src/block/edit.tsx:1141
 msgid ""
 "The snippet updates automatically when this block configuration changes."
 msgstr ""
@@ -1878,7 +1882,7 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: src/map/SearchControl.tsx:348
+#: src/map/SearchControl.tsx:352
 msgid "to load results"
 msgstr ""
 
@@ -1996,21 +2000,25 @@ msgstr ""
 msgid "Wednesday"
 msgstr ""
 
-#: src/block/edit.tsx:1097
+#: src/block/edit.tsx:1096
+msgid "When enabled, one can zoom the map using two fingers on mobile devices."
+msgstr ""
+
+#: src/block/edit.tsx:1106
 msgid ""
 "When enabled, one finger scrolls the page, while two fingers are required to "
-"move or zoom the map."
+"move the map."
 msgstr ""
 
 #: src/lib/locations/importLocations.ts:171
 msgid "Zip code"
 msgstr ""
 
-#: src/block/edit.tsx:1069
+#: src/block/edit.tsx:1072
 msgid "Zoom"
 msgstr ""
 
-#: src/block/edit.tsx:1197
+#: src/block/edit.tsx:1204
 msgid "Zoom Controls"
 msgstr ""
 
