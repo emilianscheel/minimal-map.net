@@ -1076,6 +1076,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             max={22}
             step={0.5}
           />
+        </PanelBody>
+        <PanelBody title={__("Features", "minimal-map")} initialOpen={false}>
           <ToggleControl
             label={__("Show Zoom Controls", "minimal-map")}
             checked={attributes.showZoomControls}
@@ -1089,23 +1091,27 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={(value: boolean) => setAttributes({ scrollZoom: value })}
           />
           <ToggleControl
-            label={__("Allow Two-Finger Zoom on Mobile", "minimal-map")}
+            label={__("Allow Two-Finger Zoom", "minimal-map")}
             checked={attributes.mobileTwoFingerZoom}
+            help={__(
+              "When enabled, one can zoom the map using two fingers on mobile devices.",
+              "minimal-map",
+            )}
             onChange={(value: boolean) =>
               setAttributes({ mobileTwoFingerZoom: value })
             }
           />
           <ToggleControl
-            label={__("Require Two Fingers to Move on Mobile", "minimal-map")}
+            label={__("Require Two Fingers to Move", "minimal-map")}
             help={__(
-              "When enabled, one finger scrolls the page, while two fingers are required to move or zoom the map.",
+              "When enabled, one finger scrolls the page, while two fingers are required to move the map.",
               "minimal-map",
             )}
             checked={attributes.cooperativeGestures}
             onChange={(value: boolean) =>
               setAttributes({ cooperativeGestures: value })
             }
-          />{" "}
+          />
           <ToggleControl
             label={__("Allow Search", "minimal-map")}
             checked={attributes.allowSearch}
