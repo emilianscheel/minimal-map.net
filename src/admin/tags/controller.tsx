@@ -1,7 +1,7 @@
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { Plus } from 'lucide-react';
+import { BrushCleaning, Plus } from 'lucide-react';
 import type { ViewGrid } from '@wordpress/dataviews';
 import type {
 	TagFormState,
@@ -31,6 +31,8 @@ export function useTagsController(
 	const [editingTag, setEditingTag] = useState<TagRecord | null>(null);
 	const [form, setForm] = useState<TagFormState>(DEFAULT_FORM_STATE);
 	const [formMode, setFormMode] = useState<TagsController['formMode']>('create');
+	const [isDeleteAllTagsModalOpen, setDeleteAllTagsModalOpen] = useState(false);
+	const [isDeletingAllTags, setDeletingAllTags] = useState(false);
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 	const [isDialogOpen, setDialogOpen] = useState(false);
 	const [isLoading, setLoading] = useState(enabled);
@@ -110,6 +112,18 @@ export function useTagsController(
 		setDeleteModalOpen(false);
 		setSelectedTag(null);
 	}, [isRowActionPending]);
+
+	const onCloseDeleteAllTagsModal = useCallback((): void => {
+		if (isDeletingAllTags || isRowActionPending) {
+			return;
+		}
+
+		setDeleteAllTagsModalOpen(false);
+	}, [isDeletingAllTags, isRowActionPending]);
+
+	const onOpenDeleteAllTagsModal = useCallback((): void => {
+		setDeleteAllTagsModalOpen(true);
+	}, []);
 
 	const onOpenDeleteModal = useCallback((tag: TagRecord): void => {
 		setSelectedTag(tag);
@@ -209,6 +223,45 @@ export function useTagsController(
 		}
 	}, [onDeleteTag, selectedTag]);
 
+	const onDeleteAllTags = useCallback(async (): Promise<void> => {
+		if (tags.length === 0) {
+			setDeleteAllTagsModalOpen(false);
+			return;
+		}
+
+		setDeletingAllTags(true);
+		setRowActionPending(true);
+		setActionNotice(null);
+
+		try {
+			for (const tag of tags) {
+				await deleteTag(config, tag.id);
+			}
+
+			await loadTags();
+			setDeleteAllTagsModalOpen(false);
+			setActionNotice({
+				status: 'success',
+				message: sprintf(
+					_n('%d tag deleted.', '%d tags deleted.', tags.length, 'minimal-map'),
+					tags.length
+				),
+			});
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Tags could not be deleted.', 'minimal-map'),
+			});
+			throw error;
+		} finally {
+			setDeletingAllTags(false);
+			setRowActionPending(false);
+		}
+	}, [config, loadTags, tags]);
+
 	const paginatedTags = useMemo(() => {
 		const filtered = tags.filter((tag) => {
 			if (!view.search) {
@@ -232,6 +285,14 @@ export function useTagsController(
 		headerAction: enabled ? (
 			<div className="minimal-map-admin__header-actions-group">
 				<Button
+					variant="tertiary"
+					icon={<BrushCleaning size={18} strokeWidth={2} />}
+					label={__('Delete all tags', 'minimal-map')}
+					onClick={onOpenDeleteAllTagsModal}
+					disabled={tags.length === 0 || isDeletingAllTags || isRowActionPending}
+					__next40pxDefaultSize
+				/>
+				<Button
 					__next40pxDefaultSize
 					variant="primary"
 					onClick={onAddTag}
@@ -242,6 +303,8 @@ export function useTagsController(
 				</Button>
 			</div>
 		) : null,
+		isDeleteAllTagsModalOpen,
+		isDeletingAllTags,
 		isDeleteModalOpen,
 		isLoading,
 		isRowActionPending,
@@ -256,10 +319,13 @@ export function useTagsController(
 		submitLabel: formMode === 'edit' ? __('Save changes', 'minimal-map') : __('Add tag', 'minimal-map'),
 		submitError,
 		onAddTag,
+		onCloseDeleteAllTagsModal,
 		onCloseDeleteModal,
+		onDeleteAllTags,
 		onConfirmDeleteTag,
 		onDeleteTag,
 		onEditTag,
+		onOpenDeleteAllTagsModal,
 		onOpenDeleteModal,
 		onConfirm,
 		onCancel,

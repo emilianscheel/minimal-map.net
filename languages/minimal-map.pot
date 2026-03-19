@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-19T19:08:40+00:00\n"
+"POT-Creation-Date: 2026-03-19T19:15:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: minimal-map\n"
@@ -231,7 +231,7 @@ msgid_plural "%d locations deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/collections/controller.tsx:754
+#: src/admin/collections/controller.tsx:758
 #: src/admin/locations/controller.tsx:1697
 #: src/admin/locations/controller.tsx:1764
 msgid "%d location imported and assigned to a new collection."
@@ -275,6 +275,12 @@ msgid_plural "%d markers uploaded."
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/admin/tags/controller.tsx:246
+msgid "%d tag deleted."
+msgid_plural "%d tags deleted."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/map/location-card.tsx:296
 msgid "%s away"
 msgstr ""
@@ -288,9 +294,9 @@ msgid "A title is required."
 msgstr ""
 
 #: src/admin/collections/CollectionsEmptyState.tsx:13
-#: src/admin/collections/controller.tsx:831
-#: src/admin/collections/controller.tsx:856
-#: src/admin/collections/controller.tsx:863
+#: src/admin/collections/controller.tsx:835
+#: src/admin/collections/controller.tsx:860
+#: src/admin/collections/controller.tsx:867
 msgid "Add collection"
 msgstr ""
 
@@ -314,8 +320,8 @@ msgstr ""
 msgid "Add locations"
 msgstr ""
 
-#: src/admin/tags/TagsEmptyState.tsx:13 src/admin/tags/controller.tsx:241
-#: src/admin/tags/controller.tsx:254 src/admin/tags/controller.tsx:256
+#: src/admin/tags/TagsEmptyState.tsx:13 src/admin/tags/controller.tsx:302
+#: src/admin/tags/controller.tsx:317 src/admin/tags/controller.tsx:319
 msgid "Add tag"
 msgstr ""
 
@@ -364,7 +370,7 @@ msgstr ""
 msgid "Appearance"
 msgstr ""
 
-#: src/admin/collections/DeleteAllCollectionsModal.tsx:75
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:73
 msgid ""
 "Are you sure you want to delete %d collection? This action cannot be undone."
 msgid_plural ""
@@ -378,6 +384,13 @@ msgid ""
 "Are you sure you want to delete %d location? This action cannot be undone."
 msgid_plural ""
 "Are you sure you want to delete %d locations? This action cannot be undone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/tags/DeleteAllTagsModal.tsx:61
+msgid "Are you sure you want to delete %d tag? This action cannot be undone."
+msgid_plural ""
+"Are you sure you want to delete %d tags? This action cannot be undone."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -542,7 +555,7 @@ msgstr ""
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:111
 #: src/admin/collections/CollectionDialog.tsx:59
-#: src/admin/collections/DeleteAllCollectionsModal.tsx:117
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:99
 #: src/admin/collections/DeleteCollectionActionModal.tsx:129
 #: src/admin/collections/MergeCollectionsModal.tsx:152
 #: src/admin/locations/AssignLogoModal.tsx:118
@@ -563,6 +576,7 @@ msgstr ""
 #: src/admin/markers/EditMarkerDialog.tsx:64
 #: src/admin/styles/CreateThemeModal.tsx:53
 #: src/admin/styles/DeleteThemeModal.tsx:50
+#: src/admin/tags/DeleteAllTagsModal.tsx:77
 #: src/admin/tags/DeleteTagModal.tsx:48 src/admin/tags/TagDialog.tsx:69
 msgid "Cancel"
 msgstr ""
@@ -655,11 +669,11 @@ msgstr ""
 msgid "Collection deleted. %s."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:589
+#: src/admin/collections/controller.tsx:593
 msgid "Collection locations could not be saved."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:581
+#: src/admin/collections/controller.tsx:585
 msgid "Collection locations saved."
 msgstr ""
 
@@ -668,7 +682,7 @@ msgid "Collection removed from location."
 msgstr ""
 
 #: src/admin/collections/controller.tsx:315
-#: src/admin/collections/controller.tsx:638
+#: src/admin/collections/controller.tsx:642
 msgid "Collection title is required."
 msgstr ""
 
@@ -680,7 +694,7 @@ msgstr ""
 msgid "Collection updated."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:493
+#: src/admin/collections/controller.tsx:497
 msgid "Collections could not be deleted."
 msgstr ""
 
@@ -688,11 +702,11 @@ msgstr ""
 msgid "Collections could not be loaded."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:688
+#: src/admin/collections/controller.tsx:692
 msgid "Collections could not be merged."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:682
+#: src/admin/collections/controller.tsx:686
 msgid "Collections merged successfully."
 msgstr ""
 
@@ -793,9 +807,9 @@ msgid_plural "Delete %d locations"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/collections/DeleteAllCollectionsModal.tsx:129
-#: src/admin/collections/DeleteAllCollectionsModal.tsx:41
-#: src/admin/collections/controller.tsx:795
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:111
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:39
+#: src/admin/collections/controller.tsx:799
 msgid "Delete all collections"
 msgstr ""
 
@@ -803,6 +817,11 @@ msgstr ""
 #: src/admin/locations/DeleteAllLocationsModal.tsx:89
 #: src/admin/locations/controller.tsx:1912
 msgid "Delete all locations"
+msgstr ""
+
+#: src/admin/tags/DeleteAllTagsModal.tsx:47
+#: src/admin/tags/DeleteAllTagsModal.tsx:89 src/admin/tags/controller.tsx:290
+msgid "Delete all tags"
 msgstr ""
 
 #: src/admin/collections/CollectionsGrid.tsx:93
@@ -818,7 +837,7 @@ msgstr ""
 msgid "Delete location"
 msgstr ""
 
-#: src/admin/collections/DeleteAllCollectionsModal.tsx:87
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:85
 #: src/admin/collections/DeleteCollectionActionModal.tsx:94
 msgid "Delete locations"
 msgstr ""
@@ -901,7 +920,7 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:855
+#: src/admin/collections/controller.tsx:859
 msgid "Edit collection"
 msgstr ""
 
@@ -917,7 +936,7 @@ msgstr ""
 msgid "Edit marker filename"
 msgstr ""
 
-#: src/admin/tags/controller.tsx:254
+#: src/admin/tags/controller.tsx:317
 msgid "Edit tag"
 msgstr ""
 
@@ -973,7 +992,7 @@ msgstr ""
 msgid "Export Options"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:769
+#: src/admin/collections/controller.tsx:773
 #: src/admin/locations/controller.tsx:1720
 #: src/admin/locations/controller.tsx:1781
 msgid "Failed to import locations."
@@ -1319,7 +1338,7 @@ msgid "Markers could not be uploaded."
 msgstr ""
 
 #: src/admin/collections/MergeCollectionsModal.tsx:48
-#: src/admin/collections/controller.tsx:822
+#: src/admin/collections/controller.tsx:826
 msgid "Merge collections"
 msgstr ""
 
@@ -1690,10 +1709,10 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-#: src/admin/collections/controller.tsx:862
+#: src/admin/collections/controller.tsx:866
 #: src/admin/locations/controller.tsx:2049
 #: src/admin/logos/EditLogoDialog.tsx:74
-#: src/admin/markers/EditMarkerDialog.tsx:74 src/admin/tags/controller.tsx:256
+#: src/admin/markers/EditMarkerDialog.tsx:74 src/admin/tags/controller.tsx:319
 msgid "Save changes"
 msgstr ""
 
@@ -1742,7 +1761,7 @@ msgstr ""
 msgid "Select at least two collections to merge into a new one."
 msgstr ""
 
-#: src/admin/collections/controller.tsx:626
+#: src/admin/collections/controller.tsx:630
 msgid "Select at least two collections to merge."
 msgstr ""
 
@@ -1788,7 +1807,6 @@ msgstr ""
 msgid "Show Zoom Controls"
 msgstr ""
 
-#: src/admin/collections/DeleteAllCollectionsModal.tsx:102
 #: src/admin/collections/DeleteCollectionActionModal.tsx:109
 msgid "Skip shared locations"
 msgstr ""
@@ -1843,31 +1861,31 @@ msgstr ""
 msgid "Switch Theme"
 msgstr ""
 
-#: src/admin/tags/controller.tsx:163
+#: src/admin/tags/controller.tsx:177
 msgid "Tag could not be created."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:188
+#: src/admin/tags/controller.tsx:202
 msgid "Tag could not be deleted."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:162
+#: src/admin/tags/controller.tsx:176
 msgid "Tag could not be updated."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:155
+#: src/admin/tags/controller.tsx:169
 msgid "Tag created."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:180
+#: src/admin/tags/controller.tsx:194
 msgid "Tag deleted."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:132
+#: src/admin/tags/controller.tsx:146
 msgid "Tag name is required."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:154
+#: src/admin/tags/controller.tsx:168
 msgid "Tag updated."
 msgstr ""
 
@@ -1879,7 +1897,11 @@ msgstr ""
 msgid "Tags added to location."
 msgstr ""
 
-#: src/admin/tags/controller.tsx:59
+#: src/admin/tags/controller.tsx:256
+msgid "Tags could not be deleted."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:61
 msgid "Tags could not be loaded."
 msgstr ""
 

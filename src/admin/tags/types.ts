@@ -12,6 +12,8 @@ export interface TagsController {
 	activeTheme: StyleThemeRecord | null;
 	dismissActionNotice: () => void;
 	headerAction: ReactNode;
+	isDeleteAllTagsModalOpen: boolean;
+	isDeletingAllTags: boolean;
 	isDeleteModalOpen: boolean;
 	isLoading: boolean;
 	isRowActionPending: boolean;
@@ -26,10 +28,13 @@ export interface TagsController {
 	submitLabel: string;
 	submitError: string | null;
 	onAddTag: () => void;
+	onCloseDeleteAllTagsModal: () => void;
 	onCloseDeleteModal: () => void;
+	onDeleteAllTags: () => Promise<void>;
 	onConfirmDeleteTag: () => Promise<void>;
 	onDeleteTag: (tag: TagRecord) => Promise<void>;
 	onEditTag: (tag: TagRecord) => void;
+	onOpenDeleteAllTagsModal: () => void;
 	onOpenDeleteModal: (tag: TagRecord) => void;
 	onConfirm: () => Promise<void>;
 	onCancel: () => void;
