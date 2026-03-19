@@ -1129,7 +1129,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={(value: boolean) => setAttributes({ allowSearch: value })}
           />
           <ToggleControl
-            label={__("Enable Category Filter", "minimal-map")}
+            label={__("Enable Tags Filter", "minimal-map")}
             checked={attributes.enableCategoryFilter}
             onChange={(value: boolean) =>
               setAttributes({ enableCategoryFilter: value })

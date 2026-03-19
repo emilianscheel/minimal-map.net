@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Minimal Map 0.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map\n"
-"POT-Creation-Date: 2026-03-19T18:13:46+00:00\n"
+"POT-Creation-Date: 2026-03-19T18:18:02+00:00\n"
 "PO-Revision-Date: 2026-03-19 18:15+0100\n"
 "Last-Translator: Emilian Scheel\n"
 "Language-Team: German\n"
@@ -941,8 +941,8 @@ msgid "Embed"
 msgstr ""
 
 #: src/block/edit.tsx:1132
-msgid "Enable Category Filter"
-msgstr "Kategoriefilter aktivieren"
+msgid "Enable Tags Filter"
+msgstr "Tag-Filter aktivieren"
 
 #: src/admin/collections/MergeCollectionsModal.tsx:117
 msgid "Enter a name for the merged collection..."
