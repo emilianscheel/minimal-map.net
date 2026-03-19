@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import type { ViewTable } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Plus } from 'lucide-react';
+import { BrushCleaning, Plus } from 'lucide-react';
 import { ExportLocationsDropdown } from './ExportLocationsDropdown';
 import { ImportLocationsButton } from './ImportLocationsButton';
 import type {
@@ -153,6 +153,7 @@ export function useLocationsController(
 	const [isImporting, setIsImporting] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
 	const [isCustomCsvImportModalOpen, setCustomCsvImportModalOpen] = useState(false);
+	const [isDeleteAllLocationsModalOpen, setDeleteAllLocationsModalOpen] = useState(false);
 	const [customCsvImportStep, setCustomCsvImportStep] = useState<
 		'mapping' | 'opening_hours' | 'progress'
 	>(
@@ -169,6 +170,7 @@ export function useLocationsController(
 	const [csvImportTagIds, setCsvImportTagIds] = useState<number[]>([]);
 	const [csvImportProgressCompleted, setCsvImportProgressCompleted] = useState(0);
 	const [csvImportProgressTotal, setCsvImportProgressTotal] = useState(0);
+	const [isDeletingAllLocations, setDeletingAllLocations] = useState(false);
 	const [selection, setSelection] = useState<string[]>([]);
 
 	const loadLocations = useCallback(async () => {
@@ -326,6 +328,10 @@ export function useLocationsController(
 		setCsvImportProgressTotal(0);
 	}, []);
 
+	const resetDeleteAllLocationsState = useCallback((): void => {
+		setDeleteAllLocationsModalOpen(false);
+	}, []);
+
 	const resetAssignToCollectionState = useCallback((): void => {
 		setAssignToCollectionModalOpen(false);
 		setSelectedAssignmentLocation(null);
@@ -453,6 +459,14 @@ export function useLocationsController(
 
 		resetCustomCsvImportState();
 	}, [isImporting, resetCustomCsvImportState]);
+
+	const closeDeleteAllLocationsModal = useCallback((): void => {
+		if (isDeletingAllLocations) {
+			return;
+		}
+
+		resetDeleteAllLocationsState();
+	}, [isDeletingAllLocations, resetDeleteAllLocationsState]);
 
 	const closeRemoveCollectionAssignmentModal = useCallback((): void => {
 		if (isRemovingCollectionAssignment) {
@@ -676,6 +690,20 @@ export function useLocationsController(
 		setSelectedTagRemovalLocations(selectedLocations);
 		setRemoveTagsConfirmationModalOpen(true);
 	}, []);
+
+	const onOpenDeleteAllLocationsModal = useCallback((): void => {
+		if (
+			locations.length === 0 ||
+			isRowActionPending ||
+			isImporting ||
+			isExporting ||
+			isDeletingAllLocations
+		) {
+			return;
+		}
+
+		setDeleteAllLocationsModalOpen(true);
+	}, [isDeletingAllLocations, isExporting, isImporting, isRowActionPending, locations.length]);
 
 	const assignLogoToLocations = useCallback(
 		async (
@@ -1297,6 +1325,50 @@ export function useLocationsController(
 		[config, loadLocations]
 	);
 
+	const onDeleteAllLocations = useCallback(async (): Promise<void> => {
+		if (locations.length === 0) {
+			resetDeleteAllLocationsState();
+			return;
+		}
+
+		setDeletingAllLocations(true);
+		setRowActionPending(true);
+		setActionNotice(null);
+
+		try {
+			for (const location of locations) {
+				await deleteLocation(config, location.id);
+			}
+			await loadLocations();
+			setSelection([]);
+			resetDeleteAllLocationsState();
+			setActionNotice({
+				status: 'success',
+				message: sprintf(
+					_n(
+						'%d location deleted.',
+						'%d locations deleted.',
+						locations.length,
+						'minimal-map'
+					),
+					locations.length
+				),
+			});
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Locations could not be deleted.', 'minimal-map'),
+			});
+			throw error;
+		} finally {
+			setDeletingAllLocations(false);
+			setRowActionPending(false);
+		}
+	}, [config, loadLocations, locations, resetDeleteAllLocationsState]);
+
 	const onAssignLocationToCollection = useCallback(async (): Promise<void> => {
 		if (!selectedAssignmentLocation || !assignmentCollectionId) {
 			return;
@@ -1832,8 +1904,22 @@ export function useLocationsController(
 		geocodeError,
 		geocodeNotice,
 		headerAction: enabled ? (
-			<div className="minimal-map-styles__header-actions">
-				<div className="minimal-map-styles__theme-controls">
+			<div className="minimal-map-admin__header-actions-group">
+				<div className="minimal-map-admin__header-actions-group">
+						<Button
+							variant="tertiary"
+							icon={<BrushCleaning size={18} strokeWidth={2} />}
+							label={__('Delete all locations', 'minimal-map')}
+						onClick={onOpenDeleteAllLocationsModal}
+						disabled={
+							locations.length === 0 ||
+							isDeletingAllLocations ||
+							isRowActionPending ||
+							isImporting ||
+							isExporting
+							}
+							__next40pxDefaultSize
+						/>
 					<ImportLocationsButton onImport={onImportLocations} isImporting={isImporting} />
 					<ExportLocationsDropdown onExport={onExportLocations} onExportExample={onExportExample} />
 				</div>
@@ -1853,6 +1939,8 @@ export function useLocationsController(
 		isAssignTagsModalOpen,
 		isAssignOpeningHoursModalOpen,
 		isAssignmentSaving,
+		isDeleteAllLocationsModalOpen,
+		isDeletingAllLocations,
 		isDeleteLogoConfirmationModalOpen,
 		isRemoveMarkerConfirmationModalOpen,
 		isRemoveTagsConfirmationModalOpen,
@@ -1889,6 +1977,7 @@ export function useLocationsController(
 		onBackCustomCsvImportStep,
 		onCloseAssignToCollectionModal: closeAssignToCollectionModal,
 		onCloseCustomCsvImportModal: closeCustomCsvImportModal,
+		onCloseDeleteAllLocationsModal: closeDeleteAllLocationsModal,
 		onCloseAssignLogoModal: closeAssignLogoModal,
 		onCloseAssignMarkerModal: closeAssignMarkerModal,
 		onCloseAssignTagsModal: closeAssignTagsModal,
@@ -1902,6 +1991,7 @@ export function useLocationsController(
 		onOpenAssignMarkerModal,
 		onOpenAssignTagsModal,
 		onOpenAssignOpeningHoursModal,
+		onOpenDeleteAllLocationsModal,
 		onQuickAssignLogo,
 		onQuickAssignMarker,
 		onQuickAssignTag,
@@ -1920,6 +2010,7 @@ export function useLocationsController(
 		onConfirm,
 		onDeleteLocation,
 		onDeleteLocations,
+		onDeleteAllLocations,
 		onDuplicateLocation,
 		onEditLocation,
 		onImportLocations,

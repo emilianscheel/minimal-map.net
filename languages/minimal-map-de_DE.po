@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Minimal Map 0.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map\n"
-"POT-Creation-Date: 2026-03-19T18:18:02+00:00\n"
+"POT-Creation-Date: 2026-03-19T18:59:06+00:00\n"
 "PO-Revision-Date: 2026-03-19 18:15+0100\n"
 "Last-Translator: Emilian Scheel\n"
 "Language-Team: German\n"
@@ -205,63 +205,64 @@ msgid_plural "%d assigned locations deleted"
 msgstr[0] "%d zugewiesener Standort gelöscht"
 msgstr[1] "%d zugewiesene Standorte gelöscht"
 
-#: src/admin/locations/controller.tsx:1000
+#: src/admin/locations/controller.tsx:1028
 #, fuzzy
 msgid "%d location cleared of its logo."
 msgid_plural "%d locations cleared of their logos."
 msgstr[0] "%d Standort gelöscht."
 msgstr[1] "%d Standorte gelöscht."
 
-#: src/admin/locations/controller.tsx:1055
+#: src/admin/locations/controller.tsx:1083
 #, fuzzy
 msgid "%d location cleared of its marker."
 msgid_plural "%d locations cleared of their markers."
 msgstr[0] "%d Standort gelöscht."
 msgstr[1] "%d Standorte gelöscht."
 
-#: src/admin/locations/controller.tsx:1110
+#: src/admin/locations/controller.tsx:1138
 #, fuzzy
 msgid "%d location cleared of its tags."
 msgid_plural "%d locations cleared of their tags."
 msgstr[0] "%d Standort gelöscht."
 msgstr[1] "%d Standorte gelöscht."
 
-#: src/admin/locations/controller.tsx:1280
+#: src/admin/locations/controller.tsx:1308
+#: src/admin/locations/controller.tsx:1348
 msgid "%d location deleted."
 msgid_plural "%d locations deleted."
 msgstr[0] "%d Standort gelöscht."
 msgstr[1] "%d Standorte gelöscht."
 
 #: src/admin/collections/controller.tsx:604
-#: src/admin/locations/controller.tsx:1625
-#: src/admin/locations/controller.tsx:1692
+#: src/admin/locations/controller.tsx:1697
+#: src/admin/locations/controller.tsx:1764
 msgid "%d location imported and assigned to a new collection."
 msgid_plural "%d locations imported and assigned to a new collection."
 msgstr[0] "%d Standort importiert und einer neuen Sammlung zugewiesen."
 msgstr[1] "%d Standorte importiert und einer neuen Sammlung zugewiesen."
 
-#: src/admin/locations/controller.tsx:708
+#: src/admin/locations/controller.tsx:736
 #, fuzzy
 msgid "%d location updated with a logo."
 msgid_plural "%d locations updated with a logo."
 msgstr[0] "%d Standort gelöscht."
 msgstr[1] "%d Standorte gelöscht."
 
-#: src/admin/locations/controller.tsx:761
+#: src/admin/locations/controller.tsx:789
 #, fuzzy
 msgid "%d location updated with a marker."
 msgid_plural "%d locations updated with a marker."
 msgstr[0] "%d Standort gelöscht."
 msgstr[1] "%d Standorte gelöscht."
 
-#: src/admin/locations/controller.tsx:917
+#: src/admin/locations/controller.tsx:945
 #, fuzzy
 msgid "%d location updated with new opening hours."
 msgid_plural "%d locations updated with new opening hours."
 msgstr[0] "%d Standort mit neuen Öffnungszeiten aktualisiert."
 msgstr[1] "%d Standorte mit neuen Öffnungszeiten aktualisiert."
 
-#: src/admin/locations/controller.tsx:814
+#: src/admin/locations/controller.tsx:842
 #, fuzzy
 msgid "%d location updated with new tags."
 msgid_plural "%d locations updated with new tags."
@@ -280,7 +281,7 @@ msgid_plural "%d markers uploaded."
 msgstr[0] "%d Marker hochgeladen."
 msgstr[1] "%d Marker hochgeladen."
 
-#: src/map/location-card.tsx:295
+#: src/map/location-card.tsx:296
 msgid "%s away"
 msgstr "%s entfernt"
 
@@ -314,8 +315,8 @@ msgstr ""
 "sortiert, durchsucht und erweitert werden koennen."
 
 #: src/admin/locations/LocationsEmptyState.tsx:13
-#: src/admin/locations/controller.tsx:1846
-#: src/admin/locations/controller.tsx:1875
+#: src/admin/locations/controller.tsx:1933
+#: src/admin/locations/controller.tsx:1964
 msgid "Add location"
 msgstr "Standort hinzufügen"
 
@@ -373,6 +374,7 @@ msgstr "Zoom per Scrollen erlauben"
 msgid "Appearance"
 msgstr "Darstellung"
 
+#: src/admin/locations/DeleteAllLocationsModal.tsx:61
 #: src/admin/locations/DeleteLocationActionModal.tsx:85
 msgid ""
 "Are you sure you want to delete %d location? This action cannot be undone."
@@ -557,6 +559,7 @@ msgstr "Gebäude"
 #: src/admin/locations/AssignToCollectionModal.tsx:110
 #: src/admin/locations/CustomCsvImportModal.tsx:191
 #: src/admin/locations/CustomCsvImportModal.tsx:241
+#: src/admin/locations/DeleteAllLocationsModal.tsx:77
 #: src/admin/locations/DeleteLocationActionModal.tsx:112
 #: src/admin/locations/DeleteLogoConfirmationModal.tsx:84
 #: src/admin/locations/LocationDialog.tsx:115
@@ -599,7 +602,7 @@ msgstr "Ort"
 msgid "City is required to geocode the address."
 msgstr "Der Ort ist erforderlich, um die Adresse zu geokodieren."
 
-#: src/map/SearchControl.tsx:395
+#: src/map/SearchControl.tsx:425
 msgid "Clear search"
 msgstr "Suche löschen"
 
@@ -638,7 +641,7 @@ msgstr "Sammlung konnte nicht erstellt werden."
 msgid "Collection could not be deleted."
 msgstr "Sammlung konnte nicht gelöscht werden."
 
-#: src/admin/locations/controller.tsx:1390
+#: src/admin/locations/controller.tsx:1462
 msgid "Collection could not be removed from the location."
 msgstr "Sammlung konnte vom Standort nicht entfernt werden."
 
@@ -670,7 +673,7 @@ msgstr "Standorte der Sammlung konnten nicht gespeichert werden."
 msgid "Collection locations saved."
 msgstr "Standorte der Sammlung gespeichert."
 
-#: src/admin/locations/controller.tsx:1381
+#: src/admin/locations/controller.tsx:1453
 msgid "Collection removed from location."
 msgstr "Sammlung vom Standort entfernt."
 
@@ -804,6 +807,12 @@ msgid_plural "Delete %d locations"
 msgstr[0] "%d Standort löschen"
 msgstr[1] "%d Standorte löschen"
 
+#: src/admin/locations/DeleteAllLocationsModal.tsx:47
+#: src/admin/locations/DeleteAllLocationsModal.tsx:89
+#: src/admin/locations/controller.tsx:1912
+msgid "Delete all locations"
+msgstr "Alle Standorte löschen"
+
 #: src/admin/collections/CollectionsGrid.tsx:93
 #: src/admin/collections/DeleteCollectionActionModal.tsx:139
 msgid "Delete collection"
@@ -881,7 +890,7 @@ msgstr "Beispiel-CSV herunterladen"
 msgid "Download Theme Config"
 msgstr "Theme-Konfiguration herunterladen"
 
-#: src/admin/collections/index.tsx:38 src/admin/locations/index.tsx:46
+#: src/admin/collections/index.tsx:38 src/admin/locations/index.tsx:47
 msgid "Drop CSV file here to import locations"
 msgstr "CSV-Datei hier ablegen, um Standorte zu importieren"
 
@@ -912,7 +921,7 @@ msgstr "Bearbeiten"
 msgid "Edit collection"
 msgstr "Sammlung bearbeiten"
 
-#: src/admin/locations/controller.tsx:1874
+#: src/admin/locations/controller.tsx:1963
 msgid "Edit location"
 msgstr "Standort bearbeiten"
 
@@ -981,8 +990,8 @@ msgid "Export Options"
 msgstr "Exportoptionen"
 
 #: src/admin/collections/controller.tsx:619
-#: src/admin/locations/controller.tsx:1648
-#: src/admin/locations/controller.tsx:1709
+#: src/admin/locations/controller.tsx:1720
+#: src/admin/locations/controller.tsx:1781
 msgid "Failed to import locations."
 msgstr "Standorte konnten nicht importiert werden."
 
@@ -1013,7 +1022,7 @@ msgid "Filled plus circle"
 msgstr "Ausgefüllter Plus-Kreis"
 
 #: src/admin/collections/MergeCollectionsModal.tsx:170
-#: src/admin/locations/controller.tsx:1959
+#: src/admin/locations/controller.tsx:2051
 msgid "Finish"
 msgstr "Abschliessen"
 
@@ -1136,78 +1145,79 @@ msgstr "Ungültige SVG-Datei."
 msgid "Line"
 msgstr "Linie"
 
-#: src/map/SearchControl.tsx:426
+#: src/map/SearchControl.tsx:456
 msgid "Loading results..."
 msgstr "Ergebnisse werden geladen..."
 
-#: src/admin/locations/controller.tsx:1338
+#: src/admin/locations/controller.tsx:1410
 msgid "Location assigned to collection."
 msgstr "Standort der Sammlung zugewiesen."
 
-#: src/admin/locations/controller.tsx:1216
+#: src/admin/locations/controller.tsx:1244
 msgid "Location coordinates updated."
 msgstr "Standortkoordinaten aktualisiert."
 
-#: src/admin/locations/controller.tsx:1347
+#: src/admin/locations/controller.tsx:1419
 msgid "Location could not be assigned to the collection."
 msgstr "Standort konnte der Sammlung nicht zugewiesen werden."
 
-#: src/admin/locations/controller.tsx:1557
+#: src/admin/locations/controller.tsx:1629
 msgid "Location could not be created."
 msgstr "Standort konnte nicht erstellt werden."
 
 #: src/admin/locations/DeleteLocationActionModal.tsx:50
-#: src/admin/locations/controller.tsx:1254
+#: src/admin/locations/controller.tsx:1282
 msgid "Location could not be deleted."
 msgstr "Standort konnte nicht gelöscht werden."
 
-#: src/admin/locations/controller.tsx:1170
+#: src/admin/locations/controller.tsx:1198
 msgid "Location could not be duplicated."
 msgstr "Standort konnte nicht dupliziert werden."
 
-#: src/admin/locations/controller.tsx:1225
+#: src/admin/locations/controller.tsx:1253
 msgid "Location could not be retrieved."
 msgstr "Standort konnte nicht ermittelt werden."
 
-#: src/admin/locations/controller.tsx:1556
+#: src/admin/locations/controller.tsx:1628
 msgid "Location could not be updated."
 msgstr "Standort konnte nicht aktualisiert werden."
 
-#: src/admin/locations/controller.tsx:1246
-#: src/admin/locations/controller.tsx:1278
+#: src/admin/locations/controller.tsx:1274
+#: src/admin/locations/controller.tsx:1306
 msgid "Location deleted."
 msgstr "Standort gelöscht."
 
-#: src/admin/locations/controller.tsx:1162
+#: src/admin/locations/controller.tsx:1190
 msgid "Location duplicated."
 msgstr "Standort dupliziert."
 
-#: src/admin/locations/controller.tsx:1319
+#: src/admin/locations/controller.tsx:1391
 msgid "Location is already assigned to that collection."
 msgstr "Der Standort ist dieser Sammlung bereits zugewiesen."
 
-#: src/admin/locations/controller.tsx:724
+#: src/admin/locations/controller.tsx:752
 msgid "Location logos could not be updated."
 msgstr "Standortlogo konnte nicht aktualisiert werden."
 
-#: src/admin/locations/controller.tsx:777
+#: src/admin/locations/controller.tsx:805
 msgid "Location markers could not be updated."
 msgstr "Standortmarker konnte nicht aktualisiert werden."
 
-#: src/admin/locations/controller.tsx:830
+#: src/admin/locations/controller.tsx:858
 msgid "Location tags could not be updated."
 msgstr "Schlagwörter des Standorts konnten nicht aktualisiert werden."
 
-#: src/admin/locations/controller.tsx:199
+#: src/admin/locations/controller.tsx:201
 msgid "Locations and collections could not be loaded."
 msgstr "Standorte und Sammlungen konnten nicht geladen werden."
 
 #: src/admin/locations/DeleteLocationActionModal.tsx:49
-#: src/admin/locations/controller.tsx:1290
+#: src/admin/locations/controller.tsx:1318
+#: src/admin/locations/controller.tsx:1363
 msgid "Locations could not be deleted."
 msgstr "Standorte konnten nicht gelöscht werden."
 
-#: src/admin/locations/controller.tsx:706
+#: src/admin/locations/controller.tsx:734
 msgid "Logo assigned to location."
 msgstr "Standort der Sammlung zugewiesen."
 
@@ -1223,7 +1233,7 @@ msgstr "Schlagwort konnte nicht aktualisiert werden."
 msgid "Logo deleted."
 msgstr "Logo gelöscht."
 
-#: src/admin/locations/controller.tsx:998
+#: src/admin/locations/controller.tsx:1026
 msgid "Logo removed from location."
 msgstr "Logo vom Standort entfernt."
 
@@ -1239,7 +1249,7 @@ msgstr "Logo hochgeladen."
 msgid "Logos could not be loaded."
 msgstr "Logos konnten nicht geladen werden."
 
-#: src/admin/locations/controller.tsx:1011
+#: src/admin/locations/controller.tsx:1039
 msgid "Logos could not be removed from the selected locations."
 msgstr "Logo konnte vom Standort nicht entfernt werden."
 
@@ -1291,7 +1301,7 @@ msgstr "Kartenquellen"
 msgid "Map preview"
 msgstr "Kartenvorschau"
 
-#: src/admin/locations/controller.tsx:759
+#: src/admin/locations/controller.tsx:787
 msgid "Marker assigned to location."
 msgstr "Standort der Sammlung zugewiesen."
 
@@ -1307,7 +1317,7 @@ msgstr "Marker konnten nicht hochgeladen werden."
 msgid "Marker deleted."
 msgstr "Marker gelöscht."
 
-#: src/admin/locations/controller.tsx:1053
+#: src/admin/locations/controller.tsx:1081
 msgid "Marker removed from location."
 msgstr "Logo vom Standort entfernt."
 
@@ -1323,7 +1333,7 @@ msgstr "Marker hochgeladen."
 msgid "Markers could not be loaded."
 msgstr "Marker konnten nicht geladen werden."
 
-#: src/admin/locations/controller.tsx:1066
+#: src/admin/locations/controller.tsx:1094
 msgid "Markers could not be removed from the selected locations."
 msgstr "Logo konnte vom Standort nicht entfernt werden."
 
@@ -1394,8 +1404,8 @@ msgstr "Keine Sammlungen gefunden"
 msgid "No custom marker assigned yet."
 msgstr "Noch kein benutzerdefinierter Marker zugewiesen."
 
-#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:436
-#: src/map/SearchControl.tsx:487
+#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:466
+#: src/map/SearchControl.tsx:518
 msgid "No locations found"
 msgstr "Keine Standorte gefunden"
 
@@ -1437,16 +1447,16 @@ msgid ""
 "selection."
 msgstr ""
 
-#: src/admin/locations/controller.tsx:1051
+#: src/admin/locations/controller.tsx:1079
 msgid "None of the selected locations have custom markers assigned."
 msgstr ""
 "Keiner der ausgewählten Standorte hat benutzerdefinierte Marker zugewiesen."
 
-#: src/admin/locations/controller.tsx:996
+#: src/admin/locations/controller.tsx:1024
 msgid "None of the selected locations have logos assigned."
 msgstr "Keiner der ausgewählten Standorte hat Logos zugewiesen."
 
-#: src/admin/locations/controller.tsx:1106
+#: src/admin/locations/controller.tsx:1134
 msgid "None of the selected locations have tags assigned."
 msgstr "Keiner der ausgewählten Standorte hat Schlagwörter zugewiesen."
 
@@ -1477,7 +1487,7 @@ msgstr "Geöffnet - schließt %s"
 msgid "Open collections"
 msgstr "Sammlungen öffnen"
 
-#: src/map/location-card.tsx:289
+#: src/map/location-card.tsx:290
 msgid "Open in Google Maps"
 msgstr "In Google Maps öffnen"
 
@@ -1506,7 +1516,7 @@ msgstr "Öffnungszeiten"
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
-#: src/admin/locations/controller.tsx:933
+#: src/admin/locations/controller.tsx:961
 msgid "Opening hours could not be updated."
 msgstr "Schlagwort konnte nicht aktualisiert werden."
 
@@ -1515,7 +1525,7 @@ msgstr "Schlagwort konnte nicht aktualisiert werden."
 msgid "Opening hours notes"
 msgstr "Notizen zu Öffnungszeiten"
 
-#: src/admin/locations/controller.tsx:915
+#: src/admin/locations/controller.tsx:943
 msgid "Opening hours updated."
 msgstr "Öffnungszeiten aktualisiert."
 
@@ -1584,7 +1594,7 @@ msgstr "Postleitzahl"
 msgid "Postal code is required to geocode the address."
 msgstr "Die Postleitzahl ist erforderlich, um die Adresse zu geokodieren."
 
-#: src/map/SearchControl.tsx:415
+#: src/map/SearchControl.tsx:445
 msgid "Press"
 msgstr "Adresse"
 
@@ -1705,7 +1715,7 @@ msgid "Saturday"
 msgstr "Samstag"
 
 #: src/admin/collections/controller.tsx:695
-#: src/admin/locations/controller.tsx:1958
+#: src/admin/locations/controller.tsx:2050
 #: src/admin/logos/EditLogoDialog.tsx:74
 #: src/admin/markers/EditMarkerDialog.tsx:74 src/admin/tags/controller.tsx:256
 msgid "Save changes"
@@ -1736,11 +1746,11 @@ msgid "Save Theme"
 msgstr "Theme speichern"
 
 #: src/admin/collections/CollectionAssignmentModal.tsx:72
-#: src/map/SearchControl.tsx:388
+#: src/map/SearchControl.tsx:418
 msgid "Search locations"
 msgstr "Standorte suchen"
 
-#: src/map/SearchControl.tsx:387
+#: src/map/SearchControl.tsx:417
 msgid "Search locations..."
 msgstr "Standorte suchen..."
 
@@ -1748,7 +1758,7 @@ msgstr "Standorte suchen..."
 msgid "Search Panel"
 msgstr "Suchpanel"
 
-#: src/admin/locations/controller.tsx:1529
+#: src/admin/locations/controller.tsx:1601
 msgid "Select a location on the map before finishing."
 msgstr "Wähle vor dem Abschluss einen Standort auf der Karte aus."
 
@@ -1775,7 +1785,7 @@ msgstr ""
 msgid "Select theme"
 msgstr "Theme auswählen"
 
-#: src/admin/locations/controller.tsx:1311
+#: src/admin/locations/controller.tsx:1383
 msgid "Selected collection could not be found."
 msgstr "Die ausgewählte Sammlung konnte nicht gefunden werden."
 
@@ -1893,7 +1903,7 @@ msgstr "Schlagwort aktualisiert."
 msgid "Tags (optional)"
 msgstr "Schlagwörter (optional)"
 
-#: src/admin/locations/controller.tsx:812
+#: src/admin/locations/controller.tsx:840
 msgid "Tags added to location."
 msgstr "Standorte konnten nicht importiert werden."
 
@@ -1901,11 +1911,11 @@ msgstr "Standorte konnten nicht importiert werden."
 msgid "Tags could not be loaded."
 msgstr "Schlagwörter konnten nicht geladen werden."
 
-#: src/admin/locations/controller.tsx:1121
+#: src/admin/locations/controller.tsx:1149
 msgid "Tags could not be removed from the selected locations."
 msgstr "Logo konnte vom Standort nicht entfernt werden."
 
-#: src/admin/locations/controller.tsx:1108
+#: src/admin/locations/controller.tsx:1136
 msgid "Tags removed from location."
 msgstr "Logo vom Standort entfernt."
 
@@ -1918,15 +1928,15 @@ msgstr "Telefon"
 msgid "The %s extension will be preserved."
 msgstr "Die %s Erweiterung bleibt erhalten."
 
-#: src/admin/locations/controller.tsx:995
+#: src/admin/locations/controller.tsx:1023
 msgid "The selected location already has no logo assigned."
 msgstr "Der ausgewählte Standort hat bereits kein zugewiesenes Logo."
 
-#: src/admin/locations/controller.tsx:1050
+#: src/admin/locations/controller.tsx:1078
 msgid "The selected location already has no marker assigned."
 msgstr "Der ausgewählte Standort hat bereits keinen zugewiesenen Marker."
 
-#: src/admin/locations/controller.tsx:1105
+#: src/admin/locations/controller.tsx:1133
 msgid "The selected location already has no tags assigned."
 msgstr "Der ausgewählte Standort hat bereits keine zugewiesenen Schlagwörter."
 
@@ -1965,7 +1975,7 @@ msgstr "Donnerstag"
 msgid "Title"
 msgstr "Titel"
 
-#: src/map/SearchControl.tsx:416
+#: src/map/SearchControl.tsx:446
 msgid "to load results"
 msgstr "um Ergebnisse zu laden"
 

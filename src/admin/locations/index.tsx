@@ -6,6 +6,7 @@ import AssignOpeningHoursModal from './AssignOpeningHoursModal';
 import AssignToCollectionModal from './AssignToCollectionModal';
 import AssignTagsModal from './AssignTagsModal';
 import CustomCsvImportModal from './CustomCsvImportModal';
+import DeleteAllLocationsModal from './DeleteAllLocationsModal';
 import DeleteLogoConfirmationModal from './DeleteLogoConfirmationModal';
 import LocationDialog from './LocationDialog';
 import LocationsEmptyState from './LocationsEmptyState';
@@ -62,6 +63,7 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 			<AssignTagsModal controller={controller} />
 			<AssignOpeningHoursModal controller={controller} />
 			<CustomCsvImportModal controller={controller} />
+			<DeleteAllLocationsModal controller={controller} />
 			<DeleteLogoConfirmationModal controller={controller} />
 			<RemoveMarkerConfirmationModal controller={controller} />
 			<RemoveTagsConfirmationModal controller={controller} />

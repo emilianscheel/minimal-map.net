@@ -68,7 +68,9 @@ export interface LocationsController {
 	isGeocoding: boolean;
 	isLoading: boolean;
 	isCustomCsvImportModalOpen: boolean;
+	isDeleteAllLocationsModalOpen: boolean;
 	isRemoveCollectionAssignmentModalOpen: boolean;
+	isDeletingAllLocations: boolean;
 	isRemovingCollectionAssignment: boolean;
 	isRowActionPending: boolean;
 	isSubmitting: boolean;
@@ -122,6 +124,7 @@ export interface LocationsController {
 	onBackCustomCsvImportStep: () => void;
 	onMapLocationSelect: (coordinates: MapCoordinates) => void;
 	onCloseCustomCsvImportModal: () => void;
+	onCloseDeleteAllLocationsModal: () => void;
 	onCloseRemoveCollectionAssignmentModal: () => void;
 	onCloseAssignToCollectionModal: () => void;
 	onCloseAssignLogoModal: () => void;
@@ -136,6 +139,7 @@ export interface LocationsController {
 	onConfirm: () => Promise<void>;
 	onDeleteLocation: (location: LocationRecord) => Promise<void>;
 	onDeleteLocations: (locations: LocationRecord[]) => Promise<void>;
+	onDeleteAllLocations: () => Promise<void>;
 	onDuplicateLocation: (location: LocationRecord) => Promise<void>;
 	onEditLocation: (location: LocationRecord) => void;
 	onOpenAssignToCollectionModal: (location: LocationRecord) => void;
@@ -143,6 +147,7 @@ export interface LocationsController {
 	onOpenAssignMarkerModal: (locations: LocationRecord | LocationRecord[]) => void;
 	onOpenAssignTagsModal: (locations: LocationRecord | LocationRecord[]) => void;
 	onOpenAssignOpeningHoursModal: (locations: LocationRecord | LocationRecord[]) => void;
+	onOpenDeleteAllLocationsModal: () => void;
 	onQuickAssignLogo: (location: LocationRecord, logoId: number) => Promise<void>;
 	onQuickAssignMarker: (location: LocationRecord, markerId: number) => Promise<void>;
 	onQuickAssignTag: (location: LocationRecord, tagId: number) => Promise<void>;
