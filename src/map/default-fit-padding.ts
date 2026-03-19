@@ -1,5 +1,5 @@
 import type { NormalizedMapConfig } from '../types';
-import { isMobileViewport } from './responsive';
+import { isMobileViewport, isTabletSearchSplitViewport } from './responsive';
 import { parsePixelValue } from './search-panel-layout';
 
 const DEFAULT_FIT_BOUNDS_PADDING = 48;
@@ -16,11 +16,28 @@ export interface DefaultFitBoundsPadding {
 export function getDefaultFitBoundsPadding(
 	config: Pick<
 		NormalizedMapConfig,
-		'searchPanelOuterMargin' | 'creditsOuterMargin' | 'showAttribution'
+		| 'allowSearch'
+		| 'searchPanelOuterMargin'
+		| 'creditsOuterMargin'
+		| 'showAttribution'
 	>,
-	viewportWidth?: number | null
+	viewportWidth?: number | null,
+	searchPanelReservedWidth = 0
 ): DefaultFitBoundsPadding {
 	if (!isMobileViewport(viewportWidth)) {
+		if (
+			isTabletSearchSplitViewport(viewportWidth) &&
+			config.allowSearch &&
+			searchPanelReservedWidth > 0
+		) {
+			return {
+				top: DEFAULT_FIT_BOUNDS_PADDING,
+				right: DEFAULT_FIT_BOUNDS_PADDING,
+				bottom: DEFAULT_FIT_BOUNDS_PADDING,
+				left: searchPanelReservedWidth + DEFAULT_FIT_BOUNDS_PADDING,
+			};
+		}
+
 		return {
 			top: DEFAULT_FIT_BOUNDS_PADDING,
 			right: DEFAULT_FIT_BOUNDS_PADDING,

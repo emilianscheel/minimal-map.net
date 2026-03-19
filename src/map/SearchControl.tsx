@@ -44,6 +44,7 @@ type GeocodeSearchFn = (query: string) => Promise<GeocodeResponse>;
 
 interface SearchControlProps {
 	doc: Document;
+	host?: HTMLElement;
 	frontendGeocodePath?: string;
 	geocodeSearch: GeocodeSearchFn;
 	googleMapsNavigation: boolean;
@@ -53,6 +54,7 @@ interface SearchControlProps {
 	activeCategoryTagIds: number[];
 	onCategoryFilterChange: (tagIds: number[]) => void;
 	onEscape?: () => void;
+	onOpenStateChange?: (isOpen: boolean) => void;
 	onSelect: (selection: MapLocationSelection) => void;
 	selectedId?: number;
 	siteLocale: string;
@@ -61,6 +63,7 @@ interface SearchControlProps {
 
 export const MapSearchControl = ({
 	doc,
+	host,
 	frontendGeocodePath,
 	geocodeSearch,
 	googleMapsNavigation,
@@ -70,11 +73,13 @@ export const MapSearchControl = ({
 	activeCategoryTagIds,
 	onCategoryFilterChange,
 	onEscape,
+	onOpenStateChange,
 	onSelect,
 	selectedId: selectedIdProp,
 	siteLocale,
 	siteTimezone,
 }: SearchControlProps) => {
+	const responsiveHost = host ?? doc.documentElement;
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isPanelOpen, setPanelOpen] = useState(false);
 	const [isPanelDismissed, setPanelDismissed] = useState(false);
@@ -83,7 +88,11 @@ export const MapSearchControl = ({
 	>('idle');
 	const [addressResults, setAddressResults] = useState<DistanceSearchResult[]>([]);
 	const [selectedId, setSelectedId] = useState<number | undefined>(selectedIdProp);
-	const [viewportWidth, setViewportWidth] = useState<number | null>(doc.defaultView?.innerWidth ?? null);
+	const [viewportWidth, setViewportWidth] = useState<number | null>(
+		Math.ceil(responsiveHost.getBoundingClientRect().width) ||
+			doc.defaultView?.innerWidth ||
+			null
+	);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const searchTermRef = useRef(searchTerm);
@@ -113,23 +122,40 @@ export const MapSearchControl = ({
 	}, [selectedIdProp]);
 
 	useEffect(() => {
+		onOpenStateChange?.(isOpen);
+	}, [isOpen, onOpenStateChange]);
+
+	useEffect(() => {
 		const view = doc.defaultView;
 
 		if (!view) {
 			return;
 		}
 
-		const handleResize = () => {
-			setViewportWidth(view.innerWidth);
+		const updateViewportWidth = () => {
+			const nextWidth = Math.ceil(responsiveHost.getBoundingClientRect().width);
+			setViewportWidth(
+				nextWidth > 0 ? nextWidth : view.innerWidth || null
+			);
 		};
 
-		handleResize();
-		view.addEventListener('resize', handleResize);
+		updateViewportWidth();
+
+		const resizeObserver =
+			typeof view.ResizeObserver === 'function'
+				? new view.ResizeObserver(() => {
+						updateViewportWidth();
+				  })
+				: null;
+
+		resizeObserver?.observe(responsiveHost);
+		view.addEventListener('resize', updateViewportWidth);
 
 		return () => {
-			view.removeEventListener('resize', handleResize);
+			resizeObserver?.disconnect();
+			view.removeEventListener('resize', updateViewportWidth);
 		};
-	}, [doc]);
+	}, [doc, responsiveHost]);
 
 	const filteredLocations = useMemo(() => {
 		if (!isOpen) {
@@ -238,12 +264,12 @@ export const MapSearchControl = ({
 	) => {
 		setSelectedId(location.id);
 
-		if (isMobileViewport(doc.defaultView?.innerWidth ?? null) && selectionOrigin === 'tap') {
+		if (isMobileViewport(viewportWidth) && selectionOrigin === 'tap') {
 			setPanelOpen(false);
 		}
 
 		onSelect({ location, distanceLabel });
-	}, [doc, onSelect]);
+	}, [onSelect, viewportWidth]);
 
 	const resetAddressSearch = (nextTerm = '') => {
 		setSearchTerm(nextTerm);
@@ -493,6 +519,7 @@ export function createWordPressSearchControl(
 	initialActiveCategoryTagIds: number[] = [],
 	onCategoryFilterChange?: (tagIds: number[]) => void,
 	onEscape?: () => void,
+	onOpenStateChange?: (isOpen: boolean) => void,
 ): WordPressSearchControl {
 	const context = getMapDomContext(host);
 	const container = context.doc.createElement('div');
@@ -541,9 +568,11 @@ export function createWordPressSearchControl(
 				geocodeSearch={geocodeSearch}
 				googleMapsNavigation={config.googleMapsNavigation}
 				googleMapsButtonShowIcon={config.googleMapsButtonShowIcon}
+				host={host}
 				locations={config.locations}
 				onCategoryFilterChange={onCategoryFilterChange ?? (() => {})}
 				onEscape={onEscape}
+				onOpenStateChange={onOpenStateChange}
 				onSelect={onSelect}
 				selectedId={selectedId}
 				siteLocale={config.siteLocale}

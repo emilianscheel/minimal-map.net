@@ -1,4 +1,5 @@
-export const MOBILE_BREAKPOINT = 600;
+export const MOBILE_BREAKPOINT = 700;
+export const TABLET_SEARCH_PANEL_BREAKPOINT_MAX = 900;
 
 export interface ResponsiveHeightConfig {
 	heightCssValue: string;
@@ -13,6 +14,16 @@ export function formatHeightCssValue(value: number, unit: string): string {
 
 export function isMobileViewport(viewportWidth?: number | null): boolean {
 	return typeof viewportWidth === 'number' && viewportWidth <= MOBILE_BREAKPOINT;
+}
+
+export function isTabletSearchSplitViewport(
+	viewportWidth?: number | null
+): boolean {
+	return (
+		typeof viewportWidth === 'number' &&
+		viewportWidth > MOBILE_BREAKPOINT &&
+		viewportWidth <= TABLET_SEARCH_PANEL_BREAKPOINT_MAX
+	);
 }
 
 export function getActiveHeightCssValue(

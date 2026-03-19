@@ -19,6 +19,7 @@
 .minimal-map-surface,
 .minimal-map-editor__canvas {
   position: relative;
+  container-type: inline-size;
   width: 100%;
   margin: 0;
   border-radius: inherit;
@@ -256,6 +257,14 @@
   --minimal-map-search-category-gap: calc(
     var(--minimal-map-search-margin-top) / 2
   );
+  --minimal-map-search-footprint-width: calc(
+    var(--minimal-map-search-width) + var(--minimal-map-search-margin-left) +
+      var(--minimal-map-search-margin-right)
+  );
+  --minimal-map-search-effective-footprint-width: var(
+    --minimal-map-search-footprint-width
+  );
+  --minimal-map-search-effective-width: var(--minimal-map-search-width);
   --minimal-map-search-input-radius: 10px;
   --minimal-map-search-card-radius: 2px;
   --minimal-map-search-card-gap: 12px;
@@ -279,10 +288,7 @@
   bottom: 0;
   border-top-left-radius: inherit;
   border-bottom-left-radius: inherit;
-  width: calc(
-    var(--minimal-map-search-width) + var(--minimal-map-search-margin-left) +
-      var(--minimal-map-search-margin-right)
-  );
+  width: var(--minimal-map-search-effective-footprint-width);
   background: var(--minimal-map-search-background-primary);
   z-index: 9;
   pointer-events: auto;
@@ -314,7 +320,7 @@
   position: absolute;
   top: var(--minimal-map-search-margin-top);
   left: var(--minimal-map-search-margin-left);
-  width: var(--minimal-map-search-width);
+  width: var(--minimal-map-search-effective-width);
   max-width: calc(
     100% - var(--minimal-map-search-margin-left) - var(
         --minimal-map-search-margin-right
@@ -963,9 +969,9 @@
   }
 }
 
-@media (max-width: 600px) {
+@container (max-width: 700px) {
   .minimal-map-attribution {
-    max-width: min(calc(100vw - 24px), 320px);
+    max-width: min(calc(100cqw - 24px), 320px);
   }
 
   .minimal-map-controls {
@@ -994,5 +1000,16 @@
 
   .minimal-map-search__result-logo-column {
     padding-right: 10px;
+  }
+}
+
+@container (min-width: 701px) and (max-width: 900px) {
+  .minimal-map-search-host {
+    --minimal-map-search-effective-footprint-width: 50%;
+    --minimal-map-search-effective-width: calc(
+      var(--minimal-map-search-effective-footprint-width) -
+        var(--minimal-map-search-margin-left) -
+        var(--minimal-map-search-margin-right)
+    );
   }
 }

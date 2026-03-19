@@ -6,7 +6,7 @@ import { syncTouchZoomInteraction } from './interactions';
 import { applyStyleTheme } from '../lib/styles/themeEngine';
 import { createWordPressZoomControls } from './wp-controls';
 import { createWordPressSearchControl } from './SearchControl';
-import { getSearchPanelDesktopPadding } from './search-panel-layout';
+import { getSearchPanelReservedWidth } from './search-panel-layout';
 import { getSelectedLocationTopPadding } from './selected-location-focus-padding';
 import { createLocationCardPreviewController, waitForInternalMapMovementToFinish, type LocationCardPreviewController } from './location-card-preview';
 import { getActiveHeightCssValue, isMobileViewport } from './responsive';
@@ -42,6 +42,7 @@ interface MinimalMapState {
 	pendingPreviewCleanup: (() => void) | null;
 	resizeHandler: (() => void) | null;
 	searchControl: WordPressSearchControl | null;
+	isSearchPanelOpen: boolean;
 	selectedLocation: SelectedLocationPreview | null;
 }
 
@@ -69,6 +70,16 @@ function createFallback(host: HTMLElement, message: string, context: MapDomConte
 	host.appendChild(notice);
 }
 
+function getHostResponsiveWidth(host: HTMLElement, context: MapDomContext): number {
+	const hostWidth = Math.ceil(host.getBoundingClientRect().width);
+
+	if (hostWidth > 0) {
+		return hostWidth;
+	}
+
+	return context.win.innerWidth;
+}
+
 function applyHostFontFamily(host: HTMLElement, config: NormalizedMapConfig): void {
 	if (config.fontFamily) {
 		host.style.setProperty('--minimal-map-font-family', config.fontFamily);
@@ -81,7 +92,10 @@ function applyHostFontFamily(host: HTMLElement, config: NormalizedMapConfig): vo
 function createShell(host: HTMLElement, config: NormalizedMapConfig, context: MapDomContext): HTMLElement {
 	host.innerHTML = '';
 	host.classList.add('minimal-map-runtime');
-	host.style.height = getActiveHeightCssValue(config, context.win.innerWidth);
+	host.style.height = getActiveHeightCssValue(
+		config,
+		getHostResponsiveWidth(host, context)
+	);
 	applyHostFontFamily(host, config);
 
 	const viewport = context.doc.createElement('div');
@@ -312,7 +326,8 @@ export function syncViewport(
 	config: NormalizedMapConfig,
 	viewportWidth?: number | null,
 	zoomChanged = false,
-	activeCategoryTagIds: number[] = []
+	activeCategoryTagIds: number[] = [],
+	searchPanelReservedWidth = 0
 ): void {
 	const points = getVisibleRenderedPoints(config, activeCategoryTagIds);
 
@@ -346,7 +361,11 @@ export function syncViewport(
 		{
 			duration: 180,
 			essential: true,
-			padding: getDefaultFitBoundsPadding(config, viewportWidth),
+			padding: getDefaultFitBoundsPadding(
+				config,
+				viewportWidth,
+				searchPanelReservedWidth
+			),
 		},
 		{ isMinimalMapInternal: true }
 	);
@@ -408,6 +427,7 @@ export function createMinimalMap(
 		attribution: null,
 		config: null,
 		controls: null,
+		isSearchPanelOpen: false,
 		keydownHandler: null,
 		locationCardPreview: null,
 		map: null,
@@ -458,7 +478,10 @@ export function createMinimalMap(
 	}
 
 	function applyResponsiveHostHeight(config: NormalizedMapConfig): void {
-		const nextHeightCssValue = getActiveHeightCssValue(config, context.win.innerWidth);
+		const nextHeightCssValue = getActiveHeightCssValue(
+			config,
+			getHostResponsiveWidth(host, context)
+		);
 
 		if (host.style.height !== nextHeightCssValue) {
 			host.style.height = nextHeightCssValue;
@@ -472,6 +495,24 @@ export function createMinimalMap(
 
 	function getSelectedLocationId(): number | undefined {
 		return state.selectedLocation?.locationId;
+	}
+
+	function getSearchPanelHost(): HTMLElement | null {
+		return host.querySelector<HTMLElement>('.minimal-map-search-host');
+	}
+
+	function getActiveSearchPanelReservedWidth(
+		config: NormalizedMapConfig
+	): number {
+		if (!state.isSearchPanelOpen) {
+			return 0;
+		}
+
+		return getSearchPanelReservedWidth(
+			config,
+			getSearchPanelHost(),
+			getHostResponsiveWidth(host, context)
+		);
 	}
 
 	function clearSelection(config: NormalizedMapConfig): void {
@@ -490,9 +531,10 @@ export function createMinimalMap(
 		syncViewport(
 			state.map,
 			config,
-			context.win.innerWidth,
+			getHostResponsiveWidth(host, context),
 			false,
-			state.activeCategoryTagIds
+			state.activeCategoryTagIds,
+			getActiveSearchPanelReservedWidth(config)
 		);
 	}
 
@@ -586,20 +628,21 @@ export function createMinimalMap(
 			);
 		}
 
-		const isMobile = isMobileViewport(context.win.innerWidth);
-		const topPadding = getSelectedLocationTopPadding(config, context.win.innerWidth);
+		const responsiveWidth = getHostResponsiveWidth(host, context);
+		const isMobile = isMobileViewport(responsiveWidth);
+		const topPadding = getSelectedLocationTopPadding(config, responsiveWidth);
+		const searchPanelReservedWidth = getSearchPanelReservedWidth(
+			config,
+			getSearchPanelHost(),
+			responsiveWidth
+		);
 		state.map.easeTo(
 			{
 				center: [point.lng, point.lat],
 				zoom: Math.max(state.map.getZoom(), 15),
 				padding: {
 					left: !isMobile
-						? getSearchPanelDesktopPadding(
-								config,
-								state.searchControl
-									? host.querySelector<HTMLElement>('.minimal-map-search-host')
-									: null
-							)
+						? searchPanelReservedWidth
 						: 0,
 					top: topPadding,
 					right: 0,
@@ -698,15 +741,37 @@ export function createMinimalMap(
 						syncViewport(
 							state.map,
 							state.config,
-							context.win.innerWidth,
+							getHostResponsiveWidth(host, context),
 							false,
-							state.activeCategoryTagIds
+							state.activeCategoryTagIds,
+							getActiveSearchPanelReservedWidth(state.config)
 						);
 					},
 					() => {
 						if (state.config && state.selectedLocation) {
+							state.isSearchPanelOpen = false;
 							clearSelectionAndRestoreViewport(state.config);
 						}
+					},
+					(isOpen: boolean) => {
+						if (state.isSearchPanelOpen === isOpen) {
+							return;
+						}
+
+						state.isSearchPanelOpen = isOpen;
+
+						if (!state.map || !state.config || state.selectedLocation) {
+							return;
+						}
+
+						syncViewport(
+							state.map,
+							state.config,
+							getHostResponsiveWidth(host, context),
+							false,
+							state.activeCategoryTagIds,
+							getActiveSearchPanelReservedWidth(state.config)
+						);
 					}
 				);
 			} else {
@@ -719,6 +784,7 @@ export function createMinimalMap(
 		} else {
 			state.searchControl?.destroy();
 			state.searchControl = null;
+			state.isSearchPanelOpen = false;
 		}
 	}
 
@@ -798,9 +864,10 @@ export function createMinimalMap(
 			syncViewport(
 				map,
 				activeConfig,
-				context.win.innerWidth,
+				getHostResponsiveWidth(host, context),
 				false,
-				state.activeCategoryTagIds
+				state.activeCategoryTagIds,
+				getActiveSearchPanelReservedWidth(activeConfig)
 			);
 			map.resize();
 
@@ -874,7 +941,28 @@ export function createMinimalMap(
 
 		if (typeof context.win.ResizeObserver === 'function') {
 			state.observer = new context.win.ResizeObserver(() => {
+				const activeConfig = state.config ?? config;
+
+				applyResponsiveHostHeight(activeConfig);
 				state.map?.resize();
+
+				if (!state.map) {
+					return;
+				}
+
+				if (state.selectedLocation) {
+					focusLocation(state.selectedLocation, activeConfig);
+					return;
+				}
+
+				syncViewport(
+					state.map,
+					activeConfig,
+					getHostResponsiveWidth(host, context),
+					false,
+					state.activeCategoryTagIds,
+					getActiveSearchPanelReservedWidth(activeConfig)
+				);
 			});
 			state.observer.observe(host);
 		}
@@ -1004,9 +1092,10 @@ export function createMinimalMap(
 			syncViewport(
 				state.map,
 				nextConfig,
-				context.win.innerWidth,
+				getHostResponsiveWidth(host, context),
 				zoomChanged,
-				state.activeCategoryTagIds
+				state.activeCategoryTagIds,
+				getActiveSearchPanelReservedWidth(nextConfig)
 			);
 		}
 

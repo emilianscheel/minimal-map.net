@@ -1,5 +1,8 @@
 import { getNodeDocument, getNodeWindow } from './dom-context';
-import { MOBILE_BREAKPOINT } from './responsive';
+import {
+	isMobileViewport,
+	isTabletSearchSplitViewport,
+} from './responsive';
 import type { NormalizedMapConfig } from '../types';
 
 export const DEFAULT_SEARCH_PANEL_WIDTH = '320px';
@@ -126,20 +129,42 @@ export function applySearchPanelCssVariables(
 	);
 }
 
-export function getSearchPanelDesktopPadding(
+export function getSearchPanelReservedWidth(
 	config: Pick<
 		NormalizedMapConfig,
 		'allowSearch' | 'searchPanelOuterMargin' | 'searchPanelWidth'
 	>,
-	searchHost?: HTMLElement | null
+	searchHost?: HTMLElement | null,
+	viewportWidth?: number | null
 ): number {
-	const hostWindow = getNodeWindow(searchHost) ?? (typeof window !== 'undefined' ? window : null);
+	const hostWidth = searchHost
+		? Math.ceil(searchHost.getBoundingClientRect().width)
+		: null;
+	const effectiveViewportWidth =
+		(hostWidth && hostWidth > 0 ? hostWidth : null) ??
+		viewportWidth ??
+		getNodeWindow(searchHost)?.innerWidth ??
+		null;
 
 	if (
 		!config.allowSearch ||
-		(hostWindow !== null && hostWindow.innerWidth <= MOBILE_BREAKPOINT)
+		isMobileViewport(effectiveViewportWidth)
 	) {
 		return 0;
+	}
+
+	if (isTabletSearchSplitViewport(effectiveViewportWidth)) {
+		if (searchHost) {
+			const hostWidth = Math.ceil(searchHost.getBoundingClientRect().width);
+
+			if (hostWidth > 0) {
+				return Math.ceil(hostWidth / 2);
+			}
+		}
+
+		if (typeof effectiveViewportWidth === 'number') {
+			return Math.ceil(effectiveViewportWidth / 2);
+		}
 	}
 
 	if (searchHost && getNodeDocument(searchHost)) {
@@ -149,7 +174,7 @@ export function getSearchPanelDesktopPadding(
 		measure.style.top = '0';
 		measure.style.left = '0';
 		measure.style.width =
-			'calc(var(--minimal-map-search-width) + var(--minimal-map-search-margin-left) + var(--minimal-map-search-margin-right))';
+			'var(--minimal-map-search-effective-footprint-width)';
 		measure.style.height = '0';
 		measure.style.visibility = 'hidden';
 		measure.style.pointerEvents = 'none';

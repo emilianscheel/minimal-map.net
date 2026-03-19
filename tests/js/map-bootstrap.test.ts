@@ -3,7 +3,7 @@ import { getDefaultFitBoundsPadding } from '../../src/map/default-fit-padding';
 import { normalizeMapConfig } from '../../src/map/defaults';
 import { syncTouchZoomInteraction } from '../../src/map/interactions';
 import { syncViewport } from '../../src/map/runtime';
-import { getSearchPanelDesktopPadding } from '../../src/map/search-panel-layout';
+import { getSearchPanelReservedWidth } from '../../src/map/search-panel-layout';
 import { getSelectedLocationTopPadding } from '../../src/map/selected-location-focus-padding';
 
 function createTouchZoomRotateSpy() {
@@ -92,7 +92,7 @@ describe('map touch zoom interaction', () => {
 			},
 		});
 
-		expect(getSearchPanelDesktopPadding(config)).toBe(408);
+		expect(getSearchPanelReservedWidth(config)).toBe(408);
 	});
 
 	test('returns zero desktop selection padding when search is disabled', () => {
@@ -107,7 +107,21 @@ describe('map touch zoom interaction', () => {
 			},
 		});
 
-		expect(getSearchPanelDesktopPadding(config)).toBe(0);
+		expect(getSearchPanelReservedWidth(config)).toBe(0);
+	});
+
+	test('uses half of the container width for the tablet search panel split range', () => {
+		const config = normalizeMapConfig({
+			searchPanelWidth: '360px',
+			searchPanelOuterMargin: {
+				top: '10px',
+				right: '30px',
+				bottom: '18px',
+				left: '18px',
+			},
+		});
+
+		expect(getSearchPanelReservedWidth(config, undefined, 800)).toBe(400);
 	});
 
 	test('returns the existing 48px fit padding on desktop', () => {
@@ -131,6 +145,31 @@ describe('map touch zoom interaction', () => {
 			right: 48,
 			bottom: 48,
 			left: 48,
+		});
+	});
+
+	test('adds the reserved tablet search split width to the left fit padding', () => {
+		const config = normalizeMapConfig({
+			allowSearch: true,
+			searchPanelOuterMargin: {
+				top: '12px',
+				right: '18px',
+				bottom: '24px',
+				left: '30px',
+			},
+			creditsOuterMargin: {
+				top: '10px',
+				right: '14px',
+				bottom: '16px',
+				left: '20px',
+			},
+		});
+
+		expect(getDefaultFitBoundsPadding(config, 800, 400)).toEqual({
+			top: 48,
+			right: 48,
+			bottom: 48,
+			left: 448,
 		});
 	});
 
@@ -250,6 +289,43 @@ describe('map touch zoom interaction', () => {
 					right: 48,
 					bottom: 56,
 					left: 48,
+				},
+			},
+		]);
+	});
+
+	test('syncViewport reserves the tablet search split width in fitBounds padding', () => {
+		const fitBoundsCalls: Array<{ padding: unknown }> = [];
+		const config = normalizeMapConfig({
+			allowSearch: true,
+			locations: [
+				{ id: 1, title: 'Berlin', lat: 52.52, lng: 13.405 },
+				{ id: 2, title: 'Hamburg', lat: 53.5511, lng: 9.9937 },
+			],
+		});
+
+		syncViewport(
+			{
+				easeTo() {},
+				fitBounds(_bounds, options) {
+					fitBoundsCalls.push({ padding: options.padding });
+				},
+				jumpTo() {},
+			} as never,
+			config,
+			800,
+			false,
+			[],
+			400
+		);
+
+		expect(fitBoundsCalls).toEqual([
+			{
+				padding: {
+					top: 48,
+					right: 48,
+					bottom: 48,
+					left: 448,
 				},
 			},
 		]);

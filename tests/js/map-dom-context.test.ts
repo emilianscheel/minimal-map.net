@@ -4,7 +4,7 @@ import { createElement, createRoot, useState } from '@wordpress/element';
 import { MapSearchControl, createWordPressSearchControl } from '../../src/map/SearchControl';
 import { createAttributionPill } from '../../src/map/attribution-pill';
 import { createWordPressZoomControls } from '../../src/map/wp-controls';
-import { getSearchPanelDesktopPadding } from '../../src/map/search-panel-layout';
+import { getSearchPanelReservedWidth } from '../../src/map/search-panel-layout';
 import { normalizeMapConfig } from '../../src/map/defaults';
 import type { GeocodeResponse, MapLocationPoint, MapLocationSelection } from '../../src/types';
 
@@ -156,6 +156,7 @@ function createAddressSearchControl(
 			geocodeSearch: geocodeSearchFn,
 			googleMapsNavigation,
 			googleMapsButtonShowIcon,
+			host,
 			locations,
 			onCategoryFilterChange: setActiveTags,
 			onEscape,
@@ -235,7 +236,7 @@ describe('map iframe document context', () => {
 			},
 		});
 
-		expect(getSearchPanelDesktopPadding(config, host)).toBe(408);
+		expect(getSearchPanelReservedWidth(config, host)).toBe(408);
 	});
 
 	test('binds outside-click handling to the host document', async () => {
