@@ -42,7 +42,7 @@ const SHORT_DAY_LABELS: Record<OpeningHoursDayKey, string> = {
 
 export interface OpeningHoursStatus {
 	label: string;
-	state: 'open' | 'closed';
+	state: 'open' | 'closed' | 'soon';
 }
 
 export interface OpeningHoursDisplayLine {
@@ -55,12 +55,60 @@ interface CurrentOpeningHoursContext {
 	currentMinutes: number;
 }
 
+interface CurrentDayTransition {
+	isOpen: boolean;
+	nextTransitionMinutes: number | null;
+}
+
+const SOON_THRESHOLD_MINUTES = 30;
+
 function normalizeLocale(locale: string): string {
 	return locale.trim().replace(/_/g, '-') || 'en-US';
 }
 
 function normalizeTimeZone(timeZone: string): string {
 	return timeZone.trim() || 'UTC';
+}
+
+function isUtcTimeZone(timeZone: string): boolean {
+	const normalized = normalizeTimeZone(timeZone);
+
+	return [
+		'UTC',
+		'GMT',
+		'Etc/UTC',
+		'Etc/GMT',
+		'+00:00',
+		'-00:00',
+	].includes(normalized);
+}
+
+function getBrowserTimeZone(): string | null {
+	try {
+		const browserTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+		return typeof browserTimeZone === 'string' && browserTimeZone.trim()
+			? browserTimeZone.trim()
+			: null;
+	} catch {
+		return null;
+	}
+}
+
+function getEffectiveCurrentTimeZone(timeZone: string): string {
+	const normalized = normalizeTimeZone(timeZone);
+
+	if (!isUtcTimeZone(normalized)) {
+		return normalized;
+	}
+
+	const browserTimeZone = getBrowserTimeZone();
+
+	if (browserTimeZone && !isUtcTimeZone(browserTimeZone)) {
+		return browserTimeZone;
+	}
+
+	return normalized;
 }
 
 function parseTimezoneOffsetMinutes(timeZone: string): number | null {
@@ -98,9 +146,11 @@ function getCurrentOpeningHoursContext(
 	now: Date,
 	timeZone: string
 ): CurrentOpeningHoursContext {
+	const effectiveTimeZone = getEffectiveCurrentTimeZone(timeZone);
+
 	try {
 		const formatter = getCachedDateTimeFormat('en-US', {
-			timeZone: normalizeTimeZone(timeZone),
+			timeZone: effectiveTimeZone,
 			weekday: 'long',
 			hour: '2-digit',
 			minute: '2-digit',
@@ -116,7 +166,7 @@ function getCurrentOpeningHoursContext(
 			currentMinutes: hour * 60 + minute,
 		};
 	} catch {
-		const offsetMinutes = parseTimezoneOffsetMinutes(timeZone);
+		const offsetMinutes = parseTimezoneOffsetMinutes(effectiveTimeZone);
 		const adjusted = new Date(now.getTime() + (offsetMinutes ?? 0) * 60 * 1000);
 		const weekdayIndex = (adjusted.getUTCDay() + 6) % 7;
 
@@ -215,6 +265,82 @@ function getNextOpeningForDay(
 	return null;
 }
 
+function getCurrentDayTransition(
+	day: LocationOpeningHoursDay,
+	currentMinutes: number
+): CurrentDayTransition {
+	if (!hasOpeningHoursForDay(day)) {
+		return {
+			isOpen: false,
+			nextTransitionMinutes: null,
+		};
+	}
+
+	const open = parseTimeToMinutes(day.open);
+	const close = parseTimeToMinutes(day.close);
+
+	if (open < 0 || close < 0 || open >= close) {
+		return {
+			isOpen: false,
+			nextTransitionMinutes: null,
+		};
+	}
+
+	if (currentMinutes < open) {
+		return {
+			isOpen: false,
+			nextTransitionMinutes: open,
+		};
+	}
+
+	if (currentMinutes >= close) {
+		return {
+			isOpen: false,
+			nextTransitionMinutes: null,
+		};
+	}
+
+	const lunchStart = parseTimeToMinutes(day.lunch_start);
+	const lunchEnd = getLunchBreakEnd(day);
+
+	if (
+		hasLunchBreakForDay(day) &&
+		lunchStart >= 0 &&
+		lunchEnd !== null
+	) {
+		if (currentMinutes < lunchStart) {
+			return {
+				isOpen: true,
+				nextTransitionMinutes: lunchStart,
+			};
+		}
+
+		if (currentMinutes < lunchEnd) {
+			return {
+				isOpen: false,
+				nextTransitionMinutes: lunchEnd,
+			};
+		}
+	}
+
+	return {
+		isOpen: true,
+		nextTransitionMinutes: close,
+	};
+}
+
+function isSoonTransition(
+	currentMinutes: number,
+	nextTransitionMinutes: number | null
+): boolean {
+	if (nextTransitionMinutes === null) {
+		return false;
+	}
+
+	return nextTransitionMinutes >= currentMinutes &&
+		nextTransitionMinutes - currentMinutes <= SOON_THRESHOLD_MINUTES;
+}
+
 export function getOpeningHoursStatus(
 	openingHours: LocationOpeningHours,
 	siteLocale: string,
@@ -231,44 +357,54 @@ export function getOpeningHoursStatus(
 
 	const { currentDayKey, currentMinutes } = getCurrentOpeningHoursContext(now, siteTimezone);
 	const today = openingHours[currentDayKey];
-	const open = parseTimeToMinutes(today.open);
-	const close = parseTimeToMinutes(today.close);
-	const lunchStart = parseTimeToMinutes(today.lunch_start);
-	const lunchEnd = getLunchBreakEnd(today);
+	const todayTransition = getCurrentDayTransition(today, currentMinutes);
 
-	if (
-		hasOpeningHoursForDay(today) &&
-		open >= 0 &&
-		close > open &&
-		currentMinutes >= open &&
-		currentMinutes < close &&
-		!(
-			hasLunchBreakForDay(today) &&
-			lunchStart >= 0 &&
-			lunchEnd !== null &&
-			currentMinutes >= lunchStart &&
-			currentMinutes < lunchEnd
-		)
-	) {
+	if (todayTransition.nextTransitionMinutes !== null) {
+		const formattedTime = formatDisplayTime(
+			formatMinutesToTimeString(todayTransition.nextTransitionMinutes),
+			siteLocale
+		);
+		const isSoon = isSoonTransition(
+			currentMinutes,
+			todayTransition.nextTransitionMinutes
+		);
+
+		if (todayTransition.isOpen) {
+			return {
+				label: isSoon
+					? sprintf(
+						__('Open - closes soon %s', 'minimal-map'),
+						formattedTime
+					)
+					: sprintf(
+						__('Open - closes %s', 'minimal-map'),
+						formattedTime
+					),
+				state: isSoon ? 'soon' : 'open',
+			};
+		}
+
 		return {
-			label: sprintf(
-				__('Open - closes %s', 'minimal-map'),
-				formatDisplayTime(today.close, siteLocale)
-			),
-			state: 'open',
+			label: isSoon
+				? sprintf(
+					__('Opens soon - %s', 'minimal-map'),
+					formattedTime
+				)
+				: sprintf(
+					__('Closed - opens %s', 'minimal-map'),
+					formattedTime
+				),
+			state: isSoon ? 'soon' : 'closed',
 		};
 	}
 
 	const currentDayIndex = OPENING_HOURS_DAY_ORDER.indexOf(currentDayKey);
 
-	for (let offset = 0; offset < OPENING_HOURS_DAY_ORDER.length; offset += 1) {
+	for (let offset = 1; offset < OPENING_HOURS_DAY_ORDER.length; offset += 1) {
 		const dayKey =
 			OPENING_HOURS_DAY_ORDER[(currentDayIndex + offset) % OPENING_HOURS_DAY_ORDER.length];
 		const day = openingHours[dayKey];
-		const nextOpening =
-			offset === 0
-				? getNextOpeningForDay(day, currentMinutes, true)
-				: getNextOpeningForDay(day, -1, false);
+		const nextOpening = getNextOpeningForDay(day, -1, false);
 
 		if (nextOpening === null) {
 			continue;
@@ -280,14 +416,11 @@ export function getOpeningHoursStatus(
 		);
 
 		return {
-			label:
-				offset === 0
-					? sprintf(__('Closed - opens %s', 'minimal-map'), formattedTime)
-					: sprintf(
-						__('Closed - opens %1$s %2$s', 'minimal-map'),
-						SHORT_DAY_LABELS[dayKey],
-						formattedTime
-					),
+			label: sprintf(
+				__('Closed - opens %1$s %2$s', 'minimal-map'),
+				SHORT_DAY_LABELS[dayKey],
+				formattedTime
+			),
 			state: 'closed',
 		};
 	}

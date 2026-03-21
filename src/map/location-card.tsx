@@ -1,5 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { memo, useMemo, useState } from '@wordpress/element';
+import { memo, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	ChevronDown,
 	Clock3,
@@ -76,6 +76,13 @@ export const getGoogleMapsDirectionsUrl = (location: MapLocationPoint): string =
 export const hasLocationCoordinates = (location: MapLocationPoint): boolean =>
 	Number.isFinite(location.lat) && Number.isFinite(location.lng);
 
+function getDelayUntilNextMinute(now: Date): number {
+	return Math.max(
+		1000,
+		(60 - now.getSeconds()) * 1000 - now.getMilliseconds() + 50
+	);
+}
+
 const SearchResultLogo = ({ logo }: { logo: MapLocationLogo }) => {
 	const isSvgMarkup = logo.content.trim().startsWith('<svg');
 
@@ -150,33 +157,59 @@ export const LocationResultCard = memo(({
 	siteTimezone,
 }: LocationResultCardProps) => {
 	const [isOpeningHoursExpanded, setOpeningHoursExpanded] = useState(false);
+	const [statusNow, setStatusNow] = useState(() => Date.now());
 	const isSearchCard = mode === 'search';
 	const hasTags = Array.isArray(location.tags) && location.tags.length > 0;
 	const showGoogleMapsButton = googleMapsNavigation && hasLocationCoordinates(location);
 	const showFooter = hasTags || showGoogleMapsButton || Boolean(distanceLabel);
+	const hasStructuredOpeningHours = Boolean(
+		location.opening_hours && isOpeningHoursConfigured(location.opening_hours)
+	);
+	const hasOpeningHoursNotes = Boolean(location.opening_hours_notes?.trim());
 
-	const {
-		showOpeningHours,
-		hasStructuredOpeningHours,
-		openingHoursStatus,
-		openingHoursLines,
-	} = useMemo(() => {
-		const isConfigured = location.opening_hours && isOpeningHoursConfigured(location.opening_hours);
-		const hasNotes = Boolean(location.opening_hours_notes?.trim());
-		const status = isConfigured && location.opening_hours
-			? getOpeningHoursStatus(location.opening_hours, siteLocale, siteTimezone)
-			: null;
-		const lines = isConfigured && location.opening_hours
-			? getOpeningHoursDisplayLines(location.opening_hours, siteLocale)
-			: [];
+	useEffect(() => {
+		if (!hasStructuredOpeningHours) {
+			return;
+		}
 
-		return {
-			showOpeningHours: isConfigured || hasNotes,
-			hasStructuredOpeningHours: isConfigured,
-			openingHoursStatus: status,
-			openingHoursLines: lines,
+		let timeoutId: number | null = null;
+
+		const scheduleNextTick = () => {
+			timeoutId = globalThis.setTimeout(() => {
+				setStatusNow(Date.now());
+				scheduleNextTick();
+			}, getDelayUntilNextMinute(new Date()));
 		};
-	}, [location.opening_hours, location.opening_hours_notes, siteLocale, siteTimezone]);
+
+		scheduleNextTick();
+
+		return () => {
+			if (timeoutId !== null) {
+				globalThis.clearTimeout(timeoutId);
+			}
+		};
+	}, [hasStructuredOpeningHours]);
+
+	const openingHoursStatus = useMemo(
+		() =>
+			hasStructuredOpeningHours && location.opening_hours
+				? getOpeningHoursStatus(
+					location.opening_hours,
+					siteLocale,
+					siteTimezone,
+					new Date(statusNow)
+				)
+				: null,
+		[hasStructuredOpeningHours, location.opening_hours, siteLocale, siteTimezone, statusNow]
+	);
+	const openingHoursLines = useMemo(
+		() =>
+			hasStructuredOpeningHours && location.opening_hours
+			? getOpeningHoursDisplayLines(location.opening_hours, siteLocale)
+			: [],
+		[hasStructuredOpeningHours, location.opening_hours, siteLocale]
+	);
+	const showOpeningHours = hasStructuredOpeningHours || hasOpeningHoursNotes;
 	const isOpeningHoursExpandable = hasStructuredOpeningHours && isSearchCard;
 
 	const layout = (

@@ -26,6 +26,7 @@ type SearchPanelConfig = Pick<
 	| 'googleMapsButtonBorderRadius'
 	| 'openingHoursOpenColor'
 	| 'openingHoursClosedColor'
+	| 'openingHoursSoonColor'
 >;
 
 export function parsePixelValue(value: string): number {
@@ -126,6 +127,10 @@ export function applySearchPanelCssVariables(
 	target.style.setProperty(
 		'--minimal-map-opening-hours-closed-color',
 		config.openingHoursClosedColor
+	);
+	target.style.setProperty(
+		'--minimal-map-opening-hours-soon-color',
+		config.openingHoursSoonColor
 	);
 }
 

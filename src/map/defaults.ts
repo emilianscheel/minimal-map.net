@@ -87,6 +87,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	googleMapsButtonShowIcon: true,
 	openingHoursOpenColor: '#1a7f37',
 	openingHoursClosedColor: '#b32d2e',
+	openingHoursSoonColor: '#d97706',
 	creditsPadding: {
 		top: '4px',
 		right: '8px',
@@ -366,6 +367,10 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 			runtimeConfig.defaults?.openingHoursClosedColor,
 			DEFAULT_MAP_DEFAULTS.openingHoursClosedColor
 		),
+		openingHoursSoonColor: normalizeColor(
+			runtimeConfig.defaults?.openingHoursSoonColor,
+			DEFAULT_MAP_DEFAULTS.openingHoursSoonColor
+		),
 		creditsPadding: normalizeBoxValue(
 			runtimeConfig.defaults?.creditsPadding,
 			DEFAULT_MAP_DEFAULTS.creditsPadding as Required<BoxValue>
@@ -539,6 +544,10 @@ export function normalizeMapConfig(
 		rawConfig.openingHoursClosedColor ?? defaults.openingHoursClosedColor,
 		defaults.openingHoursClosedColor
 	);
+	const openingHoursSoonColor = normalizeColor(
+		rawConfig.openingHoursSoonColor ?? defaults.openingHoursSoonColor,
+		defaults.openingHoursSoonColor
+	);
 	const creditsPadding = normalizeBoxValue(
 		rawConfig.creditsPadding ?? defaults.creditsPadding,
 		defaults.creditsPadding as Required<BoxValue>
@@ -653,6 +662,7 @@ export function normalizeMapConfig(
 		),
 		openingHoursOpenColor,
 		openingHoursClosedColor,
+		openingHoursSoonColor,
 		creditsPadding,
 		creditsOuterMargin,
 		creditsBackgroundColor,

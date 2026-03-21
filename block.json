@@ -219,6 +219,10 @@
       "type": "string",
       "default": "#b32d2e"
     },
+    "openingHoursSoonColor": {
+      "type": "string",
+      "default": "#d97706"
+    },
     "creditsPadding": {
       "type": "object",
       "default": {

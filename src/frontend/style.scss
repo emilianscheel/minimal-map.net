@@ -708,6 +708,10 @@
   color: var(--minimal-map-opening-hours-closed-color, #b32d2e);
 }
 
+.minimal-map-search__result-opening-hours-trigger.is-soon {
+  color: var(--minimal-map-opening-hours-soon-color, #d97706);
+}
+
 .minimal-map-search__result-opening-hours-trigger span {
   min-width: 0;
   overflow-wrap: anywhere;

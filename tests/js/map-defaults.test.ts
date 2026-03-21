@@ -180,16 +180,20 @@ describe('map defaults normalization', () => {
 		const explicitConfig = normalizeMapConfig({
 			openingHoursOpenColor: '#22863a',
 			openingHoursClosedColor: '#cf222e',
+			openingHoursSoonColor: '#fb8500',
 		});
 		const fallbackConfig = normalizeMapConfig({
 			openingHoursOpenColor: 'green',
 			openingHoursClosedColor: 'red',
+			openingHoursSoonColor: 'orange',
 		});
 
 		expect(explicitConfig.openingHoursOpenColor).toBe('#22863a');
 		expect(explicitConfig.openingHoursClosedColor).toBe('#cf222e');
+		expect(explicitConfig.openingHoursSoonColor).toBe('#fb8500');
 		expect(fallbackConfig.openingHoursOpenColor).toBe('#1a7f37');
 		expect(fallbackConfig.openingHoursClosedColor).toBe('#b32d2e');
+		expect(fallbackConfig.openingHoursSoonColor).toBe('#d97706');
 	});
 
 	test('allows raw config to override the runtime mobile two-finger zoom default', () => {

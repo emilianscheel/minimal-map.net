@@ -473,16 +473,23 @@ function GoogleMapsButtonColorSettings({
 function OpeningHoursColorSettings({
   openColor,
   closedColor,
+  soonColor,
   defaultOpenColor,
   defaultClosedColor,
+  defaultSoonColor,
   onChange,
 }: {
   openColor: string;
   closedColor: string;
+  soonColor: string;
   defaultOpenColor: string;
   defaultClosedColor: string;
+  defaultSoonColor: string;
   onChange: (
-    key: "openingHoursOpenColor" | "openingHoursClosedColor",
+    key:
+      | "openingHoursOpenColor"
+      | "openingHoursClosedColor"
+      | "openingHoursSoonColor",
     value: string,
   ) => void;
 }) {
@@ -499,6 +506,12 @@ function OpeningHoursColorSettings({
         value={closedColor}
         defaultValue={defaultClosedColor}
         onChange={(value) => onChange("openingHoursClosedColor", value)}
+      />
+      <CompactColorDropdown
+        label={__("Soon", "minimal-map")}
+        value={soonColor}
+        defaultValue={defaultSoonColor}
+        onChange={(value) => onChange("openingHoursSoonColor", value)}
       />
     </div>
   );
@@ -1553,11 +1566,15 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
           <OpeningHoursColorSettings
             openColor={attributes.openingHoursOpenColor}
             closedColor={attributes.openingHoursClosedColor}
+            soonColor={attributes.openingHoursSoonColor}
             defaultOpenColor={
               runtimeConfig.defaults?.openingHoursOpenColor ?? "#1a7f37"
             }
             defaultClosedColor={
               runtimeConfig.defaults?.openingHoursClosedColor ?? "#b32d2e"
+            }
+            defaultSoonColor={
+              runtimeConfig.defaults?.openingHoursSoonColor ?? "#d97706"
             }
             onChange={(key, value) => setAttributes({ [key]: value })}
           />

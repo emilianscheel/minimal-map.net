@@ -163,6 +163,108 @@ describe('location result card', () => {
 		root.unmount();
 	});
 
+	test('refreshes the opening-hours status while the card stays mounted', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+		const originalDateNow = Date.now;
+		const originalSetTimeout = globalThis.setTimeout;
+		const originalClearTimeout = globalThis.clearTimeout;
+		const scheduledCallbacks: Array<() => void> = [];
+		let nextTimerId = 1;
+		let nowMs = new Date('2024-03-23T10:00:00Z').getTime();
+
+		Date.now = () => nowMs;
+		globalThis.setTimeout = ((callback: TimerHandler) => {
+			scheduledCallbacks.push(callback as () => void);
+			return nextTimerId++;
+		}) as typeof globalThis.setTimeout;
+		globalThis.clearTimeout = (() => undefined) as typeof globalThis.clearTimeout;
+
+		try {
+			root.render(
+				createElement(LocationResultCard, {
+					googleMapsButtonShowIcon: true,
+					googleMapsNavigation: false,
+					location: {
+						id: 3,
+						title: 'Saturday Cafe',
+						lat: 52.52,
+						lng: 13.405,
+						city: 'Berlin',
+						street: 'Market Street',
+						house_number: '1',
+						postal_code: '10117',
+						opening_hours: {
+							monday: {
+								open: '08:00',
+								close: '20:00',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+							tuesday: {
+								open: '08:00',
+								close: '20:00',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+							wednesday: {
+								open: '08:00',
+								close: '20:00',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+							thursday: {
+								open: '08:00',
+								close: '20:00',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+							friday: {
+								open: '08:00',
+								close: '20:00',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+							saturday: {
+								open: '08:00',
+								close: '11:20',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+							sunday: {
+								open: '',
+								close: '',
+								lunch_start: '',
+								lunch_duration_minutes: 0,
+							},
+						},
+						opening_hours_notes: '',
+					},
+					mode: 'search',
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			);
+
+			await flushRender();
+
+			expect(host.textContent).toContain('Open - closes 11:20 am');
+
+			nowMs = new Date('2024-03-23T10:01:00Z').getTime();
+			scheduledCallbacks[0]?.();
+			await flushRender();
+
+			expect(host.textContent).toContain('Open - closes soon 11:20 am');
+		} finally {
+			Date.now = originalDateNow;
+			globalThis.setTimeout = originalSetTimeout;
+			globalThis.clearTimeout = originalClearTimeout;
+			root.unmount();
+		}
+	});
+
 	test('renders the in-map variant without the selection button and keeps optional controls configurable', async () => {
 		const dom = new JSDOM('<!doctype html><div id="host"></div>');
 		setGlobalDom(dom);
