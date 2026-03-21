@@ -6,6 +6,7 @@ export type AdminSectionMap = Partial<Record<AdminSectionView, AdminSection>>;
 export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 	currentView: 'dashboard',
 	sections: [],
+	isPremium: false,
 	stats: {
 		locations: 0,
 		collections: 0,
@@ -47,9 +48,14 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 	analyticsConfig: {
 		nonce: '',
 		enabled: false,
+		complianzEnabled: false,
 		settingsPath: '',
 		summaryPath: '',
 		queriesPath: '',
+	},
+	licenseConfig: {
+		nonce: '',
+		path: '',
 	},
 	mapConfig: {},
 };

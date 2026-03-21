@@ -403,6 +403,7 @@ export interface TagRestResponse {
 export interface AdminAppConfig {
 	currentView: AdminSectionView;
 	sections: AdminSection[];
+	isPremium: boolean;
 	stats: AdminStats;
 	mapConfig: MapRuntimeConfig;
 	locationsConfig: LocationsAdminConfig;
@@ -412,6 +413,12 @@ export interface AdminAppConfig {
 	tagsConfig: TagsAdminConfig;
 	stylesConfig: StylesAdminConfig;
 	analyticsConfig: AnalyticsAdminConfig;
+	licenseConfig: LicenseAdminConfig;
+}
+
+export interface LicenseAdminConfig {
+	nonce: string;
+	path: string;
 }
 
 export type DashboardCardView = Extract<

@@ -19,6 +19,7 @@ use MinimalMap\Rest\Analytics_Track_Route;
 use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
+use MinimalMap\Rest\License_Route;
 use MinimalMap\Rest\Locations_Route;
 use MinimalMap\Rest\Styles_Route;
 use WP_Post;
@@ -712,6 +713,7 @@ class Config {
 		return array(
 			'currentView'    => Admin\Admin_Menu::get_current_view(),
 			'sections'       => $sections,
+			'isPremium'      => $this->is_premium(),
 			'stats'          => array(
 				'locations'   => Location_Post_Type::get_location_count(),
 				'collections' => Collection_Post_Type::get_collection_count(),
@@ -759,7 +761,20 @@ class Config {
 				'summaryPath'      => Analytics_Summary_Route::get_rest_path(),
 				'queriesPath'      => Analytics_Queries_Route::get_rest_path(),
 			),
+			'licenseConfig' => array(
+				'nonce' => wp_create_nonce( 'wp_rest' ),
+				'path'  => License_Route::get_rest_path(),
+			),
 		);
+	}
+
+	/**
+	 * Check if the plugin is in premium mode.
+	 *
+	 * @return bool
+	 */
+	public function is_premium() {
+		return (bool) get_option( 'minimal_map_premium_active', false );
 	}
 
 	/**

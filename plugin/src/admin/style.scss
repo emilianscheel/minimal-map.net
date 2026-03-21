@@ -46,8 +46,8 @@ svg.lucide {
   --wp-admin-theme-color--rgb: 56, 88, 232;
   --wp-admin-theme-color-darker-10: #2648e6;
   --wp-admin-theme-color-darker-20: #1739d6;
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 18px;
   background: #fff;
@@ -55,7 +55,9 @@ svg.lucide {
 }
 
 .minimal-map-admin__nav {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   gap: 8px;
 }
 
@@ -97,6 +99,10 @@ svg.lucide {
 .minimal-map-admin__nav-item.components-button.is-active:focus {
   background: #f0f0f1 !important;
   color: #3858e8 !important;
+}
+
+.minimal-map-admin__license-dialog {
+  padding: 8px 4px;
 }
 
 .minimal-map-admin__nav-item.components-button:focus-visible {

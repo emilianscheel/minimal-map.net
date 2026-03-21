@@ -25,6 +25,7 @@ require_once MINIMAL_MAP_PATH . 'includes/rest/class-analytics-summary-route.php
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-analytics-track-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-frontend-geocode-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-geocode-route.php';
+require_once MINIMAL_MAP_PATH . 'includes/rest/class-license-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-locations-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-styles-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/class-plugin.php';
