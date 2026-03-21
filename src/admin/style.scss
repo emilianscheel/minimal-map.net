@@ -144,7 +144,7 @@ svg.lucide {
 
 .minimal-map-admin__header-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
 }
@@ -522,6 +522,10 @@ svg.lucide {
   align-items: center;
   gap: 12px;
   color: #1e1e1e;
+}
+
+.minimal-map-admin__header-actions .minimal-map-admin__analytics-toggle {
+  align-self: center;
 }
 
 .minimal-map-admin__analytics-toggle-label {
