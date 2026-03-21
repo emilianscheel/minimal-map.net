@@ -541,22 +541,18 @@ export const MapSearchControl = ({
 		onCategoryFilterChange(nextActiveTagIds);
 	};
 
-	const renderCategoryFilters = () => {
-		if (
-			isOpen ||
-			!enableCategoryFilter ||
-			availableTags.length === 0
-		) {
+	const renderQuickFilters = () => {
+		if (!enableCategoryFilter || availableTags.length === 0) {
 			return null;
 		}
 
 		return (
-			<div className="minimal-map-search__category-filters">
+			<div className="minimal-map-search__quick-filters">
 				{availableTags.map((tag) => (
 					<button
 						key={tag.id}
 						type="button"
-						className={`minimal-map-search__category-pill${
+						className={`minimal-map-search__quick-filter-pill${
 							activeCategoryTagIds.includes(tag.id) ? ' is-selected' : ''
 						}`}
 						aria-pressed={activeCategoryTagIds.includes(tag.id)}
@@ -676,7 +672,7 @@ export const MapSearchControl = ({
 					) : null}
 				</form>
 
-				{renderCategoryFilters()}
+				{renderQuickFilters()}
 
 				{isOpen ? (
 					<div className="minimal-map-search__results-container">
