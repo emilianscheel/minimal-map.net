@@ -3,6 +3,8 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { BrushCleaning, Plus } from 'lucide-react';
 import type { ViewGrid } from '@wordpress/dataviews';
+import { KeyboardShortcut, getShortcutAriaKeys } from '../../components/Kbd';
+import { useSingleKeyShortcut } from '../../lib/keyboard/useSingleKeyShortcut';
 import type {
 	TagFormState,
 	TagRecord,
@@ -80,6 +82,22 @@ export function useTagsController(
 		resetDialogState();
 		setDialogOpen(true);
 	}, [resetDialogState]);
+
+	const isAddTagShortcutBlocked =
+		isDialogOpen ||
+		isDeleteAllTagsModalOpen ||
+		isDeleteModalOpen ||
+		isDeletingAllTags ||
+		isSubmitting ||
+		isLoading ||
+		isRowActionPending;
+
+	useSingleKeyShortcut({
+		active: enabled,
+		blocked: isAddTagShortcutBlocked,
+		key: 'n',
+		onTrigger: onAddTag,
+	});
 
 	const onEditTag = useCallback(
 		(tag: TagRecord): void => {
@@ -298,8 +316,12 @@ export function useTagsController(
 					onClick={onAddTag}
 					icon={<Plus size={18} strokeWidth={2} />}
 					iconPosition="left"
+					aria-keyshortcuts={getShortcutAriaKeys(['n'])}
 				>
-					{__('Add tag', 'minimal-map')}
+					<span className="minimal-map-admin__button-shortcut-content">
+						<span>{__('Add tag', 'minimal-map')}</span>
+						<KeyboardShortcut keys={['n']} variant="blue" />
+					</span>
 				</Button>
 			</div>
 		) : null,

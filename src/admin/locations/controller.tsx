@@ -59,6 +59,7 @@ import {
 import { geocodeAddress } from '../../lib/locations/geocodeAddress';
 import { hasFieldErrors } from '../../lib/locations/hasFieldErrors';
 import { hasLocationAddressChanged } from '../../lib/locations/hasLocationAddressChanged';
+import { useSingleKeyShortcut } from '../../lib/keyboard/useSingleKeyShortcut';
 import { paginateLocations } from '../../lib/locations/paginateLocations';
 import { updateLocationCoordinates } from '../../lib/locations/updateLocationCoordinates';
 import { updateLocation } from '../../lib/locations/updateLocation';
@@ -79,18 +80,6 @@ const DEFAULT_MAP_CENTER: MapCoordinates = {
 	lat: 52.517,
 	lng: 13.388,
 };
-
-function isEditableShortcutTarget(target: EventTarget | null): boolean {
-	if (!(target instanceof HTMLElement)) {
-		return false;
-	}
-
-	return Boolean(
-		target.closest(
-			'input, textarea, select, [contenteditable="true"], [role="textbox"]'
-		)
-	);
-}
 
 export function useLocationsController(
 	config: LocationsAdminConfig,
@@ -606,48 +595,12 @@ export function useLocationsController(
 		isDeletingAllLocations ||
 		isRowActionPending;
 
-	useEffect(() => {
-		if (!enabled || typeof document === 'undefined') {
-			return undefined;
-		}
-
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (
-				event.defaultPrevented ||
-				event.repeat ||
-				isAddLocationShortcutBlocked ||
-				event.metaKey ||
-				event.ctrlKey ||
-				event.altKey ||
-				event.shiftKey ||
-				isEditableShortcutTarget(event.target)
-			) {
-				return;
-			}
-
-			const pressedLocationKey =
-				event.code === 'KeyN' ||
-				event.key.toLowerCase() === 'n';
-
-			if (!pressedLocationKey) {
-				return;
-			}
-
-			if (event.cancelable) {
-				event.preventDefault();
-			}
-
-			event.stopImmediatePropagation();
-			event.stopPropagation();
-			openDialog();
-		};
-
-		document.addEventListener('keydown', handleKeyDown, true);
-
-		return () => {
-			document.removeEventListener('keydown', handleKeyDown, true);
-		};
-	}, [enabled, isAddLocationShortcutBlocked, openDialog]);
+	useSingleKeyShortcut({
+		active: enabled,
+		blocked: isAddLocationShortcutBlocked,
+		key: 'n',
+		onTrigger: openDialog,
+	});
 
 	const onEditLocation = (location: LocationRecord): void => {
 		const nextForm = createLocationFormStateFromRecord(location);
@@ -2122,7 +2075,7 @@ export function useLocationsController(
 					iconPosition="left"
 					aria-keyshortcuts={getShortcutAriaKeys(['n'])}
 				>
-					<span className="minimal-map-admin__location-dialog-button-content">
+					<span className="minimal-map-admin__button-shortcut-content">
 						<span>{__('Add location', 'minimal-map')}</span>
 						<KeyboardShortcut keys={['n']} variant="blue" />
 					</span>

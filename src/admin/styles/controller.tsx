@@ -2,6 +2,8 @@ import { Button } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { KeyboardShortcut, getShortcutAriaKeys } from '../../components/Kbd';
+import { useSingleKeyShortcut } from '../../lib/keyboard/useSingleKeyShortcut';
 import type { StylesAdminConfig, StyleThemeRecord, StyleThemeColors } from '../../types';
 import type { StylesController } from './types';
 import { ThemeSelector } from './ThemeSelector';
@@ -31,6 +33,15 @@ export function useStylesController(
 	const activeTheme = useMemo(() => {
 		return themes.find((t) => t.slug === activeThemeSlug) || themes[0] || null;
 	}, [ themes, activeThemeSlug ]);
+
+	const hasChanges = useMemo(
+		() => Boolean(
+			activeTheme &&
+			draftColors &&
+			JSON.stringify(activeTheme.colors) !== JSON.stringify(draftColors)
+		),
+		[ activeTheme, draftColors ]
+	);
 
 	const fetchThemes = useCallback(async () => {
 		setIsLoading(true);
@@ -230,10 +241,15 @@ export function useStylesController(
 	const openDeleteModal = () => setIsDeleteModalOpen(true);
 	const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
+	useSingleKeyShortcut({
+		active,
+		blocked: isCreateModalOpen || isDeleteModalOpen || isLoading || isSaving || !hasChanges,
+		key: 's',
+		onTrigger: saveTheme,
+	});
+
 	const headerAction = useMemo(() => {
 		if (!active) return null;
-
-		const hasChanges = activeTheme && JSON.stringify(activeTheme.colors) !== JSON.stringify(draftColors);
 
 		return (
 			<div className="minimal-map-styles__header-actions">
@@ -255,9 +271,13 @@ export function useStylesController(
 					onClick={saveTheme}
 					isBusy={isSaving}
 					disabled={isSaving || !hasChanges}
+					aria-keyshortcuts={getShortcutAriaKeys(['s'])}
 					__next40pxDefaultSize
 				>
-					{__('Save Theme', 'minimal-map')}
+					<span className="minimal-map-admin__button-shortcut-content">
+						<span>{__('Save Theme', 'minimal-map')}</span>
+						<KeyboardShortcut keys={['s']} variant="blue" />
+					</span>
 				</Button>
 			</div>
 		);

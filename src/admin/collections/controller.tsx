@@ -34,6 +34,8 @@ import { updateCollection } from "../../lib/collections/updateCollection";
 import { deleteLocation } from "../../lib/locations/deleteLocation";
 import { ImportLocationsButton } from "../locations/ImportLocationsButton";
 import { ThemeSelector } from "../styles/ThemeSelector";
+import { KeyboardShortcut, getShortcutAriaKeys } from "../../components/Kbd";
+import { useSingleKeyShortcut } from "../../lib/keyboard/useSingleKeyShortcut";
 import type {
   CollectionsController,
   DeleteCollectionOptions,
@@ -277,6 +279,26 @@ export function useCollectionsController(
     resetDialogState();
     setDialogOpen(true);
   }, [resetDialogState]);
+
+  const isAddCollectionShortcutBlocked =
+    isDialogOpen ||
+    isAssignmentModalOpen ||
+    isDeleteAllCollectionsModalOpen ||
+    isMergeModalOpen ||
+    isAssignmentSaving ||
+    isDeletingAllCollections ||
+    isSubmitting ||
+    isLoading ||
+    isRowActionPending ||
+    isMerging ||
+    isImporting;
+
+  useSingleKeyShortcut({
+    active: enabled,
+    blocked: isAddCollectionShortcutBlocked,
+    key: "n",
+    onTrigger: openDialog,
+  });
 
   const onEditCollection = useCallback(
     (collection: CollectionRecord): void => {
@@ -831,8 +853,12 @@ export function useCollectionsController(
           onClick={openDialog}
           icon={<Plus size={18} strokeWidth={2} />}
           iconPosition="left"
+          aria-keyshortcuts={getShortcutAriaKeys(["n"])}
         >
-          {__("Add collection", "minimal-map")}
+          <span className="minimal-map-admin__button-shortcut-content">
+            <span>{__("Add collection", "minimal-map")}</span>
+            <KeyboardShortcut keys={["n"]} variant="blue" />
+          </span>
         </Button>
       </div>
     ) : null,
