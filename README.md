@@ -4,7 +4,7 @@ Render a minimalist MapLibre-powered map in Wordpress.
 
 ![Preview](screenshot.png)
 
-[All Screenshots](Screenshots.md)
+[Download Plugin](https://github.com/emilianscheel/minimal-map.net/releases/latest/download/minimal-map.zip) | [All Screenshots](Screenshots.md)
 
 ## Features
 
