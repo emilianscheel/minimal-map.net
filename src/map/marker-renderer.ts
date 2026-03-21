@@ -47,6 +47,7 @@ export interface MarkerRendererConfig
 	extends Pick<
 		NormalizedMapConfig,
 		| 'interactive'
+		| 'enableMarkerClustering'
 		| 'clusterBackgroundColor'
 		| 'clusterForegroundColor'
 		| 'markerContent'
@@ -206,7 +207,9 @@ function getMarkerIconSpec(
 function buildMarkerRenderData(config: MarkerRendererConfig): MarkerRenderData {
 	const icons = new Map<string, MarkerIconSpec>();
 	const clusterEnabled =
-		config.interactive !== false && config.points.length > 1;
+		config.enableMarkerClustering === true &&
+		config.interactive !== false &&
+		config.points.length > 1;
 
 	const features = config.points.map((point) => {
 		const iconSpec = getMarkerIconSpec(
@@ -312,6 +315,7 @@ export function createMarkerRenderer({
 	const emptyConfig: MarkerRendererConfig = {
 		clusterBackgroundColor: '#ffffff',
 		clusterForegroundColor: '#000000',
+		enableMarkerClustering: false,
 		interactive: true,
 		markerContent: null,
 		markerOffsetY: 0,

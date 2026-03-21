@@ -1225,6 +1225,13 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             }
           />
           <ToggleControl
+            label={__("Enable Marker Clustering", "minimal-map")}
+            checked={attributes.enableMarkerClustering}
+            onChange={(value: boolean) =>
+              setAttributes({ enableMarkerClustering: value })
+            }
+          />
+          <ToggleControl
             label={__("Google Maps Navigation", "minimal-map")}
             checked={attributes.googleMapsNavigation}
             onChange={(value: boolean) =>

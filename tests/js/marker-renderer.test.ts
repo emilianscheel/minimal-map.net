@@ -149,6 +149,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: false,
 			interactive: false,
 			markerContent: null,
 			markerOffsetY: 0,
@@ -168,6 +169,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: false,
 			interactive: false,
 			markerContent: null,
 			markerOffsetY: 0,
@@ -200,6 +202,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: false,
 			interactive: false,
 			markerContent: null,
 			markerOffsetY: 0,
@@ -240,6 +243,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: false,
 			interactive: false,
 			markerContent: null,
 			markerOffsetY: 6,
@@ -281,6 +285,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: false,
 			interactive: false,
 			markerContent: null,
 			markerOffsetY: 0,
@@ -319,6 +324,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: true,
 			interactive: true,
 			markerContent: null,
 			markerOffsetY: 0,
@@ -368,7 +374,7 @@ describe('marker renderer', () => {
 		]);
 	});
 
-	test('keeps multi-point non-interactive maps on the existing non-clustered marker layer', async () => {
+	test('keeps multi-point maps on the existing non-clustered marker layer when clustering is disabled', async () => {
 		const { host } = createHost();
 		const mockMap = createMockMap();
 		const renderer = createMarkerRenderer({
@@ -384,7 +390,8 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
-			interactive: false,
+			enableMarkerClustering: false,
+			interactive: true,
 			markerContent: null,
 			markerOffsetY: 0,
 			markerScale: 1,
@@ -415,6 +422,7 @@ describe('marker renderer', () => {
 		await renderer.update({
 			clusterBackgroundColor: '#ffffff',
 			clusterForegroundColor: '#000000',
+			enableMarkerClustering: true,
 			interactive: true,
 			markerContent: null,
 			markerOffsetY: 0,

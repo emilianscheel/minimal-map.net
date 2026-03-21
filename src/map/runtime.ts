@@ -315,6 +315,7 @@ function getMarkerRendererConfig(
 	return {
 		clusterBackgroundColor: config.clusterBackgroundColor,
 		clusterForegroundColor: config.clusterForegroundColor,
+		enableMarkerClustering: config.enableMarkerClustering,
 		interactive: config.interactive,
 		markerContent: config.markerContent,
 		markerOffsetY: config.markerOffsetY,
@@ -1389,6 +1390,7 @@ export function createMinimalMap(
 			!previousConfig ||
 			previousConfig.clusterBackgroundColor !== nextConfig.clusterBackgroundColor ||
 			previousConfig.clusterForegroundColor !== nextConfig.clusterForegroundColor ||
+			previousConfig.enableMarkerClustering !== nextConfig.enableMarkerClustering ||
 			previousConfig.interactive !== nextConfig.interactive ||
 			previousConfig.markerContent !== nextConfig.markerContent ||
 			previousConfig.markerOffsetY !== nextConfig.markerOffsetY ||

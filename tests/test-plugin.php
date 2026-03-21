@@ -298,6 +298,25 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Marker clustering should default off for blocks and accept explicit enablement.
+	 *
+	 * @return void
+	 */
+	public function test_marker_clustering_defaults_off_for_blocks() {
+		$config = new \MinimalMap\Config();
+
+		$default_attributes = $config->normalize_block_attributes( array() );
+		$enabled_attributes = $config->normalize_block_attributes(
+			array(
+				'enableMarkerClustering' => true,
+			)
+		);
+
+		$this->assertFalse( $default_attributes['enableMarkerClustering'] );
+		$this->assertTrue( $enabled_attributes['enableMarkerClustering'] );
+	}
+
+	/**
 	 * Published locations with valid coordinates should be exposed to the client.
 	 *
 	 * @return void

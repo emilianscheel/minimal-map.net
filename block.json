@@ -75,6 +75,10 @@
       "type": "boolean",
       "default": false
     },
+    "enableMarkerClustering": {
+      "type": "boolean",
+      "default": false
+    },
     "googleMapsNavigation": {
       "type": "boolean",
       "default": false

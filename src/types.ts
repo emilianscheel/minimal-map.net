@@ -47,6 +47,7 @@ export interface MapDefaults {
 	enableLiveLocationMap: boolean;
 	enableCategoryFilter: boolean;
 	enableOpenedFilter: boolean;
+	enableMarkerClustering: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
 	scrollZoom: boolean;
@@ -189,6 +190,7 @@ export interface RawMapConfig {
 	enableLiveLocationMap?: boolean;
 	enableCategoryFilter?: boolean;
 	enableOpenedFilter?: boolean;
+	enableMarkerClustering?: boolean;
 	googleMapsNavigation?: boolean;
 	inMapLocationCard?: boolean;
 	scrollZoom?: boolean;
@@ -272,6 +274,7 @@ export interface NormalizedMapConfig extends MapDefaults {
 	allowSearch: boolean;
 	enableCategoryFilter: boolean;
 	enableOpenedFilter: boolean;
+	enableMarkerClustering: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
 	siteTimezone: string;
@@ -432,6 +435,7 @@ export interface MapBlockAttributes {
 	enableLiveLocationMap: boolean;
 	enableCategoryFilter: boolean;
 	enableOpenedFilter: boolean;
+	enableMarkerClustering: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
 	scrollZoom: boolean;

@@ -39,6 +39,12 @@ describe('map defaults normalization', () => {
 		expect(config.enableOpenedFilter).toBe(false);
 	});
 
+	test('falls back to disabled marker clustering for shared maps without overrides', () => {
+		const config = normalizeMapConfig();
+
+		expect(config.enableMarkerClustering).toBe(false);
+	});
+
 	test('falls back to disabled live-location controls for shared maps without overrides', () => {
 		const config = normalizeMapConfig();
 
@@ -68,12 +74,14 @@ describe('map defaults normalization', () => {
 				defaults: {
 					enableCategoryFilter: true,
 					enableOpenedFilter: true,
+					enableMarkerClustering: true,
 				},
 			}
 		);
 
 		expect(config.enableCategoryFilter).toBe(true);
 		expect(config.enableOpenedFilter).toBe(true);
+		expect(config.enableMarkerClustering).toBe(true);
 	});
 
 	test('uses runtime live-location defaults when provided', () => {
