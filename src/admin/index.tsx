@@ -14,6 +14,10 @@ const DashboardSection = lazy(() => import(
 	/* webpackChunkName: "admin-section-dashboard" */
 	'./sections/DashboardSection'
 ));
+const AnalyticsSection = lazy(() => import(
+	/* webpackChunkName: "admin-section-analytics" */
+	'./sections/AnalyticsSection'
+));
 const LocationsSection = lazy(() => import(
 	/* webpackChunkName: "admin-section-locations" */
 	'./sections/LocationsSection'
@@ -44,6 +48,7 @@ const SECTION_COMPONENTS: Record<
 	LazyExoticComponent<ComponentType<AdminSectionComponentProps>>
 > = {
 	dashboard: DashboardSection,
+	analytics: AnalyticsSection,
 	locations: LocationsSection,
 	collections: CollectionsSection,
 	logos: LogosSection,

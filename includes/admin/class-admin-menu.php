@@ -37,6 +37,10 @@ class Admin_Menu {
 				'title'       => __( 'Dashboard', 'minimal-map' ),
 				'description' => __( 'An overview of Minimal Map sections and upcoming data tools.', 'minimal-map' ),
 			),
+			'analytics'  => array(
+				'title'       => __( 'Analytics', 'minimal-map' ),
+				'description' => __( 'Review map search demand and identify where people are looking for locations.', 'minimal-map' ),
+			),
 			'locations'  => array(
 				'title'       => __( 'Locations', 'minimal-map' ),
 				'description' => __( 'Create and organize the places you want to render on your maps.', 'minimal-map' ),

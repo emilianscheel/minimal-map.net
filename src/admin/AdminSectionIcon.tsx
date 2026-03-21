@@ -1,4 +1,5 @@
 import {
+	ChartColumn,
 	Image,
 	LayoutDashboard,
 	Layers3,
@@ -12,6 +13,7 @@ import type { AdminSectionView } from '../types';
 
 const SECTION_ICONS: Record<AdminSectionView, LucideIcon> = {
 	dashboard: LayoutDashboard,
+	analytics: ChartColumn,
 	locations: MapPinned,
 	collections: Layers3,
 	logos: Image,

@@ -44,6 +44,13 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		restBase: '',
 		restPath: '',
 	},
+	analyticsConfig: {
+		nonce: '',
+		enabled: false,
+		settingsPath: '',
+		summaryPath: '',
+		queriesPath: '',
+	},
 	mapConfig: {},
 };
 
@@ -53,6 +60,7 @@ export const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'lo
 
 export function isAdminSectionView(value: string): value is AdminSectionView {
 	return value === 'dashboard' ||
+		value === 'analytics' ||
 		value === 'locations' ||
 		value === 'collections' ||
 		value === 'logos' ||

@@ -192,6 +192,7 @@ svg.lucide {
 }
 
 .minimal-map-admin__locations-view,
+.minimal-map-admin__analytics-view,
 .minimal-map-admin__collections-view,
 .minimal-map-admin__markers-view,
 .minimal-map-admin__logos-view,
@@ -207,6 +208,7 @@ svg.lucide {
 }
 
 .minimal-map-admin__markers-content,
+.minimal-map-admin__analytics-content,
 .minimal-map-admin__logos-content,
 .minimal-map-admin__locations-content,
 .minimal-map-admin__collections-content,
@@ -405,11 +407,24 @@ svg.lucide {
   margin: 0 0 20px;
 }
 
+.minimal-map-admin__analytics-notice {
+  margin: 0 0 20px;
+}
+
 .minimal-map-admin__collections-notice {
   margin: 0 0 20px;
 }
 
 .minimal-map-admin__locations-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 240px;
+  width: 100%;
+}
+
+.minimal-map-admin__analytics-state {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -431,7 +446,12 @@ svg.lucide {
   --wp-dataviews-color-background: #fff;
 }
 
+.minimal-map-admin__analytics-table-wrap {
+  --wp-dataviews-color-background: #fff;
+}
+
 .minimal-map-admin__locations-dataviews-header,
+.minimal-map-admin__analytics-dataviews-header,
 .minimal-map-admin__collections-dataviews-header {
   padding: 0 0 16px;
   display: flex;
@@ -475,8 +495,55 @@ svg.lucide {
   width: 100%;
 }
 
+.minimal-map-admin__analytics-dataviews-layout {
+  width: 100%;
+}
+
 .minimal-map-admin__collections-grid-layout {
   width: 100%;
+}
+
+.minimal-map-admin__analytics-cards {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 28px;
+}
+
+.minimal-map-admin__analytics-card-value {
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 600;
+  color: #1e1e1e;
+}
+
+.minimal-map-admin__analytics-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #1e1e1e;
+}
+
+.minimal-map-admin__analytics-toggle-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.minimal-map-admin__analytics-enable-dialog {
+  display: grid;
+  gap: 16px;
+}
+
+.minimal-map-admin__analytics-enable-copy {
+  margin: 0;
+  color: #1e1e1e;
+  line-height: 1.5;
+}
+
+.minimal-map-admin__analytics-enable-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .minimal-map-admin__markers-grid-wrap {

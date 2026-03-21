@@ -154,6 +154,8 @@ export interface MapRuntimeConfig {
 	frontendGeocodePath?: string;
 	locationsPath?: string;
 	locationsUrl?: string;
+	analyticsEnabled?: boolean;
+	analyticsTrackPath?: string;
 	messages?: MapMessages;
 	embedBaseUrl?: string;
 	previewImageUrl?: string;
@@ -277,6 +279,7 @@ export interface MinimalMapInstance {
 
 export type AdminSectionView =
 	| 'dashboard'
+	| 'analytics'
 	| 'locations'
 	| 'collections'
 	| 'logos'
@@ -336,6 +339,14 @@ export interface StylesAdminConfig {
 	restPath: string;
 }
 
+export interface AnalyticsAdminConfig {
+	nonce: string;
+	enabled: boolean;
+	settingsPath: string;
+	summaryPath: string;
+	queriesPath: string;
+}
+
 export interface LocationRestResponse {
 	id: number;
 	title?: {
@@ -389,6 +400,7 @@ export interface AdminAppConfig {
 	logosConfig: LogosAdminConfig;
 	tagsConfig: TagsAdminConfig;
 	stylesConfig: StylesAdminConfig;
+	analyticsConfig: AnalyticsAdminConfig;
 }
 
 export type DashboardCardView = Extract<
@@ -604,6 +616,45 @@ export interface GeocodeResponseFailure {
 }
 
 export type GeocodeResponse = GeocodeResponseSuccess | GeocodeResponseFailure;
+
+export type AnalyticsQueryType =
+	| 'text'
+	| 'address'
+	| 'coordinates'
+	| 'live_location';
+
+export interface AnalyticsSummary {
+	totalSearches: number;
+	searchesToday: number;
+	zeroResultSearches: number;
+	averageNearestDistanceMeters: number | null;
+}
+
+export interface AnalyticsSettings {
+	enabled: boolean;
+}
+
+export interface AnalyticsQueryRecord {
+	id: number;
+	query_text: string;
+	query_type: AnalyticsQueryType;
+	result_count: number;
+	nearest_distance_meters: number | null;
+	occurred_at_gmt: string;
+}
+
+export interface AnalyticsQueriesResponse {
+	items: AnalyticsQueryRecord[];
+	totalItems: number;
+	totalPages: number;
+}
+
+export interface AnalyticsTrackPayload {
+	queryText: string;
+	queryType: AnalyticsQueryType;
+	resultCount: number;
+	nearestDistanceMeters?: number | null;
+}
 
 export type StyleThemeSlot =
 	| 'background'

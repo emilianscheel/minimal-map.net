@@ -23,4 +23,6 @@ define( 'MINIMAL_MAP_URL', plugin_dir_url( __FILE__ ) );
 
 require_once MINIMAL_MAP_PATH . 'includes/bootstrap.php';
 
+register_activation_hook( MINIMAL_MAP_FILE, array( '\MinimalMap\Plugin', 'activate' ) );
+
 \MinimalMap\Plugin::boot();

@@ -8,11 +8,16 @@
 namespace MinimalMap;
 
 use MinimalMap\Admin\Admin_Menu;
+use MinimalMap\Analytics\Analytics;
 use MinimalMap\Blocks\Map_Block;
 use MinimalMap\Collections\Collection_Post_Type;
 use MinimalMap\Logos\Logo_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Markers\Marker_Post_Type;
+use MinimalMap\Rest\Analytics_Queries_Route;
+use MinimalMap\Rest\Analytics_Settings_Route;
+use MinimalMap\Rest\Analytics_Summary_Route;
+use MinimalMap\Rest\Analytics_Track_Route;
 use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
@@ -36,6 +41,13 @@ final class Plugin {
 	 * @var Assets
 	 */
 	private $assets;
+
+	/**
+	 * Analytics service.
+	 *
+	 * @var Analytics
+	 */
+	private $analytics;
 
 	/**
 	 * Block service.
@@ -122,6 +134,34 @@ final class Plugin {
 	private $styles_route;
 
 	/**
+	 * Analytics settings REST route service.
+	 *
+	 * @var Analytics_Settings_Route
+	 */
+	private $analytics_settings_route;
+
+	/**
+	 * Analytics summary REST route service.
+	 *
+	 * @var Analytics_Summary_Route
+	 */
+	private $analytics_summary_route;
+
+	/**
+	 * Analytics queries REST route service.
+	 *
+	 * @var Analytics_Queries_Route
+	 */
+	private $analytics_queries_route;
+
+	/**
+	 * Analytics track REST route service.
+	 *
+	 * @var Analytics_Track_Route
+	 */
+	private $analytics_track_route;
+
+	/**
 	 * Boot the plugin.
 	 *
 	 * @return Plugin
@@ -139,6 +179,7 @@ final class Plugin {
 	 */
 	private function __construct() {
 		$config                   = new Config();
+		$this->analytics          = new Analytics();
 		$this->assets             = new Assets( $config );
 		$map_view                 = new Map_View( $config );
 		$this->map_block          = new Map_Block( $map_view );
@@ -153,8 +194,23 @@ final class Plugin {
 		$this->geocode_route      = new Geocode_Route();
 		$this->locations_route    = new Locations_Route( $config );
 		$this->styles_route       = new Styles_Route();
+		$this->analytics_settings_route = new Analytics_Settings_Route( $this->analytics );
+		$this->analytics_summary_route  = new Analytics_Summary_Route( $this->analytics );
+		$this->analytics_queries_route  = new Analytics_Queries_Route( $this->analytics );
+		$this->analytics_track_route    = new Analytics_Track_Route( $this->analytics );
 
 		$this->register_hooks();
+	}
+
+	/**
+	 * Activation hook callback.
+	 *
+	 * @return void
+	 */
+	public static function activate() {
+		$analytics = new Analytics();
+		$analytics->ensure_schema();
+		$analytics->schedule_cleanup();
 	}
 
 	/**
@@ -164,6 +220,8 @@ final class Plugin {
 	 */
 	private function register_hooks() {
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+		add_action( 'init', array( $this->analytics, 'ensure_schema' ), 1 );
+		add_action( 'init', array( $this->analytics, 'schedule_cleanup' ) );
 		add_action( 'init', array( $this->collection_post_type, 'register' ), 5 );
 		add_action( 'init', array( $this->tag_taxonomy, 'register' ), 5 );
 		add_action( 'init', array( $this->logo_post_type, 'register' ), 6 );
@@ -176,6 +234,11 @@ final class Plugin {
 		add_action( 'admin_enqueue_scripts', array( $this->assets, 'enqueue_admin_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this->assets, 'enqueue_frontend_assets' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this->assets, 'enqueue_frontend_assets' ) );
+		add_action( Analytics::CLEANUP_HOOK, array( $this->analytics, 'cleanup_old_queries' ) );
+		add_action( 'rest_api_init', array( $this->analytics_settings_route, 'register' ) );
+		add_action( 'rest_api_init', array( $this->analytics_summary_route, 'register' ) );
+		add_action( 'rest_api_init', array( $this->analytics_queries_route, 'register' ) );
+		add_action( 'rest_api_init', array( $this->analytics_track_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->frontend_geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->locations_route, 'register' ) );

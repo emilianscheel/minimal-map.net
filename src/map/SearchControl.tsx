@@ -4,6 +4,8 @@ import { LoaderCircle, Search, SearchX, X } from 'lucide-react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import Kbd from '../components/Kbd';
 import type {
+	AnalyticsQueryType,
+	AnalyticsTrackPayload,
 	GeocodeResponse,
 	MapCoordinates,
 	MapLocationSelection,
@@ -126,6 +128,7 @@ interface SearchControlProps {
 	selectedId?: number;
 	siteLocale: string;
 	siteTimezone: string;
+	onAnalyticsTrack?: (payload: AnalyticsTrackPayload) => void;
 }
 
 export const MapSearchControl = ({
@@ -152,6 +155,7 @@ export const MapSearchControl = ({
 	selectedId: selectedIdProp,
 	siteLocale,
 	siteTimezone,
+	onAnalyticsTrack,
 }: SearchControlProps) => {
 	const responsiveHost = host ?? doc.documentElement;
 	const [searchTerm, setSearchTerm] = useState('');
@@ -172,6 +176,7 @@ export const MapSearchControl = ({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const searchTermRef = useRef(searchTerm);
+	const lastTrackedEventKeyRef = useRef('');
 	const isMobile = isMobileViewport(viewportWidth);
 	const isOpen =
 		!isPanelDismissed && (isPanelOpen || (!isMobile && typeof selectedId === 'number'));
@@ -236,6 +241,12 @@ export const MapSearchControl = ({
 	useEffect(() => {
 		searchTermRef.current = searchTerm;
 	}, [searchTerm]);
+
+	useEffect(() => {
+		if (!trimmedSearchTerm) {
+			lastTrackedEventKeyRef.current = '';
+		}
+	}, [trimmedSearchTerm]);
 
 	useEffect(() => {
 		setSelectedId(selectedIdProp);
@@ -406,9 +417,41 @@ export const MapSearchControl = ({
 		setAddressResults([]);
 	};
 
+	const trackAnalyticsQuery = useCallback((payload: AnalyticsTrackPayload) => {
+		const queryText = payload.queryText.trim();
+
+		if (!onAnalyticsTrack || !queryText) {
+			return;
+		}
+
+		const normalizedDistance =
+			typeof payload.nearestDistanceMeters === 'number'
+				? Math.max(0, Math.round(payload.nearestDistanceMeters))
+				: null;
+		const eventKey = [
+			payload.queryType,
+			queryText,
+			payload.resultCount,
+			normalizedDistance ?? '',
+		].join('::');
+
+		if (lastTrackedEventKeyRef.current === eventKey) {
+			return;
+		}
+
+		lastTrackedEventKeyRef.current = eventKey;
+		onAnalyticsTrack({
+			...payload,
+			queryText,
+			nearestDistanceMeters: normalizedDistance,
+		});
+	}, [onAnalyticsTrack]);
+
 	const applyCoordinateSearchResults = useCallback((
 		coordinates: MapCoordinates,
-		nextTerm: string
+		nextTerm: string,
+		queryType: AnalyticsQueryType,
+		trackedQueryText = nextTerm
 	) => {
 		setSearchTerm(nextTerm);
 
@@ -425,7 +468,14 @@ export const MapSearchControl = ({
 		if (bestResult) {
 			handleSelect(bestResult.location, bestResult.distanceLabel, 'auto');
 		}
-	}, [handleSelect, quickFilteredLocations]);
+
+		trackAnalyticsQuery({
+			queryText: trackedQueryText,
+			queryType,
+			resultCount: nextAddressResults.length,
+			nearestDistanceMeters: bestResult?.distanceMeters ?? null,
+		});
+	}, [handleSelect, quickFilteredLocations, trackAnalyticsQuery]);
 
 	const formatLiveLocationError = useCallback((error?: GeolocationPositionError) => {
 		if (!error) {
@@ -451,7 +501,11 @@ export const MapSearchControl = ({
 		return __('Live location could not be loaded.', 'minimal-map');
 	}, []);
 
-	const handleAddressSearch = useCallback(async (queryOverride?: string): Promise<void> => {
+	const handleAddressSearch = useCallback(async (
+		queryOverride?: string,
+		queryTypeOverride?: AnalyticsQueryType,
+		trackedQueryTextOverride?: string,
+	): Promise<void> => {
 		const query = (queryOverride ?? searchTermRef.current).trim();
 
 		if (query === '' || addressSearchMode === 'loading') {
@@ -461,7 +515,12 @@ export const MapSearchControl = ({
 		const parsedCoordinates = parseCoordinateSearchValue(query);
 
 		if (parsedCoordinates) {
-			applyCoordinateSearchResults(parsedCoordinates, query);
+			applyCoordinateSearchResults(
+				parsedCoordinates,
+				query,
+				queryTypeOverride === 'live_location' ? 'live_location' : 'coordinates',
+				trackedQueryTextOverride ?? query
+			);
 			return;
 		}
 
@@ -481,6 +540,12 @@ export const MapSearchControl = ({
 
 		if (!result.success) {
 			setAddressSearchMode('empty');
+			trackAnalyticsQuery({
+				queryText: trackedQueryTextOverride ?? query,
+				queryType: queryTypeOverride ?? 'address',
+				resultCount: 0,
+				nearestDistanceMeters: null,
+			});
 			return;
 		}
 
@@ -490,6 +555,8 @@ export const MapSearchControl = ({
 				lng: result.lng,
 			},
 			query,
+			queryTypeOverride ?? 'address',
+			trackedQueryTextOverride ?? query
 		);
 	}, [
 		addressSearchMode,
@@ -497,6 +564,7 @@ export const MapSearchControl = ({
 		filteredLocations.length,
 		frontendGeocodePath,
 		geocodeSearch,
+		trackAnalyticsQuery,
 	]);
 
 	const requestLiveLocation = useCallback(() => {
@@ -531,7 +599,11 @@ export const MapSearchControl = ({
 
 				setLiveLocationPending(false);
 				setLiveLocationError(null);
-				void handleAddressSearch(formattedCoordinates);
+				void handleAddressSearch(
+					formattedCoordinates,
+					'live_location',
+					liveLocationLabel
+				);
 			} catch (error) {
 				if (
 					isTransientLiveLocationError(error as GeolocationPositionError)
@@ -545,7 +617,11 @@ export const MapSearchControl = ({
 
 						setLiveLocationPending(false);
 						setLiveLocationError(null);
-						void handleAddressSearch(formattedCoordinates);
+						void handleAddressSearch(
+							formattedCoordinates,
+							'live_location',
+							liveLocationLabel
+						);
 						return;
 					} catch (retryError) {
 						setLiveLocationPending(false);
@@ -562,7 +638,7 @@ export const MapSearchControl = ({
 				);
 			}
 		})();
-	}, [doc.defaultView, formatLiveLocationError, handleAddressSearch, isLiveLocationPending]);
+	}, [doc.defaultView, formatLiveLocationError, handleAddressSearch, isLiveLocationPending, liveLocationLabel]);
 
 	useEffect(() => {
 		onLiveLocationActionChange?.(requestLiveLocation);
@@ -670,6 +746,36 @@ export const MapSearchControl = ({
 		event.preventDefault();
 		void handleAddressSearch();
 	};
+
+	useEffect(() => {
+		if (
+			!trimmedSearchTerm ||
+			addressSearchMode === 'loading' ||
+			parseCoordinateSearchValue(trimmedSearchTerm) ||
+			liveLocationMatchesQuery
+		) {
+			return undefined;
+		}
+
+		const timeoutId = window.setTimeout(() => {
+			trackAnalyticsQuery({
+				queryText: trimmedSearchTerm,
+				queryType: 'text',
+				resultCount: filteredLocations.length,
+				nearestDistanceMeters: null,
+			});
+		}, 450);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+		};
+	}, [
+		addressSearchMode,
+		filteredLocations.length,
+		liveLocationMatchesQuery,
+		trackAnalyticsQuery,
+		trimmedSearchTerm,
+	]);
 
 	return (
 		<>
@@ -790,6 +896,7 @@ export function createWordPressSearchControl(
 	onEscape?: () => void,
 	onOpenStateChange?: (isOpen: boolean) => void,
 	onLiveLocationStateChange?: (isBusy: boolean) => void,
+	onAnalyticsTrack?: (payload: AnalyticsTrackPayload) => void,
 ): WordPressSearchControl {
 	const context = getMapDomContext(host);
 	const container = context.doc.createElement('div');
@@ -855,6 +962,7 @@ export function createWordPressSearchControl(
 				}}
 				onLiveLocationStateChange={onLiveLocationStateChange}
 				onOpenStateChange={onOpenStateChange}
+				onAnalyticsTrack={onAnalyticsTrack}
 				onSelect={onSelect}
 				selectedId={selectedId}
 				siteLocale={config.siteLocale}

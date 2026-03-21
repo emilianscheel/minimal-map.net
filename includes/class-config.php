@@ -11,6 +11,11 @@ use MinimalMap\Collections\Collection_Post_Type;
 use MinimalMap\Logos\Logo_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Markers\Marker_Post_Type;
+use MinimalMap\Analytics\Analytics;
+use MinimalMap\Rest\Analytics_Queries_Route;
+use MinimalMap\Rest\Analytics_Settings_Route;
+use MinimalMap\Rest\Analytics_Summary_Route;
+use MinimalMap\Rest\Analytics_Track_Route;
 use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
@@ -290,6 +295,7 @@ class Config {
 	 */
 	public function get_client_config( $include_all_locations = true ) {
 		$styles_route = new Styles_Route();
+		$analytics    = new Analytics();
 
 		$config = array(
 			'defaults'      => $this->get_default_block_attributes(),
@@ -306,6 +312,8 @@ class Config {
 			),
 			'embedBaseUrl' => $this->get_embed_base_url(),
 			'previewImageUrl' => plugins_url( 'assets/preview.png', MINIMAL_MAP_FILE ),
+			'analyticsEnabled' => $analytics->is_enabled(),
+			'analyticsTrackPath' => Analytics_Track_Route::get_rest_path(),
 		);
 
 		if ( $include_all_locations ) {
@@ -683,6 +691,7 @@ class Config {
 	public function get_admin_app_config() {
 		$sections = array();
 		$map_config = $this->get_client_config( true );
+		$analytics  = new Analytics();
 		$map_config['defaults']['mobileTwoFingerZoom'] = true;
 		$map_config['defaults']['cooperativeGestures'] = true;
 
@@ -736,6 +745,13 @@ class Config {
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => 'styles',
 				'restPath' => Styles_Route::get_rest_path(),
+			),
+			'analyticsConfig' => array(
+				'nonce'       => wp_create_nonce( 'wp_rest' ),
+				'enabled'     => $analytics->is_enabled(),
+				'settingsPath' => Analytics_Settings_Route::get_rest_path(),
+				'summaryPath'  => Analytics_Summary_Route::get_rest_path(),
+				'queriesPath'  => Analytics_Queries_Route::get_rest_path(),
 			),
 		);
 	}

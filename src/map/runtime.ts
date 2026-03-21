@@ -12,6 +12,7 @@ import { createLocationCardPreviewController, waitForInternalMapMovementToFinish
 import { getActiveHeightCssValue, isMobileViewport } from './responsive';
 import { createMarkerRenderer, type MarkerRenderer, type MarkerRendererConfig } from './marker-renderer';
 import { getMapDomContext, type MapDomContext } from './dom-context';
+import { trackMapSearchQuery } from '../lib/analytics/trackMapSearchQuery';
 import {
 	filterLocationsByCategoryTagIds,
 	filterLocationsByOpenedStatus,
@@ -966,7 +967,12 @@ export function createMinimalMap(
 					(isBusy: boolean) => {
 						state.isLiveLocationBusy = isBusy;
 						state.controls?.setLiveLocationBusy(isBusy);
-					}
+					},
+					runtimeConfig.analyticsEnabled && runtimeConfig.analyticsTrackPath
+						? (payload) => {
+							void trackMapSearchQuery(runtimeConfig.analyticsTrackPath as string, payload);
+						}
+						: undefined
 				);
 			} else {
 				state.searchControl.update(
