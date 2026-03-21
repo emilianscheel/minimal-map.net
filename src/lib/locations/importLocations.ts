@@ -38,6 +38,12 @@ export const COMMON_CSV_HEADERS = [
 	'telephone',
 	'email',
 	'website',
+	'instagram',
+	'x',
+	'facebook',
+	'threads',
+	'youtube',
+	'telegram',
 	'latitude',
 	'longitude',
 	'hidden',
@@ -71,6 +77,7 @@ export function exportLocations(
 ): string {
 	const activeDays = new Set<string>();
 	const activeLunchBreaks = new Set<string>();
+	const activeSocialPlatforms = new Set<string>();
 	let hasNotes = false;
 
 	for (const loc of locations) {
@@ -89,6 +96,14 @@ export function exportLocations(
 				}
 			}
 		}
+
+		if (Array.isArray(loc.social_media)) {
+			for (const link of loc.social_media) {
+				if (link.url?.trim()) {
+					activeSocialPlatforms.add(link.platform);
+				}
+			}
+		}
 	}
 
 	const headers: string[] = [
@@ -102,10 +117,24 @@ export function exportLocations(
 		'telephone',
 		'email',
 		'website',
-		'latitude',
-		'longitude',
-		'hidden',
 	];
+
+	const socialPlatforms: string[] = [
+		'instagram',
+		'x',
+		'facebook',
+		'threads',
+		'youtube',
+		'telegram',
+	];
+
+	for (const platform of socialPlatforms) {
+		if (activeSocialPlatforms.has(platform)) {
+			headers.push(platform);
+		}
+	}
+
+	headers.push('latitude', 'longitude', 'hidden');
 
 	if (hasNotes) {
 		headers.push('additional information opening hours');
@@ -134,6 +163,9 @@ export function exportLocations(
 
 			if (header === 'additional information opening hours') {
 				val = loc.opening_hours_notes || '';
+			} else if (socialPlatforms.includes(header)) {
+				const link = (loc.social_media || []).find((l: any) => l.platform === header);
+				val = link?.url || '';
 			} else if (OPENING_HOURS_DAY_ORDER.includes(header as any)) {
 				const day = loc.opening_hours?.[header as OpeningHoursDayKey];
 				if (day && hasOpeningHoursForDay(day)) {
@@ -174,6 +206,12 @@ export const CUSTOM_CSV_MAPPING_FIELDS = [
 	{ key: 'email', label: __('Email', 'minimal-map') },
 	{ key: 'telephone', label: __('Phone', 'minimal-map') },
 	{ key: 'website', label: __('Website', 'minimal-map') },
+	{ key: 'instagram', label: __('Instagram', 'minimal-map') },
+	{ key: 'x', label: __('X', 'minimal-map') },
+	{ key: 'facebook', label: __('Facebook', 'minimal-map') },
+	{ key: 'threads', label: __('Threads', 'minimal-map') },
+	{ key: 'youtube', label: __('YouTube', 'minimal-map') },
+	{ key: 'telegram', label: __('Telegram', 'minimal-map') },
 	{ key: 'street', label: __('Street', 'minimal-map') },
 	{ key: 'house_number', label: __('House number', 'minimal-map') },
 	{ key: 'city', label: __('City', 'minimal-map') },
@@ -440,6 +478,7 @@ export function buildMappedLocationForm(
 	openingHoursMapping: CsvOpeningHoursImportMapping = createEmptyCsvOpeningHoursImportMapping()
 ): LocationFormState {
 	const form = createBaseImportForm();
+	const socialPlatforms = ['instagram', 'x', 'facebook', 'threads', 'youtube', 'telegram'];
 
 	CUSTOM_CSV_MAPPING_FIELDS.forEach((field) => {
 		if (field.key === 'is_hidden') {
@@ -447,7 +486,16 @@ export function buildMappedLocationForm(
 			return;
 		}
 
-		form[field.key] = getMappedValue(row, mapping[field.key]);
+		const val = getMappedValue(row, mapping[field.key]);
+
+		if (socialPlatforms.includes(field.key)) {
+			if (val) {
+				form.social_media.push({ platform: field.key as any, url: val });
+			}
+			return;
+		}
+
+		(form as any)[field.key] = val;
 	});
 
 	const importedOpeningHours = buildImportedOpeningHours(row, openingHoursMapping);
@@ -529,6 +577,15 @@ function buildCommonLocationForm(
 		.map((name) => tagsByName.get(name.trim()))
 		.filter((id): id is number => !!id);
 
+	const socialMedia: any[] = [];
+	const socialPlatforms = ['instagram', 'x', 'facebook', 'threads', 'youtube', 'telegram'];
+	socialPlatforms.forEach((platform) => {
+		const url = (rowRecord as any)[platform];
+		if (url) {
+			socialMedia.push({ platform, url });
+		}
+	});
+
 	return {
 		...createBaseImportForm(),
 		title: rowRecord.title || getImportedLocationFallbackTitle(),
@@ -546,6 +603,7 @@ function buildCommonLocationForm(
 		is_hidden: normalizeLocationVisibilityValue(rowRecord.hidden),
 		opening_hours: openingHours,
 		opening_hours_notes: openingHoursNotes,
+		social_media: socialMedia,
 		logo_id: logoId,
 		marker_id: markerId,
 		tag_ids: tagIds,

@@ -1986,16 +1986,19 @@ export function useLocationsController(
 	const onExportExample = useCallback(() => {
 		const headers = [...COMMON_CSV_HEADERS];
 		// Headers are:
-		// 0: title, 1: street, 2: house_number, 3: postal_code, 4: city, 5: state, 6: country, 7: telephone, 8: email, 9: website, 10: latitude, 11: longitude,
-		// 12: hidden, 13: opening_hours, 14: opening_hours_notes, 15: additional information opening hours,
-		// 16: monday, 17: monday lunch break, 18: tuesday, 19: tuesday lunch break, 20: wednesday, 21: wednesday lunch break,
-		// 22: thursday, 23: thursday lunch break, 24: friday, 25: friday lunch break, 26: saturday, 27: saturday lunch break, 28: sunday, 29: sunday lunch break,
-		// 30: logo, 31: marker, 32: tags
+		// 0: title, 1: street, 2: house_number, 3: postal_code, 4: city, 5: state, 6: country, 7: telephone, 8: email, 9: website,
+		// 10: instagram, 11: x, 12: facebook, 13: threads, 14: youtube, 15: telegram,
+		// 16: latitude, 17: longitude, 18: hidden, 19: opening_hours, 20: opening_hours_notes, 21: additional information opening hours,
+		// 22: monday, 23: monday lunch break, 24: tuesday, 25: tuesday lunch break, 26: wednesday, 27: wednesday lunch break,
+		// 28: thursday, 29: thursday lunch break, 30: friday, 31: friday lunch break, 32: saturday, 33: saturday lunch break, 34: sunday, 35: sunday lunch break,
+		// 36: logo, 37: marker, 38: tags
 
 		const exampleData = [
 			// Brandenburg Gate: Full info with lunch breaks and notes
 			[
-				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '', '52.5162', '13.3777',
+				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '',
+				'', '', '', '', '', '',
+				'52.5162', '13.3777',
 				'false',
 				'', '', 'Seasonal opening: March-October 9am-6pm',
 				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00',
@@ -2005,7 +2008,9 @@ export function useLocationsController(
 
 			// Eiffel Tower: Basic info
 			[
-				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '', '48.8584', '2.2945',
+				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '',
+				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '',
+				'48.8584', '2.2945',
 				'true',
 				'', '', '',
 				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
