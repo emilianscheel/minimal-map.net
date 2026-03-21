@@ -5,6 +5,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { BrushCleaning, Plus } from 'lucide-react';
 import { ExportLocationsDropdown } from './ExportLocationsDropdown';
 import { ImportLocationsButton } from './ImportLocationsButton';
+import { KeyboardShortcut, getShortcutAriaKeys, isApplePlatform } from '../../components/Kbd';
 import type {
 	CsvImportAssignments,
 	CsvImportMapping,
@@ -78,6 +79,18 @@ const DEFAULT_MAP_CENTER: MapCoordinates = {
 	lat: 52.517,
 	lng: 13.388,
 };
+
+function isEditableShortcutTarget(target: EventTarget | null): boolean {
+	if (!(target instanceof HTMLElement)) {
+		return false;
+	}
+
+	return Boolean(
+		target.closest(
+			'input, textarea, select, [contenteditable="true"], [role="textbox"]'
+		)
+	);
+}
 
 export function useLocationsController(
 	config: LocationsAdminConfig,
@@ -379,7 +392,7 @@ export function useLocationsController(
 		[clearSelectionAfterBulkAction, config, loadLocations]
 	);
 
-	const resetDialogState = (): void => {
+	const resetDialogState = useCallback((): void => {
 		setFormMode('create');
 		setEditingLocation(null);
 		setOriginalForm(null);
@@ -391,7 +404,7 @@ export function useLocationsController(
 		setMapCenter(null);
 		setSelectedCoordinates(null);
 		setStep('details');
-	};
+	}, []);
 
 	const resetCustomCsvImportState = useCallback((): void => {
 		setCustomCsvImportModalOpen(false);
@@ -567,10 +580,53 @@ export function useLocationsController(
 		resetRemoveCollectionAssignmentState();
 	}, [isRemovingCollectionAssignment, resetRemoveCollectionAssignmentState]);
 
-	const openDialog = (): void => {
+	const openDialog = useCallback((): void => {
 		resetDialogState();
 		setDialogOpen(true);
-	};
+	}, [resetDialogState]);
+
+	useEffect(() => {
+		if (!enabled || typeof window === 'undefined') {
+			return undefined;
+		}
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (
+				event.defaultPrevented ||
+				event.repeat ||
+				isDialogOpen ||
+				isSubmitting ||
+				isGeocoding ||
+				event.altKey ||
+				event.shiftKey ||
+				isEditableShortcutTarget(event.target)
+			) {
+				return;
+			}
+
+			const isApple = isApplePlatform(window.navigator);
+			const hasPrimaryModifier = isApple ? event.metaKey : event.ctrlKey;
+			const hasUnexpectedModifier = isApple ? event.ctrlKey : event.metaKey;
+
+			if (
+				!hasPrimaryModifier ||
+				hasUnexpectedModifier ||
+				event.key.toLowerCase() !== 'n'
+			) {
+				return;
+			}
+
+			event.preventDefault();
+			event.stopPropagation();
+			openDialog();
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [enabled, isDialogOpen, isGeocoding, isSubmitting, openDialog]);
 
 	const onEditLocation = (location: LocationRecord): void => {
 		const nextForm = createLocationFormStateFromRecord(location);
@@ -2043,8 +2099,12 @@ export function useLocationsController(
 					onClick={openDialog}
 					icon={<Plus size={18} strokeWidth={2} />}
 					iconPosition="left"
+					aria-keyshortcuts={getShortcutAriaKeys(['primary', 'n'])}
 				>
-					{__('Add location', 'minimal-map')}
+					<span className="minimal-map-admin__location-dialog-button-content">
+						<span>{__('Add location', 'minimal-map')}</span>
+						<KeyboardShortcut keys={['primary', 'n']} variant="blue" />
+					</span>
 				</Button>
 			</div>
 		) : null,
