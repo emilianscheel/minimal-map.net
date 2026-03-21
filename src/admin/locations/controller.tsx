@@ -2134,6 +2134,7 @@ export function useLocationsController(
 		logos,
 		markers,
 		tags,
+		editingLocation,
 		dismissActionNotice,
 		fieldErrors,
 		form,

@@ -49,6 +49,7 @@ export interface LocationsController {
 	logos: LogoRecord[];
 	markers: MarkerRecord[];
 	tags: TagRecord[];
+	editingLocation: LocationRecord | null;
 	fieldErrors: FieldErrors;
 	form: LocationFormState;
 	formMode: LocationFormMode;

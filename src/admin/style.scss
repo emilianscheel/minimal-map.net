@@ -910,26 +910,21 @@ svg.lucide {
   padding: 0;
   border: 0;
   cursor: default;
-  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 
   &--static:is(button) {
     cursor: pointer;
 
     &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       z-index: 2;
-    }
-
-    &:active {
-      transform: scale(0.95);
     }
   }
 }
 
-.minimal-map-admin__location-mini-map-surface,
-.minimal-map-admin__location-mini-map-preview-marker {
-  pointer-events: none;
+.minimal-map-admin__location-mini-map-click-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: transparent;
 }
 
 .minimal-map-admin__location-mini-map-surface {
@@ -1814,24 +1809,3 @@ svg.lucide {
   color: #dcdcde;
 }
 
-.minimal-map-admin__marker-color-modal {
-  .components-modal__content {
-    padding: 0;
-  }
-}
-
-.minimal-map-admin__marker-color-dialog {
-  display: flex;
-  flex-direction: column;
-}
-
-.minimal-map-admin__marker-color-picker {
-  padding: 24px;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
-
-  .components-color-picker {
-    width: 100%;
-    max-width: 100%;
-  }
-}

@@ -71,7 +71,6 @@ export default function LocationMiniMap({
 			style={previewStyle}
 			onClick={(e) => {
 				e.stopPropagation();
-				console.log('Mini map clicked, triggering onClick');
 				onClick?.();
 			}}
 			type={onClick ? 'button' : undefined}
@@ -88,6 +87,7 @@ export default function LocationMiniMap({
 				className="minimal-map-admin__location-mini-map-preview-marker"
 				dangerouslySetInnerHTML={{ __html: previewMarkerContent }}
 			/>
+			{onClick && <div className="minimal-map-admin__location-mini-map-click-overlay" />}
 		</Container>
 	);
 }
