@@ -2,7 +2,7 @@ import type { LocationFormState } from "../../types";
 import { createDefaultOpeningHours } from "../../lib/locations/openingHours";
 import type { ViewTable } from "@wordpress/dataviews";
 
-export const LOCATIONS_TABLE_PER_PAGE = 9;
+export const LOCATIONS_TABLE_PER_PAGE = 8;
 
 export const DEFAULT_FORM_STATE: LocationFormState = {
   title: "",
