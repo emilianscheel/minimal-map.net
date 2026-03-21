@@ -15,6 +15,7 @@ import {
 	Layers3,
 	LocateFixed,
 	MapPin,
+	Palette,
 	Pencil,
 	Send,
 	Tags,
@@ -616,6 +617,25 @@ export function createLocationActions(controller: LocationsController): Action<L
 				}
 
 				controller.onOpenRemoveMarkerConfirmationModal(items);
+			},
+		},
+		{
+			id: 'set-marker-color',
+			label: (items) =>
+				items.length === 1
+					? __('Set Marker Color', 'minimal-map')
+					: __('Set Marker Colors', 'minimal-map'),
+			icon: <Palette size={16} strokeWidth={2} />,
+			context: 'list',
+			disabled: controller.isRowActionPending || controller.isAssignmentSaving,
+			isEligible: () => controller.selection.length > 1,
+			supportsBulk: true,
+			callback: (items) => {
+				if (items.length === 0) {
+					return;
+				}
+
+				controller.onOpenMarkerColorModal(items.length === 1 ? items[0] : items);
 			},
 		},
 		{

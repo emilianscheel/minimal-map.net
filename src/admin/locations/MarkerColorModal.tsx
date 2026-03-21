@@ -1,5 +1,5 @@
 import { Button, Modal, Notice } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
 import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
@@ -7,14 +7,16 @@ import { ColorControl } from '../styles/ColorControl';
 import type { LocationsController } from './types';
 
 export default function MarkerColorModal({ controller }: { controller: LocationsController }) {
-	if (!controller.isMarkerColorModalOpen || !controller.editingLocation) {
+	if (!controller.isMarkerColorModalOpen || controller.selectedMarkerColorLocations.length === 0) {
 		return null;
 	}
+
+	const isBulk = controller.selectedMarkerColorLocations.length > 1;
 
 	return (
 		<Modal
 			className="minimal-map-admin__collection-modal"
-			title={__('Edit marker color', 'minimal-map')}
+			title={isBulk ? __('Edit marker colors', 'minimal-map') : __('Edit marker color', 'minimal-map')}
 			onRequestClose={controller.onCloseMarkerColorModal}
 			shouldCloseOnClickOutside={!controller.isSubmitting}
 			shouldCloseOnEsc={!controller.isSubmitting}
@@ -37,6 +39,19 @@ export default function MarkerColorModal({ controller }: { controller: Locations
 				) : null}
 
 				<div className="minimal-map-admin__location-dialog-fields">
+					{isBulk && (
+						<p className="minimal-map-admin__assign-to-collection-empty">
+							{sprintf(
+								_n(
+									'Set a new marker color for %d selected location.',
+									'Set a new marker color for %d selected locations.',
+									controller.selectedMarkerColorLocations.length,
+									'minimal-map'
+								),
+								controller.selectedMarkerColorLocations.length
+							)}
+						</p>
+					)}
 					<ColorControl
 						label={__('Marker Color', 'minimal-map')}
 						color={controller.form.marker_color}

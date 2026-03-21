@@ -130,6 +130,7 @@ export function useLocationsController(
 	const [assignmentLogoId, setAssignmentLogoId] = useState('');
 	const [isAssignMarkerModalOpen, setAssignMarkerModalOpen] = useState(false);
 	const [selectedMarkerLocations, setSelectedMarkerLocations] = useState<LocationRecord[]>([]);
+	const [selectedMarkerColorLocations, setSelectedMarkerColorLocations] = useState<LocationRecord[]>([]);
 	const [assignmentMarkerId, setAssignmentMarkerId] = useState('');
 	const [isAssignTagsModalOpen, setAssignTagsModalOpen] = useState(false);
 	const [selectedTagsLocations, setSelectedTagsLocations] = useState<LocationRecord[]>([]);
@@ -401,6 +402,7 @@ export function useLocationsController(
 
 	const resetMarkerColorModalState = useCallback((): void => {
 		setEditingLocation(null);
+		setSelectedMarkerColorLocations([]);
 		setForm(DEFAULT_FORM_STATE);
 		setSubmitError(null);
 	}, []);
@@ -638,9 +640,18 @@ export function useLocationsController(
 	};
 
 	const onOpenMarkerColorModal = useCallback(
-		(location: LocationRecord): void => {
-			setEditingLocation(location);
-			setForm(createLocationFormStateFromRecord(location));
+		(locations: LocationRecord | LocationRecord[]): void => {
+			const locationsArray = Array.isArray(locations) ? locations : [locations];
+			setSelectedMarkerColorLocations(locationsArray);
+
+			if (locationsArray.length === 1) {
+				setEditingLocation(locationsArray[0]);
+				setForm(createLocationFormStateFromRecord(locationsArray[0]));
+			} else {
+				setEditingLocation(null);
+				setForm({ ...DEFAULT_FORM_STATE, marker_color: '' });
+			}
+
 			setSubmitError(null);
 			setMarkerColorModalOpen(true);
 		},
@@ -657,7 +668,7 @@ export function useLocationsController(
 	}, [isSubmitting, resetMarkerColorModalState]);
 
 	const onConfirmMarkerColor = useCallback(async (): Promise<void> => {
-		if (!editingLocation) {
+		if (selectedMarkerColorLocations.length === 0) {
 			return;
 		}
 
@@ -665,22 +676,42 @@ export function useLocationsController(
 		setSubmitError(null);
 
 		try {
-			await updateLocation(config, editingLocation.id, form);
+			await Promise.all(
+				selectedMarkerColorLocations.map((location) =>
+					updateLocation(config, location.id, {
+						...createLocationFormStateFromRecord(location),
+						marker_color: form.marker_color,
+					})
+				)
+			);
 			await loadLocations();
 			setMarkerColorModalOpen(false);
+			clearSelectionAfterBulkAction(selectedMarkerColorLocations);
 			resetMarkerColorModalState();
 			setActionNotice({
 				status: 'success',
-				message: __('Marker color updated.', 'minimal-map'),
+				message:
+					selectedMarkerColorLocations.length === 1
+						? __('Marker color updated.', 'minimal-map')
+						: __('Marker colors updated.', 'minimal-map'),
 			});
 		} catch (error) {
 			setSubmitError(
-				error instanceof Error ? error.message : __('Marker color could not be updated.', 'minimal-map')
+				error instanceof Error
+					? error.message
+					: __('Marker color could not be updated.', 'minimal-map')
 			);
 		} finally {
 			setSubmitting(false);
 		}
-	}, [config, editingLocation, form, loadLocations, resetMarkerColorModalState]);
+	}, [
+		clearSelectionAfterBulkAction,
+		config,
+		form.marker_color,
+		loadLocations,
+		resetMarkerColorModalState,
+		selectedMarkerColorLocations,
+	]);
 
 	const onBack = (): void => {
 		if (isSubmitting || isGeocoding) {
@@ -2297,6 +2328,7 @@ export function useLocationsController(
 		selection,
 		selectedAssignmentLocation,
 		selectedMarkerLocations,
+		selectedMarkerColorLocations,
 		selectedLogoLocations,
 		selectedOpeningHoursLocations,
 		selectedLogoRemovalLocations,

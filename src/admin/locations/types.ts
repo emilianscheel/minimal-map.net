@@ -89,6 +89,7 @@ export interface LocationsController {
 	getTagsForLocation: (locationId: number) => TagRecord[];
 	selectedLogoLocations: LocationRecord[];
 	selectedMarkerLocations: LocationRecord[];
+	selectedMarkerColorLocations: LocationRecord[];
 	selectedOpeningHoursLocations: LocationRecord[];
 	selectedAssignmentLocation: LocationRecord | null;
 	selectedTagsLocations: LocationRecord[];
@@ -163,7 +164,7 @@ export interface LocationsController {
 	onOpenRemoveMarkerConfirmationModal: (locations: LocationRecord[]) => void;
 	onOpenRemoveTagsConfirmationModal: (locations: LocationRecord[]) => void;
 	onOpenShowLocationConfirmationModal: (location: LocationRecord) => void;
-	onOpenMarkerColorModal: (location: LocationRecord) => void;
+	onOpenMarkerColorModal: (locations: LocationRecord | LocationRecord[]) => void;
 	onOpenRemoveCollectionAssignmentModal: (
 		location: LocationRecord,
 		collection: CollectionRecord
