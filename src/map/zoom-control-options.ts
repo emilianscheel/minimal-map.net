@@ -62,19 +62,19 @@ export const ZOOM_CONTROLS_PLUS_ICON_OPTIONS: ZoomControlIconOption[] = [
 		label: __( 'Plus', 'minimal-map' ),
 		value: 'plus',
 		icon: plus as ReactElement,
-		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
 	},
 	{
 		label: __( 'Plus circle', 'minimal-map' ),
 		value: 'plus-circle',
 		icon: plusCircle as ReactElement,
-		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg>',
+		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>',
 	},
 	{
 		label: __( 'Filled plus circle', 'minimal-map' ),
 		value: 'plus-circle-filled',
 		icon: plusCircleFilled as ReactElement,
-		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="currentColor" stroke="none"/><path d="M12 8v8M8 12h8" stroke="var(--minimal-map-controls-button-background, #fff)"/></svg>',
+		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="M8 12h8" stroke="var(--minimal-map-controls-button-background, #fff)"/><path d="M12 8v8" stroke="var(--minimal-map-controls-button-background, #fff)"/></svg>',
 	},
 ];
 
@@ -83,19 +83,19 @@ export const ZOOM_CONTROLS_MINUS_ICON_OPTIONS: ZoomControlIconOption[] = [
 		label: __( 'Line', 'minimal-map' ),
 		value: 'line-solid',
 		icon: lineSolid as ReactElement,
-		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg>',
+		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>',
 	},
 	{
 		label: __( 'Separator', 'minimal-map' ),
 		value: 'separator',
 		icon: separator as ReactElement,
-		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/><path d="M12 7v10" opacity="0.2"/></svg>',
+		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 16-4 4-4-4"/><path d="M3 12h18"/><path d="m8 8 4-4 4 4"/></svg>',
 	},
 	{
 		label: __( 'Close small', 'minimal-map' ),
 		value: 'close-small',
 		icon: closeSmall as ReactElement,
-		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12h8"/></svg>',
+		svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
 	},
 ];
 

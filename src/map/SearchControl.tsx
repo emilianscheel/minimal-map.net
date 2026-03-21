@@ -51,6 +51,54 @@ type SearchResultView =
 	  };
 
 type GeocodeSearchFn = (query: string) => Promise<GeocodeResponse>;
+type GeolocationRequestOptions = PositionOptions;
+
+const PRIMARY_LIVE_LOCATION_OPTIONS: GeolocationRequestOptions = {
+	enableHighAccuracy: true,
+	maximumAge: 0,
+	timeout: 10000,
+};
+
+const FALLBACK_LIVE_LOCATION_OPTIONS: GeolocationRequestOptions = {
+	enableHighAccuracy: false,
+	maximumAge: 300000,
+	timeout: 15000,
+};
+
+function isTransientLiveLocationError(error?: GeolocationPositionError): boolean {
+	if (!error) {
+		return false;
+	}
+
+	const normalizedMessage = `${error.message ?? ''}`.toLowerCase();
+
+	return (
+		error.code === error.POSITION_UNAVAILABLE ||
+		normalizedMessage.includes('kclerrorlocationunknown') ||
+		normalizedMessage.includes('locationunknown') ||
+		normalizedMessage.includes('location unknown')
+	);
+}
+
+function requestBrowserLocation(
+	geolocation: Geolocation,
+	options: GeolocationRequestOptions
+): Promise<MapCoordinates> {
+	return new Promise((resolve, reject) => {
+		geolocation.getCurrentPosition(
+			(position) => {
+				resolve({
+					lat: position.coords.latitude,
+					lng: position.coords.longitude,
+				});
+			},
+			(error) => {
+				reject(error);
+			},
+			options
+		);
+	});
+}
 
 interface SearchControlProps {
 	doc: Document;
@@ -354,6 +402,10 @@ export const MapSearchControl = ({
 		}
 
 		if (error.code === error.POSITION_UNAVAILABLE) {
+			if (isTransientLiveLocationError(error)) {
+				return __('Current location is still being determined. Please try again in a moment.', 'minimal-map');
+			}
+
 			return __('Current location is unavailable.', 'minimal-map');
 		}
 
@@ -433,28 +485,48 @@ export const MapSearchControl = ({
 
 		setLiveLocationPending(true);
 
-		geolocation.getCurrentPosition(
-			(position) => {
-				const coordinates = {
-					lat: position.coords.latitude,
-					lng: position.coords.longitude,
-				};
+		void (async () => {
+			try {
+				const coordinates = await requestBrowserLocation(
+					geolocation,
+					PRIMARY_LIVE_LOCATION_OPTIONS
+				);
+
 				const formattedCoordinates = formatCoordinateSearchValue(coordinates);
 
 				setLiveLocationPending(false);
 				setLiveLocationError(null);
 				void handleAddressSearch(formattedCoordinates);
-			},
-			(error) => {
+			} catch (error) {
+				if (
+					isTransientLiveLocationError(error as GeolocationPositionError)
+				) {
+					try {
+						const coordinates = await requestBrowserLocation(
+							geolocation,
+							FALLBACK_LIVE_LOCATION_OPTIONS
+						);
+						const formattedCoordinates = formatCoordinateSearchValue(coordinates);
+
+						setLiveLocationPending(false);
+						setLiveLocationError(null);
+						void handleAddressSearch(formattedCoordinates);
+						return;
+					} catch (retryError) {
+						setLiveLocationPending(false);
+						setLiveLocationError(
+							formatLiveLocationError(retryError as GeolocationPositionError)
+						);
+						return;
+					}
+				}
+
 				setLiveLocationPending(false);
-				setLiveLocationError(formatLiveLocationError(error));
-			},
-			{
-				enableHighAccuracy: true,
-				maximumAge: 0,
-				timeout: 10000,
+				setLiveLocationError(
+					formatLiveLocationError(error as GeolocationPositionError)
+				);
 			}
-		);
+		})();
 	}, [doc.defaultView, formatLiveLocationError, handleAddressSearch, isLiveLocationPending]);
 
 	useEffect(() => {
