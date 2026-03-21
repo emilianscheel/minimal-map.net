@@ -5,7 +5,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { BrushCleaning, Plus } from 'lucide-react';
 import { ExportLocationsDropdown } from './ExportLocationsDropdown';
 import { ImportLocationsButton } from './ImportLocationsButton';
-import { KeyboardShortcut, getShortcutAriaKeys, isApplePlatform } from '../../components/Kbd';
+import { KeyboardShortcut, getShortcutAriaKeys } from '../../components/Kbd';
 import type {
 	CsvImportAssignments,
 	CsvImportMapping,
@@ -585,8 +585,29 @@ export function useLocationsController(
 		setDialogOpen(true);
 	}, [resetDialogState]);
 
+	const isAddLocationShortcutBlocked =
+		isDialogOpen ||
+		isAssignToCollectionModalOpen ||
+		isAssignLogoModalOpen ||
+		isAssignMarkerModalOpen ||
+		isAssignTagsModalOpen ||
+		isAssignOpeningHoursModalOpen ||
+		isDeleteLogoConfirmationModalOpen ||
+		isRemoveMarkerConfirmationModalOpen ||
+		isRemoveTagsConfirmationModalOpen ||
+		isShowLocationConfirmationModalOpen ||
+		isRemoveCollectionAssignmentModalOpen ||
+		isCustomCsvImportModalOpen ||
+		isDeleteAllLocationsModalOpen ||
+		isSubmitting ||
+		isGeocoding ||
+		isImporting ||
+		isExporting ||
+		isDeletingAllLocations ||
+		isRowActionPending;
+
 	useEffect(() => {
-		if (!enabled || typeof window === 'undefined') {
+		if (!enabled || typeof document === 'undefined') {
 			return undefined;
 		}
 
@@ -594,9 +615,9 @@ export function useLocationsController(
 			if (
 				event.defaultPrevented ||
 				event.repeat ||
-				isDialogOpen ||
-				isSubmitting ||
-				isGeocoding ||
+				isAddLocationShortcutBlocked ||
+				event.metaKey ||
+				event.ctrlKey ||
 				event.altKey ||
 				event.shiftKey ||
 				isEditableShortcutTarget(event.target)
@@ -604,29 +625,29 @@ export function useLocationsController(
 				return;
 			}
 
-			const isApple = isApplePlatform(window.navigator);
-			const hasPrimaryModifier = isApple ? event.metaKey : event.ctrlKey;
-			const hasUnexpectedModifier = isApple ? event.ctrlKey : event.metaKey;
+			const pressedLocationKey =
+				event.code === 'KeyN' ||
+				event.key.toLowerCase() === 'n';
 
-			if (
-				!hasPrimaryModifier ||
-				hasUnexpectedModifier ||
-				event.key.toLowerCase() !== 'n'
-			) {
+			if (!pressedLocationKey) {
 				return;
 			}
 
-			event.preventDefault();
+			if (event.cancelable) {
+				event.preventDefault();
+			}
+
+			event.stopImmediatePropagation();
 			event.stopPropagation();
 			openDialog();
 		};
 
-		window.addEventListener('keydown', handleKeyDown);
+		document.addEventListener('keydown', handleKeyDown, true);
 
 		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
+			document.removeEventListener('keydown', handleKeyDown, true);
 		};
-	}, [enabled, isDialogOpen, isGeocoding, isSubmitting, openDialog]);
+	}, [enabled, isAddLocationShortcutBlocked, openDialog]);
 
 	const onEditLocation = (location: LocationRecord): void => {
 		const nextForm = createLocationFormStateFromRecord(location);
@@ -2099,11 +2120,11 @@ export function useLocationsController(
 					onClick={openDialog}
 					icon={<Plus size={18} strokeWidth={2} />}
 					iconPosition="left"
-					aria-keyshortcuts={getShortcutAriaKeys(['primary', 'n'])}
+					aria-keyshortcuts={getShortcutAriaKeys(['n'])}
 				>
 					<span className="minimal-map-admin__location-dialog-button-content">
 						<span>{__('Add location', 'minimal-map')}</span>
-						<KeyboardShortcut keys={['primary', 'n']} variant="blue" />
+						<KeyboardShortcut keys={['n']} variant="blue" />
 					</span>
 				</Button>
 			</div>
