@@ -14,6 +14,7 @@ import { updateLogo } from '../../lib/logos/updateLogo';
 import type { LocationRecord, LogoRecord, LocationsAdminConfig, LogosAdminConfig } from '../../types';
 import { UploadLogoButton } from './UploadLogoButton';
 import type { LogosController } from './types';
+import { triggerFileDownload } from '../../lib/download';
 
 async function readLogoFile(file: File): Promise<string> {
 	if (file.type === 'image/png' || file.name.toLowerCase().endsWith('.png')) {
@@ -314,19 +315,11 @@ export function useLogosController(
 		const href = isDataUrl
 			? logo.content
 			: URL.createObjectURL(new Blob([logo.content], { type: 'image/svg+xml' }));
-		const link = document.createElement('a');
 		const hasKnownExtension = /\.(png|svg)$/i.test(logo.title);
 		const inferredExtension = isDataUrl ? '.png' : '.svg';
+		const fileName = hasKnownExtension ? logo.title : `${logo.title}${inferredExtension}`;
 
-		link.href = href;
-		link.download = hasKnownExtension ? logo.title : `${logo.title}${inferredExtension}`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-
-		if (!isDataUrl) {
-			URL.revokeObjectURL(href);
-		}
+		triggerFileDownload(href, fileName);
 	}, []);
 
 	const onUploadLogos = useCallback(

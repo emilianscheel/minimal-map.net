@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { __ } from '@wordpress/i18n';
+import { triggerFileDownload } from '../download';
 import type { ParsedCsvData } from './importLocations';
 
 /**
@@ -19,14 +20,7 @@ export function exportToExcel(headers: string[], rows: (string | number)[][], fi
 	const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 	const url = URL.createObjectURL(blob);
 	
-	const link = document.createElement('a');
-	link.href = url;
-	link.download = fileName;
-	link.style.visibility = 'hidden';
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
-	URL.revokeObjectURL(url);
+	triggerFileDownload(url, fileName);
 }
 
 /**

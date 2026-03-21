@@ -1,7 +1,7 @@
-import { Button, FormFileUpload } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { BrushCleaning, Upload } from 'lucide-react';
+import { BrushCleaning } from 'lucide-react';
 import type { ViewGrid } from '@wordpress/dataviews';
 import apiFetch from '@wordpress/api-fetch';
 import type {
@@ -16,6 +16,7 @@ import { updateMarker } from '../../lib/markers/updateMarker';
 import { UploadMarkerButton } from './UploadMarkerButton';
 import { ThemeSelector } from '../styles/ThemeSelector';
 import type { MarkersController } from './types';
+import { triggerFileDownload } from '../../lib/download';
 
 const DEFAULT_GRID_VIEW: ViewGrid = {
 	type: 'grid',
@@ -212,13 +213,8 @@ export function useMarkersController(
 	const onDownloadMarker = useCallback((marker: MarkerRecord): void => {
 		const blob = new Blob([marker.content], { type: 'image/svg+xml' });
 		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = marker.title.endsWith('.svg') ? marker.title : `${marker.title}.svg`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		URL.revokeObjectURL(url);
+		const fileName = marker.title.endsWith('.svg') ? marker.title : `${marker.title}.svg`;
+		triggerFileDownload(url, fileName);
 	}, []);
 
 	const onConfirmEditMarker = useCallback(async (): Promise<void> => {

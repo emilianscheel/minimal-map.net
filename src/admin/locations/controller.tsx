@@ -30,6 +30,7 @@ import type {
 	TagRecord,
 	TagsAdminConfig,
 } from '../../types';
+import { triggerFileDownload } from '../../lib/download';
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
 import { fetchAllLogos } from '../../lib/logos/fetchAllLogos';
 import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
@@ -1977,14 +1978,8 @@ export function useLocationsController(
 		const csvContent = exportLocations(locations, logos, markers, tags);
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.setAttribute('href', url);
-		link.setAttribute('download', 'minimal-map-locations.csv');
-		link.style.visibility = 'hidden';
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	}, [locations]);
+		triggerFileDownload(url, 'minimal-map-locations.csv');
+	}, [locations, logos, markers, tags]);
 
 	const onExportExcel = useCallback(() => {
 		if (locations.length === 0) return;
@@ -2032,13 +2027,7 @@ export function useLocationsController(
 		const csvContent = [headers.join(','), ...exampleData].join('\n');
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.setAttribute('href', url);
-		link.setAttribute('download', 'minimal-map-example.csv');
-		link.style.visibility = 'hidden';
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
+		triggerFileDownload(url, 'minimal-map-example.csv');
 	}, []);
 
 	const onExportExampleExcel = useCallback(() => {

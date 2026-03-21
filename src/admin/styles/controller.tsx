@@ -14,6 +14,7 @@ import { ImportThemeButton } from './ImportThemeButton';
 import { parseThemeImport } from '../../lib/styles/importStyleTheme';
 import { DEFAULT_POSITRON_THEME_COLORS } from '../../lib/styles/defaultThemeColors';
 import { SLOT_LABELS } from './constants';
+import { triggerFileDownload } from '../../lib/download';
 
 export function useStylesController(
 	config: StylesAdminConfig,
@@ -158,12 +159,7 @@ export function useStylesController(
 		};
 
 		const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(configToExport, null, 2));
-		const downloadAnchorNode = document.createElement('a');
-		downloadAnchorNode.setAttribute('href', dataStr);
-		downloadAnchorNode.setAttribute('download', `minimal-map-theme-${ activeTheme.slug }.json`);
-		document.body.appendChild(downloadAnchorNode);
-		downloadAnchorNode.click();
-		downloadAnchorNode.remove();
+		triggerFileDownload(dataStr, `minimal-map-theme-${ activeTheme.slug }.json`);
 	}, [ activeTheme, draftColors ]);
 
 	const importTheme = useCallback(async (themeImport: { label: string; colors: StyleThemeColors; warningSlots: (keyof StyleThemeColors)[] }) => {
