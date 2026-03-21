@@ -1,8 +1,10 @@
+import { __ } from '@wordpress/i18n';
 import type { CSSProperties } from 'react';
 import { DEFAULT_POSITRON_THEME_COLORS } from '../lib/styles/defaultThemeColors';
 import type { LocationRecord, StyleThemeRecord } from '../types';
 
-const DEFAULT_STATIC_MARKER_CONTENT = `
+function createDefaultStaticMarker(color = '#3fb1ce'): string {
+	return `
 <svg viewBox="0 0 27 41" aria-hidden="true" focusable="false">
 	<defs>
 		<filter id="minimal-map-mini-marker-shadow" x="-40%" y="-20%" width="180%" height="180%">
@@ -24,7 +26,7 @@ const DEFAULT_STATIC_MARKER_CONTENT = `
 		</filter>
 	</defs>
 	<path
-		fill="#3fb1ce"
+		fill="${color}"
 		stroke="#2b7f94"
 		stroke-width="1.5"
 		filter="url(#minimal-map-mini-marker-shadow)"
@@ -33,15 +35,18 @@ const DEFAULT_STATIC_MARKER_CONTENT = `
 	<circle cx="13.5" cy="13" r="5.5" fill="#fff" />
 </svg>
 `;
+}
 
 export default function LocationMiniMap({
 	location,
 	theme,
 	markerContent,
+	onClick,
 }: {
 	location: LocationRecord;
 	theme: StyleThemeRecord | null;
 	markerContent?: string | null;
+	onClick?: () => void;
 }) {
 	const colors = theme?.colors ?? DEFAULT_POSITRON_THEME_COLORS;
 	const previewStyle = {
@@ -50,14 +55,28 @@ export default function LocationMiniMap({
 		'--minimal-map-mini-map-park': colors.park,
 		'--minimal-map-mini-map-road-casing': colors.roadMajorCasing,
 		'--minimal-map-mini-map-road-fill': colors.roadMajorFill,
+		cursor: onClick ? 'pointer' : 'default',
 	} as CSSProperties;
-	const previewMarkerContent = markerContent ?? location.markerContent ?? DEFAULT_STATIC_MARKER_CONTENT;
+
+	const previewMarkerContent =
+		markerContent ??
+		location.markerContent ??
+		createDefaultStaticMarker(location.marker_color);
+
+	const Container = onClick ? 'button' : 'div';
 
 	return (
-		<div
+		<Container
 			className="minimal-map-admin__location-mini-map minimal-map-admin__location-mini-map--static"
-			aria-hidden="true"
 			style={previewStyle}
+			onClick={(e) => {
+				e.stopPropagation();
+				console.log('Mini map clicked, triggering onClick');
+				onClick?.();
+			}}
+			type={onClick ? 'button' : undefined}
+			aria-label={onClick ? __('Change marker color', 'minimal-map') : undefined}
+			aria-hidden={onClick ? undefined : 'true'}
 		>
 			<div className="minimal-map-admin__location-mini-map-surface">
 				<span className="minimal-map-admin__location-mini-map-water" />
@@ -69,6 +88,6 @@ export default function LocationMiniMap({
 				className="minimal-map-admin__location-mini-map-preview-marker"
 				dangerouslySetInnerHTML={{ __html: previewMarkerContent }}
 			/>
-		</div>
+		</Container>
 	);
 }

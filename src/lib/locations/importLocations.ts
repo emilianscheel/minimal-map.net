@@ -44,6 +44,7 @@ export const COMMON_CSV_HEADERS = [
 	'threads',
 	'youtube',
 	'telegram',
+	'marker_color',
 	'latitude',
 	'longitude',
 	'hidden',
@@ -139,7 +140,7 @@ export function prepareExportData(
 		}
 	}
 
-	headers.push('latitude', 'longitude', 'hidden');
+	headers.push('marker_color', 'latitude', 'longitude', 'hidden');
 
 	if (hasNotes) {
 		headers.push('additional information opening hours');
@@ -236,6 +237,7 @@ export const CUSTOM_CSV_MAPPING_FIELDS = [
 	{ key: 'city', label: __('City', 'minimal-map') },
 	{ key: 'postal_code', label: __('Zip code', 'minimal-map') },
 	{ key: 'country', label: __('Country', 'minimal-map') },
+	{ key: 'marker_color', label: __('Marker color', 'minimal-map') },
 	{ key: 'is_hidden', label: __('Hidden', 'minimal-map') },
 ] as const;
 
@@ -476,9 +478,11 @@ function createBaseImportForm(): LocationFormState {
 		longitude: '',
 		logo_id: 0,
 		marker_id: 0,
+		marker_color: '#3FB1CE',
 		is_hidden: false,
 		opening_hours: createDefaultOpeningHours(),
 		opening_hours_notes: '',
+		social_media: [],
 		tag_ids: [],
 	};
 }
@@ -617,6 +621,7 @@ function buildCommonLocationForm(
 		telephone: rowRecord.telephone || '',
 		email: rowRecord.email || '',
 		website: rowRecord.website || '',
+		marker_color: rowRecord.marker_color || '#3FB1CE',
 		latitude: rowRecord.latitude || '',
 		longitude: rowRecord.longitude || '',
 		is_hidden: normalizeLocationVisibilityValue(rowRecord.hidden),

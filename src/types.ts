@@ -113,6 +113,7 @@ export interface MapLocationPoint {
 	lng: number;
 	markerContent?: string;
 	markerId?: string;
+	marker_color?: string;
 	tags?: MapLocationTag[];
 	logo?: MapLocationLogo | null;
 	telephone?: string;
@@ -539,6 +540,7 @@ export interface LocationMeta {
 	longitude: string;
 	logo_id: number;
 	marker_id: number;
+	marker_color: string;
 	is_hidden: boolean;
 	opening_hours: LocationOpeningHours;
 	opening_hours_notes: string;

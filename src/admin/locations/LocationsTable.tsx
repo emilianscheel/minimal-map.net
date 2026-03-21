@@ -26,18 +26,6 @@ import LocationMiniMap from '../../components/LocationMiniMap';
 import LogoPreview from '../../components/LogoPreview';
 import TagBadge from '../../components/TagBadge';
 import type { LocationRecord, SocialMediaPlatform } from '../../types';
-
-const SOCIAL_PLATFORMS: Record<
-	SocialMediaPlatform,
-	{ label: string; icon: any; color: string }
-> = {
-	instagram: { label: __('Instagram', 'minimal-map'), icon: Instagram, color: '#E4405F' },
-	x: { label: __('X', 'minimal-map'), icon: Twitter, color: '#000000' },
-	facebook: { label: __('Facebook', 'minimal-map'), icon: Facebook, color: '#1877F2' },
-	threads: { label: __('Threads', 'minimal-map'), icon: AtSign, color: '#000000' },
-	youtube: { label: __('YouTube', 'minimal-map'), icon: Youtube, color: '#FF0000' },
-	telegram: { label: __('Telegram', 'minimal-map'), icon: Send, color: '#26A5E4' },
-};
 import { formatLocationAddressLines } from '../../lib/locations/formatLocationAddressLines';
 import { formatOpeningHoursSummary } from '../../lib/locations/formatOpeningHoursSummary';
 import DeleteLocationActionModal from './DeleteLocationActionModal';
@@ -50,17 +38,22 @@ import {
 import { LOCATIONS_TABLE_PER_PAGE } from './constants';
 import type { LocationsController } from './types';
 
-function CollectionBadge({ label }: { label: string }) {
-	return (
-		<span className="components-badge is-default">
-			<span className="components-badge__flex-wrapper">
-				<span className="components-badge__content">{label}</span>
-			</span>
-		</span>
-	);
-}
-
 function useLocationFields(controller: LocationsController): Field<LocationRecord>[] {
+	const socialPlatforms: Record<
+		SocialMediaPlatform,
+		{ label: string; icon: any; color: string }
+	> = useMemo(
+		() => ({
+			instagram: { label: __('Instagram', 'minimal-map'), icon: Instagram, color: '#E4405F' },
+			x: { label: __('X', 'minimal-map'), icon: Twitter, color: '#000000' },
+			facebook: { label: __('Facebook', 'minimal-map'), icon: Facebook, color: '#1877F2' },
+			threads: { label: __('Threads', 'minimal-map'), icon: AtSign, color: '#000000' },
+			youtube: { label: __('YouTube', 'minimal-map'), icon: Youtube, color: '#FF0000' },
+			telegram: { label: __('Telegram', 'minimal-map'), icon: Send, color: '#26A5E4' },
+		}),
+		[]
+	);
+
 	return useMemo<Field<LocationRecord>[]>(
 		() => [
 			{
@@ -75,13 +68,21 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
-				render: ({ item }) => (
-					<LocationMiniMap
-						location={item}
-						theme={controller.activeTheme}
-						markerContent={controller.getMarkerForLocation(item.id)?.content ?? null}
-					/>
-				),
+				render: ({ item }) => {
+					const marker = controller.getMarkerForLocation(item.id);
+					const hasCustomMarker = !!marker;
+
+					return (
+						<LocationMiniMap
+							location={item}
+							theme={controller.activeTheme}
+							markerContent={marker?.content ?? null}
+							onClick={
+								!hasCustomMarker ? () => controller.onOpenMarkerColorModal(item) : undefined
+							}
+						/>
+					);
+				},
 			},
 			{
 				id: 'logo',
@@ -169,7 +170,7 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 					return (
 						<div className="minimal-map-admin__location-social-media">
 							{socialMedia.map((link, index) => {
-								const platform = SOCIAL_PLATFORMS[link.platform];
+								const platform = socialPlatforms[link.platform];
 								const Icon = platform.icon;
 								const shortenedUrl = link.url.replace(/^https?:\/\/(www\.)?/, '');
 

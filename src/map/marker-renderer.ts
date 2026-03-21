@@ -95,11 +95,12 @@ interface MarkerRenderData {
 
 interface MarkerFeaturePoint extends MapLocationPoint {
 	markerContent?: string;
+	marker_color?: string;
 }
 
 let markerRendererCount = 0;
 
-function createDefaultMarkerSvg(): string {
+function createDefaultMarkerSvg(color = '#3FB1CE'): string {
 	const shadowEllipses = DEFAULT_MARKER_SHADOW_ELLIPSES.map(
 		({ rx, ry }) =>
 			`<ellipse opacity="0.04" cx="10.5" cy="5.80029008" rx="${rx}" ry="${ry}" />`
@@ -112,7 +113,7 @@ function createDefaultMarkerSvg(): string {
 			<g transform="translate(3 29)" fill="#000000">
 				${shadowEllipses}
 			</g>
-			<g fill="#3FB1CE">
+			<g fill="${color}">
 				<path d="M27,13.5 C27,19.074644 20.250001,27.000002 14.75,34.500002 C14.016665,35.500004 12.983335,35.500004 12.25,34.500002 C6.7499993,27.000002 0,19.222562 0,13.5 C0,6.0441559 6.0441559,0 13.5,0 C20.955844,0 27,6.0441559 27,13.5 Z" />
 			</g>
 			<g opacity="0.25" fill="#000000">
@@ -149,7 +150,10 @@ function getPointMarkerContent(
 	return defaultMarkerContent;
 }
 
-function getMarkerIconSpec(markerContent: string | null): MarkerIconSpec {
+function getMarkerIconSpec(
+	markerContent: string | null,
+	markerColor = '#3FB1CE'
+): MarkerIconSpec {
 	if (typeof markerContent === 'string' && markerContent.trim().startsWith('<svg')) {
 		const svgMarkup = markerContent.trim();
 		const hash = hashString(svgMarkup);
@@ -164,12 +168,15 @@ function getMarkerIconSpec(markerContent: string | null): MarkerIconSpec {
 		};
 	}
 
+	const color = markerColor || '#3FB1CE';
+	const key = `default:${color}`;
+
 	return {
-		id: 'minimal-map-marker-default',
+		id: `minimal-map-marker-default-${color.replace('#', '')}`,
 		height: DEFAULT_MARKER_ICON_SIZE.height,
-		key: 'default',
+		key,
 		offsetY: DEFAULT_MARKER_OFFSET_Y,
-		svgMarkup: createDefaultMarkerSvg(),
+		svgMarkup: createDefaultMarkerSvg(color),
 		width: DEFAULT_MARKER_ICON_SIZE.width,
 	};
 }
@@ -178,7 +185,10 @@ function buildMarkerRenderData(config: MarkerRendererConfig): MarkerRenderData {
 	const icons = new Map<string, MarkerIconSpec>();
 
 	const features = config.points.map((point) => {
-		const iconSpec = getMarkerIconSpec(getPointMarkerContent(config.markerContent, point));
+		const iconSpec = getMarkerIconSpec(
+			getPointMarkerContent(config.markerContent, point),
+			point.marker_color
+		);
 		const featureProperties: MarkerFeatureProperties = {
 			iconId: iconSpec.id,
 			iconOffset: [0, iconSpec.offsetY + config.markerOffsetY],

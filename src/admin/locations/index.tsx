@@ -11,6 +11,7 @@ import DeleteLogoConfirmationModal from './DeleteLogoConfirmationModal';
 import LocationDialog from './LocationDialog';
 import LocationsEmptyState from './LocationsEmptyState';
 import LocationsTable from './LocationsTable';
+import MarkerColorModal from './MarkerColorModal';
 import RemoveMarkerConfirmationModal from './RemoveMarkerConfirmationModal';
 import RemoveCollectionAssignmentModal from './RemoveCollectionAssignmentModal';
 import RemoveTagsConfirmationModal from './RemoveTagsConfirmationModal';
@@ -58,6 +59,7 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 				)}
 			</div>
 			<LocationDialog controller={controller} />
+			<MarkerColorModal controller={controller} />
 			<AssignToCollectionModal controller={controller} />
 			<AssignLogoModal controller={controller} />
 			<AssignMarkerModal controller={controller} />

@@ -538,6 +538,7 @@ class Config {
 				'city'         => (string) get_post_meta( $post->ID, 'city', true ),
 				'state'        => (string) get_post_meta( $post->ID, 'state', true ),
 				'country'      => (string) get_post_meta( $post->ID, 'country', true ),
+				'marker_color' => (string) get_post_meta( $post->ID, 'marker_color', true ),
 				'opening_hours' => get_post_meta( $post->ID, 'opening_hours', true ),
 				'opening_hours_notes' => (string) get_post_meta( $post->ID, 'opening_hours_notes', true ),
 				'social_media' => get_post_meta( $post->ID, 'social_media', true ),

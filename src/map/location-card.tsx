@@ -24,18 +24,6 @@ import {
 } from './location-opening-hours';
 import type { MapLocationLogo, MapLocationPoint, SocialMediaPlatform } from '../types';
 
-const SOCIAL_PLATFORMS: Record<
-	SocialMediaPlatform,
-	{ label: string; icon: any }
-> = {
-	instagram: { label: __('Instagram', 'minimal-map'), icon: Instagram },
-	x: { label: __('X', 'minimal-map'), icon: Twitter },
-	facebook: { label: __('Facebook', 'minimal-map'), icon: Facebook },
-	threads: { label: __('Threads', 'minimal-map'), icon: AtSign },
-	youtube: { label: __('YouTube', 'minimal-map'), icon: Youtube },
-	telegram: { label: __('Telegram', 'minimal-map'), icon: Send },
-};
-
 export interface LocationResultCardProps {
 	distanceLabel?: string;
 	googleMapsButtonShowIcon: boolean;
@@ -123,6 +111,21 @@ const SearchResultLogo = ({ logo }: { logo: MapLocationLogo }) => {
 };
 
 function LocationContactMeta({ location }: { location: MapLocationPoint }) {
+	const socialPlatforms: Record<
+		SocialMediaPlatform,
+		{ label: string; icon: any }
+	> = useMemo(
+		() => ({
+			instagram: { label: __('Instagram', 'minimal-map'), icon: Instagram },
+			x: { label: __('X', 'minimal-map'), icon: Twitter },
+			facebook: { label: __('Facebook', 'minimal-map'), icon: Facebook },
+			threads: { label: __('Threads', 'minimal-map'), icon: AtSign },
+			youtube: { label: __('YouTube', 'minimal-map'), icon: Youtube },
+			telegram: { label: __('Telegram', 'minimal-map'), icon: Send },
+		}),
+		[]
+	);
+
 	const socialMedia = (location.social_media || []).filter((link) => link.url.trim());
 
 	if (
@@ -166,7 +169,7 @@ function LocationContactMeta({ location }: { location: MapLocationPoint }) {
 				</a>
 			) : null}
 			{socialMedia.map((link, index) => {
-				const platform = SOCIAL_PLATFORMS[link.platform];
+				const platform = socialPlatforms[link.platform];
 				const Icon = platform.icon;
 
 				return (
@@ -191,174 +194,123 @@ export const LocationResultCard = memo(({
 	googleMapsButtonShowIcon,
 	googleMapsNavigation,
 	id,
-	isSelected = false,
+	isSelected,
 	location,
 	mode,
 	onSelect,
 	siteLocale,
 	siteTimezone,
 }: LocationResultCardProps) => {
-	const [isOpeningHoursExpanded, setOpeningHoursExpanded] = useState(false);
-	const [statusNow, setStatusNow] = useState(() => Date.now());
-	const isSearchCard = mode === 'search';
-	const hasTags = Array.isArray(location.tags) && location.tags.length > 0;
-	const showGoogleMapsButton = googleMapsNavigation && hasLocationCoordinates(location);
-	const showFooter = hasTags || showGoogleMapsButton || Boolean(distanceLabel);
-	const hasStructuredOpeningHours = Boolean(
-		location.opening_hours && isOpeningHoursConfigured(location.opening_hours)
+	const [openedStatus, setOpenedStatus] = useState(() =>
+		getOpeningHoursStatus(location.opening_hours || {}, siteTimezone, new Date())
 	);
-	const hasOpeningHoursNotes = Boolean(location.opening_hours_notes?.trim());
 
 	useEffect(() => {
-		if (!hasStructuredOpeningHours) {
+		if (!location.opening_hours) {
 			return;
 		}
 
-		let timeoutId: number | null = null;
-
-		const scheduleNextTick = () => {
-			timeoutId = globalThis.setTimeout(() => {
-				setStatusNow(Date.now());
-				scheduleNextTick();
-			}, getDelayUntilNextMinute(new Date()));
+		const updateStatus = () => {
+			setOpenedStatus(
+				getOpeningHoursStatus(location.opening_hours || {}, siteTimezone, new Date())
+			);
 		};
 
-		scheduleNextTick();
+		const timeout = setTimeout(updateStatus, getDelayUntilNextMinute(new Date()));
+		return () => clearTimeout(timeout);
+	}, [location.opening_hours, siteTimezone]);
 
-		return () => {
-			if (timeoutId !== null) {
-				globalThis.clearTimeout(timeoutId);
-			}
-		};
-	}, [hasStructuredOpeningHours]);
-
-	const openingHoursStatus = useMemo(
-		() =>
-			hasStructuredOpeningHours && location.opening_hours
-				? getOpeningHoursStatus(
-					location.opening_hours,
-					siteLocale,
-					siteTimezone,
-					new Date(statusNow)
-				)
-				: null,
-		[hasStructuredOpeningHours, location.opening_hours, siteLocale, siteTimezone, statusNow]
-	);
+	const address = useMemo(() => formatLocationAddress(location), [location]);
+	const showOpeningHours = isOpeningHoursConfigured(location.opening_hours || {});
 	const openingHoursLines = useMemo(
-		() =>
-			hasStructuredOpeningHours && location.opening_hours
-			? getOpeningHoursDisplayLines(location.opening_hours, siteLocale)
-			: [],
-		[hasStructuredOpeningHours, location.opening_hours, siteLocale]
+		() => getOpeningHoursDisplayLines(location.opening_hours || {}, siteLocale),
+		[location.opening_hours, siteLocale]
 	);
-	const showOpeningHours = hasStructuredOpeningHours || hasOpeningHoursNotes;
-	const isOpeningHoursExpandable = hasStructuredOpeningHours && isSearchCard;
 
-	const layout = (
-		<div className="minimal-map-search__result-layout">
-			<div className="minimal-map-search__result-content">
-				<div className="minimal-map-search__result-title">{location.title}</div>
-				<div className="minimal-map-search__result-address">
-					<MapPin size={12} />
-					<div className="minimal-map-search__result-address-content">
-						<span>{formatLocationStreet(location)},</span>{' '}
-						<span>{formatLocationLocality(location)}</span>
-					</div>
-				</div>
-			</div>
-			{location.logo ? (
-				<div className="minimal-map-search__result-logo-column">
-					<SearchResultLogo logo={location.logo} />
-				</div>
-			) : null}
-		</div>
-	);
-	const openingHoursSection =
-		showOpeningHours ? (
-			<div className="minimal-map-search__result-opening-hours">
-				{hasStructuredOpeningHours && openingHoursStatus ? (
-					isOpeningHoursExpandable ? (
-						<>
-							<button
-								type="button"
-								className={`minimal-map-search__result-opening-hours-trigger minimal-map-search__result-opening-hours-trigger--expandable is-${openingHoursStatus.state}`}
-								aria-expanded={isOpeningHoursExpanded}
-								onClick={() => setOpeningHoursExpanded((current) => !current)}
-							>
-								<Clock3 size={12} />
-								<span>{openingHoursStatus.label}</span>
-								<ChevronDown
-									size={12}
-									className={`minimal-map-search__result-opening-hours-chevron ${
-										isOpeningHoursExpanded ? 'is-open' : ''
-									}`}
-								/>
-							</button>
-							<div
-								className={`minimal-map-search__result-opening-hours-panel ${
-									isOpeningHoursExpanded ? 'is-open' : ''
-								}`}
-							>
-								<div className="minimal-map-search__result-opening-hours-panel-inner">
-									<div className="minimal-map-search__result-opening-hours-list">
-										{openingHoursLines.map((line) => (
-											<div
-												key={line.dayLabel}
-												className="minimal-map-search__result-opening-hours-row"
-											>
-												<span className="minimal-map-search__result-opening-hours-day">
-													{line.dayLabel}
-												</span>
-												<span className="minimal-map-search__result-opening-hours-value">
-													{line.value}
-												</span>
-											</div>
-										))}
-									</div>
-									{location.opening_hours_notes?.trim() ? (
-										<div className="minimal-map-search__result-opening-hours-notes">
-											{location.opening_hours_notes.trim()}
-										</div>
-									) : null}
-								</div>
-							</div>
-						</>
-					) : (
+	const hasTags = (location.tags?.length || 0) > 0;
+	const showGoogleMapsButton = googleMapsNavigation && hasLocationCoordinates(location);
+	const showFooter = hasTags || showGoogleMapsButton || !!distanceLabel;
+
+	const [isOpeningHoursExpanded, setIsOpeningHoursExpanded] = useState(false);
+
+	const openingHoursSection = showOpeningHours ? (
+		<div className="minimal-map-search__result-opening-hours">
+			<button
+				type="button"
+				className="minimal-map-search__result-opening-hours-toggle"
+				onClick={(e) => {
+					e.stopPropagation();
+					setIsOpeningHoursExpanded(!isOpeningHoursExpanded);
+				}}
+				aria-expanded={isOpeningHoursExpanded}
+			>
+				<Clock3 size={10} />
+				<span
+					className={`minimal-map-search__result-opening-hours-status minimal-map-search__result-opening-hours-status--${openedStatus.status}`}
+				>
+					{openedStatus.label}
+				</span>
+				{openedStatus.nextEventLabel && (
+					<span className="minimal-map-search__result-opening-hours-next">
+						{openedStatus.nextEventLabel}
+					</span>
+				)}
+				<ChevronDown
+					size={12}
+					className={`minimal-map-search__result-opening-hours-chevron ${
+						isOpeningHoursExpanded ? 'is-active' : ''
+					}`}
+				/>
+			</button>
+			{isOpeningHoursExpanded && (
+				<div className="minimal-map-search__result-opening-hours-details">
+					{openingHoursLines.map((line, index) => (
 						<div
-							className={`minimal-map-search__result-opening-hours-trigger minimal-map-search__result-opening-hours-trigger--static is-${openingHoursStatus.state}`}
+							key={index}
+							className={`minimal-map-search__result-opening-hours-line ${
+								line.isToday ? 'is-today' : ''
+							}`}
 						>
-							<Clock3 size={12} />
-							<span>{openingHoursStatus.label}</span>
+							<span className="minimal-map-search__result-opening-hours-day">{line.label}</span>
+							<span className="minimal-map-search__result-opening-hours-value">{line.value}</span>
 						</div>
-					)
-				) : location.opening_hours_notes?.trim() ? (
-					<div className="minimal-map-search__result-opening-hours-trigger minimal-map-search__result-opening-hours-trigger--static">
-						<Clock3 size={12} />
-						<span>{location.opening_hours_notes.trim()}</span>
-					</div>
-				) : null}
-			</div>
-		) : null;
+					))}
+					{location.opening_hours_notes && (
+						<div className="minimal-map-search__result-opening-hours-notes">
+							{location.opening_hours_notes}
+						</div>
+					)}
+				</div>
+			)}
+		</div>
+	) : null;
 
 	return (
 		<div
 			id={id}
-			className={`minimal-map-search__result-item minimal-map-location-card minimal-map-location-card--${mode} ${
+			className={`minimal-map-search__result-item minimal-map-location-card ${
 				isSelected ? 'is-selected' : ''
-			}`}
+			} minimal-map-search__result-item--${mode}`}
 		>
-			{mode === 'search' && onSelect ? (
-				<button
-					type="button"
-					className="minimal-map-search__result-select"
-					onClick={() => onSelect(location, distanceLabel)}
-				>
-					{layout}
-				</button>
-			) : (
-				<div className="minimal-map-location-card__body">{layout}</div>
-			)}
-			<LocationContactMeta location={location} />
+			<button
+				type="button"
+				className="minimal-map-search__result-select"
+				onClick={() => onSelect?.(location, distanceLabel)}
+			>
+				<div className="minimal-map-search__result-layout">
+					{location.logo && <SearchResultLogo logo={location.logo} />}
+					<div className="minimal-map-search__result-content">
+						<div className="minimal-map-search__result-title">{location.title}</div>
+						{address && (
+							<div className="minimal-map-search__result-address">
+								<MapPin size={10} />
+								<span>{address}</span>
+							</div>
+						)}
+						<LocationContactMeta location={location} />
+					</div>
+				</div>
+			</button>
 			{openingHoursSection}
 			{showFooter ? (
 				<div className="minimal-map-search__result-footer">

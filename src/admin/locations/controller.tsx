@@ -103,6 +103,7 @@ export function useLocationsController(
 	const [originalForm, setOriginalForm] = useState<LocationFormState | null>(null);
 	const [fieldErrors, setFieldErrors] = useState(createEmptyFieldErrors());
 	const [isDialogOpen, setDialogOpen] = useState(false);
+	const [isMarkerColorModalOpen, setMarkerColorModalOpen] = useState(false);
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [isGeocoding, setGeocoding] = useState(false);
 	const [isLoading, setLoading] = useState(enabled);
@@ -398,6 +399,12 @@ export function useLocationsController(
 		setStep('details');
 	}, []);
 
+	const resetMarkerColorModalState = useCallback((): void => {
+		setEditingLocation(null);
+		setForm(DEFAULT_FORM_STATE);
+		setSubmitError(null);
+	}, []);
+
 	const resetCustomCsvImportState = useCallback((): void => {
 		setCustomCsvImportModalOpen(false);
 		setCustomCsvImportStep('mapping');
@@ -629,6 +636,51 @@ export function useLocationsController(
 
 		setDialogOpen(false);
 	};
+
+	const onOpenMarkerColorModal = useCallback(
+		(location: LocationRecord): void => {
+			setEditingLocation(location);
+			setForm(createLocationFormStateFromRecord(location));
+			setSubmitError(null);
+			setMarkerColorModalOpen(true);
+		},
+		[]
+	);
+
+	const onCloseMarkerColorModal = useCallback((): void => {
+		if (isSubmitting) {
+			return;
+		}
+
+		setMarkerColorModalOpen(false);
+		resetMarkerColorModalState();
+	}, [isSubmitting, resetMarkerColorModalState]);
+
+	const onConfirmMarkerColor = useCallback(async (): Promise<void> => {
+		if (!editingLocation) {
+			return;
+		}
+
+		setSubmitting(true);
+		setSubmitError(null);
+
+		try {
+			await updateLocation(config, editingLocation.id, form);
+			await loadLocations();
+			setMarkerColorModalOpen(false);
+			resetMarkerColorModalState();
+			setActionNotice({
+				status: 'success',
+				message: __('Marker color updated.', 'minimal-map'),
+			});
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error ? error.message : __('Marker color could not be updated.', 'minimal-map')
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}, [config, editingLocation, form, loadLocations, resetMarkerColorModalState]);
 
 	const onBack = (): void => {
 		if (isSubmitting || isGeocoding) {
@@ -1992,17 +2044,17 @@ export function useLocationsController(
 		const headers = [...COMMON_CSV_HEADERS];
 		// Headers are:
 		// 0: title, 1: street, 2: house_number, 3: postal_code, 4: city, 5: state, 6: country, 7: telephone, 8: email, 9: website,
-		// 10: instagram, 11: x, 12: facebook, 13: threads, 14: youtube, 15: telegram,
-		// 16: latitude, 17: longitude, 18: hidden, 19: opening_hours, 20: opening_hours_notes, 21: additional information opening hours,
-		// 22: monday, 23: monday lunch break, 24: tuesday, 25: tuesday lunch break, 26: wednesday, 27: wednesday lunch break,
-		// 28: thursday, 29: thursday lunch break, 30: friday, 31: friday lunch break, 32: saturday, 33: saturday lunch break, 34: sunday, 35: sunday lunch break,
-		// 36: logo, 37: marker, 38: tags
+		// 10: instagram, 11: x, 12: facebook, 13: threads, 14: youtube, 15: telegram, 16: marker_color,
+		// 17: latitude, 18: longitude, 19: hidden, 20: opening_hours, 21: opening_hours_notes, 22: additional information opening hours,
+		// 23: monday, 24: monday lunch break, 25: tuesday, 26: tuesday lunch break, 27: wednesday, 28: wednesday lunch break,
+		// 29: thursday, 30: thursday lunch break, 31: friday, 32: friday lunch break, 33: saturday, 34: saturday lunch break, 35: sunday, 36: sunday lunch break,
+		// 37: logo, 38: marker, 39: tags
 
 		const exampleData = [
 			// Brandenburg Gate: Full info with lunch breaks and notes
 			[
 				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '',
-				'', '', '', '', '', '',
+				'', '', '', '', '', '', '#3FB1CE',
 				'52.5162', '13.3777',
 				'false',
 				'', '', 'Seasonal opening: March-October 9am-6pm',
@@ -2014,7 +2066,7 @@ export function useLocationsController(
 			// Eiffel Tower: Basic info
 			[
 				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '',
-				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '',
+				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '', '#3FB1CE',
 				'48.8584', '2.2945',
 				'true',
 				'', '', '',
@@ -2036,7 +2088,7 @@ export function useLocationsController(
 			// Brandenburg Gate
 			[
 				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '',
-				'', '', '', '', '', '',
+				'', '', '', '', '', '', '#3FB1CE',
 				'52.5162', '13.3777',
 				'false',
 				'', '', 'Seasonal opening: March-October 9am-6pm',
@@ -2047,7 +2099,7 @@ export function useLocationsController(
 			// Eiffel Tower
 			[
 				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '',
-				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '',
+				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '', '#3FB1CE',
 				'48.8584', '2.2945',
 				'true',
 				'', '', '',
@@ -2144,6 +2196,7 @@ export function useLocationsController(
 		isRemoveTagsConfirmationModalOpen,
 		isShowLocationConfirmationModalOpen,
 		isDialogOpen,
+		isMarkerColorModalOpen,
 		isCustomCsvImportModalOpen,
 		isGeocoding,
 		isLoading,
@@ -2181,6 +2234,7 @@ export function useLocationsController(
 		onCloseAssignMarkerModal: closeAssignMarkerModal,
 		onCloseAssignTagsModal: closeAssignTagsModal,
 		onCloseAssignOpeningHoursModal: closeAssignOpeningHoursModal,
+		onCloseMarkerColorModal,
 		onCloseDeleteLogoConfirmationModal: closeDeleteLogoConfirmationModal,
 		onCloseRemoveMarkerConfirmationModal: closeRemoveMarkerConfirmationModal,
 		onCloseRemoveTagsConfirmationModal: closeRemoveTagsConfirmationModal,
@@ -2191,6 +2245,7 @@ export function useLocationsController(
 		onOpenAssignMarkerModal,
 		onOpenAssignTagsModal,
 		onOpenAssignOpeningHoursModal,
+		onOpenMarkerColorModal,
 		onOpenDeleteAllLocationsModal,
 		onQuickAssignLogo,
 		onQuickAssignMarker,
@@ -2209,6 +2264,7 @@ export function useLocationsController(
 		},
 		onChangeSelection: (nextSelection) => setSelection(nextSelection),
 		onConfirm,
+		onConfirmMarkerColor,
 		onDeleteLocation,
 		onDeleteLocations,
 		onDeleteAllLocations,

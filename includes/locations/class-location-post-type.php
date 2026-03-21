@@ -84,6 +84,11 @@ class Location_Post_Type {
 			'sanitize_callback' => 'absint',
 			'type'              => 'integer',
 		),
+		'marker_color'        => array(
+			'sanitize_callback' => 'sanitize_hex_color',
+			'type'              => 'string',
+			'default'           => '#3FB1CE',
+		),
 		'is_hidden'           => array(
 			'sanitize_callback' => 'rest_sanitize_boolean',
 			'type'              => 'boolean',

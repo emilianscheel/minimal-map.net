@@ -21,6 +21,7 @@ export function normalizeLocationRecord(record: LocationRestResponse): LocationR
 		longitude: meta.longitude ?? '',
 		logo_id: Number(meta.logo_id ?? 0) || 0,
 		marker_id: Number(meta.marker_id ?? 0) || 0,
+		marker_color: meta.marker_color ?? '#3FB1CE',
 		is_hidden: normalizeLocationVisibilityValue(meta.is_hidden),
 		opening_hours: normalizeOpeningHours(meta.opening_hours),
 		opening_hours_notes: meta.opening_hours_notes ?? '',

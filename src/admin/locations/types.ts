@@ -66,6 +66,7 @@ export interface LocationsController {
 	isRemoveTagsConfirmationModalOpen: boolean;
 	isShowLocationConfirmationModalOpen: boolean;
 	isDialogOpen: boolean;
+	isMarkerColorModalOpen: boolean;
 	isGeocoding: boolean;
 	isLoading: boolean;
 	isCustomCsvImportModalOpen: boolean;
@@ -137,9 +138,11 @@ export interface LocationsController {
 	onCloseRemoveMarkerConfirmationModal: () => void;
 	onCloseRemoveTagsConfirmationModal: () => void;
 	onCloseShowLocationConfirmationModal: () => void;
+	onCloseMarkerColorModal: () => void;
 	onChangeView: (nextView: ViewTable) => void;
 	onChangeSelection: (selection: string[]) => void;
 	onConfirm: () => Promise<void>;
+	onConfirmMarkerColor: () => Promise<void>;
 	onDeleteLocation: (location: LocationRecord) => Promise<void>;
 	onDeleteLocations: (locations: LocationRecord[]) => Promise<void>;
 	onDeleteAllLocations: () => Promise<void>;
@@ -159,6 +162,7 @@ export interface LocationsController {
 	onOpenRemoveMarkerConfirmationModal: (locations: LocationRecord[]) => void;
 	onOpenRemoveTagsConfirmationModal: (locations: LocationRecord[]) => void;
 	onOpenShowLocationConfirmationModal: (location: LocationRecord) => void;
+	onOpenMarkerColorModal: (location: LocationRecord) => void;
 	onOpenRemoveCollectionAssignmentModal: (
 		location: LocationRecord,
 		collection: CollectionRecord
