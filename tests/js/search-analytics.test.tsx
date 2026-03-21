@@ -148,6 +148,28 @@ describe('MapSearchControl analytics', () => {
 		root.unmount();
 	});
 
+	test('tracks a debounced unmatched text query with zero results', async () => {
+		const { dom, root, tracked } = renderSearchControl();
+		const input = dom.window.document.querySelector('input[type="search"]') as HTMLInputElement;
+
+		input.focus();
+		input.dispatchEvent(new dom.window.Event('focus', { bubbles: true }));
+		input.value = 'alksdjf';
+		input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+		await flushRender(500);
+		await flushRender();
+
+		expect(tracked).toHaveLength(1);
+		expect(tracked[0]).toMatchObject({
+			queryText: 'alksdjf',
+			queryType: 'text',
+			resultCount: 0,
+			nearestDistanceMeters: null,
+		});
+
+		root.unmount();
+	});
+
 	test('tracks an address query on submit with result and distance snapshots', async () => {
 		const { dom, root, tracked } = renderSearchControl();
 		const input = dom.window.document.querySelector('input[type="search"]') as HTMLInputElement;
@@ -165,6 +187,61 @@ describe('MapSearchControl analytics', () => {
 		expect(tracked[0].queryText).toBe('Alexanderplatz');
 		expect(tracked[0].resultCount).toBe(2);
 		expect(typeof tracked[0].nearestDistanceMeters).toBe('number');
+
+		root.unmount();
+	});
+
+	test('tracks a zero-result address query when geocoding rejects', async () => {
+		const { dom, root, tracked } = renderSearchControl({
+			geocodeSearch: async () => {
+				throw new Error('No matching coordinates were found.');
+			},
+		});
+		const input = dom.window.document.querySelector('input[type="search"]') as HTMLInputElement;
+		const form = dom.window.document.querySelector('form') as HTMLFormElement;
+
+		input.focus();
+		input.dispatchEvent(new dom.window.Event('focus', { bubbles: true }));
+		input.value = 'lkasdjf';
+		input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+		form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+		await flushRender();
+
+		expect(tracked).toHaveLength(1);
+		expect(tracked[0]).toMatchObject({
+			queryText: 'lkasdjf',
+			queryType: 'address',
+			resultCount: 0,
+			nearestDistanceMeters: null,
+		});
+
+		root.unmount();
+	});
+
+	test('tracks a zero-result address query when geocoding resolves without coordinates', async () => {
+		const { dom, root, tracked } = renderSearchControl({
+			geocodeSearch: async () => ({
+				success: false,
+				message: 'No matching coordinates were found.',
+			}),
+		});
+		const input = dom.window.document.querySelector('input[type="search"]') as HTMLInputElement;
+		const form = dom.window.document.querySelector('form') as HTMLFormElement;
+
+		input.focus();
+		input.dispatchEvent(new dom.window.Event('focus', { bubbles: true }));
+		input.value = 'lkasdjf';
+		input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+		form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+		await flushRender();
+
+		expect(tracked).toHaveLength(1);
+		expect(tracked[0]).toMatchObject({
+			queryText: 'lkasdjf',
+			queryType: 'address',
+			resultCount: 0,
+			nearestDistanceMeters: null,
+		});
 
 		root.unmount();
 	});

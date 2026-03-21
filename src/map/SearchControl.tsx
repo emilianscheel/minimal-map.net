@@ -412,6 +412,7 @@ export const MapSearchControl = ({
 	}, [onSelect, viewportWidth]);
 
 	const resetAddressSearch = (nextTerm = '') => {
+		searchTermRef.current = nextTerm;
 		setSearchTerm(nextTerm);
 		setAddressSearchMode('idle');
 		setAddressResults([]);
@@ -528,11 +529,29 @@ export const MapSearchControl = ({
 			return;
 		}
 
+		searchTermRef.current = query;
 		setSearchTerm(query);
 		setAddressSearchMode('loading');
 		setAddressResults([]);
 
-		const result = await geocodeSearch(query);
+		let result: GeocodeResponse;
+
+		try {
+			result = await geocodeSearch(query);
+		} catch {
+			if (searchTermRef.current.trim() !== query) {
+				return;
+			}
+
+			setAddressSearchMode('empty');
+			trackAnalyticsQuery({
+				queryText: trackedQueryTextOverride ?? query,
+				queryType: queryTypeOverride ?? 'address',
+				resultCount: 0,
+				nearestDistanceMeters: null,
+			});
+			return;
+		}
 
 		if (searchTermRef.current.trim() !== query) {
 			return;
@@ -744,11 +763,13 @@ export const MapSearchControl = ({
 
 	const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		void handleAddressSearch();
+		const submittedQuery = inputRef.current?.value ?? searchTermRef.current;
+		void handleAddressSearch(submittedQuery);
 	};
 
 	useEffect(() => {
 		if (
+			!isOpen ||
 			!trimmedSearchTerm ||
 			addressSearchMode === 'loading' ||
 			parseCoordinateSearchValue(trimmedSearchTerm) ||
@@ -770,6 +791,7 @@ export const MapSearchControl = ({
 			window.clearTimeout(timeoutId);
 		};
 	}, [
+		isOpen,
 		addressSearchMode,
 		filteredLocations.length,
 		liveLocationMatchesQuery,
