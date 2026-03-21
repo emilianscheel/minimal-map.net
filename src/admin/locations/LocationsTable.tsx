@@ -45,15 +45,11 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				enableSorting: false,
 				filterBy: false,
 				render: ({ item }) => (
-					item.is_hidden ? (
-						<span className="minimal-map-admin__location-logo-empty">—</span>
-					) : (
-						<LocationMiniMap
-							location={item}
-							theme={controller.activeTheme}
-							markerContent={controller.getMarkerForLocation(item.id)?.content ?? null}
-						/>
-					)
+					<LocationMiniMap
+						location={item}
+						theme={controller.activeTheme}
+						markerContent={controller.getMarkerForLocation(item.id)?.content ?? null}
+					/>
 				),
 			},
 			{
