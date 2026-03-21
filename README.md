@@ -59,7 +59,7 @@ zip -r ../minimal-map-0.4.0.zip . \
 ```
 
 ```bash
-ln -s "$(pwd)/plugin" ~/Studio/my-wordpress-website/wp-content/plugins/minimal-map.net
+ln -s "$(pwd)" ~/Studio/my-wordpress-website/wp-content/plugins/minimal-map.net
 
 rm ~/Studio/my-wordpress-website/wp-content/plugins/minimal-map.net
 ```
