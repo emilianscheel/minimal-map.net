@@ -161,6 +161,8 @@ export function createLocationCardPreviewController({
 
 			applySearchPanelCssVariables(container, config);
 			const documentFontFamily = getDocumentFontFamily(host);
+			container.style.fontFamily =
+				config.fontFamily || documentFontFamily || 'inherit';
 			container.style.setProperty(
 				'--minimal-map-font-family',
 				config.fontFamily || documentFontFamily || 'inherit'

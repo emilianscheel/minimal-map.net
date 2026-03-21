@@ -918,6 +918,15 @@
   display: none;
 }
 
+.minimal-map-location-popup__mount {
+  width: 100%;
+  font-family: var(
+    --minimal-map-font-family,
+    var(--wp--style--global--font-family, inherit)
+  );
+  color: var(--minimal-map-search-foreground-primary);
+}
+
 .minimal-map-location-card--in-map {
   width: 100%;
   max-width: 100%;
