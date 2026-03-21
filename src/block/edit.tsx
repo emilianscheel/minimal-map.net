@@ -805,6 +805,9 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     [effectiveAttributes],
   );
   const blockProps = useBlockProps({ className: "minimal-map-editor" });
+  const canEnableLiveLocationSearch = attributes.allowSearch;
+  const canEnableLiveLocationMap =
+    attributes.allowSearch && attributes.showZoomControls;
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -1127,6 +1130,38 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__("Allow Search", "minimal-map")}
             checked={attributes.allowSearch}
             onChange={(value: boolean) => setAttributes({ allowSearch: value })}
+          />
+          <ToggleControl
+            label={__("Enable Live Location Search", "minimal-map")}
+            checked={attributes.enableLiveLocationSearch}
+            disabled={!canEnableLiveLocationSearch}
+            help={
+              canEnableLiveLocationSearch
+                ? undefined
+                : __(
+                    "Enable search first to use the live location result card.",
+                    "minimal-map",
+                  )
+            }
+            onChange={(value: boolean) =>
+              setAttributes({ enableLiveLocationSearch: value })
+            }
+          />
+          <ToggleControl
+            label={__("Enable Live Location Map", "minimal-map")}
+            checked={attributes.enableLiveLocationMap}
+            disabled={!canEnableLiveLocationMap}
+            help={
+              canEnableLiveLocationMap
+                ? undefined
+                : __(
+                    "Enable search and zoom controls first to use the live location map button.",
+                    "minimal-map",
+                  )
+            }
+            onChange={(value: boolean) =>
+              setAttributes({ enableLiveLocationMap: value })
+            }
           />
           <ToggleControl
             label={__("Enable Tags Filter", "minimal-map")}

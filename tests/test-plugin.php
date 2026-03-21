@@ -274,6 +274,28 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Live location feature toggles should default off for blocks and accept explicit enablement.
+	 *
+	 * @return void
+	 */
+	public function test_live_location_features_default_off_for_blocks() {
+		$config = new \MinimalMap\Config();
+
+		$default_attributes = $config->normalize_block_attributes( array() );
+		$enabled_attributes = $config->normalize_block_attributes(
+			array(
+				'enableLiveLocationSearch' => true,
+				'enableLiveLocationMap'    => true,
+			)
+		);
+
+		$this->assertFalse( $default_attributes['enableLiveLocationSearch'] );
+		$this->assertFalse( $default_attributes['enableLiveLocationMap'] );
+		$this->assertTrue( $enabled_attributes['enableLiveLocationSearch'] );
+		$this->assertTrue( $enabled_attributes['enableLiveLocationMap'] );
+	}
+
+	/**
 	 * Published locations with valid coordinates should be exposed to the client.
 	 *
 	 * @return void

@@ -59,6 +59,14 @@
       "type": "boolean",
       "default": true
     },
+    "enableLiveLocationSearch": {
+      "type": "boolean",
+      "default": false
+    },
+    "enableLiveLocationMap": {
+      "type": "boolean",
+      "default": false
+    },
     "enableCategoryFilter": {
       "type": "boolean",
       "default": false

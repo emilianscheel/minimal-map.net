@@ -42,6 +42,8 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	borderRadius: '',
 	showZoomControls: true,
 	allowSearch: true,
+	enableLiveLocationSearch: false,
+	enableLiveLocationMap: false,
 	enableCategoryFilter: false,
 	googleMapsNavigation: false,
 	inMapLocationCard: false,
@@ -243,6 +245,12 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 		),
 		showZoomControls: runtimeConfig.defaults?.showZoomControls ?? DEFAULT_MAP_DEFAULTS.showZoomControls,
 		allowSearch: runtimeConfig.defaults?.allowSearch ?? DEFAULT_MAP_DEFAULTS.allowSearch,
+		enableLiveLocationSearch:
+			runtimeConfig.defaults?.enableLiveLocationSearch ??
+			DEFAULT_MAP_DEFAULTS.enableLiveLocationSearch,
+		enableLiveLocationMap:
+			runtimeConfig.defaults?.enableLiveLocationMap ??
+			DEFAULT_MAP_DEFAULTS.enableLiveLocationMap,
 		enableCategoryFilter:
 			runtimeConfig.defaults?.enableCategoryFilter ?? DEFAULT_MAP_DEFAULTS.enableCategoryFilter,
 		googleMapsNavigation:
@@ -594,6 +602,12 @@ export function normalizeMapConfig(
 		borderRadius,
 		showZoomControls: Boolean(rawConfig.showZoomControls ?? defaults.showZoomControls),
 		allowSearch: Boolean(rawConfig.allowSearch ?? defaults.allowSearch),
+		enableLiveLocationSearch: Boolean(
+			rawConfig.enableLiveLocationSearch ?? defaults.enableLiveLocationSearch
+		),
+		enableLiveLocationMap: Boolean(
+			rawConfig.enableLiveLocationMap ?? defaults.enableLiveLocationMap
+		),
 		enableCategoryFilter: Boolean(
 			rawConfig.enableCategoryFilter ?? defaults.enableCategoryFilter
 		),

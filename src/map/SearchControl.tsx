@@ -5,23 +5,29 @@ import type { FormEvent, KeyboardEvent } from 'react';
 import Kbd from '../components/Kbd';
 import type {
 	GeocodeResponse,
+	MapCoordinates,
 	MapLocationSelection,
 	MapLocationPoint,
 	NormalizedMapConfig,
 } from '../types';
 import { getMapDomContext } from './dom-context';
+import {
+	formatCoordinateSearchValue,
+	parseCoordinateSearchValue,
+} from './coordinate-search';
 import { geocodeSearchQuery } from './geocodeSearchQuery';
 import {
 	buildDistanceSearchResults,
 	type DistanceSearchResult,
 } from './location-distance';
-import { LocationResultCard } from './location-card';
+import { LiveLocationResultCard, LocationResultCard } from './location-card';
 import {
 	collectLocationTags,
 	filterLocationsByCategoryTagIds,
 } from './category-filter';
 import {
 	buildLocationSearchIndex,
+	normalizeSearchValue,
 	searchIndexedLocations,
 } from './location-search';
 import { applySearchPanelCssVariables } from './search-panel-layout';
@@ -50,6 +56,7 @@ interface SearchControlProps {
 	doc: Document;
 	host?: HTMLElement;
 	frontendGeocodePath?: string;
+	enableLiveLocationSearch: boolean;
 	geocodeSearch: GeocodeSearchFn;
 	googleMapsNavigation: boolean;
 	googleMapsButtonShowIcon: boolean;
@@ -58,6 +65,8 @@ interface SearchControlProps {
 	activeCategoryTagIds: number[];
 	onCategoryFilterChange: (tagIds: number[]) => void;
 	onEscape?: () => void;
+	onLiveLocationActionChange?: (action: () => void) => void;
+	onLiveLocationStateChange?: (isBusy: boolean) => void;
 	onOpenStateChange?: (isOpen: boolean) => void;
 	onSelect: (selection: MapLocationSelection) => void;
 	selectedId?: number;
@@ -69,6 +78,7 @@ export const MapSearchControl = ({
 	doc,
 	host,
 	frontendGeocodePath,
+	enableLiveLocationSearch,
 	geocodeSearch,
 	googleMapsNavigation,
 	googleMapsButtonShowIcon,
@@ -77,6 +87,8 @@ export const MapSearchControl = ({
 	activeCategoryTagIds,
 	onCategoryFilterChange,
 	onEscape,
+	onLiveLocationActionChange,
+	onLiveLocationStateChange,
 	onOpenStateChange,
 	onSelect,
 	selectedId: selectedIdProp,
@@ -87,6 +99,8 @@ export const MapSearchControl = ({
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isPanelOpen, setPanelOpen] = useState(false);
 	const [isPanelDismissed, setPanelDismissed] = useState(false);
+	const [isLiveLocationPending, setLiveLocationPending] = useState(false);
+	const [liveLocationError, setLiveLocationError] = useState<string | null>(null);
 	const [addressSearchMode, setAddressSearchMode] = useState<
 		'idle' | 'loading' | 'results' | 'empty'
 	>('idle');
@@ -104,6 +118,11 @@ export const MapSearchControl = ({
 	const isOpen =
 		!isPanelDismissed && (isPanelOpen || (!isMobile && typeof selectedId === 'number'));
 	const trimmedSearchTerm = searchTerm.trim();
+	const normalizedSearchTerm = useMemo(
+		() => normalizeSearchValue(trimmedSearchTerm),
+		[trimmedSearchTerm]
+	);
+	const liveLocationLabel = __('My location', 'minimal-map');
 	const availableTags = useMemo(
 		() => collectLocationTags(locations),
 		[locations]
@@ -119,6 +138,17 @@ export const MapSearchControl = ({
 		() => buildLocationSearchIndex(categoryFilteredLocations),
 		[categoryFilteredLocations]
 	);
+	const liveLocationAliases = useMemo(
+		() => Array.from(
+			new Set([
+				liveLocationLabel,
+				'My location',
+				'location',
+				'Mein Standort',
+			].map((value) => normalizeSearchValue(value)).filter(Boolean))
+		),
+		[liveLocationLabel]
+	);
 
 	useEffect(() => {
 		searchTermRef.current = searchTerm;
@@ -132,6 +162,14 @@ export const MapSearchControl = ({
 	useEffect(() => {
 		onOpenStateChange?.(isOpen);
 	}, [isOpen, onOpenStateChange]);
+
+	useEffect(() => {
+		onLiveLocationStateChange?.(isLiveLocationPending);
+	}, [isLiveLocationPending, onLiveLocationStateChange]);
+
+	useEffect(() => () => {
+		onLiveLocationStateChange?.(false);
+	}, [onLiveLocationStateChange]);
 
 	useEffect(() => {
 		const view = doc.defaultView;
@@ -216,6 +254,28 @@ export const MapSearchControl = ({
 
 		return filteredLocations.map((location) => ({ location }));
 	}, [addressResults, filteredLocations, searchMode]);
+	const liveLocationMatchesQuery = useMemo(() => {
+		if (!normalizedSearchTerm || !enableLiveLocationSearch) {
+			return false;
+		}
+
+		return liveLocationAliases.some(
+			(alias) =>
+				alias.includes(normalizedSearchTerm) ||
+				normalizedSearchTerm.includes(alias)
+		);
+	}, [enableLiveLocationSearch, liveLocationAliases, normalizedSearchTerm]);
+	const shouldShowLiveLocationCard =
+		isOpen &&
+		(enableLiveLocationSearch || isLiveLocationPending || liveLocationError !== null) &&
+		(
+			trimmedSearchTerm === '' ||
+			liveLocationMatchesQuery ||
+			isLiveLocationPending ||
+			liveLocationError !== null
+		);
+	const hasRenderableResults =
+		shouldShowLiveLocationCard || renderedResults.length > 0;
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -263,17 +323,66 @@ export const MapSearchControl = ({
 		setAddressResults([]);
 	};
 
-	const handleAddressSearch = async (): Promise<void> => {
-		if (
-			trimmedSearchTerm === '' ||
-			filteredLocations.length > 0 ||
-			addressSearchMode === 'loading' ||
-			!frontendGeocodePath
-		) {
+	const applyCoordinateSearchResults = useCallback((
+		coordinates: MapCoordinates,
+		nextTerm: string
+	) => {
+		setSearchTerm(nextTerm);
+
+		const nextAddressResults = buildDistanceSearchResults(
+			coordinates,
+			categoryFilteredLocations,
+		);
+
+		setAddressResults(nextAddressResults);
+		setAddressSearchMode(nextAddressResults.length > 0 ? 'results' : 'empty');
+
+		const bestResult = nextAddressResults[0];
+
+		if (bestResult) {
+			handleSelect(bestResult.location, bestResult.distanceLabel, 'auto');
+		}
+	}, [categoryFilteredLocations, handleSelect]);
+
+	const formatLiveLocationError = useCallback((error?: GeolocationPositionError) => {
+		if (!error) {
+			return __('Live location could not be loaded.', 'minimal-map');
+		}
+
+		if (error.code === error.PERMISSION_DENIED) {
+			return __('Location access was denied.', 'minimal-map');
+		}
+
+		if (error.code === error.POSITION_UNAVAILABLE) {
+			return __('Current location is unavailable.', 'minimal-map');
+		}
+
+		if (error.code === error.TIMEOUT) {
+			return __('Location request timed out.', 'minimal-map');
+		}
+
+		return __('Live location could not be loaded.', 'minimal-map');
+	}, []);
+
+	const handleAddressSearch = useCallback(async (queryOverride?: string): Promise<void> => {
+		const query = (queryOverride ?? searchTermRef.current).trim();
+
+		if (query === '' || addressSearchMode === 'loading') {
 			return;
 		}
 
-		const query = trimmedSearchTerm;
+		const parsedCoordinates = parseCoordinateSearchValue(query);
+
+		if (parsedCoordinates) {
+			applyCoordinateSearchResults(parsedCoordinates, query);
+			return;
+		}
+
+		if (filteredLocations.length > 0 || !frontendGeocodePath) {
+			return;
+		}
+
+		setSearchTerm(query);
 		setAddressSearchMode('loading');
 		setAddressResults([]);
 
@@ -288,23 +397,69 @@ export const MapSearchControl = ({
 			return;
 		}
 
-		const nextAddressResults = buildDistanceSearchResults(
+		applyCoordinateSearchResults(
 			{
 				lat: result.lat,
 				lng: result.lng,
 			},
-			categoryFilteredLocations,
+			query,
 		);
+	}, [
+		addressSearchMode,
+		applyCoordinateSearchResults,
+		filteredLocations.length,
+		frontendGeocodePath,
+		geocodeSearch,
+	]);
 
-		setAddressResults(nextAddressResults);
-		setAddressSearchMode('results');
-
-		const bestResult = nextAddressResults[0];
-
-		if (bestResult) {
-			handleSelect(bestResult.location, bestResult.distanceLabel, 'auto');
+	const requestLiveLocation = useCallback(() => {
+		if (isLiveLocationPending) {
+			return;
 		}
-	};
+
+		setPanelDismissed(false);
+		setPanelOpen(true);
+		setLiveLocationError(null);
+		inputRef.current?.focus();
+
+		const geolocation = doc.defaultView?.navigator?.geolocation;
+
+		if (!geolocation) {
+			setLiveLocationError(
+				__('Live location is not supported in this browser.', 'minimal-map')
+			);
+			return;
+		}
+
+		setLiveLocationPending(true);
+
+		geolocation.getCurrentPosition(
+			(position) => {
+				const coordinates = {
+					lat: position.coords.latitude,
+					lng: position.coords.longitude,
+				};
+				const formattedCoordinates = formatCoordinateSearchValue(coordinates);
+
+				setLiveLocationPending(false);
+				setLiveLocationError(null);
+				void handleAddressSearch(formattedCoordinates);
+			},
+			(error) => {
+				setLiveLocationPending(false);
+				setLiveLocationError(formatLiveLocationError(error));
+			},
+			{
+				enableHighAccuracy: true,
+				maximumAge: 0,
+				timeout: 10000,
+			}
+		);
+	}, [doc.defaultView, formatLiveLocationError, handleAddressSearch, isLiveLocationPending]);
+
+	useEffect(() => {
+		onLiveLocationActionChange?.(requestLiveLocation);
+	}, [onLiveLocationActionChange, requestLiveLocation]);
 
 	const toggleCategoryTagId = (tagId: number) => {
 		const nextActiveTagIds = activeCategoryTagIds.includes(tagId)
@@ -344,6 +499,14 @@ export const MapSearchControl = ({
 
 	const renderResultCards = () => (
 		<div className="minimal-map-search__results">
+			{shouldShowLiveLocationCard ? (
+				<LiveLocationResultCard
+					errorMessage={liveLocationError}
+					isPending={isLiveLocationPending}
+					label={liveLocationLabel}
+					onSelect={requestLiveLocation}
+				/>
+			) : null}
 			{renderedResults.map(({ location, distanceLabel }) => (
 				<LocationResultCard
 					key={location.id}
@@ -445,7 +608,7 @@ export const MapSearchControl = ({
 
 				{isOpen ? (
 					<div className="minimal-map-search__results-container">
-						{renderedResults.length > 0 ? (
+						{hasRenderableResults ? (
 							renderResultCards()
 						) : searchMode === 'address-prompt' ? (
 							<div className="minimal-map-search__state">
@@ -488,6 +651,7 @@ export const MapSearchControl = ({
 
 export interface WordPressSearchControl {
 	destroy: () => void;
+	requestLiveLocation: () => void;
 	update: (
 		config: NormalizedMapConfig,
 		selectedId?: number,
@@ -506,9 +670,11 @@ export function createWordPressSearchControl(
 	onCategoryFilterChange?: (tagIds: number[]) => void,
 	onEscape?: () => void,
 	onOpenStateChange?: (isOpen: boolean) => void,
+	onLiveLocationStateChange?: (isBusy: boolean) => void,
 ): WordPressSearchControl {
 	const context = getMapDomContext(host);
 	const container = context.doc.createElement('div');
+	let requestLiveLocationAction = () => {};
 	container.className = 'minimal-map-search-host';
 
 	container.style.position = 'absolute';
@@ -550,6 +716,7 @@ export function createWordPressSearchControl(
 				activeCategoryTagIds={activeCategoryTagIds}
 				doc={context.doc}
 				enableCategoryFilter={config.enableCategoryFilter}
+				enableLiveLocationSearch={config.enableLiveLocationSearch}
 				frontendGeocodePath={frontendGeocodePath}
 				geocodeSearch={geocodeSearch}
 				googleMapsNavigation={config.googleMapsNavigation}
@@ -558,6 +725,10 @@ export function createWordPressSearchControl(
 				locations={config.locations}
 				onCategoryFilterChange={onCategoryFilterChange ?? (() => {})}
 				onEscape={onEscape}
+				onLiveLocationActionChange={(action) => {
+					requestLiveLocationAction = action;
+				}}
+				onLiveLocationStateChange={onLiveLocationStateChange}
 				onOpenStateChange={onOpenStateChange}
 				onSelect={onSelect}
 				selectedId={selectedId}
@@ -571,8 +742,12 @@ export function createWordPressSearchControl(
 
 	return {
 		destroy() {
+			requestLiveLocationAction = () => {};
 			root.unmount();
 			container.remove();
+		},
+		requestLiveLocation() {
+			requestLiveLocationAction();
 		},
 		update(config, selectedId, activeCategoryTagIds = []) {
 			render(config, selectedId, activeCategoryTagIds);

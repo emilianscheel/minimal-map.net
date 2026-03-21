@@ -4,6 +4,17 @@ import { getZoomControlRuntimeIconSvg } from './zoom-control-options';
 import { getMapDomContext } from './dom-context';
 import type { NormalizedMapConfig, WordPressZoomControls } from '../types';
 
+const LIVE_LOCATION_ICON = `
+	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+		<line x1="2" x2="5" y1="12" y2="12" />
+		<line x1="19" x2="22" y1="12" y2="12" />
+		<line x1="12" x2="12" y1="2" y2="5" />
+		<line x1="12" x2="12" y1="19" y2="22" />
+		<circle cx="12" cy="12" r="7" />
+		<circle cx="12" cy="12" r="3" />
+	</svg>
+`;
+
 function applyControlStyles(controls: HTMLDivElement, config: NormalizedMapConfig): void {
 	controls.dataset.position = config.zoomControlsPosition;
 	controls.style.setProperty('--minimal-map-controls-margin-top', config.zoomControlsOuterMargin.top);
@@ -46,10 +57,13 @@ function createControlButton(
 export function createWordPressZoomControls(
 	host: HTMLElement,
 	map: MapLibreMap,
-	config: NormalizedMapConfig
+	config: NormalizedMapConfig,
+	onLiveLocationSelect?: () => void,
+	isLiveLocationBusy = false
 ): WordPressZoomControls {
 	const context = getMapDomContext(host);
 	const controls = context.doc.createElement('div');
+	let liveLocationButton: HTMLButtonElement | null = null;
 
 	controls.className = 'minimal-map-controls';
 	applyControlStyles(controls, config);
@@ -67,12 +81,37 @@ export function createWordPressZoomControls(
 		host
 	);
 
+	if (config.allowSearch && config.enableLiveLocationMap) {
+		liveLocationButton = createControlButton(
+			__( 'My location', 'minimal-map' ),
+			LIVE_LOCATION_ICON,
+			() => {
+				onLiveLocationSelect?.();
+			},
+			host
+		);
+		liveLocationButton.disabled = isLiveLocationBusy;
+		liveLocationButton.classList.add('minimal-map-controls__button--live-location');
+	}
+
 	controls.append(zoomInButton, zoomOutButton);
+
+	if (liveLocationButton) {
+		controls.appendChild(liveLocationButton);
+	}
+
 	host.appendChild(controls);
 
 	return {
 		destroy() {
 			controls.remove();
+		},
+		setLiveLocationBusy(nextIsBusy) {
+			if (!liveLocationButton) {
+				return;
+			}
+
+			liveLocationButton.disabled = nextIsBusy;
 		},
 	};
 }

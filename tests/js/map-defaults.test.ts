@@ -33,6 +33,13 @@ describe('map defaults normalization', () => {
 		expect(config.enableCategoryFilter).toBe(false);
 	});
 
+	test('falls back to disabled live-location controls for shared maps without overrides', () => {
+		const config = normalizeMapConfig();
+
+		expect(config.enableLiveLocationSearch).toBe(false);
+		expect(config.enableLiveLocationMap).toBe(false);
+	});
+
 	test('allows raw config to override the runtime cooperative gestures default', () => {
 		const config = normalizeMapConfig(
 			{
@@ -59,6 +66,39 @@ describe('map defaults normalization', () => {
 		);
 
 		expect(config.enableCategoryFilter).toBe(true);
+	});
+
+	test('uses runtime live-location defaults when provided', () => {
+		const config = normalizeMapConfig(
+			{},
+			{
+				defaults: {
+					enableLiveLocationSearch: true,
+					enableLiveLocationMap: true,
+				},
+			}
+		);
+
+		expect(config.enableLiveLocationSearch).toBe(true);
+		expect(config.enableLiveLocationMap).toBe(true);
+	});
+
+	test('allows raw config to override runtime live-location defaults', () => {
+		const config = normalizeMapConfig(
+			{
+				enableLiveLocationSearch: false,
+				enableLiveLocationMap: false,
+			},
+			{
+				defaults: {
+					enableLiveLocationSearch: true,
+					enableLiveLocationMap: true,
+				},
+			}
+		);
+
+		expect(config.enableLiveLocationSearch).toBe(false);
+		expect(config.enableLiveLocationMap).toBe(false);
 	});
 
 	test('uses the runtime font family default when raw config leaves it blank', () => {

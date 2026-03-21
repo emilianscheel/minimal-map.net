@@ -43,6 +43,8 @@ export interface MapDefaults {
 	borderRadius: string;
 	showZoomControls: boolean;
 	allowSearch: boolean;
+	enableLiveLocationSearch: boolean;
+	enableLiveLocationMap: boolean;
 	enableCategoryFilter: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
@@ -175,6 +177,8 @@ export interface RawMapConfig {
 	borderRadius?: string | BorderRadiusValue | null;
 	showZoomControls?: boolean;
 	allowSearch?: boolean;
+	enableLiveLocationSearch?: boolean;
+	enableLiveLocationMap?: boolean;
 	enableCategoryFilter?: boolean;
 	googleMapsNavigation?: boolean;
 	inMapLocationCard?: boolean;
@@ -401,6 +405,8 @@ export interface MapBlockAttributes {
 	fontFamily: string;
 	showZoomControls: boolean;
 	allowSearch: boolean;
+	enableLiveLocationSearch: boolean;
+	enableLiveLocationMap: boolean;
 	enableCategoryFilter: boolean;
 	googleMapsNavigation: boolean;
 	inMapLocationCard: boolean;
@@ -449,10 +455,12 @@ export interface MapBlockAttributes {
 
 export interface WordPressZoomControls {
 	destroy: () => void;
+	setLiveLocationBusy: (isBusy: boolean) => void;
 }
 
 export interface WordPressSearchControl {
 	destroy: () => void;
+	requestLiveLocation: () => void;
 	update: (
 		config: NormalizedMapConfig,
 		selectedId?: number,

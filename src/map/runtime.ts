@@ -34,6 +34,7 @@ interface MinimalMapState {
 	attribution: WordPressAttributionControl | null;
 	config: NormalizedMapConfig | null;
 	controls: WordPressZoomControls | null;
+	isLiveLocationBusy: boolean;
 	keydownHandler: ((event: KeyboardEvent) => void) | null;
 	locationCardPreview: LocationCardPreviewController | null;
 	map: MapLibreMap | null;
@@ -125,6 +126,8 @@ function didZoomControlsStyleChange(
 	}
 
 	return (
+		previousConfig.allowSearch !== nextConfig.allowSearch ||
+		previousConfig.enableLiveLocationMap !== nextConfig.enableLiveLocationMap ||
 		previousConfig.zoomControlsPosition !== nextConfig.zoomControlsPosition ||
 		previousConfig.zoomControlsBackgroundColor !== nextConfig.zoomControlsBackgroundColor ||
 		previousConfig.zoomControlsIconColor !== nextConfig.zoomControlsIconColor ||
@@ -427,6 +430,7 @@ export function createMinimalMap(
 		attribution: null,
 		config: null,
 		controls: null,
+		isLiveLocationBusy: false,
 		isSearchPanelOpen: false,
 		keydownHandler: null,
 		locationCardPreview: null,
@@ -676,7 +680,15 @@ export function createMinimalMap(
 		state.controls = null;
 
 		if (config.showZoomControls && state.map) {
-			state.controls = createWordPressZoomControls(host, state.map, config);
+			state.controls = createWordPressZoomControls(
+				host,
+				state.map,
+				config,
+				() => {
+					state.searchControl?.requestLiveLocation();
+				},
+				state.isLiveLocationBusy
+			);
 		}
 	}
 
@@ -772,6 +784,10 @@ export function createMinimalMap(
 							state.activeCategoryTagIds,
 							getActiveSearchPanelReservedWidth(state.config)
 						);
+					},
+					(isBusy: boolean) => {
+						state.isLiveLocationBusy = isBusy;
+						state.controls?.setLiveLocationBusy(isBusy);
 					}
 				);
 			} else {
@@ -784,6 +800,8 @@ export function createMinimalMap(
 		} else {
 			state.searchControl?.destroy();
 			state.searchControl = null;
+			state.isLiveLocationBusy = false;
+			state.controls?.setLiveLocationBusy(false);
 			state.isSearchPanelOpen = false;
 		}
 	}

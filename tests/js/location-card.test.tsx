@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { JSDOM } from 'jsdom';
 import { createElement, createRoot } from '@wordpress/element';
-import { LocationResultCard } from '../../src/map/location-card';
+import { LiveLocationResultCard, LocationResultCard } from '../../src/map/location-card';
 
 const originalGlobals = {
 	document: globalThis.document,
@@ -361,6 +361,40 @@ describe('location result card', () => {
 		).toBe(true);
 		expect(host.querySelector('.minimal-map-search__result-opening-hours-panel')).toBeNull();
 		expect(host.querySelector('.minimal-map-search__result-opening-hours-chevron')).toBeNull();
+
+		root.unmount();
+	});
+
+	test('renders the live-location card with disabled state and inline error text', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+
+		root.render(
+			createElement(LiveLocationResultCard, {
+				errorMessage: 'Location access was denied.',
+				isPending: true,
+				label: 'My location',
+				onSelect() {},
+			})
+		);
+
+		await flushRender();
+
+		const button = host.querySelector(
+			'.minimal-map-search__result-select'
+		) as HTMLButtonElement | null;
+
+		expect(button).not.toBeNull();
+		expect(button?.disabled).toBe(true);
+		expect(button?.getAttribute('aria-busy')).toBe('true');
+		expect(
+			host.querySelector('.minimal-map-search__result-title--live-location')?.textContent
+		).toContain('My location');
+		expect(
+			host.querySelector('.minimal-map-search__result-live-location-error')?.textContent
+		).toContain('Location access was denied.');
 
 		root.unmount();
 	});

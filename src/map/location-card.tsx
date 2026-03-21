@@ -1,6 +1,15 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { memo, useMemo, useState } from '@wordpress/element';
-import { ChevronDown, Clock3, Globe, Mail, MapPin, Navigation, Phone } from 'lucide-react';
+import {
+	ChevronDown,
+	Clock3,
+	Globe,
+	LocateFixed,
+	Mail,
+	MapPin,
+	Navigation,
+	Phone,
+} from 'lucide-react';
 import TagBadge from '../components/TagBadge';
 import { isOpeningHoursConfigured } from '../lib/locations/openingHours';
 import {
@@ -20,6 +29,13 @@ export interface LocationResultCardProps {
 	onSelect?: (location: MapLocationPoint, distanceLabel?: string) => void;
 	siteLocale: string;
 	siteTimezone: string;
+}
+
+export interface LiveLocationResultCardProps {
+	errorMessage?: string | null;
+	isPending?: boolean;
+	label: string;
+	onSelect: () => void;
 }
 
 export const formatDisplayUrl = (url: string): string => {
@@ -301,3 +317,36 @@ export const LocationResultCard = memo(({
 		</div>
 	);
 });
+
+export const LiveLocationResultCard = memo(({
+	errorMessage,
+	isPending = false,
+	label,
+	onSelect,
+}: LiveLocationResultCardProps) => (
+	<div className="minimal-map-search__result-item minimal-map-location-card minimal-map-search__result-item--live-location">
+		<button
+			type="button"
+			className="minimal-map-search__result-select"
+			onClick={onSelect}
+			disabled={isPending}
+			aria-busy={isPending}
+		>
+			<div className="minimal-map-search__result-layout">
+				<div className="minimal-map-search__result-content">
+					<div className="minimal-map-search__result-title minimal-map-search__result-title--live-location">
+						<span className="minimal-map-search__result-live-location-icon" aria-hidden="true">
+							<LocateFixed size={14} />
+						</span>
+						<span>{label}</span>
+					</div>
+					{errorMessage ? (
+						<div className="minimal-map-search__result-live-location-error">
+							{errorMessage}
+						</div>
+					) : null}
+				</div>
+			</div>
+		</button>
+	</div>
+));

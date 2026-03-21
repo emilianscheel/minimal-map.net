@@ -152,6 +152,11 @@
   box-shadow: none;
 }
 
+.minimal-map-controls__button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .minimal-map-controls__button:focus-visible {
   outline: 2px solid #3858e8;
   outline-offset: 2px;
@@ -557,6 +562,11 @@
   min-width: 0;
 }
 
+.minimal-map-search__result-select:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
 .minimal-map-search__result-select:focus {
   outline: none;
 }
@@ -576,6 +586,27 @@
   font-size: 15px;
   margin: 0;
   color: var(--minimal-map-search-foreground-primary);
+}
+
+.minimal-map-search__result-title--live-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.minimal-map-search__result-live-location-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--minimal-map-search-foreground-primary);
+  flex: 0 0 auto;
+}
+
+.minimal-map-search__result-live-location-error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--minimal-map-opening-hours-closed-color, #b32d2e);
 }
 
 .minimal-map-search__result-layout {
