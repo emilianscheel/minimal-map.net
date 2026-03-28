@@ -10,7 +10,7 @@ import {
 	Target,
 } from 'lucide-react';
 import type { AnalyticsBreakdownDatum, AnalyticsSummary } from '../../types';
-import AnalyticsMiniChart, { formatPercentage } from './AnalyticsMiniChart';
+import AnalyticsSparkline, { formatPercentage } from './AnalyticsSparkline';
 
 function formatMetricValue(value: number | null, suffix = ''): string {
 	if (value === null) {
@@ -81,7 +81,7 @@ export default function AnalyticsCards({
 			value: hasData ? formatMetricValue(summary.totalSearches) : '—',
 			description: __('Demand across the selected period.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Total searches trend', 'minimal-map')}
 					formatTooltipValue={formatMetricValue}
 					isEmpty={!hasData}
@@ -97,7 +97,7 @@ export default function AnalyticsCards({
 			value: hasData ? formatPercentage(summary.successRate) : '—',
 			description: __('Searches returning at least one result.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Success rate trend', 'minimal-map')}
 					formatTooltipValue={formatPercentage}
 					isEmpty={!hasData}
@@ -113,7 +113,7 @@ export default function AnalyticsCards({
 			value: hasData ? formatMetricValue(summary.zeroResultSearches) : '—',
 			description: __('Searches with no matching location.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Zero-result searches trend', 'minimal-map')}
 					formatTooltipValue={formatMetricValue}
 					isEmpty={!hasData}
@@ -129,7 +129,7 @@ export default function AnalyticsCards({
 			value: formatDistanceValue(summary.averageNearestDistanceMeters, hasData),
 			description: __('Average distance for searches with a nearby match.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Average distance trend', 'minimal-map')}
 					formatTooltipValue={formatSparklineDistance}
 					isEmpty={!hasData && summary.averageNearestDistanceMeters === null}
@@ -147,7 +147,7 @@ export default function AnalyticsCards({
 				? sprintf(__('Most searched: %s', 'minimal-map'), topQuery.label)
 				: __('No repeated search terms yet.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Top search terms', 'minimal-map')}
 					data={summary.breakdowns.topQueries}
 					isEmpty={!hasData}
@@ -164,7 +164,7 @@ export default function AnalyticsCards({
 				? sprintf(__('Most requested without a result: %s', 'minimal-map'), topZeroResultQuery.label)
 				: __('No failed searches in the selected period.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Top zero-result searches', 'minimal-map')}
 					data={summary.breakdowns.topZeroResultQueries}
 					isEmpty={!hasData}
@@ -185,7 +185,7 @@ export default function AnalyticsCards({
 				)
 				: __('How visitors are searching your map.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Query type mix', 'minimal-map')}
 					data={summary.breakdowns.queryTypeMix}
 					isEmpty={!hasData}
@@ -206,7 +206,7 @@ export default function AnalyticsCards({
 				)
 				: __('How many results each search returned.', 'minimal-map'),
 			chart: (
-				<AnalyticsMiniChart
+				<AnalyticsSparkline
 					ariaLabel={__('Result distribution', 'minimal-map')}
 					data={summary.breakdowns.resultDistribution}
 					isEmpty={!hasData}

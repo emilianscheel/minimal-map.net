@@ -9,15 +9,16 @@ const LINE_CHART_HEIGHT = 84;
 const BAR_CHART_HEIGHT = 112;
 const CHART_PADDING_X = 2;
 const CHART_PADDING_Y = 8;
-const DONUT_CENTER_X = 54;
-const DONUT_CENTER_Y = 56;
-const DONUT_INNER_RADIUS = 20;
-const DONUT_OUTER_RADIUS = 34;
+const DONUT_VISUAL_SIZE = 92;
+const DONUT_CENTER_X = 46;
+const DONUT_CENTER_Y = 46;
+const DONUT_INNER_RADIUS = 17;
+const DONUT_OUTER_RADIUS = 28;
 const DONUT_COLORS = ['#1e1e1e', '#5c6168', '#8d949b', '#b9bfc5', '#d5d7da'];
-const BAR_LABEL_WIDTH = 104;
+const BAR_LABEL_WIDTH = 88;
 const BAR_HEIGHT = 10;
 const BAR_START_X = BAR_LABEL_WIDTH + 12;
-const BAR_END_PADDING = 6;
+const BAR_END_PADDING = 18;
 
 type LineChartProps = {
 	ariaLabel: string;
@@ -41,7 +42,7 @@ type DonutChartProps = {
 	variant: 'donut';
 };
 
-type AnalyticsMiniChartProps =
+type AnalyticsSparklineProps =
 	| LineChartProps
 	| BarChartProps
 	| DonutChartProps;
@@ -307,7 +308,7 @@ function AnalyticsBarChart({
 				<svg
 					className="minimal-map-admin__analytics-bar-chart-svg"
 					viewBox={`0 0 ${CHART_WIDTH} ${BAR_CHART_HEIGHT}`}
-					preserveAspectRatio="none"
+					preserveAspectRatio="xMinYMid meet"
 					aria-hidden="true"
 				>
 					{data.map((item, index) => {
@@ -371,9 +372,8 @@ function AnalyticsDonutChart({
 		bestIndex === -1 || item.value > data[bestIndex].value ? index : bestIndex
 	), -1);
 	const centerIndex = activeIndex ?? dominantIndex;
-	const centerItem = centerIndex >= 0 ? data[centerIndex] : null;
-	const centerPercentage = centerItem && totalValue > 0
-		? Math.round((centerItem.value / totalValue) * 100)
+	const centerPercentage = centerIndex >= 0 && totalValue > 0
+		? Math.round((data[centerIndex].value / totalValue) * 100)
 		: 0;
 	let startAngle = 0;
 
@@ -384,7 +384,7 @@ function AnalyticsDonutChart({
 					<>
 						<svg
 							className="minimal-map-admin__analytics-donut-chart-svg"
-							viewBox={`0 0 108 112`}
+							viewBox={`0 0 ${DONUT_VISUAL_SIZE} ${DONUT_VISUAL_SIZE}`}
 							preserveAspectRatio="xMidYMid meet"
 							aria-hidden="true"
 						>
@@ -409,9 +409,6 @@ function AnalyticsDonutChart({
 						<div className="minimal-map-admin__analytics-donut-chart-center">
 							<span className="minimal-map-admin__analytics-donut-chart-total">
 								{totalValue > 0 ? `${centerPercentage}%` : '—'}
-							</span>
-							<span className="minimal-map-admin__analytics-donut-chart-caption">
-								{centerItem ? truncateLabel(centerItem.label, 14) : '—'}
 							</span>
 						</div>
 					</>
@@ -449,7 +446,7 @@ function AnalyticsDonutChart({
 	);
 }
 
-export default function AnalyticsMiniChart(props: AnalyticsMiniChartProps) {
+export default function AnalyticsSparkline(props: AnalyticsSparklineProps) {
 	if (props.variant === 'line') {
 		return <AnalyticsLineChart {...props} />;
 	}

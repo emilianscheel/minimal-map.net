@@ -558,6 +558,16 @@ svg.lucide {
   color: #1e1e1e;
 }
 
+.minimal-map-admin__analytics-card .components-card__body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.minimal-map-admin__analytics-card .minimal-map-admin__feature-meta {
+  margin-top: auto;
+}
+
 .minimal-map-admin__analytics-card-description {
   margin: -8px 0 0;
   font-size: 0.9375rem;
@@ -566,6 +576,7 @@ svg.lucide {
 }
 
 .minimal-map-admin__analytics-sparkline {
+  flex: 1 1 auto;
   position: relative;
   height: 84px;
   margin: -8px -8px 6px;
@@ -628,6 +639,9 @@ svg.lucide {
 }
 
 .minimal-map-admin__analytics-breakdown-chart {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 320px;
   min-height: 112px;
   margin: -8px -8px 6px;
 }
@@ -635,7 +649,8 @@ svg.lucide {
 .minimal-map-admin__analytics-bar-chart-svg {
   display: block;
   width: 100%;
-  height: 112px;
+  height: auto;
+  max-width: 320px;
   overflow: visible;
 }
 
@@ -647,24 +662,25 @@ svg.lucide {
 }
 
 .minimal-map-admin__analytics-donut-chart {
+  flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(0, 112px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 92px) minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
-  min-height: 112px;
+  gap: 10px;
+  min-height: 92px;
   margin: -8px -8px 6px;
 }
 
 .minimal-map-admin__analytics-donut-chart-visual {
   position: relative;
-  width: 108px;
-  height: 112px;
+  width: 92px;
+  height: 92px;
 }
 
 .minimal-map-admin__analytics-donut-chart-svg {
   display: block;
-  width: 108px;
-  height: 112px;
+  width: 92px;
+  height: 92px;
 }
 
 .minimal-map-admin__analytics-donut-chart-center {
@@ -678,17 +694,10 @@ svg.lucide {
 }
 
 .minimal-map-admin__analytics-donut-chart-total {
-  font-size: 1rem;
+  font-size: 0.75rem;
   line-height: 1;
   font-weight: 600;
   color: #1e1e1e;
-}
-
-.minimal-map-admin__analytics-donut-chart-caption {
-  max-width: 68px;
-  font-size: 0.6875rem;
-  line-height: 1.2;
-  color: #646970;
 }
 
 .minimal-map-admin__analytics-donut-legend {
