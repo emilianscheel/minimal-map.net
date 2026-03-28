@@ -2,8 +2,10 @@
 
 body.toplevel_page_minimal-map {
   #wpbody-content {
+    height: calc(100vh - 32px);
     min-height: calc(100vh - 32px);
     padding-bottom: 0;
+    overflow: hidden;
   }
 
   #wpfooter {
@@ -25,17 +27,20 @@ svg.lucide {
 
 .minimal-map-admin-wrap {
   margin: 0px 0 0 -20px;
+  height: calc(100vh - 32px);
   min-height: calc(100vh - 32px);
 }
 
 .minimal-map-admin-wrap > [data-minimal-map-admin-root] {
   display: block;
+  height: inherit;
   min-height: inherit;
 }
 
 .minimal-map-admin__app {
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr);
+  height: 100%;
   min-height: calc(100vh - 32px);
   background: #fff;
   overflow: hidden;
@@ -49,9 +54,11 @@ svg.lucide {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
   padding: 18px;
   background: #fff;
   border-right: 1px solid #dcdcde;
+  overflow: hidden;
 }
 
 .minimal-map-admin__nav {
@@ -59,6 +66,8 @@ svg.lucide {
   flex-direction: column;
   flex: 1;
   gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .minimal-map-admin__nav-item.components-button {
@@ -140,6 +149,7 @@ svg.lucide {
   grid-template-rows: auto 1fr;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .minimal-map-admin__header {
@@ -195,6 +205,8 @@ svg.lucide {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .minimal-map-admin__locations-view,
@@ -1482,6 +1494,7 @@ svg.lucide {
 
   .minimal-map-admin__app {
     grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .minimal-map-admin__sidebar {
@@ -1520,14 +1533,17 @@ svg.lucide {
 
 @media (max-width: 782px) {
   body.toplevel_page_minimal-map #wpbody-content {
+    height: calc(100vh - 46px);
     min-height: calc(100vh - 46px);
   }
 
   .minimal-map-admin-wrap {
+    height: calc(100vh - 66px);
     min-height: calc(100vh - 66px);
   }
 
   .minimal-map-admin__app {
+    height: calc(100vh - 66px);
     min-height: calc(100vh - 66px);
   }
 
