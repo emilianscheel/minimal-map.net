@@ -506,6 +506,9 @@ export type AdminLogoListItem = LogoRecord;
 export interface LicenseAdminConfig {
 	nonce: string;
 	path: string;
+	purchaseUrl: string;
+	hasActivation: boolean;
+	openOnLoad: boolean;
 }
 
 export type DashboardCardView = Extract<

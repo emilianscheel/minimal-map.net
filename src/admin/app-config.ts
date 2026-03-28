@@ -62,6 +62,9 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 	licenseConfig: {
 		nonce: '',
 		path: '',
+		purchaseUrl: '',
+		hasActivation: false,
+		openOnLoad: false,
 	},
 	mapConfig: {},
 };

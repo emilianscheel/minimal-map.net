@@ -27,6 +27,11 @@ class Admin_Menu {
 	const DEFAULT_VIEW = 'dashboard';
 
 	/**
+	 * Query arg used to open the license modal on page load.
+	 */
+	const LICENSE_MODAL_QUERY_ARG = 'minimal-map-license';
+
+	/**
 	 * Get all internal plugin sections.
 	 *
 	 * @return array<string, array<string, string>>
@@ -98,6 +103,32 @@ class Admin_Menu {
 		}
 
 		return add_query_arg( 'view', $view, $base_url );
+	}
+
+	/**
+	 * Build the admin URL that opens the license modal.
+	 *
+	 * @return string
+	 */
+	public static function get_license_modal_url() {
+		return add_query_arg(
+			self::LICENSE_MODAL_QUERY_ARG,
+			'open',
+			self::get_view_url( self::DEFAULT_VIEW )
+		);
+	}
+
+	/**
+	 * Check whether the license modal should open on page load.
+	 *
+	 * @return bool
+	 */
+	public static function should_open_license_modal() {
+		$value = isset( $_GET[ self::LICENSE_MODAL_QUERY_ARG ] )
+			? sanitize_key( wp_unslash( $_GET[ self::LICENSE_MODAL_QUERY_ARG ] ) )
+			: '';
+
+		return 'open' === $value;
 	}
 
 	/**

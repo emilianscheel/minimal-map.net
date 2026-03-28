@@ -278,14 +278,30 @@ final class Plugin {
 			return $actions;
 		}
 
-		$dashboard_link = sprintf(
-			'<a href="%1$s">%2$s</a>',
-			esc_url( Admin_Menu::get_view_url( Admin_Menu::DEFAULT_VIEW ) ),
-			esc_html__( 'Dashboard', 'minimal-map' )
+		$plugin_actions = array(
+			'dashboard' => sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( Admin_Menu::get_view_url( Admin_Menu::DEFAULT_VIEW ) ),
+				esc_html__( 'Dashboard', 'minimal-map' )
+			),
 		);
 
+		if ( ! License_Route::has_local_activation() ) {
+			$plugin_actions['buy-premium'] = sprintf(
+				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
+				esc_url( License_Route::PRODUCT_URL ),
+				esc_html__( 'Buy Premium', 'minimal-map' )
+			);
+
+			$plugin_actions['enter-license-key'] = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( Admin_Menu::get_license_modal_url() ),
+				esc_html__( 'Enter License Key', 'minimal-map' )
+			);
+		}
+
 		return array_merge(
-			array( 'dashboard' => $dashboard_link ),
+			$plugin_actions,
 			$actions
 		);
 	}

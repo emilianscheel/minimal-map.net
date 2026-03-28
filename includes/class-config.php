@@ -809,6 +809,8 @@ class Config {
 			);
 		}
 
+		$has_license_activation = License_Route::has_local_activation();
+
 		return array(
 			'currentView'    => Admin\Admin_Menu::get_current_view(),
 			'sections'       => $sections,
@@ -867,8 +869,11 @@ class Config {
 				'queriesPath'      => Analytics_Queries_Route::get_rest_path(),
 			),
 			'licenseConfig' => array(
-				'nonce' => wp_create_nonce( 'wp_rest' ),
-				'path'  => License_Route::get_rest_path(),
+				'nonce'         => wp_create_nonce( 'wp_rest' ),
+				'path'          => License_Route::get_rest_path(),
+				'purchaseUrl'   => License_Route::PRODUCT_URL,
+				'hasActivation' => $has_license_activation,
+				'openOnLoad'    => Admin\Admin_Menu::should_open_license_modal() && ! $has_license_activation,
 			),
 		);
 	}

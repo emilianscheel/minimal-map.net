@@ -27,6 +27,11 @@ class License_Route {
 	const PRODUCT_ID = 'u8ew5xq0SpeZ0StSxqWbKg==';
 
 	/**
+	 * Gumroad product URL.
+	 */
+	const PRODUCT_URL = 'https://emilianscheel.gumroad.com/l/minimal-map';
+
+	/**
 	 * Premium activation option key.
 	 */
 	const PREMIUM_ACTIVE_OPTION = 'minimal_map_premium_active';
@@ -77,8 +82,8 @@ class License_Route {
 	 */
 	public function handle_request( $request ) {
 		$license_key = sanitize_text_field( (string) $request->get_param( 'license_key' ) );
-		$stored_license_key = $this->get_stored_license_key();
-		$has_local_activation = $this->has_local_activation();
+		$stored_license_key = self::get_stored_license_key();
+		$has_local_activation = self::has_local_activation();
 		$is_same_license_key = '' !== $stored_license_key && hash_equals( $stored_license_key, $license_key );
 
 		if ( $has_local_activation && ! $is_same_license_key ) {
@@ -140,8 +145,8 @@ class License_Route {
 	 *
 	 * @return bool
 	 */
-	private function has_local_activation() {
-		return (bool) get_option( self::PREMIUM_ACTIVE_OPTION, false ) || '' !== $this->get_stored_license_key();
+	public static function has_local_activation() {
+		return (bool) get_option( self::PREMIUM_ACTIVE_OPTION, false ) || '' !== self::get_stored_license_key();
 	}
 
 	/**
@@ -149,7 +154,7 @@ class License_Route {
 	 *
 	 * @return string
 	 */
-	private function get_stored_license_key() {
+	public static function get_stored_license_key() {
 		return trim( (string) get_option( self::LICENSE_KEY_OPTION, '' ) );
 	}
 }

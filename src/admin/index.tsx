@@ -12,7 +12,6 @@ import {
 } from "./app-config";
 import LoadingView from "./LoadingView";
 import LicenseKeyModal from "./premium/LicenseKeyModal";
-import { GUMROAD_URL } from "./premium/constants";
 import Kbd from "../components/Kbd";
 import type { AdminSectionView } from "../types";
 import type { AdminSectionComponentProps } from "./sections/types";
@@ -90,7 +89,10 @@ const SECTION_COMPONENTS: Record<
 };
 
 function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
-  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(false);
+  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(
+    adminConfig.licenseConfig.openOnLoad &&
+      !adminConfig.licenseConfig.hasActivation,
+  );
 
   return (
     <aside className="minimal-map-admin__sidebar">
@@ -122,13 +124,13 @@ function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
           );
         })}
 
-        {!adminConfig.isPremium && (
+        {!adminConfig.licenseConfig.hasActivation && (
           <>
             <Button
               variant="tertiary"
               __next40pxDefaultSize
               className="minimal-map-admin__nav-item minimal-map-admin__nav-item--premium"
-              href={GUMROAD_URL}
+              href={adminConfig.licenseConfig.purchaseUrl}
               target="_blank"
               rel="noopener noreferrer"
               style={{ marginTop: "auto" }}
