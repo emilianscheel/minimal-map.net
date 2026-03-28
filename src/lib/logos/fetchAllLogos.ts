@@ -2,7 +2,9 @@ import apiFetch from '@wordpress/api-fetch';
 import type { LogoRecord, LogoRestResponse, LogosAdminConfig } from '../../types';
 import { normalizeLogoRecord } from './normalizeLogoRecord';
 
-export async function fetchAllLogos(config: LogosAdminConfig): Promise<LogoRecord[]> {
+export async function fetchAllLogos(
+	config: Pick<LogosAdminConfig, 'restPath'>
+): Promise<LogoRecord[]> {
 	const logos: LogoRecord[] = [];
 	let page = 1;
 	let totalPages = 1;

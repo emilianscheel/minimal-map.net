@@ -2,7 +2,9 @@ import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import type { MarkerRecord, MarkersAdminConfig } from '../../types';
 
-export async function fetchAllMarkers(config: MarkersAdminConfig): Promise<MarkerRecord[]> {
+export async function fetchAllMarkers(
+	config: Pick<MarkersAdminConfig, 'restPath'>
+): Promise<MarkerRecord[]> {
 	try {
 		const markers: MarkerRecord[] = [];
 		let page = 1;

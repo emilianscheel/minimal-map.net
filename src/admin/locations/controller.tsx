@@ -54,16 +54,18 @@ import {
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
 	createEmptyCsvOpeningHoursImportMapping,
-	exportLocations,
 	getValidCsvOpeningHoursColumnIndexes,
 	isCommonCsvFormat,
 	parseCsvFile,
-	prepareExportData,
 	runCommonCsvImport,
 	runMappedCsvImport,
 	type CsvOpeningHoursImportMapping,
 } from '../../lib/locations/importLocations';
 import { exportToExcel, parseExcelFile } from '../../lib/locations/excel';
+import {
+	exportLocationsFile,
+	getLocationsExportErrorMessage,
+} from '../../lib/locations/exportLocationsFile';
 import { geocodeAddress } from '../../lib/locations/geocodeAddress';
 import { hasFieldErrors } from '../../lib/locations/hasFieldErrors';
 import { hasLocationAddressChanged } from '../../lib/locations/hasLocationAddressChanged';
@@ -2159,29 +2161,17 @@ export function useLocationsController(
 		setActionNotice(null);
 
 		try {
-			const [allLocations, allLogos, allMarkers, allTags] = await Promise.all([
-				fetchAllLocations(config),
-				fetchAllLogos(logosConfig),
-				fetchAllMarkers(markersConfig),
-				fetchAllTags(tagsConfig),
-			]);
-
-			if (format === 'csv') {
-				const csvContent = exportLocations(allLocations, allLogos, allMarkers, allTags);
-				const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-				const url = URL.createObjectURL(blob);
-				triggerFileDownload(url, 'minimal-map-locations.csv');
-			} else {
-				const { headers, rows } = prepareExportData(allLocations, allLogos, allMarkers, allTags);
-				exportToExcel(headers, rows, 'minimal-map-locations.xlsx');
-			}
+			await exportLocationsFile(format, {
+				nonce: config.nonce,
+				locationsRestPath: config.restPath,
+				logosRestPath: logosConfig.restPath,
+				markersRestPath: markersConfig.restPath,
+				tagsRestPath: tagsConfig.restPath,
+			});
 		} catch (error) {
 			setActionNotice({
 				status: 'error',
-				message:
-					error instanceof Error
-						? error.message
-						: __('Locations could not be exported.', 'minimal-map'),
+				message: getLocationsExportErrorMessage(error),
 			});
 		} finally {
 			setIsExporting(false);

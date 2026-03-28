@@ -312,8 +312,28 @@ export interface AdminCommandSection {
 	keywords: string[];
 }
 
+export type AdminCommandActionKey =
+	| 'export-locations-csv'
+	| 'export-locations-excel';
+
+export interface AdminCommandAction {
+	key: AdminCommandActionKey;
+	label: string;
+	keywords: string[];
+}
+
+export interface LocationsExportActionConfig {
+	nonce: string;
+	locationsRestPath: string;
+	logosRestPath: string;
+	markersRestPath: string;
+	tagsRestPath: string;
+}
+
 export interface AdminCommandsConfig {
 	sections: AdminCommandSection[];
+	actions: AdminCommandAction[];
+	locationsExportConfig: LocationsExportActionConfig | null;
 }
 
 export interface AdminStats {

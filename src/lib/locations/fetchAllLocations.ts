@@ -2,7 +2,9 @@ import apiFetch from '@wordpress/api-fetch';
 import type { LocationRecord, LocationRestResponse, LocationsAdminConfig } from '../../types';
 import { normalizeLocationRecord } from './normalizeLocationRecord';
 
-export async function fetchAllLocations(config: LocationsAdminConfig): Promise<LocationRecord[]> {
+export async function fetchAllLocations(
+	config: Pick<LocationsAdminConfig, 'restPath'>
+): Promise<LocationRecord[]> {
 	const perPage = 100;
 	let page = 1;
 	let totalPages = 1;

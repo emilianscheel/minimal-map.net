@@ -697,6 +697,7 @@ class Config {
 	 */
 	public function get_admin_commands_config() {
 		$sections = array();
+		$actions  = array();
 
 		foreach ( Admin\Admin_Menu::get_sections() as $view => $section ) {
 			if ( Admin\Admin_Menu::DEFAULT_VIEW === $view ) {
@@ -715,8 +716,38 @@ class Config {
 			);
 		}
 
+		$actions[] = array(
+			'key'      => 'export-locations-csv',
+			'label'    => __( 'Minimal Map: Export Locations as CSV', 'minimal-map' ),
+			'keywords' => array(
+				'minimal map',
+				'locations',
+				'export',
+				'csv',
+			),
+		);
+		$actions[] = array(
+			'key'      => 'export-locations-excel',
+			'label'    => __( 'Minimal Map: Export Locations as Excel', 'minimal-map' ),
+			'keywords' => array(
+				'minimal map',
+				'locations',
+				'export',
+				'excel',
+				'xlsx',
+			),
+		);
+
 		return array(
-			'sections' => $sections,
+			'sections'              => $sections,
+			'actions'               => $actions,
+			'locationsExportConfig' => array(
+				'nonce'             => wp_create_nonce( 'wp_rest' ),
+				'locationsRestPath' => Location_Post_Type::get_rest_path(),
+				'logosRestPath'     => Logo_Post_Type::get_rest_path(),
+				'markersRestPath'   => Marker_Post_Type::get_rest_path(),
+				'tagsRestPath'      => Tag_Taxonomy::get_rest_path(),
+			),
 		);
 	}
 

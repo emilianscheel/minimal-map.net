@@ -2,7 +2,9 @@ import apiFetch from '@wordpress/api-fetch';
 import type { TagRecord, TagRestResponse, TagsAdminConfig } from '../../types';
 import { normalizeTagRecord } from './normalizeTagRecord';
 
-export async function fetchAllTags(config: TagsAdminConfig): Promise<TagRecord[]> {
+export async function fetchAllTags(
+	config: Pick<TagsAdminConfig, 'restPath'>
+): Promise<TagRecord[]> {
 	const tags: TagRecord[] = [];
 	let page = 1;
 	let totalPages = 1;
