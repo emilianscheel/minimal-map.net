@@ -347,6 +347,7 @@ export interface TagsAdminConfig {
 	nonce: string;
 	restBase: string;
 	restPath: string;
+	queryPath: string;
 }
 
 export interface StylesAdminConfig {

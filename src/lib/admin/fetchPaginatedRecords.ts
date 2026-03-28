@@ -12,6 +12,7 @@ import type {
 	LocationsAdminConfig,
 	LogosAdminConfig,
 	MarkersAdminConfig,
+	TagsAdminConfig,
 } from '../../types';
 
 export interface AdminQueryParams {
@@ -75,6 +76,13 @@ export function fetchAdminLogos(
 	params: AdminQueryParams = {}
 ): Promise<PaginatedResult<AdminLogoListItem>> {
 	return fetchPaginatedResult<AdminLogoListItem>(config.queryPath, params);
+}
+
+export function fetchAdminTags(
+	config: TagsAdminConfig,
+	params: AdminQueryParams = {}
+): Promise<PaginatedResult<TagRecord>> {
+	return fetchPaginatedResult<TagRecord>(config.queryPath, params);
 }
 
 export type LocationLookupResource = 'collections' | 'logos' | 'markers' | 'tags';

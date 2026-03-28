@@ -12,6 +12,8 @@ import type {
 	StyleThemeRecord,
 } from '../../types';
 import { DEFAULT_FORM_STATE, DEFAULT_GRID_VIEW } from './constants';
+import { fetchAdminTags } from '../../lib/admin/fetchPaginatedRecords';
+import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAllTags } from '../../lib/tags/fetchAllTags';
 import { createTag } from '../../lib/tags/createTag';
 import { updateTag } from '../../lib/tags/updateTag';
@@ -30,6 +32,7 @@ export function useTagsController(
 ): TagsController {
 	const [actionNotice, setActionNotice] = useState<TagsController['actionNotice']>(null);
 	const [tags, setTags] = useState<TagRecord[]>([]);
+	const [totalItems, setTotalItems] = useState(0);
 	const [editingTag, setEditingTag] = useState<TagRecord | null>(null);
 	const [form, setForm] = useState<TagFormState>(DEFAULT_FORM_STATE);
 	const [formMode, setFormMode] = useState<TagsController['formMode']>('create');
@@ -54,8 +57,13 @@ export function useTagsController(
 		setLoadError(null);
 
 		try {
-			const records = await fetchAllTags(config);
-			setTags(records);
+			const result = await fetchAdminTags(config, {
+				page: view.page ?? 1,
+				perPage: view.perPage ?? DEFAULT_GRID_VIEW.perPage,
+				search: view.search ?? '',
+			});
+			setTags(result.items);
+			setTotalItems(result.totalItems);
 		} catch (error) {
 			setLoadError(
 				error instanceof Error
@@ -65,11 +73,17 @@ export function useTagsController(
 		} finally {
 			setLoading(false);
 		}
-	}, [config, enabled]);
+	}, [config, enabled, view.page, view.perPage, view.search]);
 
 	useEffect(() => {
+		configureApiFetch(config.nonce);
+
+		if (!enabled) {
+			return;
+		}
+
 		void loadTags();
-	}, [loadTags]);
+	}, [config.nonce, enabled, loadTags]);
 
 	const resetDialogState = useCallback((): void => {
 		setEditingTag(null);
@@ -242,7 +256,7 @@ export function useTagsController(
 	}, [onDeleteTag, selectedTag]);
 
 	const onDeleteAllTags = useCallback(async (): Promise<void> => {
-		if (tags.length === 0) {
+		if (totalItems === 0) {
 			setDeleteAllTagsModalOpen(false);
 			return;
 		}
@@ -252,7 +266,9 @@ export function useTagsController(
 		setActionNotice(null);
 
 		try {
-			for (const tag of tags) {
+			const allTags = await fetchAllTags(config);
+
+			for (const tag of allTags) {
 				await deleteTag(config, tag.id);
 			}
 
@@ -261,8 +277,8 @@ export function useTagsController(
 			setActionNotice({
 				status: 'success',
 				message: sprintf(
-					_n('%d tag deleted.', '%d tags deleted.', tags.length, 'minimal-map'),
-					tags.length
+					_n('%d tag deleted.', '%d tags deleted.', allTags.length, 'minimal-map'),
+					allTags.length
 				),
 			});
 		} catch (error) {
@@ -278,23 +294,10 @@ export function useTagsController(
 			setDeletingAllTags(false);
 			setRowActionPending(false);
 		}
-	}, [config, loadTags, tags]);
+	}, [config, loadTags, totalItems]);
 
-	const paginatedTags = useMemo(() => {
-		const filtered = tags.filter((tag) => {
-			if (!view.search) {
-				return true;
-			}
-			return tag.name.toLowerCase().includes(view.search.toLowerCase());
-		});
-
-		const page = view.page ?? 1;
-		const perPage = view.perPage ?? 20;
-		const start = (page - 1) * perPage;
-		return filtered.slice(start, start + perPage);
-	}, [tags, view]);
-
-	const totalPages = Math.max(1, Math.ceil(tags.length / (view.perPage ?? 20)));
+	const paginatedTags = useMemo(() => tags, [tags]);
+	const totalPages = Math.max(1, Math.ceil(totalItems / (view.perPage ?? DEFAULT_GRID_VIEW.perPage ?? 20)));
 
 	return {
 		actionNotice,
@@ -307,7 +310,7 @@ export function useTagsController(
 					icon={<BrushCleaning size={18} strokeWidth={2} />}
 					label={__('Delete all tags', 'minimal-map')}
 					onClick={onOpenDeleteAllTagsModal}
-					disabled={tags.length === 0 || isDeletingAllTags || isRowActionPending}
+					disabled={totalItems === 0 || isDeletingAllTags || isRowActionPending}
 					__next40pxDefaultSize
 				/>
 				<Button
@@ -334,6 +337,7 @@ export function useTagsController(
 		isDialogOpen,
 		loadError,
 		tags,
+		totalItems,
 		form,
 		formMode,
 		modalTitle: formMode === 'edit' ? __('Edit tag', 'minimal-map') : __('Add tag', 'minimal-map'),

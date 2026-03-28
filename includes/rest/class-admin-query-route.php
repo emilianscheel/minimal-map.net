@@ -105,6 +105,17 @@ class Admin_Query_Route {
 				'args'                => $this->get_pagination_args(),
 			)
 		);
+
+		register_rest_route(
+			self::REST_NAMESPACE,
+			self::REST_ROUTE_BASE . '/tags',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'handle_tags_request' ),
+				'permission_callback' => array( $this, 'can_manage_admin_data' ),
+				'args'                => $this->get_pagination_args(),
+			)
+		);
 	}
 
 	/**
@@ -262,6 +273,26 @@ class Admin_Query_Route {
 	}
 
 	/**
+	 * Handle admin tag list queries.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function handle_tags_request( WP_REST_Request $request ) {
+		$params = $this->get_pagination_params( $request );
+		$query  = $this->query_tag_terms( $params['page'], $params['per_page'], $params['search'] );
+
+		return rest_ensure_response(
+			$this->build_paginated_payload(
+				$query['items'],
+				$params['page'],
+				$params['per_page'],
+				$query['total_items']
+			)
+		);
+	}
+
+	/**
 	 * Get the locations query path.
 	 *
 	 * @return string
@@ -304,6 +335,15 @@ class Admin_Query_Route {
 	 */
 	public static function get_logos_rest_path() {
 		return '/' . self::REST_NAMESPACE . self::REST_ROUTE_BASE . '/logos';
+	}
+
+	/**
+	 * Get the tags query path.
+	 *
+	 * @return string
+	 */
+	public static function get_tags_rest_path() {
+		return '/' . self::REST_NAMESPACE . self::REST_ROUTE_BASE . '/tags';
 	}
 
 	/**

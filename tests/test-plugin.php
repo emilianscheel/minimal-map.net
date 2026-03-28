@@ -106,6 +106,28 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create one location tag term.
+	 *
+	 * @param string $name Tag name.
+	 * @return int
+	 */
+	private function create_tag( $name ) {
+		$result = wp_insert_term(
+			$name,
+			\MinimalMap\Tags\Tag_Taxonomy::TAXONOMY
+		);
+
+		$this->assertIsArray( $result );
+
+		$term_id = (int) $result['term_id'];
+
+		update_term_meta( $term_id, 'background_color', '#111111' );
+		update_term_meta( $term_id, 'foreground_color', '#ffffff' );
+
+		return $term_id;
+	}
+
+	/**
 	 * Create one administrator user and authenticate as that user.
 	 *
 	 * @return int
@@ -487,6 +509,10 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			\MinimalMap\Rest\Admin_Query_Route::get_collections_rest_path(),
 			$admin_config['collectionsConfig']['queryPath']
 		);
+		$this->assertSame(
+			\MinimalMap\Rest\Admin_Query_Route::get_tags_rest_path(),
+			$admin_config['tagsConfig']['queryPath']
+		);
 	}
 
 	/**
@@ -521,6 +547,33 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertSame( $matching_location_id, $data['items'][0]['id'] );
 		$this->assertSame( 'Cologne', $data['items'][0]['city'] );
 		$this->assertSame( $collection_id, $data['items'][0]['collections'][0]['id'] );
+	}
+
+	/**
+	 * Admin tags queries should paginate and search tag names.
+	 *
+	 * @return void
+	 */
+	public function test_admin_tags_route_paginates_and_searches_names() {
+		$this->create_admin_user();
+
+		$this->create_tag( 'Coffee' );
+		$this->create_tag( 'Bakery' );
+
+		$request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Admin_Query_Route::get_tags_rest_path() );
+		$request->set_param( 'page', 1 );
+		$request->set_param( 'per_page', 1 );
+		$request->set_param( 'search', 'Bake' );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 1, $data['totalItems'] );
+		$this->assertSame( 1, $data['totalPages'] );
+		$this->assertCount( 1, $data['items'] );
+		$this->assertSame( 'Bakery', $data['items'][0]['name'] );
+		$this->assertSame( '#111111', $data['items'][0]['background_color'] );
 	}
 
 	/**

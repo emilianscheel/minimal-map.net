@@ -6,7 +6,7 @@ import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAnalyticsQueries } from '../../lib/analytics/fetchAnalyticsQueries';
 import { fetchAnalyticsSummary } from '../../lib/analytics/fetchAnalyticsSummary';
 import { updateAnalyticsSettings } from '../../lib/analytics/updateAnalyticsSettings';
-import type { AnalyticsAdminConfig, AnalyticsSummary } from '../../types';
+import type { AnalyticsAdminConfig, AnalyticsSettings, AnalyticsSummary } from '../../types';
 import { DEFAULT_ANALYTICS_VIEW, EMPTY_ANALYTICS_SUMMARY } from './constants';
 import type { AnalyticsController } from './types';
 
@@ -16,7 +16,8 @@ export function useAnalyticsController(
 	const [enabled, setEnabled] = useState(config.enabled);
 	const [complianzEnabled, setComplianzEnabled] = useState(config.complianzEnabled);
 	const [isConfirmEnableModalOpen, setConfirmEnableModalOpen] = useState(false);
-	const [isLoading, setLoading] = useState(true);
+	const [isLoadingQueries, setLoadingQueries] = useState(true);
+	const [isLoadingSummary, setLoadingSummary] = useState(true);
 	const [isSavingSettings, setSavingSettings] = useState(false);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [notice, setNotice] = useState<AnalyticsController['notice']>(null);
@@ -50,10 +51,10 @@ export function useAnalyticsController(
 	useEffect(() => {
 		let isMounted = true;
 
-		setLoading(true);
+		setLoadingSummary(true);
 		setLoadError(null);
 
-		void Promise.all([loadSummary(), loadQueries(view)])
+		void loadSummary()
 			.catch((error) => {
 				if (!isMounted) {
 					return;
@@ -67,14 +68,43 @@ export function useAnalyticsController(
 			})
 			.finally(() => {
 				if (isMounted) {
-					setLoading(false);
+					setLoadingSummary(false);
 				}
 			});
 
 		return () => {
 			isMounted = false;
 		};
-	}, [loadQueries, loadSummary, view]);
+	}, [loadSummary]);
+
+	useEffect(() => {
+		let isMounted = true;
+
+		setLoadingQueries(true);
+		setLoadError(null);
+
+		void loadQueries(view)
+			.catch((error) => {
+				if (!isMounted) {
+					return;
+				}
+
+				setLoadError(
+					error instanceof Error
+						? error.message
+						: __('Analytics data could not be loaded.', 'minimal-map')
+				);
+			})
+			.finally(() => {
+				if (isMounted) {
+					setLoadingQueries(false);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [loadQueries, view]);
 
 	const onChangeView = useCallback((nextView: ViewTable) => {
 		setView((currentView) => ({
@@ -151,7 +181,7 @@ export function useAnalyticsController(
 		complianzEnabled,
 		headerAction,
 		isConfirmEnableModalOpen,
-		isLoading,
+		isLoading: isLoadingQueries || isLoadingSummary,
 		isSavingSettings,
 		loadError,
 		notice,

@@ -21,6 +21,7 @@ export interface TagsController {
 	isDialogOpen: boolean;
 	loadError: string | null;
 	tags: TagRecord[];
+	totalItems: number;
 	form: TagFormState;
 	formMode: TagFormMode;
 	modalTitle: string;

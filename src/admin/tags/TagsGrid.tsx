@@ -75,7 +75,7 @@ export default function TagsGrid({ controller }: { controller: TagsController })
 				fields={fields}
 				getItemId={(item: TagRecord) => `${item.id}`}
 				paginationInfo={{
-					totalItems: controller.tags.length,
+					totalItems: controller.totalItems,
 					totalPages: controller.totalPages,
 				}}
 				defaultLayouts={{

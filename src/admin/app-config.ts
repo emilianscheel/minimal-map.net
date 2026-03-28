@@ -44,6 +44,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		nonce: '',
 		restBase: '',
 		restPath: '',
+		queryPath: '',
 	},
 	stylesConfig: {
 		nonce: '',

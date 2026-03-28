@@ -31,7 +31,7 @@ export default function TagsView({ controller }: { controller: TagsController })
 					<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
 						<Spinner />
 					</div>
-				) : controller.tags.length === 0 ? (
+				) : controller.totalItems === 0 ? (
 					<TagsEmptyState controller={controller} />
 				) : (
 					<TagsGrid controller={controller} />

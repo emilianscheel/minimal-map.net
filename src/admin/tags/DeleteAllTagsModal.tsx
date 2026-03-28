@@ -61,10 +61,10 @@ export default function DeleteAllTagsModal({
 						_n(
 							'Are you sure you want to delete %d tag? This action cannot be undone.',
 							'Are you sure you want to delete %d tags? This action cannot be undone.',
-							controller.tags.length,
+							controller.totalItems,
 							'minimal-map'
 						),
-						controller.tags.length
+						controller.totalItems
 					)}
 				</p>
 				<div className="minimal-map-admin__collection-delete-dialog-actions">

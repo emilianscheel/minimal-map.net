@@ -753,6 +753,7 @@ class Config {
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => Tag_Taxonomy::REST_BASE,
 				'restPath' => Tag_Taxonomy::get_rest_path(),
+				'queryPath' => Admin_Query_Route::get_tags_rest_path(),
 			),
 			'stylesConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),

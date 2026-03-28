@@ -69,6 +69,7 @@ function createControllerStub(
 			{ id: 1, name: 'Coffee', background_color: '#111111', foreground_color: '#ffffff' } as never,
 			{ id: 2, name: 'Bakery', background_color: '#222222', foreground_color: '#ffffff' } as never,
 		],
+		totalItems: 2,
 		form: { name: '', background_color: '', foreground_color: '' },
 		formMode: 'create',
 		modalTitle: 'Add tag',
