@@ -237,6 +237,7 @@ final class Plugin {
 	 * @return void
 	 */
 	private function register_hooks() {
+		add_filter( 'plugin_action_links_' . plugin_basename( MINIMAL_MAP_FILE ), array( $this, 'add_plugin_action_links' ) );
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'init', array( $this->analytics, 'ensure_schema' ), 1 );
 		add_action( 'init', array( $this->analytics, 'schedule_cleanup' ) );
@@ -264,6 +265,29 @@ final class Plugin {
 		add_action( 'rest_api_init', array( $this->locations_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->license_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->styles_route, 'register' ) );
+	}
+
+	/**
+	 * Add plugin row action links on the plugins screen.
+	 *
+	 * @param array<string, string> $actions Existing action links.
+	 * @return array<string, string>
+	 */
+	public function add_plugin_action_links( $actions ) {
+		if ( ! current_user_can( Admin_Menu::CAPABILITY ) ) {
+			return $actions;
+		}
+
+		$dashboard_link = sprintf(
+			'<a href="%1$s">%2$s</a>',
+			esc_url( Admin_Menu::get_view_url( Admin_Menu::DEFAULT_VIEW ) ),
+			esc_html__( 'Dashboard', 'minimal-map' )
+		);
+
+		return array_merge(
+			array( 'dashboard' => $dashboard_link ),
+			$actions
+		);
 	}
 
 	/**
