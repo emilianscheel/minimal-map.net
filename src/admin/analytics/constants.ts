@@ -7,6 +7,7 @@ import type {
 	SearchAnalyticsSummary,
 	SelectionAnalyticsSummary,
 } from '../../types';
+import { normalizeAnalyticsTableView } from '../../lib/analytics/normalizeAnalyticsView';
 import type { AnalyticsSummaryByCategory, AnalyticsTableState, AnalyticsTablesByCategory } from './types';
 
 export const ANALYTICS_TABLE_PER_PAGE = 9;
@@ -80,42 +81,11 @@ export const EMPTY_ANALYTICS_SUMMARIES: AnalyticsSummaryByCategory = {
 };
 
 export function createDefaultAnalyticsView(category: AnalyticsEventCategory): ViewTable {
-	switch (category) {
-		case 'selection':
-			return {
-				type: 'table',
-				page: 1,
-				perPage: ANALYTICS_TABLE_PER_PAGE,
-				titleField: 'location_title',
-				fields: ['interaction_source', 'query_text', 'occurred_at_gmt'],
-				layout: {
-					enableMoving: false,
-				},
-			};
-		case 'action':
-			return {
-				type: 'table',
-				page: 1,
-				perPage: ANALYTICS_TABLE_PER_PAGE,
-				titleField: 'location_title',
-				fields: ['action_type', 'interaction_source', 'action_target', 'occurred_at_gmt'],
-				layout: {
-					enableMoving: false,
-				},
-			};
-		case 'search':
-		default:
-			return {
-				type: 'table',
-				page: 1,
-				perPage: ANALYTICS_TABLE_PER_PAGE,
-				titleField: 'query_text',
-				fields: ['query_type', 'result_count', 'nearest_distance_meters', 'occurred_at_gmt'],
-				layout: {
-					enableMoving: false,
-				},
-			};
-	}
+	return normalizeAnalyticsTableView(category, {
+		type: 'table',
+		page: 1,
+		perPage: ANALYTICS_TABLE_PER_PAGE,
+	});
 }
 
 export function createEmptyAnalyticsTableState(category: AnalyticsEventCategory): AnalyticsTableState {

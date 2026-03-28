@@ -1,5 +1,5 @@
 import { DataViews } from '@wordpress/dataviews/wp';
-import type { Field, View, ViewTable } from '@wordpress/dataviews';
+import type { Action, Field, View, ViewTable } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type {
@@ -9,7 +9,11 @@ import type {
 	AnalyticsQueryRecord,
 	AnalyticsQueryType,
 } from '../../types';
+import { normalizeAnalyticsQueryRecord } from '../../lib/analytics/normalizeAnalyticsQueries';
+import { normalizeAnalyticsTableView } from '../../lib/analytics/normalizeAnalyticsView';
 import { ANALYTICS_TABLE_PER_PAGE } from './constants';
+
+const EMPTY_ANALYTICS_ACTIONS: Action<AnalyticsQueryRecord>[] = [];
 
 function formatQueryType(value: AnalyticsQueryType): string {
 	switch (value) {
@@ -69,6 +73,23 @@ function formatDistance(distanceMeters: number | null): string {
 	return `${Math.round(distanceMeters)} m`;
 }
 
+function formatOccurredAt(
+	value: string,
+	timeFormatter: Intl.DateTimeFormat
+): string {
+	if (!value) {
+		return '—';
+	}
+
+	const date = new Date(value);
+
+	if (Number.isNaN(date.getTime())) {
+		return '—';
+	}
+
+	return timeFormatter.format(date);
+}
+
 function useAnalyticsFields(
 	category: AnalyticsEventCategory,
 	siteLocale: string,
@@ -114,7 +135,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => timeFormatter.format(new Date(item.occurred_at_gmt)),
+					render: ({ item }) => formatOccurredAt(item.occurred_at_gmt, timeFormatter),
 				},
 			] satisfies Field<AnalyticsQueryRecord>[];
 		}
@@ -160,7 +181,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => timeFormatter.format(new Date(item.occurred_at_gmt)),
+					render: ({ item }) => formatOccurredAt(item.occurred_at_gmt, timeFormatter),
 				},
 			] satisfies Field<AnalyticsQueryRecord>[];
 		}
@@ -173,7 +194,7 @@ function useAnalyticsFields(
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
-				render: ({ item }) => item.query_text,
+				render: ({ item }) => item.query_text || '—',
 			},
 			{
 				id: 'query_type',
@@ -205,7 +226,7 @@ function useAnalyticsFields(
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
-				render: ({ item }) => timeFormatter.format(new Date(item.occurred_at_gmt)),
+				render: ({ item }) => formatOccurredAt(item.occurred_at_gmt, timeFormatter),
 			},
 		] satisfies Field<AnalyticsQueryRecord>[];
 	}, [category, siteLocale, siteTimezone]);
@@ -231,21 +252,35 @@ export default function AnalyticsTable({
 	siteTimezone: string;
 }) {
 	const fields = useAnalyticsFields(category, siteLocale, siteTimezone);
+	const safeQueries = useMemo(
+		() => Array.isArray(queries)
+			? queries.map((query, index) => normalizeAnalyticsQueryRecord(query, category, index))
+			: [],
+		[category, queries]
+	);
+	const safeView = useMemo(
+		() => normalizeAnalyticsTableView(category, view),
+		[category, view]
+	);
 
 	return (
 		<div className="minimal-map-admin__analytics-table-wrap">
 			<DataViews
+				actions={EMPTY_ANALYTICS_ACTIONS}
 				config={{ perPageSizes: [ANALYTICS_TABLE_PER_PAGE] }}
-				data={queries}
+				data={safeQueries}
 				defaultLayouts={{ table: {} }}
 				fields={fields}
 				getItemId={(item: AnalyticsQueryRecord) => `${item.id}`}
+				isItemClickable={() => false}
 				paginationInfo={{
 					totalItems,
 					totalPages,
 				}}
-				view={view}
-				onChangeView={(nextView: View) => onChangeView(nextView as ViewTable)}
+				view={safeView}
+				onChangeView={(nextView: View) => onChangeView(
+					normalizeAnalyticsTableView(category, nextView as ViewTable)
+				)}
 			>
 				<div className="minimal-map-admin__analytics-dataviews-header">
 					<DataViews.Search />

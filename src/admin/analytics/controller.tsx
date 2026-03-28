@@ -5,6 +5,7 @@ import { exportAnalyticsFile, getAnalyticsExportErrorMessage } from '../../lib/a
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAnalyticsQueries } from '../../lib/analytics/fetchAnalyticsQueries';
 import { fetchAnalyticsSummary } from '../../lib/analytics/fetchAnalyticsSummary';
+import { normalizeAnalyticsTableView } from '../../lib/analytics/normalizeAnalyticsView';
 import { updateAnalyticsSettings } from '../../lib/analytics/updateAnalyticsSettings';
 import type {
 	ActionAnalyticsSummary,
@@ -112,12 +113,13 @@ export function useAnalyticsController(
 		category: AnalyticsEventCategory,
 		nextView: ViewTable,
 	) => {
+		const safeView = normalizeAnalyticsTableView(category, nextView);
 		const response: AnalyticsQueriesResponse = await fetchQueries(
 			config,
 			{
-				page: nextView.page,
-				perPage: nextView.perPage,
-				search: nextView.search,
+				page: safeView.page,
+				perPage: safeView.perPage,
+				search: safeView.search,
 			},
 			range,
 			category,
@@ -256,13 +258,14 @@ export function useAnalyticsController(
 	const onChangeView = useCallback((category: AnalyticsEventCategory, nextView: ViewTable) => {
 		setTables((currentTables) => {
 			const currentView = currentTables[category].view;
+			const mergedView = {
+				...currentView,
+				...nextView,
+				page: nextView.search !== currentView.search ? 1 : (nextView.page ?? currentView.page),
+			};
 
 			return updateTableState(currentTables, category, {
-				view: {
-					...currentView,
-					...nextView,
-					page: nextView.search !== currentView.search ? 1 : (nextView.page ?? currentView.page),
-				},
+				view: normalizeAnalyticsTableView(category, mergedView),
 			});
 		});
 	}, []);

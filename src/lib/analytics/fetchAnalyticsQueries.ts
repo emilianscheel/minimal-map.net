@@ -6,6 +6,7 @@ import type {
 	AnalyticsQueriesResponse,
 	AnalyticsRangeKey,
 } from '../../types';
+import { normalizeAnalyticsQueriesResponse } from './normalizeAnalyticsQueries';
 
 export async function fetchAnalyticsQueries(
 	config: AnalyticsAdminConfig,
@@ -23,8 +24,10 @@ export async function fetchAnalyticsQueries(
 		params.set('search', view.search.trim());
 	}
 
-	return apiFetch({
+	const response = await apiFetch({
 		method: 'GET',
 		path: `${config.queriesPath}?${params.toString()}`,
 	});
+
+	return normalizeAnalyticsQueriesResponse(response, category);
 }
