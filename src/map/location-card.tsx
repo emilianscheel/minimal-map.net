@@ -26,12 +26,15 @@ import {
   getOpeningHoursStatus,
 } from "./location-opening-hours";
 import type {
+  AnalyticsActionType,
+  AnalyticsInteractionSource,
   MapLocationLogo,
   MapLocationPoint,
   SocialMediaPlatform,
 } from "../types";
 
 export interface LocationResultCardProps {
+  analyticsSource?: Extract<AnalyticsInteractionSource, "search_panel" | "in_map_card">;
   distanceLabel?: string;
   googleMapsButtonShowIcon: boolean;
   googleMapsNavigation: boolean;
@@ -39,6 +42,10 @@ export interface LocationResultCardProps {
   isSelected?: boolean;
   location: MapLocationPoint;
   mode: "search" | "in-map";
+  onAnalyticsAction?: (
+    actionType: AnalyticsActionType,
+    actionTarget?: string,
+  ) => void;
   onSelect?: (location: MapLocationPoint, distanceLabel?: string) => void;
   siteLocale: string;
   siteTimezone: string;
@@ -91,6 +98,14 @@ export const getGoogleMapsDirectionsUrl = (
 export const hasLocationCoordinates = (location: MapLocationPoint): boolean =>
   Number.isFinite(location.lat) && Number.isFinite(location.lng);
 
+function getActionTargetHostname(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
 function getDelayUntilNextMinute(now: Date): number {
   return Math.max(
     1000,
@@ -120,7 +135,16 @@ const SearchResultLogo = ({ logo }: { logo: MapLocationLogo }) => {
   );
 };
 
-function LocationContactMeta({ location }: { location: MapLocationPoint }) {
+function LocationContactMeta({
+  location,
+  onAnalyticsAction,
+}: {
+  location: MapLocationPoint;
+  onAnalyticsAction?: (
+    actionType: AnalyticsActionType,
+    actionTarget?: string,
+  ) => void;
+}) {
   const socialPlatforms: Record<
     SocialMediaPlatform,
     { label: string; icon: any }
@@ -155,6 +179,7 @@ function LocationContactMeta({ location }: { location: MapLocationPoint }) {
         <a
           className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
           href={`tel:${location.telephone}`}
+          onClick={() => onAnalyticsAction?.("telephone")}
         >
           <Phone size={10} />
           <span>{location.telephone}</span>
@@ -164,6 +189,7 @@ function LocationContactMeta({ location }: { location: MapLocationPoint }) {
         <a
           className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
           href={`mailto:${location.email}`}
+          onClick={() => onAnalyticsAction?.("email")}
         >
           <Mail size={10} />
           <span>{location.email}</span>
@@ -173,6 +199,11 @@ function LocationContactMeta({ location }: { location: MapLocationPoint }) {
         <a
           className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
           href={location.website}
+          onClick={() =>
+            onAnalyticsAction?.(
+              "website",
+              getActionTargetHostname(location.website || ""),
+            )}
           rel="noreferrer noopener"
           target="_blank"
         >
@@ -189,6 +220,7 @@ function LocationContactMeta({ location }: { location: MapLocationPoint }) {
             key={index}
             className="minimal-map-search__meta-item minimal-map-search__meta-item--link"
             href={link.url}
+            onClick={() => onAnalyticsAction?.("social_media", link.platform)}
             rel="noreferrer noopener"
             target="_blank"
           >
@@ -203,6 +235,7 @@ function LocationContactMeta({ location }: { location: MapLocationPoint }) {
 
 export const LocationResultCard = memo(
   ({
+    analyticsSource,
     distanceLabel,
     googleMapsButtonShowIcon,
     googleMapsNavigation,
@@ -210,10 +243,22 @@ export const LocationResultCard = memo(
     isSelected,
     location,
     mode,
+    onAnalyticsAction,
     onSelect,
     siteLocale,
     siteTimezone,
   }: LocationResultCardProps) => {
+    const emitAnalyticsAction = (
+      actionType: AnalyticsActionType,
+      actionTarget?: string,
+    ) => {
+      if (!analyticsSource) {
+        return;
+      }
+
+      onAnalyticsAction?.(actionType, actionTarget);
+    };
+
     const openingHours = useMemo(
       () => normalizeOpeningHours(location.opening_hours),
       [location.opening_hours],
@@ -294,6 +339,9 @@ export const LocationResultCard = memo(
                 className={`minimal-map-search__result-opening-hours-trigger minimal-map-search__result-opening-hours-trigger--expandable ${openingHoursStateClass}`}
                 onClick={(event) => {
                   event.stopPropagation();
+                  if (!isOpeningHoursExpanded) {
+                    emitAnalyticsAction("opening_hours");
+                  }
                   setIsOpeningHoursExpanded((value) => !value);
                 }}
                 aria-expanded={isOpeningHoursExpanded}
@@ -363,7 +411,10 @@ export const LocationResultCard = memo(
                 </div>
               </div>
             )}
-            <LocationContactMeta location={location} />
+            <LocationContactMeta
+              location={location}
+              onAnalyticsAction={emitAnalyticsAction}
+            />
           </div>
           {location.logo && <SearchResultLogo logo={location.logo} />}
         </div>
@@ -405,6 +456,7 @@ export const LocationResultCard = memo(
                 <a
                   className="minimal-map-search__maps-link"
                   href={getGoogleMapsDirectionsUrl(location)}
+                  onClick={() => emitAnalyticsAction("google_maps")}
                   target="_blank"
                   rel="noreferrer noopener"
                 >

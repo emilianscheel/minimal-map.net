@@ -59,22 +59,33 @@ class Minimal_Map_Analytics_Test extends WP_UnitTestCase {
 
 		$data = array_merge(
 			array(
+				'event_category'          => 'search',
 				'query_text'              => 'Example query',
 				'query_type'              => 'text',
 				'result_count'            => 0,
 				'nearest_distance_meters' => null,
+				'location_id'             => null,
+				'location_title'          => '',
+				'interaction_source'      => '',
+				'action_type'             => '',
+				'action_target'           => '',
 				'occurred_at_gmt'         => gmdate( 'Y-m-d H:i:s' ),
 			),
 			$row
 		);
 
-		$formats = array( '%s', '%s', '%d', '%s' );
+		$formats = array();
 
-		if ( null === $data['nearest_distance_meters'] ) {
-			unset( $data['nearest_distance_meters'] );
-		} else {
-			$data['nearest_distance_meters'] = absint( $data['nearest_distance_meters'] );
-			$formats                         = array( '%s', '%s', '%d', '%d', '%s' );
+		foreach ( array_keys( $data ) as $key ) {
+			switch ( $key ) {
+				case 'result_count':
+				case 'nearest_distance_meters':
+				case 'location_id':
+					$formats[] = '%d';
+					break;
+				default:
+					$formats[] = '%s';
+			}
 		}
 
 		$wpdb->insert( $this->analytics->get_table_name(), $data, $formats );
@@ -446,6 +457,98 @@ class Minimal_Map_Analytics_Test extends WP_UnitTestCase {
 		$data     = $response->get_data();
 
 		$this->assertSame( 2, $data['totalItems'] );
+	}
+
+	/**
+	 * Tracking route should support selection and action payloads.
+	 *
+	 * @return void
+	 */
+	public function test_tracking_route_supports_selection_and_action_categories() {
+		update_option( \MinimalMap\Analytics\Analytics::OPTION_ENABLED, '1', false );
+
+		$selection_request = new WP_REST_Request( 'POST', \MinimalMap\Rest\Analytics_Track_Route::get_rest_path() );
+		$selection_request->set_param( 'event_category', 'selection' );
+		$selection_request->set_param( 'location_id', 12 );
+		$selection_request->set_param( 'location_title', 'Berlin Mitte' );
+		$selection_request->set_param( 'interaction_source', 'search_panel' );
+		$selection_request->set_param( 'query_text', 'Berlin' );
+
+		$action_request = new WP_REST_Request( 'POST', \MinimalMap\Rest\Analytics_Track_Route::get_rest_path() );
+		$action_request->set_param( 'event_category', 'action' );
+		$action_request->set_param( 'location_id', 12 );
+		$action_request->set_param( 'location_title', 'Berlin Mitte' );
+		$action_request->set_param( 'interaction_source', 'in_map_card' );
+		$action_request->set_param( 'action_type', 'website' );
+		$action_request->set_param( 'action_target', 'example.com' );
+
+		$this->assertTrue( rest_do_request( $selection_request )->get_data()['tracked'] );
+		$this->assertTrue( rest_do_request( $action_request )->get_data()['tracked'] );
+
+		$selection_summary = $this->analytics->get_summary( '30d', 'selection' );
+		$action_summary    = $this->analytics->get_summary( '30d', 'action' );
+
+		$this->assertSame( 1, $selection_summary['totalSelections'] );
+		$this->assertSame( 'Berlin Mitte', $selection_summary['breakdowns']['topLocations'][0]['label'] );
+		$this->assertSame( 1, $action_summary['totalActions'] );
+		$this->assertSame( 'Website', $action_summary['breakdowns']['actionTypeMix'][3]['label'] );
+		$this->assertSame( 1, $action_summary['breakdowns']['actionTypeMix'][3]['value'] );
+	}
+
+	/**
+	 * Summary and queries routes should filter by analytics category.
+	 *
+	 * @return void
+	 */
+	public function test_summary_and_queries_routes_filter_by_category() {
+		$now = gmdate( 'Y-m-d H:i:s' );
+
+		$this->insert_query_row(
+			array(
+				'event_category'  => 'search',
+				'query_text'      => 'Berlin',
+				'query_type'      => 'text',
+				'result_count'    => 2,
+				'occurred_at_gmt' => $now,
+			)
+		);
+		$this->insert_query_row(
+			array(
+				'event_category'     => 'selection',
+				'location_id'        => 1,
+				'location_title'     => 'Berlin Mitte',
+				'interaction_source' => 'search_panel',
+				'query_text'         => 'Berlin',
+				'occurred_at_gmt'    => $now,
+			)
+		);
+		$this->insert_query_row(
+			array(
+				'event_category'     => 'action',
+				'location_id'        => 1,
+				'location_title'     => 'Berlin Mitte',
+				'interaction_source' => 'in_map_card',
+				'action_type'        => 'google_maps',
+				'action_target'      => '',
+				'occurred_at_gmt'    => $now,
+			)
+		);
+
+		$summary_request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Analytics_Summary_Route::get_rest_path() );
+		$summary_request->set_param( 'category', 'selection' );
+		$summary_response = rest_do_request( $summary_request )->get_data();
+
+		$this->assertSame( 'selection', $summary_response['category'] );
+		$this->assertSame( 1, $summary_response['totalSelections'] );
+		$this->assertSame( 100.0, $summary_response['conversionRate'] );
+
+		$queries_request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Analytics_Queries_Route::get_rest_path() );
+		$queries_request->set_param( 'category', 'action' );
+		$queries_response = rest_do_request( $queries_request )->get_data();
+
+		$this->assertSame( 1, $queries_response['totalItems'] );
+		$this->assertSame( 'action', $queries_response['items'][0]['event_category'] );
+		$this->assertSame( 'google_maps', $queries_response['items'][0]['action_type'] );
 	}
 
 	/**

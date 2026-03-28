@@ -1,14 +1,16 @@
 import { __ } from '@wordpress/i18n';
-import type {
-	AnalyticsRangeKey,
-	AnalyticsSummary,
-} from '../../types';
 import type { ViewTable } from '@wordpress/dataviews';
+import type {
+	ActionAnalyticsSummary,
+	AnalyticsEventCategory,
+	AnalyticsRangeKey,
+	SearchAnalyticsSummary,
+	SelectionAnalyticsSummary,
+} from '../../types';
+import type { AnalyticsSummaryByCategory, AnalyticsTableState, AnalyticsTablesByCategory } from './types';
 
 export const ANALYTICS_TABLE_PER_PAGE = 9;
-export const ANALYTICS_SERIES_DAYS = 30;
 export const DEFAULT_ANALYTICS_RANGE: AnalyticsRangeKey = '30d';
-export const ANALYTICS_BREAKDOWN_LIMIT = 5;
 
 export const ANALYTICS_RANGE_OPTIONS: Array<{
 	value: AnalyticsRangeKey;
@@ -22,7 +24,8 @@ export const ANALYTICS_RANGE_OPTIONS: Array<{
 	{ value: 'all', label: __('All', 'minimal-map') },
 ];
 
-export const EMPTY_ANALYTICS_SUMMARY: AnalyticsSummary = {
+export const EMPTY_SEARCH_ANALYTICS_SUMMARY: SearchAnalyticsSummary = {
+	category: 'search',
 	totalSearches: 0,
 	searchesToday: 0,
 	zeroResultSearches: 0,
@@ -43,18 +46,89 @@ export const EMPTY_ANALYTICS_SUMMARY: AnalyticsSummary = {
 	},
 };
 
-export const DEFAULT_ANALYTICS_VIEW: ViewTable = {
-	type: 'table',
-	page: 1,
-	perPage: ANALYTICS_TABLE_PER_PAGE,
-	titleField: 'query_text',
-	fields: [
-		'query_type',
-		'result_count',
-		'nearest_distance_meters',
-		'occurred_at_gmt',
-	],
-	layout: {
-		enableMoving: false,
+export const EMPTY_SELECTION_ANALYTICS_SUMMARY: SelectionAnalyticsSummary = {
+	category: 'selection',
+	totalSelections: 0,
+	conversionRate: 0,
+	series: {
+		totalSelections: [],
+		conversionRate: [],
 	},
+	breakdowns: {
+		sourceMix: [],
+		topLocations: [],
+	},
+};
+
+export const EMPTY_ACTION_ANALYTICS_SUMMARY: ActionAnalyticsSummary = {
+	category: 'action',
+	totalActions: 0,
+	series: {
+		totalActions: [],
+	},
+	breakdowns: {
+		actionTypeMix: [],
+		sourceMix: [],
+		topLocations: [],
+	},
+};
+
+export const EMPTY_ANALYTICS_SUMMARIES: AnalyticsSummaryByCategory = {
+	search: EMPTY_SEARCH_ANALYTICS_SUMMARY,
+	selection: EMPTY_SELECTION_ANALYTICS_SUMMARY,
+	action: EMPTY_ACTION_ANALYTICS_SUMMARY,
+};
+
+export function createDefaultAnalyticsView(category: AnalyticsEventCategory): ViewTable {
+	switch (category) {
+		case 'selection':
+			return {
+				type: 'table',
+				page: 1,
+				perPage: ANALYTICS_TABLE_PER_PAGE,
+				titleField: 'location_title',
+				fields: ['interaction_source', 'query_text', 'occurred_at_gmt'],
+				layout: {
+					enableMoving: false,
+				},
+			};
+		case 'action':
+			return {
+				type: 'table',
+				page: 1,
+				perPage: ANALYTICS_TABLE_PER_PAGE,
+				titleField: 'location_title',
+				fields: ['action_type', 'interaction_source', 'action_target', 'occurred_at_gmt'],
+				layout: {
+					enableMoving: false,
+				},
+			};
+		case 'search':
+		default:
+			return {
+				type: 'table',
+				page: 1,
+				perPage: ANALYTICS_TABLE_PER_PAGE,
+				titleField: 'query_text',
+				fields: ['query_type', 'result_count', 'nearest_distance_meters', 'occurred_at_gmt'],
+				layout: {
+					enableMoving: false,
+				},
+			};
+	}
+}
+
+export function createEmptyAnalyticsTableState(category: AnalyticsEventCategory): AnalyticsTableState {
+	return {
+		queries: [],
+		totalItems: 0,
+		totalPages: 1,
+		view: createDefaultAnalyticsView(category),
+	};
+}
+
+export const EMPTY_ANALYTICS_TABLES: AnalyticsTablesByCategory = {
+	search: createEmptyAnalyticsTableState('search'),
+	selection: createEmptyAnalyticsTableState('selection'),
+	action: createEmptyAnalyticsTableState('action'),
 };

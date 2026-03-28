@@ -711,6 +711,24 @@ export type AnalyticsQueryType =
 	| 'coordinates'
 	| 'live_location';
 
+export type AnalyticsEventCategory =
+	| 'search'
+	| 'selection'
+	| 'action';
+
+export type AnalyticsInteractionSource =
+	| 'search_panel'
+	| 'map_marker'
+	| 'in_map_card';
+
+export type AnalyticsActionType =
+	| 'opening_hours'
+	| 'telephone'
+	| 'email'
+	| 'website'
+	| 'social_media'
+	| 'google_maps';
+
 export type AnalyticsRangeKey =
 	| 'today'
 	| 'yesterday'
@@ -730,7 +748,7 @@ export interface AnalyticsBreakdownDatum {
 	value: number;
 }
 
-export interface AnalyticsSummarySeries {
+export interface SearchAnalyticsSummarySeries {
 	totalSearches: AnalyticsTrendPoint[];
 	searchesToday: AnalyticsTrendPoint[];
 	zeroResultSearches: AnalyticsTrendPoint[];
@@ -738,22 +756,55 @@ export interface AnalyticsSummarySeries {
 	successRate: AnalyticsTrendPoint[];
 }
 
-export interface AnalyticsSummaryBreakdowns {
+export interface SearchAnalyticsSummaryBreakdowns {
 	queryTypeMix: AnalyticsBreakdownDatum[];
 	resultDistribution: AnalyticsBreakdownDatum[];
 	topQueries: AnalyticsBreakdownDatum[];
 	topZeroResultQueries: AnalyticsBreakdownDatum[];
 }
 
-export interface AnalyticsSummary {
+export interface SearchAnalyticsSummary {
+	category: 'search';
 	totalSearches: number;
 	searchesToday: number;
 	zeroResultSearches: number;
 	averageNearestDistanceMeters: number | null;
 	successRate: number | null;
-	series: AnalyticsSummarySeries;
-	breakdowns: AnalyticsSummaryBreakdowns;
+	series: SearchAnalyticsSummarySeries;
+	breakdowns: SearchAnalyticsSummaryBreakdowns;
 }
+
+export interface SelectionAnalyticsSummary {
+	category: 'selection';
+	totalSelections: number;
+	conversionRate: number;
+	series: {
+		totalSelections: AnalyticsTrendPoint[];
+		conversionRate: AnalyticsTrendPoint[];
+	};
+	breakdowns: {
+		sourceMix: AnalyticsBreakdownDatum[];
+		topLocations: AnalyticsBreakdownDatum[];
+	};
+}
+
+export interface ActionAnalyticsSummary {
+	category: 'action';
+	totalActions: number;
+	series: {
+		totalActions: AnalyticsTrendPoint[];
+	};
+	breakdowns: {
+		actionTypeMix: AnalyticsBreakdownDatum[];
+		sourceMix: AnalyticsBreakdownDatum[];
+		topLocations: AnalyticsBreakdownDatum[];
+	};
+}
+
+export type AnalyticsSummary =
+	| SearchAnalyticsSummary
+	| SelectionAnalyticsSummary
+	| ActionAnalyticsSummary;
 
 export interface AnalyticsSettings {
 	enabled: boolean;
@@ -762,10 +813,16 @@ export interface AnalyticsSettings {
 
 export interface AnalyticsQueryRecord {
 	id: number;
+	event_category: AnalyticsEventCategory;
 	query_text: string;
 	query_type: AnalyticsQueryType;
 	result_count: number;
 	nearest_distance_meters: number | null;
+	location_id: number | null;
+	location_title: string;
+	interaction_source: AnalyticsInteractionSource | '';
+	action_type: AnalyticsActionType | '';
+	action_target: string;
 	occurred_at_gmt: string;
 }
 
@@ -775,12 +832,35 @@ export interface AnalyticsQueriesResponse {
 	totalPages: number;
 }
 
-export interface AnalyticsTrackPayload {
+export interface AnalyticsSearchTrackPayload {
+	eventCategory: 'search';
 	queryText: string;
 	queryType: AnalyticsQueryType;
 	resultCount: number;
 	nearestDistanceMeters?: number | null;
 }
+
+export interface AnalyticsSelectionTrackPayload {
+	eventCategory: 'selection';
+	locationId: number;
+	locationTitle: string;
+	interactionSource: Extract<AnalyticsInteractionSource, 'search_panel' | 'map_marker'>;
+	queryText?: string;
+}
+
+export interface AnalyticsActionTrackPayload {
+	eventCategory: 'action';
+	locationId: number;
+	locationTitle: string;
+	interactionSource: Extract<AnalyticsInteractionSource, 'search_panel' | 'in_map_card'>;
+	actionType: AnalyticsActionType;
+	actionTarget?: string;
+}
+
+export type AnalyticsTrackPayload =
+	| AnalyticsSearchTrackPayload
+	| AnalyticsSelectionTrackPayload
+	| AnalyticsActionTrackPayload;
 
 export type StyleThemeSlot =
 	| 'background'

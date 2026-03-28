@@ -26,6 +26,7 @@ describe('trackMapSearchQuery', () => {
 			method: 'POST',
 			path: '/minimal-map/v1/analytics/track',
 			data: {
+				event_category: 'search',
 				query_text: 'lkasdjf',
 				query_type: 'address',
 				result_count: 0,
@@ -58,6 +59,7 @@ describe('trackMapSearchQuery', () => {
 			method: 'POST',
 			path: '/minimal-map/v1/analytics/track',
 			data: {
+				event_category: 'search',
 				query_text: 'Alexanderplatz',
 				query_type: 'address',
 				result_count: 2,

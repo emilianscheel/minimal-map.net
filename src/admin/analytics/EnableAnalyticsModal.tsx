@@ -19,7 +19,7 @@ export default function EnableAnalyticsModal({
 		>
 			<div className="minimal-map-admin__analytics-enable-dialog">
 				<p className="minimal-map-admin__analytics-enable-copy">
-					{__('Enabling analytics will start storing frontend search queries, result counts, nearest-distance snapshots, and timestamps for new searches.', 'minimal-map')}
+					{__('Enabling analytics will start storing frontend search, selection, and action events for new map interactions.', 'minimal-map')}
 				</p>
 				<p className="minimal-map-admin__analytics-enable-copy">
 					{__('You may need to update your privacy terms before turning this on.', 'minimal-map')}

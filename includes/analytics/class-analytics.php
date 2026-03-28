@@ -14,7 +14,7 @@ class Analytics {
 	/**
 	 * Stored schema version.
 	 */
-	const SCHEMA_VERSION = '1';
+	const SCHEMA_VERSION = '2';
 
 	/**
 	 * Enabled option name.
@@ -47,6 +47,27 @@ class Analytics {
 	 * @var string[]
 	 */
 	const QUERY_TYPES = array( 'text', 'address', 'coordinates', 'live_location' );
+
+	/**
+	 * Allowed event categories.
+	 *
+	 * @var string[]
+	 */
+	const EVENT_CATEGORIES = array( 'search', 'selection', 'action' );
+
+	/**
+	 * Allowed interaction sources.
+	 *
+	 * @var string[]
+	 */
+	const INTERACTION_SOURCES = array( 'search_panel', 'map_marker', 'in_map_card' );
+
+	/**
+	 * Allowed action types.
+	 *
+	 * @var string[]
+	 */
+	const ACTION_TYPES = array( 'opening_hours', 'telephone', 'email', 'website', 'social_media', 'google_maps' );
 
 	/**
 	 * Default summary range key.
@@ -90,14 +111,24 @@ class Analytics {
 		$charset_collate = $this->get_charset_collate();
 		$sql             = "CREATE TABLE {$table_name} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			query_text varchar(255) NOT NULL,
-			query_type varchar(32) NOT NULL,
+			event_category varchar(32) NOT NULL DEFAULT 'search',
+			query_text varchar(255) NOT NULL DEFAULT '',
+			query_type varchar(32) NOT NULL DEFAULT 'text',
 			result_count int(10) unsigned NOT NULL DEFAULT 0,
 			nearest_distance_meters int(10) unsigned NULL DEFAULT NULL,
+			location_id bigint(20) unsigned NULL DEFAULT NULL,
+			location_title varchar(255) NOT NULL DEFAULT '',
+			interaction_source varchar(32) NOT NULL DEFAULT '',
+			action_type varchar(32) NOT NULL DEFAULT '',
+			action_target varchar(255) NOT NULL DEFAULT '',
 			occurred_at_gmt datetime NOT NULL,
 			PRIMARY KEY  (id),
 			KEY occurred_at_gmt (occurred_at_gmt),
-			KEY query_type (query_type)
+			KEY event_category (event_category),
+			KEY query_type (query_type),
+			KEY interaction_source (interaction_source),
+			KEY action_type (action_type),
+			KEY location_id (location_id)
 		) {$charset_collate};";
 
 		dbDelta( $sql );
@@ -189,13 +220,23 @@ class Analytics {
 	 * @return bool
 	 */
 	public function track_query( $payload ) {
+		return $this->track_event( $payload );
+	}
+
+	/**
+	 * Track one analytics event if analytics is enabled.
+	 *
+	 * @param array<string, mixed> $payload Raw event payload.
+	 * @return bool
+	 */
+	public function track_event( $payload ) {
 		if ( ! $this->is_enabled() ) {
 			return false;
 		}
 
 		$normalized = $this->normalize_track_payload( $payload );
 
-		if ( '' === $normalized['query_text'] ) {
+		if ( ! $this->is_valid_track_payload( $normalized ) ) {
 			return false;
 		}
 
@@ -206,38 +247,126 @@ class Analytics {
 		$inserted = $wpdb->insert(
 			$this->get_table_name(),
 			array(
+				'event_category'          => $normalized['event_category'],
 				'query_text'              => $normalized['query_text'],
 				'query_type'              => $normalized['query_type'],
 				'result_count'            => $normalized['result_count'],
 				'nearest_distance_meters' => $normalized['nearest_distance_meters'],
+				'location_id'             => $normalized['location_id'],
+				'location_title'          => $normalized['location_title'],
+				'interaction_source'      => $normalized['interaction_source'],
+				'action_type'             => $normalized['action_type'],
+				'action_target'           => $normalized['action_target'],
 				'occurred_at_gmt'         => gmdate( 'Y-m-d H:i:s' ),
 			),
-			array( '%s', '%s', '%d', '%d', '%s' )
+			array( '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
 		);
 
 		return false !== $inserted;
 	}
 
 	/**
-	 * Sparkline window in days.
-	 */
-	const SUMMARY_SERIES_DAYS = 30;
-
-	/**
 	 * Return summary analytics metrics.
 	 *
 	 * @param string $range Selected analytics range.
-	 * @return array<string, float|int|null>
+	 * @param string $category Selected analytics category.
+	 * @return array<string, mixed>
 	 */
-	public function get_summary( $range = self::DEFAULT_SUMMARY_RANGE ) {
+	public function get_summary( $range = self::DEFAULT_SUMMARY_RANGE, $category = 'search' ) {
 		$this->ensure_schema();
 
-		$rows   = $this->get_summary_rows( $range );
+		$normalized_category = $this->sanitize_event_category( $category );
+
+		switch ( $normalized_category ) {
+			case 'selection':
+				return $this->get_selection_summary( $range );
+			case 'action':
+				return $this->get_action_summary( $range );
+			case 'search':
+			default:
+				return $this->get_search_summary( $range );
+		}
+	}
+
+	/**
+	 * Query paginated analytics rows.
+	 *
+	 * @param array<string, mixed> $args Query arguments.
+	 * @return array<string, mixed>
+	 */
+	public function query_queries( $args = array() ) {
+		$this->ensure_schema();
+
+		global $wpdb;
+
+		$page               = max( 1, isset( $args['page'] ) ? absint( $args['page'] ) : 1 );
+		$per_page           = max( 1, min( 50, isset( $args['per_page'] ) ? absint( $args['per_page'] ) : 10 ) );
+		$range              = isset( $args['range'] ) ? $this->normalize_range_key( $args['range'] ) : self::DEFAULT_SUMMARY_RANGE;
+		$category           = isset( $args['category'] ) ? $this->sanitize_event_category( $args['category'] ) : 'search';
+		$search             = isset( $args['search'] ) ? trim( sanitize_text_field( (string) $args['search'] ) ) : '';
+		$offset             = ( $page - 1 ) * $per_page;
+		$where_conditions   = array();
+		$params             = array();
+		$table_name         = $this->get_table_name();
+		$range_where        = $this->build_range_where_fragment( $range );
+		$category_where     = $this->build_category_where_fragment( $category );
+		$search_where       = $this->build_query_search_fragment( $category, $search );
+
+		if ( ! empty( $range_where['sql'] ) ) {
+			$where_conditions[] = ltrim( str_replace( 'WHERE ', '', $range_where['sql'] ) );
+			$params             = array_merge( $params, $range_where['params'] );
+		}
+
+		if ( ! empty( $category_where['sql'] ) ) {
+			$where_conditions[] = $category_where['sql'];
+			$params             = array_merge( $params, $category_where['params'] );
+		}
+
+		if ( ! empty( $search_where['sql'] ) ) {
+			$where_conditions[] = $search_where['sql'];
+			$params             = array_merge( $params, $search_where['params'] );
+		}
+
+		$where      = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
+		$count_sql  = "SELECT COUNT(*) FROM {$table_name} {$where}";
+		$items_sql  = "SELECT id, event_category, query_text, query_type, result_count, nearest_distance_meters, location_id, location_title, interaction_source, action_type, action_target, occurred_at_gmt
+			FROM {$table_name}
+			{$where}
+			ORDER BY occurred_at_gmt DESC, id DESC
+			LIMIT %d OFFSET %d";
+		$total_items = (int) (
+			$params
+				? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) )
+				: $wpdb->get_var( $count_sql )
+		);
+
+		$item_params   = $params;
+		$item_params[] = $per_page;
+		$item_params[] = $offset;
+		$query         = $wpdb->prepare( $items_sql, $item_params );
+		$rows          = $wpdb->get_results( $query, ARRAY_A );
+
+		return array(
+			'items'      => array_map( array( $this, 'normalize_row' ), is_array( $rows ) ? $rows : array() ),
+			'totalItems' => $total_items,
+			'totalPages' => max( 1, (int) ceil( $total_items / $per_page ) ),
+		);
+	}
+
+	/**
+	 * Return search analytics summary.
+	 *
+	 * @param string $range Selected analytics range.
+	 * @return array<string, mixed>
+	 */
+	private function get_search_summary( $range ) {
+		$rows   = $this->get_summary_rows( $range, 'search' );
 		$total  = count( $rows );
-		$series = $this->build_summary_series( $rows, $range );
+		$series = $this->build_search_summary_series( $rows, $range );
 
 		if ( 0 === $total ) {
 			return array(
+				'category'                     => 'search',
 				'totalSearches'                => 0,
 				'searchesToday'                => 0,
 				'zeroResultSearches'           => 0,
@@ -256,9 +385,10 @@ class Analytics {
 		$searches_today = $this->count_rows_for_local_date( $rows, new \DateTimeImmutable( 'now', wp_timezone() ) );
 		$zero_results   = $this->count_zero_result_rows( $rows );
 		$average        = $this->get_average_nearest_distance( $rows );
-		$success_rate   = $this->calculate_success_rate( $total, $zero_results );
+		$success_rate   = $this->calculate_rate( $total - $zero_results, $total );
 
 		return array(
+			'category'                     => 'search',
 			'totalSearches'                => $total,
 			'searchesToday'                => $searches_today,
 			'zeroResultSearches'           => $zero_results,
@@ -275,32 +405,122 @@ class Analytics {
 	}
 
 	/**
-	 * Build stable daily series for the summary sparklines.
+	 * Return selection analytics summary.
 	 *
-	 * @param array<int, array<string, mixed>> $rows Analytics rows in the series window.
-	 * @param string                           $range Selected analytics range.
+	 * @param string $range Selected analytics range.
+	 * @return array<string, mixed>
+	 */
+	private function get_selection_summary( $range ) {
+		$selection_rows = $this->get_summary_rows( $range, 'selection' );
+		$search_rows    = $this->get_summary_rows( $range, 'search' );
+		$series         = $this->build_selection_summary_series( $selection_rows, $search_rows, $range );
+		$total          = count( $selection_rows );
+		$search_total   = count( $search_rows );
+
+		return array(
+			'category'       => 'selection',
+			'totalSelections'=> $total,
+			'conversionRate' => $this->calculate_rate( $total, $search_total ),
+			'series'         => $series,
+			'breakdowns'     => array(
+				'sourceMix'    => $this->build_source_mix_breakdown(
+					$selection_rows,
+					array(
+						'search_panel' => __( 'Search panel', 'minimal-map' ),
+						'map_marker'   => __( 'Map marker', 'minimal-map' ),
+					)
+				),
+				'topLocations' => $this->build_top_location_breakdown( $selection_rows ),
+			),
+		);
+	}
+
+	/**
+	 * Return action analytics summary.
+	 *
+	 * @param string $range Selected analytics range.
+	 * @return array<string, mixed>
+	 */
+	private function get_action_summary( $range ) {
+		$rows   = $this->get_summary_rows( $range, 'action' );
+		$total  = count( $rows );
+		$series = $this->build_action_summary_series( $rows, $range );
+
+		return array(
+			'category'    => 'action',
+			'totalActions'=> $total,
+			'series'      => $series,
+			'breakdowns'  => array(
+				'actionTypeMix' => $this->build_action_type_mix_breakdown( $rows ),
+				'sourceMix'     => $this->build_source_mix_breakdown(
+					$rows,
+					array(
+						'search_panel' => __( 'Search panel', 'minimal-map' ),
+						'in_map_card'  => __( 'In-map card', 'minimal-map' ),
+					)
+				),
+				'topLocations'  => $this->build_top_location_breakdown( $rows ),
+			),
+		);
+	}
+
+	/**
+	 * Return query rows for one summary range and category.
+	 *
+	 * @param string $range Selected analytics range.
+	 * @param string $category Selected category.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function get_summary_rows( $range, $category ) {
+		global $wpdb;
+
+		$table_name     = $this->get_table_name();
+		$where_clauses  = array();
+		$params         = array();
+		$range_where    = $this->build_range_where_fragment( $range );
+		$category_where = $this->build_category_where_fragment( $category );
+
+		if ( ! empty( $range_where['sql'] ) ) {
+			$where_clauses[] = ltrim( str_replace( 'WHERE ', '', $range_where['sql'] ) );
+			$params          = array_merge( $params, $range_where['params'] );
+		}
+
+		if ( ! empty( $category_where['sql'] ) ) {
+			$where_clauses[] = $category_where['sql'];
+			$params          = array_merge( $params, $category_where['params'] );
+		}
+
+		$where = empty( $where_clauses ) ? '' : 'WHERE ' . implode( ' AND ', $where_clauses );
+		$sql   = "SELECT event_category, query_text, query_type, result_count, nearest_distance_meters, location_id, location_title, interaction_source, action_type, action_target, occurred_at_gmt
+			FROM {$table_name}
+			{$where}
+			ORDER BY occurred_at_gmt ASC, id ASC";
+
+		if ( ! empty( $params ) ) {
+			$sql = $wpdb->prepare( $sql, $params );
+		}
+
+		$rows = $wpdb->get_results( $sql, ARRAY_A );
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Build stable search series for the selected range.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Search rows.
+	 * @param string                           $range Selected range.
 	 * @return array<string, array<int, array<string, int|float|string|null>>>
 	 */
-	private function build_summary_series( $rows, $range ) {
+	private function build_search_summary_series( $rows, $range ) {
 		$bucket_state = $this->initialize_summary_buckets( $range, $rows );
 		$buckets      = $bucket_state['buckets'];
 		$granularity  = $bucket_state['granularity'];
 
 		foreach ( $rows as $row ) {
-			if ( empty( $row['occurred_at_gmt'] ) ) {
-				continue;
-			}
+			$local_key = $this->get_row_bucket_key( $row, $granularity );
 
-			try {
-				$occurred_at = new \DateTimeImmutable( (string) $row['occurred_at_gmt'], new \DateTimeZone( 'UTC' ) );
-			} catch ( \Exception $exception ) {
-				continue;
-			}
-
-			$local_occurrence = $occurred_at->setTimezone( wp_timezone() );
-			$local_key        = $this->format_bucket_key( $local_occurrence, $granularity );
-
-			if ( ! isset( $buckets[ $local_key ] ) ) {
+			if ( ! $local_key || ! isset( $buckets[ $local_key ] ) ) {
 				continue;
 			}
 
@@ -326,30 +546,28 @@ class Analytics {
 			'successRate'                  => array(),
 		);
 
-		foreach ( $buckets as $date => $day ) {
+		foreach ( $buckets as $date => $bucket ) {
 			$series['totalSearches'][] = array(
 				'date'  => $date,
-				'value' => $day['totalSearches'],
+				'value' => $bucket['totalSearches'],
 			);
 			$series['searchesToday'][] = array(
 				'date'  => $date,
-				'value' => $day['searchesToday'],
+				'value' => $bucket['searchesToday'],
 			);
 			$series['zeroResultSearches'][] = array(
 				'date'  => $date,
-				'value' => $day['zeroResultSearches'],
+				'value' => $bucket['zeroResultSearches'],
 			);
 			$series['averageNearestDistanceMeters'][] = array(
 				'date'  => $date,
-				'value' => $day['averageNearestDistanceMeters_count'] > 0
-					? $day['averageNearestDistanceMeters_sum'] / $day['averageNearestDistanceMeters_count']
+				'value' => $bucket['averageNearestDistanceMeters_count'] > 0
+					? $bucket['averageNearestDistanceMeters_sum'] / $bucket['averageNearestDistanceMeters_count']
 					: 0,
 			);
 			$series['successRate'][] = array(
 				'date'  => $date,
-				'value' => $day['totalSearches'] > 0
-					? ( $day['successfulSearches'] / $day['totalSearches'] ) * 100
-					: 0,
+				'value' => $this->calculate_rate( $bucket['successfulSearches'], $bucket['totalSearches'] ),
 			);
 		}
 
@@ -357,28 +575,84 @@ class Analytics {
 	}
 
 	/**
-	 * Return query rows for one summary range.
+	 * Build stable selection series for the selected range.
 	 *
-	 * @param string $range Selected analytics range.
-	 * @return array<int, array<string, mixed>>
+	 * @param array<int, array<string, mixed>> $selection_rows Selection rows.
+	 * @param array<int, array<string, mixed>> $search_rows Search rows.
+	 * @param string                           $range Selected range.
+	 * @return array<string, array<int, array<string, int|float|string|null>>>
 	 */
-	private function get_summary_rows( $range ) {
-		global $wpdb;
+	private function build_selection_summary_series( $selection_rows, $search_rows, $range ) {
+		$bucket_state = $this->initialize_summary_buckets( $range, array_merge( $selection_rows, $search_rows ) );
+		$buckets      = $bucket_state['buckets'];
+		$granularity  = $bucket_state['granularity'];
 
-		$table_name     = $this->get_table_name();
-		$where_fragment = $this->build_range_where_fragment( $range );
-		$sql            = "SELECT query_text, query_type, result_count, nearest_distance_meters, occurred_at_gmt
-			FROM {$table_name}
-			{$where_fragment['sql']}
-			ORDER BY occurred_at_gmt ASC, id ASC";
+		foreach ( $search_rows as $row ) {
+			$local_key = $this->get_row_bucket_key( $row, $granularity );
 
-		if ( ! empty( $where_fragment['params'] ) ) {
-			$sql = $wpdb->prepare( $sql, $where_fragment['params'] );
+			if ( $local_key && isset( $buckets[ $local_key ] ) ) {
+				$buckets[ $local_key ]['searches'] += 1;
+			}
 		}
 
-		$rows = $wpdb->get_results( $sql, ARRAY_A );
+		foreach ( $selection_rows as $row ) {
+			$local_key = $this->get_row_bucket_key( $row, $granularity );
 
-		return is_array( $rows ) ? $rows : array();
+			if ( $local_key && isset( $buckets[ $local_key ] ) ) {
+				$buckets[ $local_key ]['selections'] += 1;
+			}
+		}
+
+		$series = array(
+			'totalSelections' => array(),
+			'conversionRate'  => array(),
+		);
+
+		foreach ( $buckets as $date => $bucket ) {
+			$series['totalSelections'][] = array(
+				'date'  => $date,
+				'value' => $bucket['selections'],
+			);
+			$series['conversionRate'][] = array(
+				'date'  => $date,
+				'value' => $this->calculate_rate( $bucket['selections'], $bucket['searches'] ),
+			);
+		}
+
+		return $series;
+	}
+
+	/**
+	 * Build stable action series for the selected range.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Action rows.
+	 * @param string                           $range Selected range.
+	 * @return array<string, array<int, array<string, int|float|string|null>>>
+	 */
+	private function build_action_summary_series( $rows, $range ) {
+		$bucket_state = $this->initialize_summary_buckets( $range, $rows );
+		$buckets      = $bucket_state['buckets'];
+		$granularity  = $bucket_state['granularity'];
+		$series       = array(
+			'totalActions' => array(),
+		);
+
+		foreach ( $rows as $row ) {
+			$local_key = $this->get_row_bucket_key( $row, $granularity );
+
+			if ( $local_key && isset( $buckets[ $local_key ] ) ) {
+				$buckets[ $local_key ]['totalActions'] += 1;
+			}
+		}
+
+		foreach ( $buckets as $date => $bucket ) {
+			$series['totalActions'][] = array(
+				'date'  => $date,
+				'value' => $bucket['totalActions'],
+			);
+		}
+
+		return $series;
 	}
 
 	/**
@@ -406,9 +680,9 @@ class Analytics {
 			$end_month        = ( new \DateTimeImmutable( 'now', wp_timezone() ) )->modify( 'first day of this month' )->setTime( 0, 0, 0 );
 
 			while ( $cursor->getTimestamp() <= $end_month->getTimestamp() ) {
-				$key            = $this->format_bucket_key( $cursor, $granularity );
+				$key             = $this->format_bucket_key( $cursor, $granularity );
 				$buckets[ $key ] = $this->get_empty_summary_bucket();
-				$cursor         = $cursor->modify( '+1 month' );
+				$cursor          = $cursor->modify( '+1 month' );
 			}
 
 			return array(
@@ -422,9 +696,9 @@ class Analytics {
 		$step   = 'hour' === $granularity ? '+1 hour' : '+1 day';
 
 		while ( $cursor instanceof \DateTimeImmutable && $end instanceof \DateTimeImmutable && $cursor->getTimestamp() < $end->getTimestamp() ) {
-			$key            = $this->format_bucket_key( $cursor, $granularity );
+			$key             = $this->format_bucket_key( $cursor, $granularity );
 			$buckets[ $key ] = $this->get_empty_summary_bucket();
-			$cursor         = $cursor->modify( $step );
+			$cursor          = $cursor->modify( $step );
 		}
 
 		return array(
@@ -440,12 +714,15 @@ class Analytics {
 	 */
 	private function get_empty_summary_bucket() {
 		return array(
-			'totalSearches'                     => 0,
-			'searchesToday'                     => 0,
-			'zeroResultSearches'                => 0,
-			'successfulSearches'                => 0,
-			'averageNearestDistanceMeters_sum'  => 0.0,
-			'averageNearestDistanceMeters_count'=> 0,
+			'totalSearches'                      => 0,
+			'searchesToday'                      => 0,
+			'zeroResultSearches'                 => 0,
+			'successfulSearches'                 => 0,
+			'averageNearestDistanceMeters_sum'   => 0.0,
+			'averageNearestDistanceMeters_count' => 0,
+			'searches'                           => 0,
+			'selections'                         => 0,
+			'totalActions'                       => 0,
 		);
 	}
 
@@ -515,9 +792,9 @@ class Analytics {
 	 * @return array<string, mixed>
 	 */
 	private function build_range_where_fragment( $range ) {
-		$config      = $this->get_range_config( $range );
-		$conditions  = array();
-		$params      = array();
+		$config     = $this->get_range_config( $range );
+		$conditions = array();
+		$params     = array();
 
 		if ( ! empty( $config['start_gmt'] ) ) {
 			$conditions[] = 'occurred_at_gmt >= %s';
@@ -533,6 +810,67 @@ class Analytics {
 			'sql'    => empty( $conditions ) ? '' : 'WHERE ' . implode( ' AND ', $conditions ),
 			'params' => $params,
 		);
+	}
+
+	/**
+	 * Build one SQL category fragment with prepared params.
+	 *
+	 * @param string $category Selected category.
+	 * @return array<string, mixed>
+	 */
+	private function build_category_where_fragment( $category ) {
+		$normalized_category = $this->sanitize_event_category( $category );
+
+		if ( 'search' === $normalized_category ) {
+			return array(
+				'sql'    => "(event_category = 'search' OR event_category = '' OR event_category IS NULL)",
+				'params' => array(),
+			);
+		}
+
+		return array(
+			'sql'    => 'event_category = %s',
+			'params' => array( $normalized_category ),
+		);
+	}
+
+	/**
+	 * Build one SQL text search fragment with prepared params.
+	 *
+	 * @param string $category Selected category.
+	 * @param string $search Search string.
+	 * @return array<string, mixed>
+	 */
+	private function build_query_search_fragment( $category, $search ) {
+		global $wpdb;
+
+		if ( '' === $search ) {
+			return array(
+				'sql'    => '',
+				'params' => array(),
+			);
+		}
+
+		$like = '%' . $wpdb->esc_like( $search ) . '%';
+
+		switch ( $this->sanitize_event_category( $category ) ) {
+			case 'selection':
+				return array(
+					'sql'    => '(location_title LIKE %s OR query_text LIKE %s OR interaction_source LIKE %s)',
+					'params' => array( $like, $like, $like ),
+				);
+			case 'action':
+				return array(
+					'sql'    => '(location_title LIKE %s OR action_type LIKE %s OR action_target LIKE %s OR interaction_source LIKE %s)',
+					'params' => array( $like, $like, $like, $like ),
+				);
+			case 'search':
+			default:
+				return array(
+					'sql'    => 'query_text LIKE %s',
+					'params' => array( $like ),
+				);
+		}
 	}
 
 	/**
@@ -581,6 +919,27 @@ class Analytics {
 	}
 
 	/**
+	 * Return one row bucket key.
+	 *
+	 * @param array<string, mixed> $row Row data.
+	 * @param string               $granularity Bucket granularity.
+	 * @return string|null
+	 */
+	private function get_row_bucket_key( $row, $granularity ) {
+		if ( empty( $row['occurred_at_gmt'] ) ) {
+			return null;
+		}
+
+		try {
+			$local_occurrence = $this->get_local_occurrence( $row['occurred_at_gmt'] );
+		} catch ( \Exception $exception ) {
+			return null;
+		}
+
+		return $this->format_bucket_key( $local_occurrence, $granularity );
+	}
+
+	/**
 	 * Count rows that occurred on one local date.
 	 *
 	 * @param array<int, array<string, mixed>> $rows Summary rows.
@@ -592,17 +951,9 @@ class Analytics {
 		$count      = 0;
 
 		foreach ( $rows as $row ) {
-			if ( empty( $row['occurred_at_gmt'] ) ) {
-				continue;
-			}
+			$bucket_key = $this->get_row_bucket_key( $row, 'day' );
 
-			try {
-				$local_occurrence = $this->get_local_occurrence( $row['occurred_at_gmt'] );
-			} catch ( \Exception $exception ) {
-				continue;
-			}
-
-			if ( $local_occurrence->format( 'Y-m-d' ) === $target_key ) {
+			if ( $bucket_key === $target_key ) {
 				++$count;
 			}
 		}
@@ -655,18 +1006,18 @@ class Analytics {
 	}
 
 	/**
-	 * Calculate one success-rate percentage.
+	 * Calculate one percentage rate.
 	 *
-	 * @param int $total Total searches.
-	 * @param int $zero_results Zero-result searches.
-	 * @return float|null
+	 * @param int $numerator Numerator.
+	 * @param int $denominator Denominator.
+	 * @return float
 	 */
-	private function calculate_success_rate( $total, $zero_results ) {
-		if ( $total <= 0 ) {
+	private function calculate_rate( $numerator, $denominator ) {
+		if ( $denominator <= 0 ) {
 			return 0.0;
 		}
 
-		return ( ( $total - $zero_results ) / $total ) * 100;
+		return ( $numerator / $denominator ) * 100;
 	}
 
 	/**
@@ -789,6 +1140,207 @@ class Analytics {
 			$counts[ $label ] += 1;
 		}
 
+		return $this->sort_counts_to_breakdown_items( $counts );
+	}
+
+	/**
+	 * Build one source-mix breakdown.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @param array<string, string>            $labels Labels keyed by source.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function build_source_mix_breakdown( $rows, $labels ) {
+		$counts = array_fill_keys( array_keys( $labels ), 0 );
+
+		foreach ( $rows as $row ) {
+			$source = $this->sanitize_interaction_source( isset( $row['interaction_source'] ) ? $row['interaction_source'] : '' );
+
+			if ( '' !== $source && isset( $counts[ $source ] ) ) {
+				$counts[ $source ] += 1;
+			}
+		}
+
+		$items = array();
+
+		foreach ( $labels as $key => $label ) {
+			$items[] = array(
+				'key'   => $key,
+				'label' => $label,
+				'value' => $counts[ $key ],
+			);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Build one action-type mix breakdown.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function build_action_type_mix_breakdown( $rows ) {
+		$labels = array(
+			'opening_hours' => __( 'Opening hours', 'minimal-map' ),
+			'telephone'     => __( 'Phone', 'minimal-map' ),
+			'email'         => __( 'Email', 'minimal-map' ),
+			'website'       => __( 'Website', 'minimal-map' ),
+			'social_media'  => __( 'Social media', 'minimal-map' ),
+			'google_maps'   => __( 'Google Maps', 'minimal-map' ),
+		);
+		$counts = array_fill_keys( array_keys( $labels ), 0 );
+
+		foreach ( $rows as $row ) {
+			$action_type = $this->sanitize_action_type( isset( $row['action_type'] ) ? $row['action_type'] : '' );
+
+			if ( '' !== $action_type && isset( $counts[ $action_type ] ) ) {
+				$counts[ $action_type ] += 1;
+			}
+		}
+
+		$items = array();
+
+		foreach ( $labels as $key => $label ) {
+			$items[] = array(
+				'key'   => $key,
+				'label' => $label,
+				'value' => $counts[ $key ],
+			);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Build one top-locations breakdown.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function build_top_location_breakdown( $rows ) {
+		$counts = array();
+
+		foreach ( $rows as $row ) {
+			$label = isset( $row['location_title'] ) ? trim( sanitize_text_field( (string) $row['location_title'] ) ) : '';
+
+			if ( '' === $label ) {
+				continue;
+			}
+
+			if ( ! isset( $counts[ $label ] ) ) {
+				$counts[ $label ] = 0;
+			}
+
+			$counts[ $label ] += 1;
+		}
+
+		return $this->sort_counts_to_breakdown_items( $counts );
+	}
+
+	/**
+	 * Normalize one raw analytics row for REST responses.
+	 *
+	 * @param array<string, mixed> $row Raw database row.
+	 * @return array<string, mixed>
+	 */
+	private function normalize_row( $row ) {
+		$occurred_at = isset( $row['occurred_at_gmt'] ) ? strtotime( (string) $row['occurred_at_gmt'] . ' UTC' ) : false;
+
+		return array(
+			'id'                      => isset( $row['id'] ) ? absint( $row['id'] ) : 0,
+			'event_category'          => $this->sanitize_event_category( isset( $row['event_category'] ) ? $row['event_category'] : 'search' ),
+			'query_text'              => isset( $row['query_text'] ) ? sanitize_text_field( (string) $row['query_text'] ) : '',
+			'query_type'              => $this->sanitize_query_type( isset( $row['query_type'] ) ? $row['query_type'] : 'text' ),
+			'result_count'            => isset( $row['result_count'] ) ? max( 0, absint( $row['result_count'] ) ) : 0,
+			'nearest_distance_meters' => isset( $row['nearest_distance_meters'] ) && null !== $row['nearest_distance_meters']
+				? max( 0, absint( $row['nearest_distance_meters'] ) )
+				: null,
+			'location_id'             => isset( $row['location_id'] ) && null !== $row['location_id']
+				? absint( $row['location_id'] )
+				: null,
+			'location_title'          => isset( $row['location_title'] ) ? sanitize_text_field( (string) $row['location_title'] ) : '',
+			'interaction_source'      => $this->sanitize_interaction_source( isset( $row['interaction_source'] ) ? $row['interaction_source'] : '' ),
+			'action_type'             => $this->sanitize_action_type( isset( $row['action_type'] ) ? $row['action_type'] : '' ),
+			'action_target'           => isset( $row['action_target'] ) ? sanitize_text_field( (string) $row['action_target'] ) : '',
+			'occurred_at_gmt'         => false !== $occurred_at ? gmdate( 'c', $occurred_at ) : gmdate( 'c' ),
+		);
+	}
+
+	/**
+	 * Normalize and sanitize one tracking payload.
+	 *
+	 * @param array<string, mixed> $payload Raw tracking payload.
+	 * @return array<string, mixed>
+	 */
+	private function normalize_track_payload( $payload ) {
+		$query_text = isset( $payload['query_text'] ) ? trim( sanitize_text_field( (string) $payload['query_text'] ) ) : '';
+
+		if ( strlen( $query_text ) > 255 ) {
+			$query_text = substr( $query_text, 0, 255 );
+		}
+
+		$location_title = isset( $payload['location_title'] ) ? trim( sanitize_text_field( (string) $payload['location_title'] ) ) : '';
+
+		if ( strlen( $location_title ) > 255 ) {
+			$location_title = substr( $location_title, 0, 255 );
+		}
+
+		$action_target = isset( $payload['action_target'] ) ? trim( sanitize_text_field( (string) $payload['action_target'] ) ) : '';
+
+		if ( strlen( $action_target ) > 255 ) {
+			$action_target = substr( $action_target, 0, 255 );
+		}
+
+		$nearest_distance = null;
+
+		if ( isset( $payload['nearest_distance_meters'] ) && '' !== $payload['nearest_distance_meters'] && null !== $payload['nearest_distance_meters'] ) {
+			$nearest_distance = max( 0, (int) round( (float) $payload['nearest_distance_meters'] ) );
+		}
+
+		$location_id = isset( $payload['location_id'] ) && '' !== $payload['location_id']
+			? absint( $payload['location_id'] )
+			: null;
+
+		return array(
+			'event_category'          => $this->sanitize_event_category( isset( $payload['event_category'] ) ? $payload['event_category'] : 'search' ),
+			'query_text'              => $query_text,
+			'query_type'              => $this->sanitize_query_type( isset( $payload['query_type'] ) ? $payload['query_type'] : 'text' ),
+			'result_count'            => isset( $payload['result_count'] ) ? max( 0, absint( $payload['result_count'] ) ) : 0,
+			'nearest_distance_meters' => $nearest_distance,
+			'location_id'             => $location_id,
+			'location_title'          => $location_title,
+			'interaction_source'      => $this->sanitize_interaction_source( isset( $payload['interaction_source'] ) ? $payload['interaction_source'] : '' ),
+			'action_type'             => $this->sanitize_action_type( isset( $payload['action_type'] ) ? $payload['action_type'] : '' ),
+			'action_target'           => $action_target,
+		);
+	}
+
+	/**
+	 * Validate one normalized tracking payload.
+	 *
+	 * @param array<string, mixed> $payload Normalized tracking payload.
+	 * @return bool
+	 */
+	private function is_valid_track_payload( $payload ) {
+		switch ( $payload['event_category'] ) {
+			case 'selection':
+				return ! empty( $payload['location_id'] ) && '' !== $payload['location_title'] && '' !== $payload['interaction_source'];
+			case 'action':
+				return ! empty( $payload['location_id'] ) && '' !== $payload['location_title'] && '' !== $payload['interaction_source'] && '' !== $payload['action_type'];
+			case 'search':
+			default:
+				return '' !== $payload['query_text'];
+		}
+	}
+
+	/**
+	 * Sort one associative count map into breakdown items.
+	 *
+	 * @param array<string, int> $counts Count map.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function sort_counts_to_breakdown_items( $counts ) {
 		if ( empty( $counts ) ) {
 			return array();
 		}
@@ -820,114 +1372,6 @@ class Analytics {
 	}
 
 	/**
-	 * Query paginated analytics rows.
-	 *
-	 * @param array<string, mixed> $args Query arguments.
-	 * @return array<string, mixed>
-	 */
-	public function query_queries( $args = array() ) {
-		$this->ensure_schema();
-
-		global $wpdb;
-
-		$page     = max( 1, isset( $args['page'] ) ? absint( $args['page'] ) : 1 );
-		$per_page = max( 1, min( 50, isset( $args['per_page'] ) ? absint( $args['per_page'] ) : 10 ) );
-		$range    = isset( $args['range'] ) ? $this->normalize_range_key( $args['range'] ) : self::DEFAULT_SUMMARY_RANGE;
-		$search   = isset( $args['search'] ) ? trim( sanitize_text_field( (string) $args['search'] ) ) : '';
-		$offset   = ( $page - 1 ) * $per_page;
-		$where_conditions = array();
-		$params   = array();
-
-		$table_name = $this->get_table_name();
-		$range_where = $this->build_range_where_fragment( $range );
-
-		if ( ! empty( $range_where['sql'] ) ) {
-			$where_conditions[] = ltrim( str_replace( 'WHERE ', '', $range_where['sql'] ) );
-			$params             = array_merge( $params, $range_where['params'] );
-		}
-
-		if ( '' !== $search ) {
-			$where_conditions[] = 'query_text LIKE %s';
-			$params[]           = '%' . $wpdb->esc_like( $search ) . '%';
-		}
-
-		$where     = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
-		$count_sql = "SELECT COUNT(*) FROM {$table_name} {$where}";
-		$items_sql  = "SELECT id, query_text, query_type, result_count, nearest_distance_meters, occurred_at_gmt
-			FROM {$table_name}
-			{$where}
-			ORDER BY occurred_at_gmt DESC, id DESC
-			LIMIT %d OFFSET %d";
-
-		$total_items = (int) (
-			$params
-				? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) )
-				: $wpdb->get_var( $count_sql )
-		);
-
-		$item_params   = $params;
-		$item_params[] = $per_page;
-		$item_params[] = $offset;
-		$query         = $wpdb->prepare( $items_sql, $item_params );
-		$rows          = $wpdb->get_results( $query, ARRAY_A );
-
-		return array(
-			'items'      => array_map( array( $this, 'normalize_row' ), is_array( $rows ) ? $rows : array() ),
-			'totalItems' => $total_items,
-			'totalPages' => max( 1, (int) ceil( $total_items / $per_page ) ),
-		);
-	}
-
-	/**
-	 * Normalize one raw analytics row for REST responses.
-	 *
-	 * @param array<string, mixed> $row Raw database row.
-	 * @return array<string, mixed>
-	 */
-	private function normalize_row( $row ) {
-		$occurred_at = isset( $row['occurred_at_gmt'] ) ? strtotime( (string) $row['occurred_at_gmt'] . ' UTC' ) : false;
-
-		return array(
-			'id'                     => isset( $row['id'] ) ? absint( $row['id'] ) : 0,
-			'query_text'             => isset( $row['query_text'] ) ? sanitize_text_field( (string) $row['query_text'] ) : '',
-			'query_type'             => $this->sanitize_query_type( isset( $row['query_type'] ) ? $row['query_type'] : 'text' ),
-			'result_count'           => isset( $row['result_count'] ) ? max( 0, absint( $row['result_count'] ) ) : 0,
-			'nearest_distance_meters' => isset( $row['nearest_distance_meters'] ) && null !== $row['nearest_distance_meters']
-				? max( 0, absint( $row['nearest_distance_meters'] ) )
-				: null,
-			'occurred_at_gmt'        => false !== $occurred_at ? gmdate( 'c', $occurred_at ) : gmdate( 'c' ),
-		);
-	}
-
-	/**
-	 * Normalize and sanitize one tracking payload.
-	 *
-	 * @param array<string, mixed> $payload Raw tracking payload.
-	 * @return array<string, mixed>
-	 */
-	private function normalize_track_payload( $payload ) {
-		$query_text = isset( $payload['query_text'] ) ? sanitize_text_field( (string) $payload['query_text'] ) : '';
-		$query_text = trim( $query_text );
-
-		if ( strlen( $query_text ) > 255 ) {
-			$query_text = substr( $query_text, 0, 255 );
-		}
-
-		$nearest_distance = null;
-
-		if ( isset( $payload['nearest_distance_meters'] ) && '' !== $payload['nearest_distance_meters'] && null !== $payload['nearest_distance_meters'] ) {
-			$nearest_distance = max( 0, (int) round( (float) $payload['nearest_distance_meters'] ) );
-		}
-
-		return array(
-			'query_text'              => $query_text,
-			'query_type'              => $this->sanitize_query_type( isset( $payload['query_type'] ) ? $payload['query_type'] : 'text' ),
-			'result_count'            => isset( $payload['result_count'] ) ? max( 0, absint( $payload['result_count'] ) ) : 0,
-			'nearest_distance_meters' => $nearest_distance,
-		);
-	}
-
-	/**
 	 * Sanitize a query type into the supported set.
 	 *
 	 * @param mixed $query_type Raw query type.
@@ -941,6 +1385,54 @@ class Analytics {
 		}
 
 		return 'text';
+	}
+
+	/**
+	 * Sanitize an event category into the supported set.
+	 *
+	 * @param mixed $category Raw category.
+	 * @return string
+	 */
+	private function sanitize_event_category( $category ) {
+		$normalized = sanitize_key( (string) $category );
+
+		if ( in_array( $normalized, self::EVENT_CATEGORIES, true ) ) {
+			return $normalized;
+		}
+
+		return 'search';
+	}
+
+	/**
+	 * Sanitize one interaction source into the supported set.
+	 *
+	 * @param mixed $source Raw source.
+	 * @return string
+	 */
+	private function sanitize_interaction_source( $source ) {
+		$normalized = sanitize_key( (string) $source );
+
+		if ( in_array( $normalized, self::INTERACTION_SOURCES, true ) ) {
+			return $normalized;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Sanitize one action type into the supported set.
+	 *
+	 * @param mixed $action_type Raw action type.
+	 * @return string
+	 */
+	private function sanitize_action_type( $action_type ) {
+		$normalized = sanitize_key( (string) $action_type );
+
+		if ( in_array( $normalized, self::ACTION_TYPES, true ) ) {
+			return $normalized;
+		}
+
+		return '';
 	}
 
 	/**

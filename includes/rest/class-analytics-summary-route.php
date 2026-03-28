@@ -65,7 +65,12 @@ class Analytics_Summary_Route {
 	 * @return \WP_REST_Response
 	 */
 	public function handle_request( $request ) {
-		return rest_ensure_response( $this->analytics->get_summary( $request->get_param( 'range' ) ) );
+		return rest_ensure_response(
+			$this->analytics->get_summary(
+				$request->get_param( 'range' ),
+				$request->get_param( 'category' )
+			)
+		);
 	}
 
 	/**
@@ -89,6 +94,13 @@ class Analytics_Summary_Route {
 				'type'              => 'string',
 				'default'           => Analytics::DEFAULT_SUMMARY_RANGE,
 				'sanitize_callback' => 'sanitize_key',
+			),
+			'category' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'default'           => 'search',
+				'sanitize_callback' => 'sanitize_key',
+				'enum'              => Analytics::EVENT_CATEGORIES,
 			),
 		);
 	}

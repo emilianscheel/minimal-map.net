@@ -4,6 +4,7 @@ import { LocationResultCard } from './location-card';
 import { getDocumentFontFamily } from './dom-context';
 import { applySearchPanelCssVariables } from './search-panel-layout';
 import type {
+	AnalyticsActionType,
 	MapLocationPoint,
 	NormalizedMapConfig,
 	SelectedLocationPreview,
@@ -21,6 +22,11 @@ type PopupLike = {
 interface CreateLocationCardPreviewOptions {
 	host: HTMLElement;
 	map: MapLibreMap;
+	onAnalyticsAction?: (
+		location: MapLocationPoint,
+		actionType: AnalyticsActionType,
+		actionTarget?: string
+	) => void;
 	popupFactory?: (options: PopupOptions) => PopupLike;
 }
 
@@ -117,6 +123,7 @@ export function waitForInternalMapMovementToFinish(
 export function createLocationCardPreviewController({
 	host,
 	map,
+	onAnalyticsAction,
 	popupFactory = (options) => new maplibregl.Popup(options),
 }: CreateLocationCardPreviewOptions): LocationCardPreviewController {
 	const container = host.ownerDocument.createElement('div');
@@ -169,11 +176,15 @@ export function createLocationCardPreviewController({
 			);
 			root.render(
 				<LocationResultCard
+					analyticsSource="in_map_card"
 					distanceLabel={selection?.distanceLabel}
 					googleMapsButtonShowIcon={config.googleMapsButtonShowIcon}
 					googleMapsNavigation={config.googleMapsNavigation}
 					location={location}
 					mode="in-map"
+					onAnalyticsAction={(actionType, actionTarget) => {
+						onAnalyticsAction?.(location, actionType, actionTarget);
+					}}
 					siteLocale={config.siteLocale}
 					siteTimezone={config.siteTimezone}
 				/>

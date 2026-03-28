@@ -12,13 +12,15 @@ import { createLocationCardPreviewController, waitForInternalMapMovementToFinish
 import { getActiveHeightCssValue, isMobileViewport } from './responsive';
 import { createMarkerRenderer, type MarkerRenderer, type MarkerRendererConfig } from './marker-renderer';
 import { getMapDomContext, type MapDomContext } from './dom-context';
-import { trackMapSearchQuery } from '../lib/analytics/trackMapSearchQuery';
+import { trackMapAnalyticsEvent } from '../lib/analytics/trackMapAnalyticsEvent';
 import {
 	filterLocationsByCategoryTagIds,
 	filterLocationsByOpenedStatus,
 	pruneActiveCategoryTagIds,
 } from './category-filter';
 import type {
+	AnalyticsActionType,
+	AnalyticsTrackPayload,
 	MapLocationSelection,
 	MapRuntimeConfig,
 	MapLocationPoint,
@@ -681,6 +683,16 @@ export function createMinimalMap(
 				state.locationCardPreview = createLocationCardPreviewController({
 					host,
 					map: state.map,
+					onAnalyticsAction: (location, actionType, actionTarget) => {
+						trackAnalyticsEvent({
+							actionTarget,
+							actionType,
+							eventCategory: 'action',
+							interactionSource: 'in_map_card',
+							locationId: location.id ?? 0,
+							locationTitle: location.title ?? '',
+						});
+					},
 				});
 			}
 		} else {
@@ -765,6 +777,24 @@ export function createMinimalMap(
 			},
 			{ isMinimalMapInternal: true }
 		);
+	}
+
+	function trackAnalyticsEvent(
+		payload: AnalyticsTrackPayload
+	): void {
+		if (!runtimeConfig.analyticsEnabled || !runtimeConfig.analyticsTrackPath) {
+			return;
+		}
+
+		const isComplianzAccepted =
+			!runtimeConfig.analyticsComplianzEnabled ||
+			(window as any).MinimalMapComplianzConsent === true;
+
+		if (!isComplianzAccepted) {
+			return;
+		}
+
+		void trackMapAnalyticsEvent(runtimeConfig.analyticsTrackPath as string, payload);
 	}
 
 	function setupUserInteractionListeners(map: MapLibreMap): void {
@@ -989,12 +1019,7 @@ export function createMinimalMap(
 						state.controls?.setLiveLocationBusy(isBusy);
 					},
 					runtimeConfig.analyticsEnabled && runtimeConfig.analyticsTrackPath
-						? (payload) => {
-							const isComplianzAccepted = !runtimeConfig.analyticsComplianzEnabled || (window as any).MinimalMapComplianzConsent === true;
-							if (isComplianzAccepted) {
-								void trackMapSearchQuery(runtimeConfig.analyticsTrackPath as string, payload);
-							}
-						}
+						? trackAnalyticsEvent
 						: undefined
 				);
 			} else {
@@ -1078,6 +1103,17 @@ export function createMinimalMap(
 			map,
 			onLocationSelect: (locationId) => {
 				const activeConfig = state.config ?? config;
+				const selectedLocation = activeConfig.locations.find((location) => location.id === locationId);
+
+				if (selectedLocation?.id) {
+					trackAnalyticsEvent({
+						eventCategory: 'selection',
+						interactionSource: 'map_marker',
+						locationId: selectedLocation.id,
+						locationTitle: selectedLocation.title ?? '',
+					});
+				}
+
 				focusLocation({ locationId }, activeConfig);
 			},
 		});

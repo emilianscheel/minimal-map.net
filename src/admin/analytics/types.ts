@@ -1,10 +1,36 @@
 import type { ViewTable } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
-import type { AnalyticsQueryRecord, AnalyticsRangeKey, AnalyticsSummary } from '../../types';
+import type {
+	ActionAnalyticsSummary,
+	AnalyticsEventCategory,
+	AnalyticsQueryRecord,
+	AnalyticsRangeKey,
+	SearchAnalyticsSummary,
+	SelectionAnalyticsSummary,
+} from '../../types';
 
 export interface AnalyticsNotice {
 	status: 'success' | 'error';
 	message: string;
+}
+
+export interface AnalyticsSummaryByCategory {
+	search: SearchAnalyticsSummary;
+	selection: SelectionAnalyticsSummary;
+	action: ActionAnalyticsSummary;
+}
+
+export interface AnalyticsTableState {
+	queries: AnalyticsQueryRecord[];
+	totalItems: number;
+	totalPages: number;
+	view: ViewTable;
+}
+
+export interface AnalyticsTablesByCategory {
+	search: AnalyticsTableState;
+	selection: AnalyticsTableState;
+	action: AnalyticsTableState;
 }
 
 export interface AnalyticsController {
@@ -13,18 +39,16 @@ export interface AnalyticsController {
 	headerAction: ReactNode;
 	isConfirmEnableModalOpen: boolean;
 	isLoading: boolean;
+	isLoadingSummary: boolean;
 	isSavingSettings: boolean;
 	loadError: string | null;
 	notice: AnalyticsNotice | null;
-	queries: AnalyticsQueryRecord[];
 	range: AnalyticsRangeKey;
-	summary: AnalyticsSummary;
-	totalItems: number;
-	totalPages: number;
-	view: ViewTable;
+	summaries: AnalyticsSummaryByCategory;
+	tables: AnalyticsTablesByCategory;
 	dismissNotice: () => void;
 	onChangeRange: (range: AnalyticsRangeKey) => void;
-	onChangeView: (view: ViewTable) => void;
+	onChangeView: (category: AnalyticsEventCategory, view: ViewTable) => void;
 	onCloseConfirmEnableModal: () => void;
 	onConfirmEnableAnalytics: () => Promise<void>;
 	onToggleAnalytics: () => void;

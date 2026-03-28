@@ -10,7 +10,7 @@ namespace MinimalMap\Rest;
 use MinimalMap\Analytics\Analytics;
 
 /**
- * Public analytics tracking endpoint for frontend search activity.
+ * Public analytics tracking endpoint for frontend map activity.
  */
 class Analytics_Track_Route {
 	/**
@@ -72,12 +72,18 @@ class Analytics_Track_Route {
 
 		return rest_ensure_response(
 			array(
-				'tracked' => $this->analytics->track_query(
+				'tracked' => $this->analytics->track_event(
 					array(
+						'event_category'          => isset( $params['event_category'] ) ? $params['event_category'] : 'search',
 						'query_text'              => isset( $params['query_text'] ) ? $params['query_text'] : '',
 						'query_type'              => isset( $params['query_type'] ) ? $params['query_type'] : 'text',
 						'result_count'            => isset( $params['result_count'] ) ? $params['result_count'] : 0,
 						'nearest_distance_meters' => isset( $params['nearest_distance_meters'] ) ? $params['nearest_distance_meters'] : null,
+						'location_id'             => isset( $params['location_id'] ) ? $params['location_id'] : null,
+						'location_title'          => isset( $params['location_title'] ) ? $params['location_title'] : '',
+						'interaction_source'      => isset( $params['interaction_source'] ) ? $params['interaction_source'] : '',
+						'action_type'             => isset( $params['action_type'] ) ? $params['action_type'] : '',
+						'action_target'           => isset( $params['action_target'] ) ? $params['action_target'] : '',
 					)
 				),
 			)
@@ -91,25 +97,59 @@ class Analytics_Track_Route {
 	 */
 	private function get_route_args() {
 		return array(
+			'event_category' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'default'           => 'search',
+				'sanitize_callback' => 'sanitize_key',
+				'enum'              => Analytics::EVENT_CATEGORIES,
+			),
 			'query_text' => array(
-				'required'          => true,
+				'required'          => false,
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 			),
 			'query_type' => array(
-				'required'          => true,
+				'required'          => false,
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 				'enum'              => Analytics::QUERY_TYPES,
 			),
 			'result_count' => array(
-				'required'          => true,
+				'required'          => false,
 				'type'              => 'integer',
 				'sanitize_callback' => 'absint',
 			),
 			'nearest_distance_meters' => array(
 				'required'          => false,
 				'type'              => 'number',
+			),
+			'location_id' => array(
+				'required'          => false,
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			),
+			'location_title' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'interaction_source' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_key',
+				'enum'              => Analytics::INTERACTION_SOURCES,
+			),
+			'action_type' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_key',
+				'enum'              => Analytics::ACTION_TYPES,
+			),
+			'action_target' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
 			),
 		);
 	}

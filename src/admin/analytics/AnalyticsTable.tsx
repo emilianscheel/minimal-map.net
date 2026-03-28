@@ -2,11 +2,16 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Field, View, ViewTable } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { AnalyticsQueryRecord } from '../../types';
+import type {
+	AnalyticsActionType,
+	AnalyticsEventCategory,
+	AnalyticsInteractionSource,
+	AnalyticsQueryRecord,
+	AnalyticsQueryType,
+} from '../../types';
 import { ANALYTICS_TABLE_PER_PAGE } from './constants';
-import type { AnalyticsController } from './types';
 
-function formatQueryType(value: AnalyticsQueryRecord['query_type']): string {
+function formatQueryType(value: AnalyticsQueryType): string {
 	switch (value) {
 		case 'address':
 			return __('Address', 'minimal-map');
@@ -17,6 +22,38 @@ function formatQueryType(value: AnalyticsQueryRecord['query_type']): string {
 		case 'text':
 		default:
 			return __('Text', 'minimal-map');
+	}
+}
+
+function formatInteractionSource(value: AnalyticsInteractionSource | ''): string {
+	switch (value) {
+		case 'map_marker':
+			return __('Map marker', 'minimal-map');
+		case 'in_map_card':
+			return __('In-map card', 'minimal-map');
+		case 'search_panel':
+			return __('Search panel', 'minimal-map');
+		default:
+			return '—';
+	}
+}
+
+function formatActionType(value: AnalyticsActionType | ''): string {
+	switch (value) {
+		case 'opening_hours':
+			return __('Opening hours', 'minimal-map');
+		case 'telephone':
+			return __('Phone', 'minimal-map');
+		case 'email':
+			return __('Email', 'minimal-map');
+		case 'website':
+			return __('Website', 'minimal-map');
+		case 'social_media':
+			return __('Social media', 'minimal-map');
+		case 'google_maps':
+			return __('Google Maps', 'minimal-map');
+		default:
+			return '—';
 	}
 }
 
@@ -33,6 +70,7 @@ function formatDistance(distanceMeters: number | null): string {
 }
 
 function useAnalyticsFields(
+	category: AnalyticsEventCategory,
 	siteLocale: string,
 	siteTimezone: string
 ): Field<AnalyticsQueryRecord>[] {
@@ -42,6 +80,90 @@ function useAnalyticsFields(
 			timeStyle: 'short',
 			timeZone: siteTimezone || undefined,
 		});
+
+		if (category === 'selection') {
+			return [
+				{
+					id: 'location_title',
+					label: __('Location', 'minimal-map'),
+					enableGlobalSearch: true,
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => item.location_title || '—',
+				},
+				{
+					id: 'interaction_source',
+					label: __('Source', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => formatInteractionSource(item.interaction_source),
+				},
+				{
+					id: 'query_text',
+					label: __('Query', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => item.query_text || '—',
+				},
+				{
+					id: 'occurred_at_gmt',
+					label: __('Time', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => timeFormatter.format(new Date(item.occurred_at_gmt)),
+				},
+			] satisfies Field<AnalyticsQueryRecord>[];
+		}
+
+		if (category === 'action') {
+			return [
+				{
+					id: 'location_title',
+					label: __('Location', 'minimal-map'),
+					enableGlobalSearch: true,
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => item.location_title || '—',
+				},
+				{
+					id: 'action_type',
+					label: __('Action', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => formatActionType(item.action_type),
+				},
+				{
+					id: 'interaction_source',
+					label: __('Source', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => formatInteractionSource(item.interaction_source),
+				},
+				{
+					id: 'action_target',
+					label: __('Target', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => item.action_target || '—',
+				},
+				{
+					id: 'occurred_at_gmt',
+					label: __('Time', 'minimal-map'),
+					enableHiding: false,
+					enableSorting: false,
+					filterBy: false,
+					render: ({ item }) => timeFormatter.format(new Date(item.occurred_at_gmt)),
+				},
+			] satisfies Field<AnalyticsQueryRecord>[];
+		}
 
 		return [
 			{
@@ -86,34 +208,44 @@ function useAnalyticsFields(
 				render: ({ item }) => timeFormatter.format(new Date(item.occurred_at_gmt)),
 			},
 		] satisfies Field<AnalyticsQueryRecord>[];
-	}, [siteLocale, siteTimezone]);
+	}, [category, siteLocale, siteTimezone]);
 }
 
 export default function AnalyticsTable({
-	controller,
+	category,
+	queries,
+	totalItems,
+	totalPages,
+	view,
+	onChangeView,
 	siteLocale,
 	siteTimezone,
 }: {
-	controller: AnalyticsController;
+	category: AnalyticsEventCategory;
+	queries: AnalyticsQueryRecord[];
+	totalItems: number;
+	totalPages: number;
+	view: ViewTable;
+	onChangeView: (view: ViewTable) => void;
 	siteLocale: string;
 	siteTimezone: string;
 }) {
-	const fields = useAnalyticsFields(siteLocale, siteTimezone);
+	const fields = useAnalyticsFields(category, siteLocale, siteTimezone);
 
 	return (
 		<div className="minimal-map-admin__analytics-table-wrap">
 			<DataViews
 				config={{ perPageSizes: [ANALYTICS_TABLE_PER_PAGE] }}
-				data={controller.queries}
+				data={queries}
 				defaultLayouts={{ table: {} }}
 				fields={fields}
 				getItemId={(item: AnalyticsQueryRecord) => `${item.id}`}
 				paginationInfo={{
-					totalItems: controller.totalItems,
-					totalPages: controller.totalPages,
+					totalItems,
+					totalPages,
 				}}
-				view={controller.view}
-				onChangeView={(nextView: View) => controller.onChangeView(nextView as ViewTable)}
+				view={view}
+				onChangeView={(nextView: View) => onChangeView(nextView as ViewTable)}
 			>
 				<div className="minimal-map-admin__analytics-dataviews-header">
 					<DataViews.Search />

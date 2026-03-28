@@ -3,6 +3,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BarChart3,
 	ChartColumn,
+	MapPin,
 	PieChart,
 	Route,
 	Search,
@@ -56,11 +57,232 @@ function getDominantBreakdownItem(items: AnalyticsBreakdownDatum[]): AnalyticsBr
 	return [...items].sort((left, right) => right.value - left.value)[0] ?? null;
 }
 
+export function getAnalyticsSectionTitle(category: AnalyticsSummary['category']): string {
+	switch (category) {
+		case 'selection':
+			return __('Selection', 'minimal-map');
+		case 'action':
+			return __('Action', 'minimal-map');
+		case 'search':
+		default:
+			return __('Search', 'minimal-map');
+	}
+}
+
 export default function AnalyticsCards({
 	summary,
 }: {
 	summary: AnalyticsSummary;
 }) {
+	if (summary.category === 'selection') {
+		const hasData = summary.totalSelections > 0;
+		const topLocation = getTopBreakdownItem(summary.breakdowns.topLocations);
+		const dominantSource = getDominantBreakdownItem(summary.breakdowns.sourceMix);
+		const dominantSourceShare = dominantSource && hasData
+			? (dominantSource.value / summary.totalSelections) * 100
+			: null;
+
+		const cards = [
+			{
+				id: 'selection-total',
+				icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Total selections', 'minimal-map'),
+				value: hasData ? formatMetricValue(summary.totalSelections) : '—',
+				description: __('Explicit location picks from search or marker clicks.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Total selections trend', 'minimal-map')}
+						formatTooltipValue={formatMetricValue}
+						isEmpty={!hasData}
+						series={summary.series.totalSelections}
+						variant="line"
+					/>
+				),
+			},
+			{
+				id: 'selection-conversion',
+				icon: <Target aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Search-to-selection conversion', 'minimal-map'),
+				value: hasData ? formatPercentage(summary.conversionRate) : '—',
+				description: __('How often searches turn into a location choice.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Selection conversion trend', 'minimal-map')}
+						formatTooltipValue={formatPercentage}
+						isEmpty={!hasData}
+						series={summary.series.conversionRate}
+						variant="line"
+					/>
+				),
+			},
+			{
+				id: 'selection-source-mix',
+				icon: <PieChart aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Selection source mix', 'minimal-map'),
+				value: dominantSourceShare !== null ? formatPercentage(dominantSourceShare) : '—',
+				description: dominantSource && dominantSourceShare !== null
+					? sprintf(
+						__('%1$s leads with %2$s.', 'minimal-map'),
+						dominantSource.label,
+						formatPercentage(dominantSourceShare),
+					)
+					: __('Where people choose locations from.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Selection source mix', 'minimal-map')}
+						data={summary.breakdowns.sourceMix}
+						isEmpty={!hasData}
+						variant="donut"
+					/>
+				),
+			},
+			{
+				id: 'selection-top-locations',
+				icon: <MapPin aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Top selected locations', 'minimal-map'),
+				value: topLocation ? formatMetricValue(topLocation.value) : '—',
+				description: topLocation
+					? sprintf(__('Most selected: %s', 'minimal-map'), topLocation.label)
+					: __('No selected locations in this period yet.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Top selected locations', 'minimal-map')}
+						data={summary.breakdowns.topLocations}
+						isEmpty={!hasData}
+						variant="bar"
+					/>
+				),
+			},
+		];
+
+		return (
+			<div className="minimal-map-admin__analytics-cards">
+				{cards.map((card) => (
+					<Card key={card.id} className="minimal-map-admin__feature-card minimal-map-admin__analytics-card">
+						<CardBody>
+							{card.chart}
+							<div className="minimal-map-admin__feature-meta">
+								<span className="minimal-map-admin__feature-icon">{card.icon}</span>
+								<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
+							</div>
+							<h3 className="minimal-map-admin__feature-title">{card.title}</h3>
+							<p className="minimal-map-admin__analytics-card-description">{card.description}</p>
+						</CardBody>
+					</Card>
+				))}
+			</div>
+		);
+	}
+
+	if (summary.category === 'action') {
+		const hasData = summary.totalActions > 0;
+		const topLocation = getTopBreakdownItem(summary.breakdowns.topLocations);
+		const dominantActionType = getDominantBreakdownItem(summary.breakdowns.actionTypeMix);
+		const dominantSource = getDominantBreakdownItem(summary.breakdowns.sourceMix);
+		const dominantActionTypeShare = dominantActionType && hasData
+			? (dominantActionType.value / summary.totalActions) * 100
+			: null;
+		const dominantSourceShare = dominantSource && hasData
+			? (dominantSource.value / summary.totalActions) * 100
+			: null;
+
+		const cards = [
+			{
+				id: 'action-total',
+				icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Total actions', 'minimal-map'),
+				value: hasData ? formatMetricValue(summary.totalActions) : '—',
+				description: __('Clicks and expansions after a location is viewed.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Total actions trend', 'minimal-map')}
+						formatTooltipValue={formatMetricValue}
+						isEmpty={!hasData}
+						series={summary.series.totalActions}
+						variant="line"
+					/>
+				),
+			},
+			{
+				id: 'action-type-mix',
+				icon: <PieChart aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Action type mix', 'minimal-map'),
+				value: dominantActionTypeShare !== null ? formatPercentage(dominantActionTypeShare) : '—',
+				description: dominantActionType && dominantActionTypeShare !== null
+					? sprintf(
+						__('%1$s leads with %2$s.', 'minimal-map'),
+						dominantActionType.label,
+						formatPercentage(dominantActionTypeShare),
+					)
+					: __('Which follow-up actions visitors use most.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Action type mix', 'minimal-map')}
+						data={summary.breakdowns.actionTypeMix}
+						isEmpty={!hasData}
+						variant="donut"
+					/>
+				),
+			},
+			{
+				id: 'action-source-mix',
+				icon: <BarChart3 aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Action source mix', 'minimal-map'),
+				value: dominantSourceShare !== null ? formatPercentage(dominantSourceShare) : '—',
+				description: dominantSource && dominantSourceShare !== null
+					? sprintf(
+						__('%1$s drives %2$s of actions.', 'minimal-map'),
+						dominantSource.label,
+						formatPercentage(dominantSourceShare),
+					)
+					: __('Where follow-up actions happen most often.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Action source mix', 'minimal-map')}
+						data={summary.breakdowns.sourceMix}
+						isEmpty={!hasData}
+						variant="donut"
+					/>
+				),
+			},
+			{
+				id: 'action-top-locations',
+				icon: <MapPin aria-hidden="true" size={22} strokeWidth={1.8} />,
+				title: __('Top locations by actions', 'minimal-map'),
+				value: topLocation ? formatMetricValue(topLocation.value) : '—',
+				description: topLocation
+					? sprintf(__('Most actioned: %s', 'minimal-map'), topLocation.label)
+					: __('No tracked actions in the selected period.', 'minimal-map'),
+				chart: (
+					<AnalyticsSparkline
+						ariaLabel={__('Top locations by actions', 'minimal-map')}
+						data={summary.breakdowns.topLocations}
+						isEmpty={!hasData}
+						variant="bar"
+					/>
+				),
+			},
+		];
+
+		return (
+			<div className="minimal-map-admin__analytics-cards">
+				{cards.map((card) => (
+					<Card key={card.id} className="minimal-map-admin__feature-card minimal-map-admin__analytics-card">
+						<CardBody>
+							{card.chart}
+							<div className="minimal-map-admin__feature-meta">
+								<span className="minimal-map-admin__feature-icon">{card.icon}</span>
+								<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
+							</div>
+							<h3 className="minimal-map-admin__feature-title">{card.title}</h3>
+							<p className="minimal-map-admin__analytics-card-description">{card.description}</p>
+						</CardBody>
+					</Card>
+				))}
+			</div>
+		);
+	}
+
 	const hasData = summary.totalSearches > 0;
 	const topQuery = getTopBreakdownItem(summary.breakdowns.topQueries);
 	const topZeroResultQuery = getTopBreakdownItem(summary.breakdowns.topZeroResultQueries);
@@ -181,7 +403,7 @@ export default function AnalyticsCards({
 				? sprintf(
 					__('%1$s leads with %2$s.', 'minimal-map'),
 					dominantQueryType.label,
-					formatPercentage(dominantQueryTypeShare)
+					formatPercentage(dominantQueryTypeShare),
 				)
 				: __('How visitors are searching your map.', 'minimal-map'),
 			chart: (
@@ -202,7 +424,7 @@ export default function AnalyticsCards({
 				? sprintf(
 					__('%1$s is the largest bucket at %2$s.', 'minimal-map'),
 					dominantResultBucket.label,
-					formatPercentage(dominantResultBucketShare)
+					formatPercentage(dominantResultBucketShare),
 				)
 				: __('How many results each search returned.', 'minimal-map'),
 			chart: (

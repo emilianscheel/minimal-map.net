@@ -4,7 +4,9 @@ import { LoaderCircle, Search, SearchX, X } from 'lucide-react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import Kbd from '../components/Kbd';
 import type {
+	AnalyticsActionTrackPayload,
 	AnalyticsQueryType,
+	AnalyticsSearchTrackPayload,
 	AnalyticsTrackPayload,
 	GeocodeResponse,
 	MapCoordinates,
@@ -408,8 +410,18 @@ export const MapSearchControl = ({
 			setPanelOpen(false);
 		}
 
+		if (selectionOrigin === 'tap' && onAnalyticsTrack && location.id) {
+			onAnalyticsTrack({
+				eventCategory: 'selection',
+				interactionSource: 'search_panel',
+				locationId: location.id,
+				locationTitle: location.title ?? '',
+				queryText: trimmedSearchTerm || undefined,
+			});
+		}
+
 		onSelect({ location, distanceLabel });
-	}, [onSelect, viewportWidth]);
+	}, [onAnalyticsTrack, onSelect, trimmedSearchTerm, viewportWidth]);
 
 	const resetAddressSearch = (nextTerm = '') => {
 		searchTermRef.current = nextTerm;
@@ -418,7 +430,7 @@ export const MapSearchControl = ({
 		setAddressResults([]);
 	};
 
-	const trackAnalyticsQuery = useCallback((payload: AnalyticsTrackPayload) => {
+	const trackAnalyticsQuery = useCallback((payload: AnalyticsSearchTrackPayload) => {
 		const queryText = payload.queryText.trim();
 
 		if (!onAnalyticsTrack || !queryText) {
@@ -443,8 +455,28 @@ export const MapSearchControl = ({
 		lastTrackedEventKeyRef.current = eventKey;
 		onAnalyticsTrack({
 			...payload,
+			eventCategory: 'search',
 			queryText,
 			nearestDistanceMeters: normalizedDistance,
+		});
+	}, [onAnalyticsTrack]);
+
+	const trackAnalyticsAction = useCallback((
+		location: MapLocationPoint,
+		actionType: AnalyticsActionTrackPayload['actionType'],
+		actionTarget = '',
+	) => {
+		if (!onAnalyticsTrack || !location.id) {
+			return;
+		}
+
+		onAnalyticsTrack({
+			actionTarget,
+			actionType,
+			eventCategory: 'action',
+			interactionSource: 'search_panel',
+			locationId: location.id,
+			locationTitle: location.title ?? '',
 		});
 	}, [onAnalyticsTrack]);
 
@@ -471,6 +503,7 @@ export const MapSearchControl = ({
 		}
 
 		trackAnalyticsQuery({
+			eventCategory: 'search',
 			queryText: trackedQueryText,
 			queryType,
 			resultCount: nextAddressResults.length,
@@ -545,6 +578,7 @@ export const MapSearchControl = ({
 
 			setAddressSearchMode('empty');
 			trackAnalyticsQuery({
+				eventCategory: 'search',
 				queryText: trackedQueryTextOverride ?? query,
 				queryType: queryTypeOverride ?? 'address',
 				resultCount: 0,
@@ -560,6 +594,7 @@ export const MapSearchControl = ({
 		if (!result.success) {
 			setAddressSearchMode('empty');
 			trackAnalyticsQuery({
+				eventCategory: 'search',
 				queryText: trackedQueryTextOverride ?? query,
 				queryType: queryTypeOverride ?? 'address',
 				resultCount: 0,
@@ -719,6 +754,7 @@ export const MapSearchControl = ({
 			) : null}
 			{renderedResults.map(({ location, distanceLabel }) => (
 				<LocationResultCard
+					analyticsSource="search_panel"
 					key={location.id}
 					distanceLabel={distanceLabel}
 					googleMapsButtonShowIcon={googleMapsButtonShowIcon}
@@ -727,6 +763,9 @@ export const MapSearchControl = ({
 					isSelected={selectedId === location.id}
 					location={location}
 					mode="search"
+					onAnalyticsAction={(actionType, actionTarget) => {
+						trackAnalyticsAction(location, actionType, actionTarget);
+					}}
 					onSelect={handleSelect}
 					siteLocale={siteLocale}
 					siteTimezone={siteTimezone}
@@ -780,6 +819,7 @@ export const MapSearchControl = ({
 
 		const timeoutId = window.setTimeout(() => {
 			trackAnalyticsQuery({
+				eventCategory: 'search',
 				queryText: trimmedSearchTerm,
 				queryType: 'text',
 				resultCount: filteredLocations.length,

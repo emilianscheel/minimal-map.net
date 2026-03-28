@@ -71,6 +71,7 @@ class Analytics_Queries_Route {
 					'page'     => $request->get_param( 'page' ),
 					'per_page' => $request->get_param( 'per_page' ),
 					'range'    => $request->get_param( 'range' ),
+					'category' => $request->get_param( 'category' ),
 					'search'   => $request->get_param( 'search' ),
 				)
 			)
@@ -115,6 +116,13 @@ class Analytics_Queries_Route {
 				'type'              => 'string',
 				'default'           => Analytics::DEFAULT_SUMMARY_RANGE,
 				'sanitize_callback' => 'sanitize_key',
+			),
+			'category' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'default'           => 'search',
+				'sanitize_callback' => 'sanitize_key',
+				'enum'              => Analytics::EVENT_CATEGORIES,
 			),
 		);
 	}

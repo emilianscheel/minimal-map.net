@@ -263,6 +263,22 @@ svg.lucide {
   width: 100%;
 }
 
+.minimal-map-admin__analytics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.minimal-map-admin__analytics-section + .minimal-map-admin__analytics-section {
+  margin-top: 40px;
+}
+
+.minimal-map-admin__analytics-section-title {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
 .minimal-map-admin__content--dashboard {
   display: flex;
   min-height: 0;
