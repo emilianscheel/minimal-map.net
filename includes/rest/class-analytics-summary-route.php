@@ -53,6 +53,7 @@ class Analytics_Summary_Route {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'handle_request' ),
 				'permission_callback' => array( $this, 'can_manage_analytics' ),
+				'args'                => $this->get_route_args(),
 			)
 		);
 	}
@@ -60,10 +61,11 @@ class Analytics_Summary_Route {
 	/**
 	 * Return analytics summary metrics.
 	 *
+	 * @param \WP_REST_Request $request Request object.
 	 * @return \WP_REST_Response
 	 */
-	public function handle_request() {
-		return rest_ensure_response( $this->analytics->get_summary() );
+	public function handle_request( $request ) {
+		return rest_ensure_response( $this->analytics->get_summary( $request->get_param( 'range' ) ) );
 	}
 
 	/**
@@ -73,6 +75,22 @@ class Analytics_Summary_Route {
 	 */
 	public function can_manage_analytics() {
 		return current_user_can( Admin_Menu::CAPABILITY );
+	}
+
+	/**
+	 * Return route args.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private function get_route_args() {
+		return array(
+			'range' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'default'           => Analytics::DEFAULT_SUMMARY_RANGE,
+				'sanitize_callback' => 'sanitize_key',
+			),
+		);
 	}
 
 	/**

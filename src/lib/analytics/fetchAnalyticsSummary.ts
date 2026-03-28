@@ -1,11 +1,15 @@
 import apiFetch from '@wordpress/api-fetch';
-import type { AnalyticsAdminConfig, AnalyticsSummary } from '../../types';
+import type { AnalyticsAdminConfig, AnalyticsRangeKey, AnalyticsSummary } from '../../types';
 
 export async function fetchAnalyticsSummary(
-	config: AnalyticsAdminConfig
+	config: AnalyticsAdminConfig,
+	range: AnalyticsRangeKey
 ): Promise<AnalyticsSummary> {
+	const params = new URLSearchParams();
+	params.set('range', range);
+
 	return apiFetch({
 		method: 'GET',
-		path: config.summaryPath,
+		path: `${config.summaryPath}?${params.toString()}`,
 	});
 }

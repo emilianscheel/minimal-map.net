@@ -70,6 +70,7 @@ class Analytics_Queries_Route {
 				array(
 					'page'     => $request->get_param( 'page' ),
 					'per_page' => $request->get_param( 'per_page' ),
+					'range'    => $request->get_param( 'range' ),
 					'search'   => $request->get_param( 'search' ),
 				)
 			)
@@ -108,6 +109,12 @@ class Analytics_Queries_Route {
 				'required'          => false,
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
+			),
+			'range' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'default'           => Analytics::DEFAULT_SUMMARY_RANGE,
+				'sanitize_callback' => 'sanitize_key',
 			),
 		);
 	}

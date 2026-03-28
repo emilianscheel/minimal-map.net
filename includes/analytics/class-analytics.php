@@ -49,6 +49,21 @@ class Analytics {
 	const QUERY_TYPES = array( 'text', 'address', 'coordinates', 'live_location' );
 
 	/**
+	 * Default summary range key.
+	 */
+	const DEFAULT_SUMMARY_RANGE = '30d';
+
+	/**
+	 * Allowed summary range keys.
+	 */
+	const SUMMARY_RANGE_KEYS = array( 'today', 'yesterday', '7d', '30d', '90d', 'all' );
+
+	/**
+	 * Maximum number of top breakdown items.
+	 */
+	const SUMMARY_TOP_ITEMS_LIMIT = 5;
+
+	/**
 	 * Return the analytics table name.
 	 *
 	 * @return string
@@ -211,16 +226,15 @@ class Analytics {
 	/**
 	 * Return summary analytics metrics.
 	 *
+	 * @param string $range Selected analytics range.
 	 * @return array<string, float|int|null>
 	 */
-	public function get_summary() {
+	public function get_summary( $range = self::DEFAULT_SUMMARY_RANGE ) {
 		$this->ensure_schema();
 
-		global $wpdb;
-
-		$table_name = $this->get_table_name();
-		$total      = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
-		$empty_series = $this->get_empty_summary_series();
+		$rows   = $this->get_summary_rows( $range );
+		$total  = count( $rows );
+		$series = $this->build_summary_series( $rows, $range );
 
 		if ( 0 === $total ) {
 			return array(
@@ -228,43 +242,34 @@ class Analytics {
 				'searchesToday'                => 0,
 				'zeroResultSearches'           => 0,
 				'averageNearestDistanceMeters' => null,
-				'series'                       => $empty_series,
+				'successRate'                  => 0.0,
+				'series'                       => $series,
+				'breakdowns'                   => array(
+					'queryTypeMix'         => array(),
+					'resultDistribution'   => array(),
+					'topQueries'           => array(),
+					'topZeroResultQueries' => array(),
+				),
 			);
 		}
 
-		$today_start = new \DateTimeImmutable( 'now', wp_timezone() );
-		$today_start = $today_start->setTime( 0, 0, 0 );
-		$today_gmt   = $today_start->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
-		$series_start_local = $today_start->modify( '-' . ( self::SUMMARY_SERIES_DAYS - 1 ) . ' days' );
-		$series_start_gmt   = $series_start_local->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
-
-		$searches_today = (int) $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table_name} WHERE occurred_at_gmt >= %s",
-				$today_gmt
-			)
-		);
-		$zero_results   = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE result_count = 0" );
-		$average        = $wpdb->get_var( "SELECT AVG(nearest_distance_meters) FROM {$table_name} WHERE nearest_distance_meters IS NOT NULL" );
-		$series_rows    = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT result_count, nearest_distance_meters, occurred_at_gmt
-				FROM {$table_name}
-				WHERE occurred_at_gmt >= %s
-				ORDER BY occurred_at_gmt ASC",
-				$series_start_gmt
-			),
-			ARRAY_A
-		);
+		$searches_today = $this->count_rows_for_local_date( $rows, new \DateTimeImmutable( 'now', wp_timezone() ) );
+		$zero_results   = $this->count_zero_result_rows( $rows );
+		$average        = $this->get_average_nearest_distance( $rows );
+		$success_rate   = $this->calculate_success_rate( $total, $zero_results );
 
 		return array(
 			'totalSearches'                => $total,
 			'searchesToday'                => $searches_today,
 			'zeroResultSearches'           => $zero_results,
 			'averageNearestDistanceMeters' => null !== $average ? (float) $average : null,
-			'series'                       => $this->build_summary_series(
-				is_array( $series_rows ) ? $series_rows : array(),
-				$series_start_local
+			'successRate'                  => $success_rate,
+			'series'                       => $series,
+			'breakdowns'                   => array(
+				'queryTypeMix'         => $this->build_query_type_mix_breakdown( $rows ),
+				'resultDistribution'   => $this->build_result_distribution_breakdown( $rows ),
+				'topQueries'           => $this->build_top_query_breakdown( $rows, false ),
+				'topZeroResultQueries' => $this->build_top_query_breakdown( $rows, true ),
 			),
 		);
 	}
@@ -273,25 +278,13 @@ class Analytics {
 	 * Build stable daily series for the summary sparklines.
 	 *
 	 * @param array<int, array<string, mixed>> $rows Analytics rows in the series window.
-	 * @param \DateTimeImmutable               $series_start_local Local start day.
+	 * @param string                           $range Selected analytics range.
 	 * @return array<string, array<int, array<string, int|float|string|null>>>
 	 */
-	private function build_summary_series( $rows, \DateTimeImmutable $series_start_local ) {
-		$timezone = wp_timezone();
-		$days     = array();
-
-		for ( $day_index = 0; $day_index < self::SUMMARY_SERIES_DAYS; $day_index++ ) {
-			$day = $series_start_local->modify( '+' . $day_index . ' days' );
-			$key = $day->format( 'Y-m-d' );
-
-			$days[ $key ] = array(
-				'totalSearches' => 0,
-				'searchesToday' => 0,
-				'zeroResultSearches' => 0,
-				'averageNearestDistanceMeters_sum' => 0.0,
-				'averageNearestDistanceMeters_count' => 0,
-			);
-		}
+	private function build_summary_series( $rows, $range ) {
+		$bucket_state = $this->initialize_summary_buckets( $range, $rows );
+		$buckets      = $bucket_state['buckets'];
+		$granularity  = $bucket_state['granularity'];
 
 		foreach ( $rows as $row ) {
 			if ( empty( $row['occurred_at_gmt'] ) ) {
@@ -304,33 +297,36 @@ class Analytics {
 				continue;
 			}
 
-			$local_key = $occurred_at->setTimezone( $timezone )->format( 'Y-m-d' );
+			$local_occurrence = $occurred_at->setTimezone( wp_timezone() );
+			$local_key        = $this->format_bucket_key( $local_occurrence, $granularity );
 
-			if ( ! isset( $days[ $local_key ] ) ) {
+			if ( ! isset( $buckets[ $local_key ] ) ) {
 				continue;
 			}
 
-			$days[ $local_key ]['totalSearches'] += 1;
-			$days[ $local_key ]['searchesToday'] += 1;
+			$buckets[ $local_key ]['totalSearches'] += 1;
+			$buckets[ $local_key ]['searchesToday'] += 1;
+			$buckets[ $local_key ]['successfulSearches'] += isset( $row['result_count'] ) && (int) $row['result_count'] > 0 ? 1 : 0;
 
 			if ( isset( $row['result_count'] ) && 0 === (int) $row['result_count'] ) {
-				$days[ $local_key ]['zeroResultSearches'] += 1;
+				$buckets[ $local_key ]['zeroResultSearches'] += 1;
 			}
 
 			if ( isset( $row['nearest_distance_meters'] ) && null !== $row['nearest_distance_meters'] && '' !== $row['nearest_distance_meters'] ) {
-				$days[ $local_key ]['averageNearestDistanceMeters_sum'] += (float) $row['nearest_distance_meters'];
-				$days[ $local_key ]['averageNearestDistanceMeters_count'] += 1;
+				$buckets[ $local_key ]['averageNearestDistanceMeters_sum'] += (float) $row['nearest_distance_meters'];
+				$buckets[ $local_key ]['averageNearestDistanceMeters_count'] += 1;
 			}
 		}
 
 		$series = array(
-			'totalSearches' => array(),
-			'searchesToday' => array(),
-			'zeroResultSearches' => array(),
+			'totalSearches'                => array(),
+			'searchesToday'                => array(),
+			'zeroResultSearches'           => array(),
 			'averageNearestDistanceMeters' => array(),
+			'successRate'                  => array(),
 		);
 
-		foreach ( $days as $date => $day ) {
+		foreach ( $buckets as $date => $day ) {
 			$series['totalSearches'][] = array(
 				'date'  => $date,
 				'value' => $day['totalSearches'],
@@ -349,49 +345,478 @@ class Analytics {
 					? $day['averageNearestDistanceMeters_sum'] / $day['averageNearestDistanceMeters_count']
 					: 0,
 			);
+			$series['successRate'][] = array(
+				'date'  => $date,
+				'value' => $day['totalSearches'] > 0
+					? ( $day['successfulSearches'] / $day['totalSearches'] ) * 100
+					: 0,
+			);
 		}
 
 		return $series;
 	}
 
 	/**
-	 * Return an empty fixed-length summary series payload.
+	 * Return query rows for one summary range.
 	 *
-	 * @return array<string, array<int, array<string, int|string|null>>>
+	 * @param string $range Selected analytics range.
+	 * @return array<int, array<string, mixed>>
 	 */
-	private function get_empty_summary_series() {
-		$today = new \DateTimeImmutable( 'now', wp_timezone() );
-		$today = $today->setTime( 0, 0, 0 );
-		$start = $today->modify( '-' . ( self::SUMMARY_SERIES_DAYS - 1 ) . ' days' );
-		$series = array(
-			'totalSearches' => array(),
-			'searchesToday' => array(),
-			'zeroResultSearches' => array(),
-			'averageNearestDistanceMeters' => array(),
-		);
+	private function get_summary_rows( $range ) {
+		global $wpdb;
 
-		for ( $day_index = 0; $day_index < self::SUMMARY_SERIES_DAYS; $day_index++ ) {
-			$date = $start->modify( '+' . $day_index . ' days' )->format( 'Y-m-d' );
+		$table_name     = $this->get_table_name();
+		$where_fragment = $this->build_range_where_fragment( $range );
+		$sql            = "SELECT query_text, query_type, result_count, nearest_distance_meters, occurred_at_gmt
+			FROM {$table_name}
+			{$where_fragment['sql']}
+			ORDER BY occurred_at_gmt ASC, id ASC";
 
-			$series['totalSearches'][] = array(
-				'date' => $date,
-				'value' => 0,
-			);
-			$series['searchesToday'][] = array(
-				'date' => $date,
-				'value' => 0,
-			);
-			$series['zeroResultSearches'][] = array(
-				'date' => $date,
-				'value' => 0,
-			);
-			$series['averageNearestDistanceMeters'][] = array(
-				'date' => $date,
-				'value' => 0,
+		if ( ! empty( $where_fragment['params'] ) ) {
+			$sql = $wpdb->prepare( $sql, $where_fragment['params'] );
+		}
+
+		$rows = $wpdb->get_results( $sql, ARRAY_A );
+
+		return is_array( $rows ) ? $rows : array();
+	}
+
+	/**
+	 * Build initialized summary buckets for a range.
+	 *
+	 * @param string                           $range Selected analytics range.
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return array<string, mixed>
+	 */
+	private function initialize_summary_buckets( $range, $rows ) {
+		$range_config = $this->get_range_config( $range );
+		$granularity  = $range_config['granularity'];
+		$buckets      = array();
+
+		if ( 'month' === $granularity ) {
+			if ( empty( $rows ) ) {
+				return array(
+					'granularity' => $granularity,
+					'buckets'     => array(),
+				);
+			}
+
+			$first_occurrence = $this->get_local_occurrence( $rows[0]['occurred_at_gmt'] );
+			$cursor           = $first_occurrence->modify( 'first day of this month' )->setTime( 0, 0, 0 );
+			$end_month        = ( new \DateTimeImmutable( 'now', wp_timezone() ) )->modify( 'first day of this month' )->setTime( 0, 0, 0 );
+
+			while ( $cursor->getTimestamp() <= $end_month->getTimestamp() ) {
+				$key            = $this->format_bucket_key( $cursor, $granularity );
+				$buckets[ $key ] = $this->get_empty_summary_bucket();
+				$cursor         = $cursor->modify( '+1 month' );
+			}
+
+			return array(
+				'granularity' => $granularity,
+				'buckets'     => $buckets,
 			);
 		}
 
-		return $series;
+		$cursor = $range_config['start_local'];
+		$end    = $range_config['end_local'];
+		$step   = 'hour' === $granularity ? '+1 hour' : '+1 day';
+
+		while ( $cursor instanceof \DateTimeImmutable && $end instanceof \DateTimeImmutable && $cursor->getTimestamp() < $end->getTimestamp() ) {
+			$key            = $this->format_bucket_key( $cursor, $granularity );
+			$buckets[ $key ] = $this->get_empty_summary_bucket();
+			$cursor         = $cursor->modify( $step );
+		}
+
+		return array(
+			'granularity' => $granularity,
+			'buckets'     => $buckets,
+		);
+	}
+
+	/**
+	 * Return one empty summary bucket.
+	 *
+	 * @return array<string, float|int>
+	 */
+	private function get_empty_summary_bucket() {
+		return array(
+			'totalSearches'                     => 0,
+			'searchesToday'                     => 0,
+			'zeroResultSearches'                => 0,
+			'successfulSearches'                => 0,
+			'averageNearestDistanceMeters_sum'  => 0.0,
+			'averageNearestDistanceMeters_count'=> 0,
+		);
+	}
+
+	/**
+	 * Return one normalized range configuration.
+	 *
+	 * @param string $range Selected analytics range.
+	 * @return array<string, mixed>
+	 */
+	private function get_range_config( $range ) {
+		$normalized_range = $this->normalize_range_key( $range );
+		$timezone         = wp_timezone();
+		$today_start      = ( new \DateTimeImmutable( 'now', $timezone ) )->setTime( 0, 0, 0 );
+
+		switch ( $normalized_range ) {
+			case 'today':
+				$start_local = $today_start;
+				$end_local   = $today_start->modify( '+1 day' );
+				$granularity = 'hour';
+				break;
+			case 'yesterday':
+				$start_local = $today_start->modify( '-1 day' );
+				$end_local   = $today_start;
+				$granularity = 'hour';
+				break;
+			case '7d':
+				$start_local = $today_start->modify( '-6 days' );
+				$end_local   = $today_start->modify( '+1 day' );
+				$granularity = 'day';
+				break;
+			case '90d':
+				$start_local = $today_start->modify( '-89 days' );
+				$end_local   = $today_start->modify( '+1 day' );
+				$granularity = 'day';
+				break;
+			case 'all':
+				$start_local = null;
+				$end_local   = null;
+				$granularity = 'month';
+				break;
+			case '30d':
+			default:
+				$start_local = $today_start->modify( '-29 days' );
+				$end_local   = $today_start->modify( '+1 day' );
+				$granularity = 'day';
+				break;
+		}
+
+		return array(
+			'range'       => $normalized_range,
+			'granularity' => $granularity,
+			'start_local' => $start_local,
+			'end_local'   => $end_local,
+			'start_gmt'   => $start_local instanceof \DateTimeImmutable
+				? $start_local->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' )
+				: null,
+			'end_gmt'     => $end_local instanceof \DateTimeImmutable
+				? $end_local->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' )
+				: null,
+		);
+	}
+
+	/**
+	 * Build one SQL range fragment with prepared params.
+	 *
+	 * @param string $range Selected analytics range.
+	 * @return array<string, mixed>
+	 */
+	private function build_range_where_fragment( $range ) {
+		$config      = $this->get_range_config( $range );
+		$conditions  = array();
+		$params      = array();
+
+		if ( ! empty( $config['start_gmt'] ) ) {
+			$conditions[] = 'occurred_at_gmt >= %s';
+			$params[]     = $config['start_gmt'];
+		}
+
+		if ( ! empty( $config['end_gmt'] ) ) {
+			$conditions[] = 'occurred_at_gmt < %s';
+			$params[]     = $config['end_gmt'];
+		}
+
+		return array(
+			'sql'    => empty( $conditions ) ? '' : 'WHERE ' . implode( ' AND ', $conditions ),
+			'params' => $params,
+		);
+	}
+
+	/**
+	 * Normalize one analytics range key.
+	 *
+	 * @param string $range Raw range.
+	 * @return string
+	 */
+	private function normalize_range_key( $range ) {
+		$normalized = sanitize_key( (string) $range );
+
+		if ( in_array( $normalized, self::SUMMARY_RANGE_KEYS, true ) ) {
+			return $normalized;
+		}
+
+		return self::DEFAULT_SUMMARY_RANGE;
+	}
+
+	/**
+	 * Convert one GMT occurrence into the site timezone.
+	 *
+	 * @param string $occurred_at_gmt Occurrence timestamp in GMT.
+	 * @return \DateTimeImmutable
+	 */
+	private function get_local_occurrence( $occurred_at_gmt ) {
+		return ( new \DateTimeImmutable( (string) $occurred_at_gmt, new \DateTimeZone( 'UTC' ) ) )->setTimezone( wp_timezone() );
+	}
+
+	/**
+	 * Format one time bucket key.
+	 *
+	 * @param \DateTimeImmutable $date Date to format.
+	 * @param string             $granularity Bucket granularity.
+	 * @return string
+	 */
+	private function format_bucket_key( \DateTimeImmutable $date, $granularity ) {
+		switch ( $granularity ) {
+			case 'hour':
+				return $date->format( 'Y-m-d H:00' );
+			case 'month':
+				return $date->format( 'Y-m' );
+			case 'day':
+			default:
+				return $date->format( 'Y-m-d' );
+		}
+	}
+
+	/**
+	 * Count rows that occurred on one local date.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @param \DateTimeImmutable               $target_date Target local date.
+	 * @return int
+	 */
+	private function count_rows_for_local_date( $rows, \DateTimeImmutable $target_date ) {
+		$target_key = $target_date->format( 'Y-m-d' );
+		$count      = 0;
+
+		foreach ( $rows as $row ) {
+			if ( empty( $row['occurred_at_gmt'] ) ) {
+				continue;
+			}
+
+			try {
+				$local_occurrence = $this->get_local_occurrence( $row['occurred_at_gmt'] );
+			} catch ( \Exception $exception ) {
+				continue;
+			}
+
+			if ( $local_occurrence->format( 'Y-m-d' ) === $target_key ) {
+				++$count;
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Count zero-result summary rows.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return int
+	 */
+	private function count_zero_result_rows( $rows ) {
+		$count = 0;
+
+		foreach ( $rows as $row ) {
+			if ( isset( $row['result_count'] ) && 0 === (int) $row['result_count'] ) {
+				++$count;
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Return the average nearest distance across rows with distance data.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return float|null
+	 */
+	private function get_average_nearest_distance( $rows ) {
+		$sum   = 0.0;
+		$count = 0;
+
+		foreach ( $rows as $row ) {
+			if ( ! isset( $row['nearest_distance_meters'] ) || null === $row['nearest_distance_meters'] || '' === $row['nearest_distance_meters'] ) {
+				continue;
+			}
+
+			$sum += (float) $row['nearest_distance_meters'];
+			++$count;
+		}
+
+		if ( 0 === $count ) {
+			return null;
+		}
+
+		return $sum / $count;
+	}
+
+	/**
+	 * Calculate one success-rate percentage.
+	 *
+	 * @param int $total Total searches.
+	 * @param int $zero_results Zero-result searches.
+	 * @return float|null
+	 */
+	private function calculate_success_rate( $total, $zero_results ) {
+		if ( $total <= 0 ) {
+			return 0.0;
+		}
+
+		return ( ( $total - $zero_results ) / $total ) * 100;
+	}
+
+	/**
+	 * Build the query-type mix breakdown.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function build_query_type_mix_breakdown( $rows ) {
+		$counts = array_fill_keys( self::QUERY_TYPES, 0 );
+
+		foreach ( $rows as $row ) {
+			$type = $this->sanitize_query_type( isset( $row['query_type'] ) ? $row['query_type'] : 'text' );
+			$counts[ $type ] += 1;
+		}
+
+		return array(
+			array(
+				'key'   => 'text',
+				'label' => __( 'Text', 'minimal-map' ),
+				'value' => $counts['text'],
+			),
+			array(
+				'key'   => 'address',
+				'label' => __( 'Address', 'minimal-map' ),
+				'value' => $counts['address'],
+			),
+			array(
+				'key'   => 'coordinates',
+				'label' => __( 'Coordinates', 'minimal-map' ),
+				'value' => $counts['coordinates'],
+			),
+			array(
+				'key'   => 'live_location',
+				'label' => __( 'Live location', 'minimal-map' ),
+				'value' => $counts['live_location'],
+			),
+		);
+	}
+
+	/**
+	 * Build the result-distribution breakdown.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function build_result_distribution_breakdown( $rows ) {
+		$counts = array(
+			'0'   => 0,
+			'1'   => 0,
+			'2-5' => 0,
+			'6+'  => 0,
+		);
+
+		foreach ( $rows as $row ) {
+			$result_count = isset( $row['result_count'] ) ? max( 0, absint( $row['result_count'] ) ) : 0;
+
+			if ( 0 === $result_count ) {
+				$counts['0'] += 1;
+			} elseif ( 1 === $result_count ) {
+				$counts['1'] += 1;
+			} elseif ( $result_count <= 5 ) {
+				$counts['2-5'] += 1;
+			} else {
+				$counts['6+'] += 1;
+			}
+		}
+
+		return array(
+			array(
+				'key'   => '0',
+				'label' => __( '0 results', 'minimal-map' ),
+				'value' => $counts['0'],
+			),
+			array(
+				'key'   => '1',
+				'label' => __( '1 result', 'minimal-map' ),
+				'value' => $counts['1'],
+			),
+			array(
+				'key'   => '2-5',
+				'label' => __( '2-5 results', 'minimal-map' ),
+				'value' => $counts['2-5'],
+			),
+			array(
+				'key'   => '6+',
+				'label' => __( '6+ results', 'minimal-map' ),
+				'value' => $counts['6+'],
+			),
+		);
+	}
+
+	/**
+	 * Build the top-query breakdown.
+	 *
+	 * @param array<int, array<string, mixed>> $rows Summary rows.
+	 * @param bool                             $zero_results_only Restrict to zero-result searches.
+	 * @return array<int, array<string, int|string>>
+	 */
+	private function build_top_query_breakdown( $rows, $zero_results_only ) {
+		$counts = array();
+
+		foreach ( $rows as $row ) {
+			$result_count = isset( $row['result_count'] ) ? max( 0, absint( $row['result_count'] ) ) : 0;
+
+			if ( $zero_results_only && 0 !== $result_count ) {
+				continue;
+			}
+
+			$label = isset( $row['query_text'] ) ? trim( sanitize_text_field( (string) $row['query_text'] ) ) : '';
+
+			if ( '' === $label ) {
+				continue;
+			}
+
+			if ( ! isset( $counts[ $label ] ) ) {
+				$counts[ $label ] = 0;
+			}
+
+			$counts[ $label ] += 1;
+		}
+
+		if ( empty( $counts ) ) {
+			return array();
+		}
+
+		uksort(
+			$counts,
+			static function ( $left, $right ) use ( $counts ) {
+				$value_compare = $counts[ $right ] <=> $counts[ $left ];
+
+				if ( 0 !== $value_compare ) {
+					return $value_compare;
+				}
+
+				return strcasecmp( $left, $right );
+			}
+		);
+
+		$items = array();
+
+		foreach ( array_slice( $counts, 0, self::SUMMARY_TOP_ITEMS_LIMIT, true ) as $label => $value ) {
+			$items[] = array(
+				'key'   => $label,
+				'label' => $label,
+				'value' => $value,
+			);
+		}
+
+		return $items;
 	}
 
 	/**
@@ -407,18 +832,27 @@ class Analytics {
 
 		$page     = max( 1, isset( $args['page'] ) ? absint( $args['page'] ) : 1 );
 		$per_page = max( 1, min( 50, isset( $args['per_page'] ) ? absint( $args['per_page'] ) : 10 ) );
+		$range    = isset( $args['range'] ) ? $this->normalize_range_key( $args['range'] ) : self::DEFAULT_SUMMARY_RANGE;
 		$search   = isset( $args['search'] ) ? trim( sanitize_text_field( (string) $args['search'] ) ) : '';
 		$offset   = ( $page - 1 ) * $per_page;
-		$where    = '';
+		$where_conditions = array();
 		$params   = array();
 
-		if ( '' !== $search ) {
-			$where    = 'WHERE query_text LIKE %s';
-			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
+		$table_name = $this->get_table_name();
+		$range_where = $this->build_range_where_fragment( $range );
+
+		if ( ! empty( $range_where['sql'] ) ) {
+			$where_conditions[] = ltrim( str_replace( 'WHERE ', '', $range_where['sql'] ) );
+			$params             = array_merge( $params, $range_where['params'] );
 		}
 
-		$table_name = $this->get_table_name();
-		$count_sql  = "SELECT COUNT(*) FROM {$table_name} {$where}";
+		if ( '' !== $search ) {
+			$where_conditions[] = 'query_text LIKE %s';
+			$params[]           = '%' . $wpdb->esc_like( $search ) . '%';
+		}
+
+		$where     = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
+		$count_sql = "SELECT COUNT(*) FROM {$table_name} {$where}";
 		$items_sql  = "SELECT id, query_text, query_type, result_count, nearest_distance_meters, occurred_at_gmt
 			FROM {$table_name}
 			{$where}

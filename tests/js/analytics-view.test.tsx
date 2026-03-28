@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
 import { JSDOM } from 'jsdom';
 import { createElement, createRoot } from '@wordpress/element';
 import AnalyticsView from '../../src/admin/analytics';
@@ -45,6 +47,10 @@ function setGlobalDom(dom: JSDOM): void {
 			observe() {}
 			unobserve() {}
 		};
+	globalThis.ResizeObserver =
+		globalThis.ResizeObserver ?? globalThis.window.ResizeObserver;
+	globalThis.HTMLIFrameElement =
+		globalThis.HTMLIFrameElement ?? globalThis.window.HTMLIFrameElement;
 	globalThis.requestAnimationFrame =
 		globalThis.requestAnimationFrame ?? globalThis.window.requestAnimationFrame.bind(globalThis.window);
 	globalThis.cancelAnimationFrame =
@@ -53,6 +59,13 @@ function setGlobalDom(dom: JSDOM): void {
 
 async function flushRender(): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+function createTestCache(dom: JSDOM) {
+	return createCache({
+		key: 'minimal-map-test',
+		container: dom.window.document.head,
+	});
 }
 
 function createSeries(values: Array<number | null>): AnalyticsTrendPoint[] {
@@ -83,16 +96,40 @@ function createControllerStub(
 				occurred_at_gmt: '2026-03-21T08:00:00+00:00',
 			},
 		],
+		range: '30d',
 		summary: {
 			totalSearches: 12,
 			searchesToday: 4,
 			zeroResultSearches: 2,
 			averageNearestDistanceMeters: 840,
+			successRate: 83,
 			series: {
 				totalSearches: createSeries([1, 3, 2, 5]),
 				searchesToday: createSeries([1, 3, 2, 5]),
 				zeroResultSearches: createSeries([0, 1, 0, 1]),
 				averageNearestDistanceMeters: createSeries([500, 920, 0, 940]),
+				successRate: createSeries([100, 67, 100, 80]),
+			},
+			breakdowns: {
+				queryTypeMix: [
+					{ key: 'text', label: 'Text', value: 7 },
+					{ key: 'address', label: 'Address', value: 3 },
+					{ key: 'coordinates', label: 'Coordinates', value: 1 },
+					{ key: 'live_location', label: 'Live location', value: 1 },
+				],
+				resultDistribution: [
+					{ key: '0', label: '0 results', value: 2 },
+					{ key: '1', label: '1 result', value: 3 },
+					{ key: '2-5', label: '2-5 results', value: 5 },
+					{ key: '6+', label: '6+ results', value: 2 },
+				],
+				topQueries: [
+					{ key: 'Berlin Mitte', label: 'Berlin Mitte', value: 4 },
+					{ key: 'Hamburg', label: 'Hamburg', value: 3 },
+				],
+				topZeroResultQueries: [
+					{ key: 'Munich', label: 'Munich', value: 2 },
+				],
 			},
 		},
 		totalItems: 1,
@@ -108,6 +145,7 @@ function createControllerStub(
 			},
 		},
 		dismissNotice() {},
+		onChangeRange() {},
 		onChangeView() {},
 		onCloseConfirmEnableModal() {},
 		onConfirmEnableAnalytics: async () => {},
@@ -121,6 +159,8 @@ afterEach(() => {
 	globalThis.document = originalGlobals.document;
 	globalThis.navigator = originalGlobals.navigator;
 	globalThis.HTMLElement = originalGlobals.HTMLElement;
+	delete (globalThis as { HTMLIFrameElement?: typeof window.HTMLIFrameElement }).HTMLIFrameElement;
+	delete (globalThis as { ResizeObserver?: typeof window.ResizeObserver }).ResizeObserver;
 	delete (globalThis as { requestAnimationFrame?: FrameRequestCallback }).requestAnimationFrame;
 	delete (globalThis as { cancelAnimationFrame?: (handle: number) => void }).cancelAnimationFrame;
 });
@@ -133,17 +173,25 @@ describe('AnalyticsView', () => {
 		const root = createRoot(host);
 
 		root.render(
-			createElement(AnalyticsView, {
-				controller: createControllerStub(),
-				siteLocale: 'en-US',
-				siteTimezone: 'Europe/Berlin',
-			})
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub(),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
 		);
 
 		await flushRender();
 
 		expect(dom.window.document.body.textContent).toContain('Total searches');
-		expect(dom.window.document.body.textContent).toContain('Average nearest distance');
+		expect(dom.window.document.body.textContent).toContain('Success rate');
+		expect(dom.window.document.body.textContent).toContain('Average distance to nearest store');
+		expect(dom.window.document.body.textContent).toContain('Top zero-result searches');
+		expect(dom.window.document.body.textContent).toContain('Query type mix');
+		expect(dom.window.document.body.textContent).toContain('Result distribution');
 		expect(dom.window.document.body.textContent).toContain('Berlin Mitte');
 		expect(dom.window.document.body.textContent).not.toContain('All tracked search queries across the retention window.');
 
@@ -157,11 +205,15 @@ describe('AnalyticsView', () => {
 		const root = createRoot(host);
 
 		root.render(
-			createElement(AnalyticsView, {
-				controller: createControllerStub(),
-				siteLocale: 'en-US',
-				siteTimezone: 'Europe/Berlin',
-			})
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub(),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
 		);
 
 		await flushRender();
@@ -187,28 +239,40 @@ describe('AnalyticsView', () => {
 		const root = createRoot(host);
 
 		root.render(
-			createElement(AnalyticsView, {
-				controller: createControllerStub({
-					enabled: false,
-					isConfirmEnableModalOpen: true,
-					queries: [],
-					summary: {
-						totalSearches: 0,
-						searchesToday: 0,
-						zeroResultSearches: 0,
-						averageNearestDistanceMeters: null,
-						series: {
-							totalSearches: createSeries([0, 0, 0, 0]),
-							searchesToday: createSeries([0, 0, 0, 0]),
-							zeroResultSearches: createSeries([0, 0, 0, 0]),
-							averageNearestDistanceMeters: createSeries([0, 0, 0, 0]),
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub({
+						enabled: false,
+						isConfirmEnableModalOpen: true,
+						queries: [],
+						summary: {
+							totalSearches: 0,
+							searchesToday: 0,
+							zeroResultSearches: 0,
+							averageNearestDistanceMeters: null,
+							successRate: null,
+							series: {
+								totalSearches: createSeries([0, 0, 0, 0]),
+								searchesToday: createSeries([0, 0, 0, 0]),
+								zeroResultSearches: createSeries([0, 0, 0, 0]),
+								averageNearestDistanceMeters: createSeries([0, 0, 0, 0]),
+								successRate: createSeries([null, null, null, null]),
+							},
+							breakdowns: {
+								queryTypeMix: [],
+								resultDistribution: [],
+								topQueries: [],
+								topZeroResultQueries: [],
+							},
 						},
-					},
-					totalItems: 0,
-				}),
-				siteLocale: 'en-US',
-				siteTimezone: 'Europe/Berlin',
-			})
+						totalItems: 0,
+					}),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
 		);
 
 		await flushRender();

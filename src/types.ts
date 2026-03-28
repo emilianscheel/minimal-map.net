@@ -711,9 +711,23 @@ export type AnalyticsQueryType =
 	| 'coordinates'
 	| 'live_location';
 
+export type AnalyticsRangeKey =
+	| 'today'
+	| 'yesterday'
+	| '7d'
+	| '30d'
+	| '90d'
+	| 'all';
+
 export interface AnalyticsTrendPoint {
 	date: string;
 	value: number | null;
+}
+
+export interface AnalyticsBreakdownDatum {
+	key: string;
+	label: string;
+	value: number;
 }
 
 export interface AnalyticsSummarySeries {
@@ -721,6 +735,14 @@ export interface AnalyticsSummarySeries {
 	searchesToday: AnalyticsTrendPoint[];
 	zeroResultSearches: AnalyticsTrendPoint[];
 	averageNearestDistanceMeters: AnalyticsTrendPoint[];
+	successRate: AnalyticsTrendPoint[];
+}
+
+export interface AnalyticsSummaryBreakdowns {
+	queryTypeMix: AnalyticsBreakdownDatum[];
+	resultDistribution: AnalyticsBreakdownDatum[];
+	topQueries: AnalyticsBreakdownDatum[];
+	topZeroResultQueries: AnalyticsBreakdownDatum[];
 }
 
 export interface AnalyticsSummary {
@@ -728,7 +750,9 @@ export interface AnalyticsSummary {
 	searchesToday: number;
 	zeroResultSearches: number;
 	averageNearestDistanceMeters: number | null;
+	successRate: number | null;
 	series: AnalyticsSummarySeries;
+	breakdowns: AnalyticsSummaryBreakdowns;
 }
 
 export interface AnalyticsSettings {

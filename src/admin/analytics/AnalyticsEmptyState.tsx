@@ -34,10 +34,10 @@ export default function AnalyticsEmptyState({
 	return (
 		<EmptyState
 			icon={<ChartColumn />}
-			title={__('No analytics data yet', 'minimal-map')}
+			title={__('No analytics data in this period yet', 'minimal-map')}
 			description={enabled
-				? __('Search activity will appear here once visitors start using the map search.', 'minimal-map')
-				: __('Tracking is currently disabled, but any historic analytics data will still appear here when available.', 'minimal-map')}
+				? __('Try a wider time period or wait for visitors to use the map search.', 'minimal-map')
+				: __('Tracking is currently disabled, but historic analytics data will still appear here when available.', 'minimal-map')}
 		/>
 	);
 }

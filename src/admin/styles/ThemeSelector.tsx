@@ -1,7 +1,6 @@
-import { Button, Dropdown, MenuGroup, MenuItem, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { ChevronDown, Check } from 'lucide-react';
 import { StyleThemeRecord } from '../../types';
+import OptionDropdown from '../components/OptionDropdown';
 
 interface ThemeSelectorProps {
 	activeTheme: StyleThemeRecord | null;
@@ -11,48 +10,17 @@ interface ThemeSelectorProps {
 
 export function ThemeSelector({ activeTheme, themes, onSwitch }: ThemeSelectorProps) {
 	return (
-		<Dropdown
-			popoverProps={{ placement: 'bottom-start' }}
-			renderToggle={({ isOpen, onToggle }) => (
-				<Button
-					onClick={onToggle}
-					aria-expanded={isOpen}
-					variant="tertiary"
-					__next40pxDefaultSize
-					className="minimal-map-styles__theme-selector-toggle"
-				>
-					<span className="minimal-map-styles__theme-selector-label">
-						{activeTheme?.label || __('Select theme', 'minimal-map')}
-					</span>
-					<ChevronDown size={16} style={{ flexShrink: 0 }} />
-				</Button>
-			)}
-			renderContent={() => (
-				<MenuGroup label={__('Switch Theme', 'minimal-map')}>
-					{themes.map((theme) => {
-						const isSelected = theme.slug === activeTheme?.slug;
-						return (
-							<MenuItem
-								key={theme.slug}
-								onClick={() => onSwitch(theme.slug)}
-							>
-								<HStack justify="space-between" style={{ width: '100%' }}>
-									<span>{theme.label}</span>
-									{isSelected && (
-										<Check
-											size={16}
-											style={{
-												flexShrink: 0,
-												color: 'var(--wp-admin-theme-color, #3858e8)',
-											}}
-										/>
-									)}
-								</HStack>
-							</MenuItem>
-						);
-					})}
-				</MenuGroup>
-			)}
+		<OptionDropdown
+			activeValue={activeTheme?.slug ?? null}
+			emptyLabel={__('Select theme', 'minimal-map')}
+			groupLabel={__('Switch Theme', 'minimal-map')}
+			labelClassName="minimal-map-admin__option-dropdown-label"
+			onSelect={(value) => onSwitch(value)}
+			options={themes.map((theme) => ({
+				value: theme.slug,
+				label: theme.label,
+			}))}
+			toggleClassName="minimal-map-admin__option-dropdown-toggle"
 		/>
 	);
 }
