@@ -11,6 +11,7 @@ import {
 	Target,
 } from 'lucide-react';
 import type { AnalyticsBreakdownDatum, AnalyticsSummary } from '../../types';
+import { normalizeAnalyticsSummary } from '../../lib/analytics/normalizeAnalyticsSummary';
 import AnalyticsSparkline, { formatPercentage } from './AnalyticsSparkline';
 
 function formatMetricValue(value: number | null, suffix = ''): string {
@@ -76,12 +77,14 @@ export default function AnalyticsCards({
 	isLoading: boolean;
 	summary: AnalyticsSummary;
 }) {
-	if (summary.category === 'selection') {
-		const hasData = summary.totalSelections > 0;
-		const topLocation = getTopBreakdownItem(summary.breakdowns.topLocations);
-		const dominantSource = getDominantBreakdownItem(summary.breakdowns.sourceMix);
+	const safeSummary = normalizeAnalyticsSummary(summary);
+
+	if (safeSummary.category === 'selection') {
+		const hasData = safeSummary.totalSelections > 0;
+		const topLocation = getTopBreakdownItem(safeSummary.breakdowns.topLocations);
+		const dominantSource = getDominantBreakdownItem(safeSummary.breakdowns.sourceMix);
 		const dominantSourceShare = dominantSource && hasData
-			? (dominantSource.value / summary.totalSelections) * 100
+			? (dominantSource.value / safeSummary.totalSelections) * 100
 			: null;
 
 		const cards = [
@@ -89,14 +92,14 @@ export default function AnalyticsCards({
 				id: 'selection-total',
 				icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Total selections', 'minimal-map'),
-				value: hasData ? formatMetricValue(summary.totalSelections) : '—',
+				value: hasData ? formatMetricValue(safeSummary.totalSelections) : '—',
 				description: __('Explicit location picks from search or marker clicks.', 'minimal-map'),
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Total selections trend', 'minimal-map')}
 						formatTooltipValue={formatMetricValue}
 						isEmpty={!hasData}
-						series={summary.series.totalSelections}
+						series={safeSummary.series.totalSelections}
 						variant="line"
 					/>
 				),
@@ -105,14 +108,14 @@ export default function AnalyticsCards({
 				id: 'selection-conversion',
 				icon: <Target aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Search-to-selection conversion', 'minimal-map'),
-				value: hasData ? formatPercentage(summary.conversionRate) : '—',
+				value: hasData ? formatPercentage(safeSummary.conversionRate) : '—',
 				description: __('How often searches turn into a location choice.', 'minimal-map'),
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Selection conversion trend', 'minimal-map')}
 						formatTooltipValue={formatPercentage}
 						isEmpty={!hasData}
-						series={summary.series.conversionRate}
+						series={safeSummary.series.conversionRate}
 						variant="line"
 					/>
 				),
@@ -132,7 +135,7 @@ export default function AnalyticsCards({
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Selection source mix', 'minimal-map')}
-						data={summary.breakdowns.sourceMix}
+						data={safeSummary.breakdowns.sourceMix}
 						isEmpty={!hasData}
 						variant="donut"
 					/>
@@ -149,7 +152,7 @@ export default function AnalyticsCards({
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Top selected locations', 'minimal-map')}
-						data={summary.breakdowns.topLocations}
+						data={safeSummary.breakdowns.topLocations}
 						isEmpty={!hasData}
 						variant="bar"
 					/>
@@ -183,16 +186,16 @@ export default function AnalyticsCards({
 		);
 	}
 
-	if (summary.category === 'action') {
-		const hasData = summary.totalActions > 0;
-		const topLocation = getTopBreakdownItem(summary.breakdowns.topLocations);
-		const dominantActionType = getDominantBreakdownItem(summary.breakdowns.actionTypeMix);
-		const dominantSource = getDominantBreakdownItem(summary.breakdowns.sourceMix);
+	if (safeSummary.category === 'action') {
+		const hasData = safeSummary.totalActions > 0;
+		const topLocation = getTopBreakdownItem(safeSummary.breakdowns.topLocations);
+		const dominantActionType = getDominantBreakdownItem(safeSummary.breakdowns.actionTypeMix);
+		const dominantSource = getDominantBreakdownItem(safeSummary.breakdowns.sourceMix);
 		const dominantActionTypeShare = dominantActionType && hasData
-			? (dominantActionType.value / summary.totalActions) * 100
+			? (dominantActionType.value / safeSummary.totalActions) * 100
 			: null;
 		const dominantSourceShare = dominantSource && hasData
-			? (dominantSource.value / summary.totalActions) * 100
+			? (dominantSource.value / safeSummary.totalActions) * 100
 			: null;
 
 		const cards = [
@@ -200,14 +203,14 @@ export default function AnalyticsCards({
 				id: 'action-total',
 				icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Total actions', 'minimal-map'),
-				value: hasData ? formatMetricValue(summary.totalActions) : '—',
+				value: hasData ? formatMetricValue(safeSummary.totalActions) : '—',
 				description: __('Clicks and expansions after a location is viewed.', 'minimal-map'),
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Total actions trend', 'minimal-map')}
 						formatTooltipValue={formatMetricValue}
 						isEmpty={!hasData}
-						series={summary.series.totalActions}
+						series={safeSummary.series.totalActions}
 						variant="line"
 					/>
 				),
@@ -227,7 +230,7 @@ export default function AnalyticsCards({
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Action type mix', 'minimal-map')}
-						data={summary.breakdowns.actionTypeMix}
+						data={safeSummary.breakdowns.actionTypeMix}
 						isEmpty={!hasData}
 						variant="donut"
 					/>
@@ -248,7 +251,7 @@ export default function AnalyticsCards({
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Action source mix', 'minimal-map')}
-						data={summary.breakdowns.sourceMix}
+						data={safeSummary.breakdowns.sourceMix}
 						isEmpty={!hasData}
 						variant="donut"
 					/>
@@ -265,7 +268,7 @@ export default function AnalyticsCards({
 				chart: (
 					<AnalyticsSparkline
 						ariaLabel={__('Top locations by actions', 'minimal-map')}
-						data={summary.breakdowns.topLocations}
+						data={safeSummary.breakdowns.topLocations}
 						isEmpty={!hasData}
 						variant="bar"
 					/>
@@ -299,16 +302,16 @@ export default function AnalyticsCards({
 		);
 	}
 
-	const hasData = summary.totalSearches > 0;
-	const topQuery = getTopBreakdownItem(summary.breakdowns.topQueries);
-	const topZeroResultQuery = getTopBreakdownItem(summary.breakdowns.topZeroResultQueries);
-	const dominantQueryType = getDominantBreakdownItem(summary.breakdowns.queryTypeMix);
-	const dominantResultBucket = getDominantBreakdownItem(summary.breakdowns.resultDistribution);
+	const hasData = safeSummary.totalSearches > 0;
+	const topQuery = getTopBreakdownItem(safeSummary.breakdowns.topQueries);
+	const topZeroResultQuery = getTopBreakdownItem(safeSummary.breakdowns.topZeroResultQueries);
+	const dominantQueryType = getDominantBreakdownItem(safeSummary.breakdowns.queryTypeMix);
+	const dominantResultBucket = getDominantBreakdownItem(safeSummary.breakdowns.resultDistribution);
 	const dominantQueryTypeShare = dominantQueryType && hasData
-		? (dominantQueryType.value / summary.totalSearches) * 100
+		? (dominantQueryType.value / safeSummary.totalSearches) * 100
 		: null;
 	const dominantResultBucketShare = dominantResultBucket && hasData
-		? (dominantResultBucket.value / summary.totalSearches) * 100
+		? (dominantResultBucket.value / safeSummary.totalSearches) * 100
 		: null;
 
 	const cards = [
@@ -316,14 +319,14 @@ export default function AnalyticsCards({
 			id: 'total',
 			icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Total searches', 'minimal-map'),
-			value: hasData ? formatMetricValue(summary.totalSearches) : '—',
+			value: hasData ? formatMetricValue(safeSummary.totalSearches) : '—',
 			description: __('Demand across the selected period.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Total searches trend', 'minimal-map')}
 					formatTooltipValue={formatMetricValue}
 					isEmpty={!hasData}
-					series={summary.series.totalSearches}
+					series={safeSummary.series.totalSearches}
 					variant="line"
 				/>
 			),
@@ -332,14 +335,14 @@ export default function AnalyticsCards({
 			id: 'success-rate',
 			icon: <Target aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Success rate', 'minimal-map'),
-			value: hasData ? formatPercentage(summary.successRate) : '—',
+			value: hasData ? formatPercentage(safeSummary.successRate) : '—',
 			description: __('Searches returning at least one result.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Success rate trend', 'minimal-map')}
 					formatTooltipValue={formatPercentage}
 					isEmpty={!hasData}
-					series={summary.series.successRate}
+					series={safeSummary.series.successRate}
 					variant="line"
 				/>
 			),
@@ -348,14 +351,14 @@ export default function AnalyticsCards({
 			id: 'zero',
 			icon: <SearchX aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Zero-result searches', 'minimal-map'),
-			value: hasData ? formatMetricValue(summary.zeroResultSearches) : '—',
+			value: hasData ? formatMetricValue(safeSummary.zeroResultSearches) : '—',
 			description: __('Searches with no matching location.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Zero-result searches trend', 'minimal-map')}
 					formatTooltipValue={formatMetricValue}
 					isEmpty={!hasData}
-					series={summary.series.zeroResultSearches}
+					series={safeSummary.series.zeroResultSearches}
 					variant="line"
 				/>
 			),
@@ -364,14 +367,14 @@ export default function AnalyticsCards({
 			id: 'distance',
 			icon: <Route aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Average distance to nearest store', 'minimal-map'),
-			value: formatDistanceValue(summary.averageNearestDistanceMeters, hasData),
+			value: formatDistanceValue(safeSummary.averageNearestDistanceMeters, hasData),
 			description: __('Average distance for searches with a nearby match.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Average distance trend', 'minimal-map')}
 					formatTooltipValue={formatSparklineDistance}
-					isEmpty={!hasData && summary.averageNearestDistanceMeters === null}
-					series={summary.series.averageNearestDistanceMeters}
+					isEmpty={!hasData && safeSummary.averageNearestDistanceMeters === null}
+					series={safeSummary.series.averageNearestDistanceMeters}
 					variant="line"
 				/>
 			),
@@ -387,7 +390,7 @@ export default function AnalyticsCards({
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Top search terms', 'minimal-map')}
-					data={summary.breakdowns.topQueries}
+					data={safeSummary.breakdowns.topQueries}
 					isEmpty={!hasData}
 					variant="bar"
 				/>
@@ -404,7 +407,7 @@ export default function AnalyticsCards({
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Top zero-result searches', 'minimal-map')}
-					data={summary.breakdowns.topZeroResultQueries}
+					data={safeSummary.breakdowns.topZeroResultQueries}
 					isEmpty={!hasData}
 					variant="bar"
 				/>
@@ -425,7 +428,7 @@ export default function AnalyticsCards({
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Query type mix', 'minimal-map')}
-					data={summary.breakdowns.queryTypeMix}
+					data={safeSummary.breakdowns.queryTypeMix}
 					isEmpty={!hasData}
 					variant="donut"
 				/>
@@ -446,7 +449,7 @@ export default function AnalyticsCards({
 			chart: (
 				<AnalyticsSparkline
 					ariaLabel={__('Result distribution', 'minimal-map')}
-					data={summary.breakdowns.resultDistribution}
+					data={safeSummary.breakdowns.resultDistribution}
 					isEmpty={!hasData}
 					variant="donut"
 				/>

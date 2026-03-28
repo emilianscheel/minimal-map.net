@@ -2,6 +2,7 @@ import { Notice, Spinner } from '@wordpress/components';
 import type { AnalyticsEventCategory, AnalyticsSummary } from '../../types';
 import AnalyticsCards, { getAnalyticsSectionTitle } from './AnalyticsCards';
 import AnalyticsEmptyState from './AnalyticsEmptyState';
+import AnalyticsSectionBoundary from './AnalyticsSectionBoundary';
 import AnalyticsTable from './AnalyticsTable';
 import EnableAnalyticsModal from './EnableAnalyticsModal';
 import type { AnalyticsController } from './types';
@@ -44,30 +45,35 @@ function AnalyticsSection({
 					{getAnalyticsSectionTitle(category)}
 				</h2>
 			</div>
-			<AnalyticsCards isLoading={controller.isLoadingSummary} summary={summary} />
-			{controller.isLoadingSummary ? (
-				<div className="minimal-map-admin__analytics-state">
-					<Spinner />
-				</div>
-			) : table.queries.length === 0 ? (
-				<AnalyticsEmptyState
-					category={category}
-					enabled={controller.enabled}
-					hasSearch={hasSearch}
-					hasTrackedData={hasTrackedData}
-				/>
-			) : (
-				<AnalyticsTable
-					category={category}
-					onChangeView={(nextView) => controller.onChangeView(category, nextView)}
-					queries={table.queries}
-					siteLocale={siteLocale}
-					siteTimezone={siteTimezone}
-					totalItems={table.totalItems}
-					totalPages={table.totalPages}
-					view={table.view}
-				/>
-			)}
+			<AnalyticsSectionBoundary
+				resetKey={`${category}-${controller.range}`}
+				title={getAnalyticsSectionTitle(category)}
+			>
+				<AnalyticsCards isLoading={controller.isLoadingSummary} summary={summary} />
+				{controller.isLoadingSummary ? (
+					<div className="minimal-map-admin__analytics-state">
+						<Spinner />
+					</div>
+				) : table.queries.length === 0 ? (
+					<AnalyticsEmptyState
+						category={category}
+						enabled={controller.enabled}
+						hasSearch={hasSearch}
+						hasTrackedData={hasTrackedData}
+					/>
+				) : (
+					<AnalyticsTable
+						category={category}
+						onChangeView={(nextView) => controller.onChangeView(category, nextView)}
+						queries={table.queries}
+						siteLocale={siteLocale}
+						siteTimezone={siteTimezone}
+						totalItems={table.totalItems}
+						totalPages={table.totalPages}
+						view={table.view}
+					/>
+				)}
+			</AnalyticsSectionBoundary>
 		</section>
 	);
 }

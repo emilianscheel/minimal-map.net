@@ -428,4 +428,54 @@ describe('AnalyticsView', () => {
 
 		root.unmount();
 	});
+
+	test('does not crash when analytics breakdowns arrive in malformed legacy shapes', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+		const controller = createControllerStub();
+
+		(controller.summaries.search as unknown as {
+			breakdowns: Record<string, unknown>;
+			series: Record<string, unknown>;
+		}).breakdowns = {
+			queryTypeMix: { text: 4 },
+			resultDistribution: [
+				{ key: '0', label: 0, value: '2' },
+			],
+			topQueries: { label: 'Berlin' },
+			topZeroResultQueries: [
+				{ key: 'broken', label: { city: 'Berlin' }, value: 1 },
+			],
+		};
+		(controller.summaries.search as unknown as {
+			series: Record<string, unknown>;
+		}).series = {
+			totalSearches: { date: '2026-03-01', value: 2 },
+			searchesToday: [],
+			zeroResultSearches: [],
+			averageNearestDistanceMeters: [],
+			successRate: [],
+		};
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller,
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
+		);
+
+		await flushRender();
+
+		expect(dom.window.document.body.textContent).toContain('Search');
+		expect(dom.window.document.body.textContent).toContain('Top zero-result searches');
+
+		root.unmount();
+	});
 });

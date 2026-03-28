@@ -3,6 +3,10 @@ import type {
 	AnalyticsBreakdownDatum,
 	AnalyticsTrendPoint,
 } from '../../types';
+import {
+	normalizeAnalyticsBreakdownData,
+	normalizeAnalyticsTrendSeries,
+} from '../../lib/analytics/normalizeAnalyticsSummary';
 
 const CHART_WIDTH = 260;
 const LINE_CHART_HEIGHT = 84;
@@ -199,18 +203,19 @@ function AnalyticsLineChart({
 	isEmpty = false,
 	series,
 }: Omit<LineChartProps, 'variant'>) {
+	const safeSeries = useMemo(() => normalizeAnalyticsTrendSeries(series), [series]);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
 	const definedValues = useMemo(
-		() => series.map((point) => point.value).filter((value): value is number => value !== null),
-		[series]
+		() => safeSeries.map((point) => point.value).filter((value): value is number => value !== null),
+		[safeSeries]
 	);
 	const hasRenderableData = !isEmpty && definedValues.length > 0;
 	const xScale = useMemo(
 		() => createLinearScale(
-			[0, Math.max(0, series.length - 1)],
+			[0, Math.max(0, safeSeries.length - 1)],
 			[CHART_PADDING_X, CHART_WIDTH - CHART_PADDING_X]
 		),
-		[series.length]
+		[safeSeries.length]
 	);
 	const yScale = useMemo(
 		() => createLinearScale(
@@ -220,10 +225,10 @@ function AnalyticsLineChart({
 		[definedValues]
 	);
 	const pathData = useMemo(
-		() => hasRenderableData ? buildSmoothLinePath(series, xScale, yScale) : '',
-		[hasRenderableData, series, xScale, yScale]
+		() => hasRenderableData ? buildSmoothLinePath(safeSeries, xScale, yScale) : '',
+		[hasRenderableData, safeSeries, xScale, yScale]
 	);
-	const activePoint = activeIndex !== null ? series[activeIndex] ?? null : null;
+	const activePoint = activeIndex !== null ? safeSeries[activeIndex] ?? null : null;
 	const activePointX = activeIndex !== null ? xScale(activeIndex) : null;
 	const activePointY = activePoint && activePoint.value !== null && activeIndex !== null
 		? yScale(activePoint.value)
@@ -269,9 +274,9 @@ function AnalyticsLineChart({
 				) : null}
 			</svg>
 			<div className="minimal-map-admin__analytics-sparkline-hotspots" aria-hidden="true">
-				{series.map((point, index) => {
-					const left = `${(index / Math.max(1, series.length)) * 100}%`;
-					const width = `${100 / Math.max(1, series.length)}%`;
+				{safeSeries.map((point, index) => {
+					const left = `${(index / Math.max(1, safeSeries.length)) * 100}%`;
+					const width = `${100 / Math.max(1, safeSeries.length)}%`;
 
 					return (
 						<button
@@ -311,10 +316,11 @@ function AnalyticsBarChart({
 	data,
 	isEmpty = false,
 }: Omit<BarChartProps, 'variant'>) {
-	const hasRenderableData = !isEmpty && hasBreakdownData(data);
-	const maxValue = Math.max(...data.map((item) => item.value), 0);
+	const safeData = useMemo(() => normalizeAnalyticsBreakdownData(data), [data]);
+	const hasRenderableData = !isEmpty && hasBreakdownData(safeData);
+	const maxValue = Math.max(...safeData.map((item) => item.value), 0);
 	const chartWidth = CHART_WIDTH - BAR_START_X - BAR_END_PADDING;
-	const rowHeight = (BAR_CHART_HEIGHT - CHART_PADDING_Y * 2) / Math.max(1, data.length);
+	const rowHeight = (BAR_CHART_HEIGHT - CHART_PADDING_Y * 2) / Math.max(1, safeData.length);
 
 	return (
 		<div className="minimal-map-admin__analytics-breakdown-chart" aria-label={ariaLabel}>
@@ -325,7 +331,7 @@ function AnalyticsBarChart({
 					preserveAspectRatio="xMinYMid meet"
 					aria-hidden="true"
 				>
-					{data.map((item, index) => {
+					{safeData.map((item, index) => {
 						const top = CHART_PADDING_Y + rowHeight * index;
 						const barY = top + (rowHeight - BAR_HEIGHT) / 2;
 						const width = maxValue > 0 ? (item.value / maxValue) * chartWidth : 0;
@@ -379,15 +385,16 @@ function AnalyticsDonutChart({
 	data,
 	isEmpty = false,
 }: Omit<DonutChartProps, 'variant'>) {
+	const safeData = useMemo(() => normalizeAnalyticsBreakdownData(data), [data]);
 	const [activeIndex, setActiveIndex] = useState<number | null>(null);
-	const hasRenderableData = !isEmpty && hasBreakdownData(data);
-	const totalValue = data.reduce((sum, item) => sum + item.value, 0);
-	const dominantIndex = data.reduce((bestIndex, item, index) => (
-		bestIndex === -1 || item.value > data[bestIndex].value ? index : bestIndex
+	const hasRenderableData = !isEmpty && hasBreakdownData(safeData);
+	const totalValue = safeData.reduce((sum, item) => sum + item.value, 0);
+	const dominantIndex = safeData.reduce((bestIndex, item, index) => (
+		bestIndex === -1 || item.value > safeData[bestIndex].value ? index : bestIndex
 	), -1);
 	const centerIndex = activeIndex ?? dominantIndex;
 	const centerPercentage = centerIndex >= 0 && totalValue > 0
-		? Math.round((data[centerIndex].value / totalValue) * 100)
+		? Math.round((safeData[centerIndex].value / totalValue) * 100)
 		: 0;
 	let startAngle = 0;
 
@@ -402,7 +409,7 @@ function AnalyticsDonutChart({
 							preserveAspectRatio="xMidYMid meet"
 							aria-hidden="true"
 						>
-							{data.map((item, index) => {
+							{safeData.map((item, index) => {
 								const sweepAngle = totalValue > 0 ? (item.value / totalValue) * 360 : 0;
 								const endAngle = startAngle + sweepAngle;
 								const path = buildDonutSegmentPath(startAngle, endAngle);
@@ -431,8 +438,8 @@ function AnalyticsDonutChart({
 				)}
 			</div>
 
-			<div className="minimal-map-admin__analytics-donut-legend">
-				{data.map((item, index) => (
+				<div className="minimal-map-admin__analytics-donut-legend">
+					{safeData.map((item, index) => (
 					<button
 						key={item.key}
 						type="button"
