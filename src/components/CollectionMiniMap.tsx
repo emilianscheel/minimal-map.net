@@ -1,10 +1,8 @@
 import { memo, useEffect, useMemo, useRef } from '@wordpress/element';
 import { createMinimalMap } from '../map/bootstrap';
-import { getCollectionPreviewLocations } from '../lib/collections/getCollectionPreviewLocations';
 import { areCollectionMiniMapPropsEqual } from '../lib/collections/collectionMiniMap';
 import type {
-	CollectionRecord,
-	LocationRecord,
+	MapLocationPoint,
 	MinimalMapInstance,
 	RawMapConfig,
 	StyleThemeRecord,
@@ -13,24 +11,14 @@ import type {
 const COLLECTION_MARKER_SCALE = 24 / 41;
 
 function CollectionMiniMap({
-	collection,
-	locations,
+	previewLocations,
 	theme,
 }: {
-	collection: CollectionRecord;
-	locations: LocationRecord[];
+	previewLocations: MapLocationPoint[];
 	theme: StyleThemeRecord | null;
 }) {
 	const hostRef = useRef<HTMLDivElement | null>(null);
 	const mapRef = useRef<MinimalMapInstance | null>(null);
-	const assignedLocationIdsKey = useMemo(
-		() => collection.location_ids.join(','),
-		[collection.location_ids]
-	);
-	const previewLocations = useMemo(
-		() => getCollectionPreviewLocations(collection, locations),
-		[collection.id, assignedLocationIdsKey, locations]
-	);
 	const mapConfig = useMemo<RawMapConfig>(() => ({
 		centerLat: 52.517,
 		centerLng: 13.388,
@@ -57,7 +45,10 @@ function CollectionMiniMap({
 		mapRef.current = createMinimalMap(
 			hostRef.current,
 			mapConfig,
-			window.MinimalMapAdminConfig?.mapConfig ?? {}
+			{
+				...(window.MinimalMapAdminConfig?.mapConfig ?? {}),
+				autoFetchLocations: false,
+			}
 		);
 
 		return () => {

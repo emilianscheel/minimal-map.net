@@ -6,16 +6,15 @@ import { __ } from "@wordpress/i18n";
 import { Pencil, Trash2 } from "lucide-react";
 import type { MouseEvent } from "react";
 import CollectionMiniMap from "../../components/CollectionMiniMap";
-import type { CollectionRecord, LocationRecord } from "../../types";
+import type { AdminCollectionListItem, CollectionRecord } from "../../types";
 import DeleteCollectionActionModal from "./DeleteCollectionActionModal";
 import type { CollectionsController } from "./types";
 
 function useCollectionFields(
-  locations: LocationRecord[],
   onOpenAssignmentModal: CollectionsController["onOpenAssignmentModal"],
   activeTheme: CollectionsController["activeTheme"],
-): Field<CollectionRecord>[] {
-  return useMemo<Field<CollectionRecord>[]>(
+): Field<AdminCollectionListItem>[] {
+  return useMemo<Field<AdminCollectionListItem>[]>(
     () => [
       {
         id: "map_preview",
@@ -25,7 +24,10 @@ function useCollectionFields(
         enableSorting: false,
         filterBy: false,
         render: ({ item }) => (
-          <CollectionMiniMap collection={item} locations={locations} theme={activeTheme} />
+          <CollectionMiniMap
+            previewLocations={item.preview_locations}
+            theme={activeTheme}
+          />
         ),
       },
       {
@@ -57,7 +59,7 @@ function useCollectionFields(
         ),
       },
     ],
-    [locations, onOpenAssignmentModal, activeTheme],
+    [onOpenAssignmentModal, activeTheme],
   );
 }
 
@@ -65,8 +67,8 @@ function useCollectionActions(
   isRowActionPending: boolean,
   onEditCollection: CollectionsController["onEditCollection"],
   onDeleteCollection: CollectionsController["onDeleteCollection"],
-): Action<CollectionRecord>[] {
-  return useMemo<Action<CollectionRecord>[]>(
+): Action<AdminCollectionListItem>[] {
+  return useMemo<Action<AdminCollectionListItem>[]>(
     () => [
       {
         id: "edit-collection",
@@ -101,7 +103,11 @@ function useCollectionActions(
               collection={items[0]}
               onDelete={onDeleteCollection}
               closeModal={closeModal}
-              onActionPerformed={onActionPerformed}
+              onActionPerformed={
+                onActionPerformed
+                  ? (performedItems) => onActionPerformed(performedItems as AdminCollectionListItem[])
+                  : undefined
+              }
             />
           );
         },
@@ -122,7 +128,6 @@ export default function CollectionsGrid({
     controller.onDeleteCollection,
   );
   const fields = useCollectionFields(
-    controller.locations,
     controller.onOpenAssignmentModal,
     controller.activeTheme,
   );
@@ -134,9 +139,9 @@ export default function CollectionsGrid({
         data={controller.paginatedCollections}
         defaultLayouts={{ grid: {} }}
         fields={fields}
-        getItemId={(item: CollectionRecord) => `${item.id}`}
+        getItemId={(item: AdminCollectionListItem) => `${item.id}`}
         paginationInfo={{
-          totalItems: controller.collections.length,
+          totalItems: controller.totalItems,
           totalPages: controller.totalPages,
         }}
         view={controller.view}

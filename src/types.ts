@@ -159,6 +159,7 @@ export interface MapRuntimeConfig {
 	frontendGeocodePath?: string;
 	locationsPath?: string;
 	locationsUrl?: string;
+	autoFetchLocations?: boolean;
 	analyticsEnabled?: boolean;
 	analyticsComplianzEnabled?: boolean;
 	analyticsTrackPath?: string;
@@ -317,24 +318,29 @@ export interface LocationsAdminConfig {
 	restBase: string;
 	restPath: string;
 	geocodePath: string;
+	queryPath: string;
+	lookupPath: string;
 }
 
 export interface CollectionsAdminConfig {
 	nonce: string;
 	restBase: string;
 	restPath: string;
+	queryPath: string;
 }
 
 export interface MarkersAdminConfig {
 	nonce: string;
 	restBase: string;
 	restPath: string;
+	queryPath: string;
 }
 
 export interface LogosAdminConfig {
 	nonce: string;
 	restBase: string;
 	restPath: string;
+	queryPath: string;
 }
 
 export interface TagsAdminConfig {
@@ -415,6 +421,46 @@ export interface AdminAppConfig {
 	analyticsConfig: AnalyticsAdminConfig;
 	licenseConfig: LicenseAdminConfig;
 }
+
+export interface PaginatedResult<T> {
+	items: T[];
+	totalItems: number;
+	totalPages: number;
+	page: number;
+	perPage: number;
+}
+
+export interface AdminCollectionSummary {
+	id: number;
+	title: string;
+}
+
+export interface AdminLocationListItem extends LocationRecord {
+	collections: CollectionRecord[];
+	logo: LogoRecord | null;
+	marker: MarkerRecord | null;
+	tags_data: TagRecord[];
+}
+
+export interface AdminLocationLookupItem {
+	id: number;
+	title: string;
+	street: string;
+	house_number: string;
+	postal_code: string;
+	city: string;
+	state: string;
+	country: string;
+}
+
+export interface AdminCollectionListItem extends CollectionRecord {
+	location_count: number;
+	preview_locations: MapLocationPoint[];
+}
+
+export type AdminMarkerListItem = MarkerRecord;
+
+export type AdminLogoListItem = LogoRecord;
 
 export interface LicenseAdminConfig {
 	nonce: string;

@@ -24,6 +24,7 @@ export interface MarkersController {
 	isUploading: boolean;
 	loadError: string | null;
 	markers: MarkerRecord[];
+	totalItems: number;
 	onCancelEditMarker: () => void;
 	onChangeEditFilename: (value: string) => void;
 	onCloseDeleteAllMarkersModal: () => void;

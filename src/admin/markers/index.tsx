@@ -38,7 +38,7 @@ export default function MarkersView({ controller }: { controller: MarkersControl
 					<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
 						<Spinner />
 					</div>
-				) : controller.markers.length === 0 ? (
+				) : controller.totalItems === 0 ? (
 					<MarkersEmptyState controller={controller} />
 				) : (
 					<MarkersGrid controller={controller} />

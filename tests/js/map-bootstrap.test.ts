@@ -2,7 +2,11 @@ import { describe, expect, test } from 'bun:test';
 import { getDefaultFitBoundsPadding } from '../../src/map/default-fit-padding';
 import { normalizeMapConfig } from '../../src/map/defaults';
 import { syncTouchZoomInteraction } from '../../src/map/interactions';
-import { shouldShowFallbackForMapError, syncViewport } from '../../src/map/runtime';
+import {
+	shouldAutoFetchLocations,
+	shouldShowFallbackForMapError,
+	syncViewport,
+} from '../../src/map/runtime';
 import { getSearchPanelReservedWidth } from '../../src/map/search-panel-layout';
 import { getSelectedLocationTopPadding } from '../../src/map/selected-location-focus-padding';
 
@@ -50,6 +54,23 @@ describe('map touch zoom interaction', () => {
 				false
 			)
 		).toBe(true);
+	});
+
+	test('skips runtime location fetching when autoFetchLocations is disabled', () => {
+		const config = normalizeMapConfig({
+			locations: [],
+		});
+
+		expect(
+			shouldAutoFetchLocations(
+				config,
+				{
+					autoFetchLocations: false,
+					locationsUrl: 'https://example.com/locations',
+				},
+				false
+			)
+		).toBe(false);
 	});
 
 	test('enables touch zoom and disables rotation when mobile two-finger zoom is on', () => {

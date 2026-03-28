@@ -18,6 +18,7 @@ use MinimalMap\Rest\Analytics_Queries_Route;
 use MinimalMap\Rest\Analytics_Settings_Route;
 use MinimalMap\Rest\Analytics_Summary_Route;
 use MinimalMap\Rest\Analytics_Track_Route;
+use MinimalMap\Rest\Admin_Query_Route;
 use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
@@ -170,6 +171,13 @@ final class Plugin {
 	private $analytics_track_route;
 
 	/**
+	 * Admin query REST route service.
+	 *
+	 * @var Admin_Query_Route
+	 */
+	private $admin_query_route;
+
+	/**
 	 * Boot the plugin.
 	 *
 	 * @return Plugin
@@ -207,6 +215,7 @@ final class Plugin {
 		$this->analytics_summary_route  = new Analytics_Summary_Route( $this->analytics );
 		$this->analytics_queries_route  = new Analytics_Queries_Route( $this->analytics );
 		$this->analytics_track_route    = new Analytics_Track_Route( $this->analytics );
+		$this->admin_query_route        = new Admin_Query_Route();
 
 		$this->register_hooks();
 	}
@@ -248,6 +257,7 @@ final class Plugin {
 		add_action( 'rest_api_init', array( $this->analytics_summary_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->analytics_queries_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->analytics_track_route, 'register' ) );
+		add_action( 'rest_api_init', array( $this->admin_query_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->frontend_geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->locations_route, 'register' ) );

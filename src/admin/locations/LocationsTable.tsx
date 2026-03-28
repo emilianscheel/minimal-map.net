@@ -705,7 +705,7 @@ export default function LocationsTable({ controller }: { controller: LocationsCo
 				fields={fields}
 				getItemId={(item: LocationRecord) => `${item.id}`}
 				paginationInfo={{
-					totalItems: controller.locations.length,
+					totalItems: controller.totalItems,
 					totalPages: controller.totalPages,
 				}}
 				selection={controller.selection}

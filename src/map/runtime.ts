@@ -497,6 +497,18 @@ function rehydrateLocations(
 	});
 }
 
+export function shouldAutoFetchLocations(
+	config: NormalizedMapConfig,
+	runtimeConfig: MapRuntimeConfig,
+	isFetching: boolean
+): boolean {
+	return !isFetching &&
+		config.locations.length === 0 &&
+		Boolean(runtimeConfig.locationsUrl) &&
+		runtimeConfig.autoFetchLocations !== false &&
+		!config._isPreview;
+}
+
 export function createMinimalMap(
 	host: HTMLElement,
 	initialConfig: RawMapConfig = {},
@@ -530,22 +542,17 @@ export function createMinimalMap(
 	let styleRebuildTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	async function maybeFetchLocations(config: NormalizedMapConfig): Promise<void> {
-		if (
-			isFetching ||
-			config.locations.length > 0 ||
-			!runtimeConfig.locationsUrl ||
-			config._isPreview
-		) {
+		if (!shouldAutoFetchLocations(config, runtimeConfig, isFetching)) {
 			return;
 		}
 
 		isFetching = true;
 
-		try {
-			const { locations, markers, logos } = await fetchOptimizedLocations(
-				runtimeConfig.locationsUrl,
-				config.collectionId
-			);
+			try {
+				const { locations, markers, logos } = await fetchOptimizedLocations(
+					runtimeConfig.locationsUrl!,
+					config.collectionId
+				);
 
 			if (destroyed) {
 				return;

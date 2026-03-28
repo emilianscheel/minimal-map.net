@@ -5,6 +5,7 @@ import type {
 	CsvOpeningHoursImportMapping,
 } from '../../lib/locations/importLocations';
 import type {
+	AdminLocationListItem,
 	CollectionRecord,
 	FieldErrors,
 	LogoRecord,
@@ -80,7 +81,8 @@ export interface LocationsController {
 	isImporting: boolean;
 	isExporting: boolean;
 	loadError: string | null;
-	locations: LocationRecord[];
+	locations: AdminLocationListItem[];
+	totalItems: number;
 	mapCenter: MapCoordinates | null;
 	modalTitle: string;
 	getCollectionsForLocation: (locationId: number) => CollectionRecord[];
@@ -189,6 +191,6 @@ export interface LocationsController {
 	onExportExample: () => void;
 	onExportExampleExcel: () => void;
 	onAddLocation: () => void;
-	paginatedLocations: LocationRecord[];
+	paginatedLocations: AdminLocationListItem[];
 	totalPages: number;
 }

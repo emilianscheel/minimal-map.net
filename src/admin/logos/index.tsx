@@ -39,7 +39,7 @@ export default function LogosView({ controller }: { controller: LogosController 
 					<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
 						<Spinner />
 					</div>
-				) : controller.logos.length === 0 ? (
+				) : controller.totalItems === 0 ? (
 					<LogosEmptyState controller={controller} />
 				) : (
 					<LogosGrid controller={controller} />

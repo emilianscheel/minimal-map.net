@@ -24,6 +24,7 @@ export interface LogosController {
 	isUploading: boolean;
 	loadError: string | null;
 	logos: LogoRecord[];
+	totalItems: number;
 	onChangeView: (nextView: ViewGrid) => void;
 	onCancelEditLogo: () => void;
 	onChangeEditFilename: (value: string) => void;

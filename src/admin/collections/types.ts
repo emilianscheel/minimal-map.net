@@ -1,10 +1,11 @@
 import type { ViewGrid, ViewPickerTable } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
 import type {
+	AdminCollectionListItem,
+	AdminLocationLookupItem,
 	CollectionFormMode,
 	CollectionFormState,
 	CollectionRecord,
-	LocationRecord,
 	StyleThemeRecord,
 } from '../../types';
 
@@ -23,10 +24,10 @@ export type MergeCollectionsStep = 'selection' | 'details';
 export interface CollectionsController {
 	actionNotice: CollectionsNotice | null;
 	activeTheme: StyleThemeRecord | null;
-	assignmentLocations: LocationRecord[];
+	assignmentLocations: AdminLocationLookupItem[];
 	assignmentSearch: string;
 	assignmentLocationsView: ViewPickerTable;
-	collections: CollectionRecord[];
+	collections: AdminCollectionListItem[];
 	filteredAssignmentLocationsCount: number;
 	form: CollectionFormState;
 	formMode: CollectionFormMode;
@@ -42,13 +43,16 @@ export interface CollectionsController {
 	isMergeModalOpen: boolean;
 	isMerging: boolean;
 	isImporting: boolean;
+	totalItems: number;
+	assignmentTotalItems: number;
+	mergeCollections: CollectionRecord[];
+	mergeCollectionsTotalItems: number;
 	mergeStep: MergeCollectionsStep;
 	mergeSelectionView: ViewPickerTable;
 	selectedMergeCollectionIds: number[];
 	mergeTitle: string;
 	shouldDeleteAfterMerge: boolean;
 	loadError: string | null;
-	locations: LocationRecord[];
 	modalTitle: string;
 	selectedAssignmentCollection: CollectionRecord | null;
 	selectedLocationIds: number[];
@@ -84,6 +88,6 @@ export interface CollectionsController {
 	onChangeMergeTitle: (value: string) => void;
 	onToggleDeleteAfterMerge: () => void;
 	onAddCollection: () => void;
-	paginatedCollections: CollectionRecord[];
+	paginatedCollections: AdminCollectionListItem[];
 	totalPages: number;
 }

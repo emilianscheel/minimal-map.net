@@ -12,6 +12,7 @@ import type {
 	ParsedCsvData,
 } from '../../lib/locations/importLocations';
 import type {
+	AdminLocationListItem,
 	CollectionRecord,
 	CollectionsAdminConfig,
 	LocationDialogStep,
@@ -30,6 +31,10 @@ import type {
 	TagRecord,
 	TagsAdminConfig,
 } from '../../types';
+import {
+	fetchAdminLocations,
+	fetchAllLocationLookupResource,
+} from '../../lib/admin/fetchPaginatedRecords';
 import { triggerFileDownload } from '../../lib/download';
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
 import { fetchAllLogos } from '../../lib/logos/fetchAllLogos';
@@ -63,7 +68,6 @@ import { geocodeAddress } from '../../lib/locations/geocodeAddress';
 import { hasFieldErrors } from '../../lib/locations/hasFieldErrors';
 import { hasLocationAddressChanged } from '../../lib/locations/hasLocationAddressChanged';
 import { useSingleKeyShortcut } from '../../lib/keyboard/useSingleKeyShortcut';
-import { paginateLocations } from '../../lib/locations/paginateLocations';
 import { updateLocationCoordinates } from '../../lib/locations/updateLocationCoordinates';
 import { updateLocation } from '../../lib/locations/updateLocation';
 import { validateAddressStep } from '../../lib/locations/validateAddressStep';
@@ -113,7 +117,8 @@ export function useLocationsController(
 	const [actionNotice, setActionNotice] = useState<LocationsController['actionNotice']>(null);
 	const [geocodeError, setGeocodeError] = useState<string | null>(null);
 	const [geocodeNotice, setGeocodeNotice] = useState<string | null>(null);
-	const [locations, setLocations] = useState<LocationRecord[]>([]);
+	const [locations, setLocations] = useState<AdminLocationListItem[]>([]);
+	const [totalItems, setTotalItems] = useState(0);
 	const [collections, setCollections] = useState<CollectionRecord[]>([]);
 	const [logos, setLogos] = useState<LogoRecord[]>([]);
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
@@ -183,6 +188,17 @@ export function useLocationsController(
 	const [csvImportProgressTotal, setCsvImportProgressTotal] = useState(0);
 	const [isDeletingAllLocations, setDeletingAllLocations] = useState(false);
 	const [selection, setSelection] = useState<string[]>([]);
+	const [debouncedSearch, setDebouncedSearch] = useState(view.search ?? '');
+
+	useEffect(() => {
+		const timeoutId = window.setTimeout(() => {
+			setDebouncedSearch(view.search ?? '');
+		}, 250);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+		};
+	}, [view.search]);
 
 	const loadLocations = useCallback(async () => {
 		if (!enabled) {
@@ -193,18 +209,13 @@ export function useLocationsController(
 		setLoadError(null);
 
 		try {
-			const [locationRecords, collectionRecords, logoRecords, markerRecords, tagRecords] = await Promise.all([
-				fetchAllLocations(config),
-				fetchAllCollections(collectionsConfig),
-				fetchAllLogos(logosConfig),
-				fetchAllMarkers(markersConfig),
-				fetchAllTags(tagsConfig),
-			]);
-			setLocations(locationRecords);
-			setCollections(collectionRecords);
-			setLogos(logoRecords);
-			setMarkers(markerRecords);
-			setTags(tagRecords);
+			const result = await fetchAdminLocations(config, {
+				page: view.page ?? 1,
+				perPage: LOCATIONS_TABLE_PER_PAGE,
+				search: debouncedSearch,
+			});
+			setLocations(result.items);
+			setTotalItems(result.totalItems);
 		} catch (error) {
 			setLoadError(
 				error instanceof Error
@@ -214,7 +225,7 @@ export function useLocationsController(
 		} finally {
 			setLoading(false);
 		}
-	}, [collectionsConfig, config, enabled, logosConfig, markersConfig, tagsConfig]);
+	}, [config, debouncedSearch, enabled, view.page]);
 
 	useEffect(() => {
 		configureApiFetch(collectionsConfig.nonce || config.nonce);
@@ -226,48 +237,65 @@ export function useLocationsController(
 		void loadLocations();
 	}, [collectionsConfig.nonce, config.nonce, enabled, loadLocations]);
 
-	useEffect(() => {
-		setView((currentView) => ({
-			...currentView,
-			page: 1,
-		}));
-	}, [locations.length, view.search]);
-
-	const { locations: paginatedLocations, totalPages } = useMemo(
-		() => paginateLocations(locations, view),
-		[locations, view]
+	const paginatedLocations = locations;
+	const totalPages = Math.max(
+		1,
+		Math.ceil(totalItems / Math.max(1, view.perPage ?? LOCATIONS_TABLE_PER_PAGE))
 	);
-
-	const collectionsByLocationId = useMemo(() => {
-		const lookup = new Map<number, CollectionRecord[]>();
-
-		collections.forEach((collection) => {
-			collection.location_ids.forEach((locationId) => {
-				const assignedCollections = lookup.get(locationId) ?? [];
-				assignedCollections.push(collection);
-				lookup.set(locationId, assignedCollections);
-			});
-		});
-
-		lookup.forEach((assignedCollections, locationId) => {
-			lookup.set(
-				locationId,
-				[...assignedCollections].sort((left, right) => left.title.localeCompare(right.title))
-			);
-		});
-
-		return lookup;
-	}, [collections]);
 
 	const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
 	const logosById = useMemo(() => new Map(logos.map((logo) => [logo.id, logo])), [logos]);
 	const markersById = useMemo(() => new Map(markers.map((marker) => [marker.id, marker])), [markers]);
+	const locationsById = useMemo(() => new Map(locations.map((location) => [location.id, location])), [locations]);
+
+	const ensureCollectionLookups = useCallback(async (): Promise<CollectionRecord[]> => {
+		if (collections.length > 0) {
+			return collections;
+		}
+
+		const records = await fetchAllLocationLookupResource<CollectionRecord>(config, 'collections');
+		setCollections(records);
+		return records;
+	}, [collections, config]);
+
+	const ensureLogoLookups = useCallback(async (): Promise<LogoRecord[]> => {
+		if (logos.length > 0) {
+			return logos;
+		}
+
+		const records = await fetchAllLocationLookupResource<LogoRecord>(config, 'logos');
+		setLogos(records);
+		return records;
+	}, [config, logos]);
+
+	const ensureMarkerLookups = useCallback(async (): Promise<MarkerRecord[]> => {
+		if (markers.length > 0) {
+			return markers;
+		}
+
+		const records = await fetchAllLocationLookupResource<MarkerRecord>(config, 'markers');
+		setMarkers(records);
+		return records;
+	}, [config, markers]);
+
+	const ensureTagLookups = useCallback(async (): Promise<TagRecord[]> => {
+		if (tags.length > 0) {
+			return tags;
+		}
+
+		const records = await fetchAllLocationLookupResource<TagRecord>(config, 'tags');
+		setTags(records);
+		return records;
+	}, [config, tags]);
 
 	const getTagsForLocation = useCallback(
 		(locationId: number): TagRecord[] => {
 			const location = locations.find((loc) => loc.id === locationId);
 			if (!location) {
 				return [];
+			}
+			if (Array.isArray(location.tags_data) && location.tags_data.length > 0) {
+				return location.tags_data;
 			}
 			return location.tag_ids
 				.map((tagId) => tagsById.get(tagId))
@@ -279,7 +307,15 @@ export function useLocationsController(
 	const getLogoForLocation = useCallback(
 		(locationId: number): LogoRecord | null => {
 			const location = locations.find((loc) => loc.id === locationId);
-			if (!location || location.logo_id <= 0) {
+			if (!location) {
+				return null;
+			}
+
+			if (location.logo) {
+				return location.logo;
+			}
+
+			if (location.logo_id <= 0) {
 				return null;
 			}
 
@@ -291,7 +327,15 @@ export function useLocationsController(
 	const getMarkerForLocation = useCallback(
 		(locationId: number): MarkerRecord | null => {
 			const location = locations.find((loc) => loc.id === locationId);
-			if (!location || location.marker_id <= 0) {
+			if (!location) {
+				return null;
+			}
+
+			if (location.marker) {
+				return location.marker;
+			}
+
+			if (location.marker_id <= 0) {
 				return null;
 			}
 
@@ -802,10 +846,20 @@ export function useLocationsController(
 	}, []);
 
 	const onOpenAssignToCollectionModal = useCallback((location: LocationRecord): void => {
+		void ensureCollectionLookups().catch((error) => {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Collections could not be loaded.', 'minimal-map'),
+			});
+		});
+
 		setSelectedAssignmentLocation(location);
 		setAssignmentCollectionId('');
 		setAssignToCollectionModalOpen(true);
-	}, []);
+	}, [ensureCollectionLookups]);
 
 	const onOpenAssignLogoModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
 		const nextLocations = normalizeLocationSelection(selectedLocations);
@@ -814,10 +868,20 @@ export function useLocationsController(
 			return;
 		}
 
+		void ensureLogoLookups().catch((error) => {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Logos could not be loaded.', 'minimal-map'),
+			});
+		});
+
 		setSelectedLogoLocations(nextLocations);
 		setAssignmentLogoId('');
 		setAssignLogoModalOpen(true);
-	}, [normalizeLocationSelection]);
+	}, [ensureLogoLookups, normalizeLocationSelection]);
 
 	const onOpenAssignMarkerModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
 		const nextLocations = normalizeLocationSelection(selectedLocations);
@@ -826,10 +890,20 @@ export function useLocationsController(
 			return;
 		}
 
+		void ensureMarkerLookups().catch((error) => {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Markers could not be loaded.', 'minimal-map'),
+			});
+		});
+
 		setSelectedMarkerLocations(nextLocations);
 		setAssignmentMarkerId('');
 		setAssignMarkerModalOpen(true);
-	}, [normalizeLocationSelection]);
+	}, [ensureMarkerLookups, normalizeLocationSelection]);
 
 	const onOpenAssignTagsModal = useCallback((selectedLocations: LocationRecord | LocationRecord[]): void => {
 		const nextLocations = normalizeLocationSelection(selectedLocations);
@@ -838,10 +912,20 @@ export function useLocationsController(
 			return;
 		}
 
+		void ensureTagLookups().catch((error) => {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Tags could not be loaded.', 'minimal-map'),
+			});
+		});
+
 		setSelectedTagsLocations(nextLocations);
 		setAssignmentTagIds([]);
 		setAssignTagsModalOpen(true);
-	}, [normalizeLocationSelection]);
+	}, [ensureTagLookups, normalizeLocationSelection]);
 
 	const onOpenAssignOpeningHoursModal = useCallback(
 		(selectedLocations: LocationRecord | LocationRecord[]): void => {
@@ -914,7 +998,7 @@ export function useLocationsController(
 
 	const onOpenDeleteAllLocationsModal = useCallback((): void => {
 		if (
-			locations.length === 0 ||
+			totalItems === 0 ||
 			isRowActionPending ||
 			isImporting ||
 			isExporting ||
@@ -924,7 +1008,7 @@ export function useLocationsController(
 		}
 
 		setDeleteAllLocationsModalOpen(true);
-	}, [isDeletingAllLocations, isExporting, isImporting, isRowActionPending, locations.length]);
+	}, [isDeletingAllLocations, isExporting, isImporting, isRowActionPending, totalItems]);
 
 	const onConfirmShowLocation = useCallback(async (): Promise<void> => {
 		if (!selectedShownLocation) {
@@ -1403,8 +1487,16 @@ export function useLocationsController(
 	);
 
 	const getCollectionsForLocation = useCallback(
-		(locationId: number): CollectionRecord[] => collectionsByLocationId.get(locationId) ?? [],
-		[collectionsByLocationId]
+		(locationId: number): CollectionRecord[] => {
+			const location = locationsById.get(locationId);
+
+			if (location?.collections?.length) {
+				return location.collections;
+			}
+
+			return collections.filter((collection) => collection.location_ids.includes(locationId));
+		},
+		[collections, locationsById]
 	);
 
 	const onDuplicateLocation = useCallback(
@@ -1416,7 +1508,7 @@ export function useLocationsController(
 				await duplicateLocation(
 					config,
 					location,
-					locations.map((item) => item.title)
+					(await fetchAllLocations(config)).map((item) => item.title)
 				);
 				await loadLocations();
 				setActionNotice({
@@ -1436,7 +1528,7 @@ export function useLocationsController(
 				setRowActionPending(false);
 			}
 		},
-		[config, loadLocations, locations]
+		[config, loadLocations]
 	);
 
 	const onRetrieveLocation = useCallback(
@@ -1560,7 +1652,7 @@ export function useLocationsController(
 	);
 
 	const onDeleteAllLocations = useCallback(async (): Promise<void> => {
-		if (locations.length === 0) {
+		if (totalItems === 0) {
 			resetDeleteAllLocationsState();
 			return;
 		}
@@ -1570,7 +1662,9 @@ export function useLocationsController(
 		setActionNotice(null);
 
 		try {
-			for (const location of locations) {
+			const allLocations = await fetchAllLocations(config);
+
+			for (const location of allLocations) {
 				await deleteLocation(config, location.id);
 			}
 			await loadLocations();
@@ -1582,10 +1676,10 @@ export function useLocationsController(
 					_n(
 						'%d location deleted.',
 						'%d locations deleted.',
-						locations.length,
+						allLocations.length,
 						'minimal-map'
 					),
-					locations.length
+					allLocations.length
 				),
 			});
 		} catch (error) {
@@ -1601,7 +1695,7 @@ export function useLocationsController(
 			setDeletingAllLocations(false);
 			setRowActionPending(false);
 		}
-	}, [config, loadLocations, locations, resetDeleteAllLocationsState]);
+	}, [config, loadLocations, resetDeleteAllLocationsState, totalItems]);
 
 	const onAssignLocationToCollection = useCallback(async (): Promise<void> => {
 		if (!selectedAssignmentLocation || !assignmentCollectionId) {
@@ -1609,7 +1703,8 @@ export function useLocationsController(
 		}
 
 		const collectionId = Number(assignmentCollectionId);
-		const selectedCollection = collections.find((collection) => collection.id === collectionId);
+		const availableCollections = await ensureCollectionLookups();
+		const selectedCollection = availableCollections.find((collection) => collection.id === collectionId);
 
 		if (!selectedCollection) {
 			setActionNotice({
@@ -1657,8 +1752,8 @@ export function useLocationsController(
 		}
 	}, [
 		assignmentCollectionId,
-		collections,
 		collectionsConfig,
+		ensureCollectionLookups,
 		loadLocations,
 		resetAssignToCollectionState,
 		selectedAssignmentLocation,
@@ -2055,21 +2150,51 @@ export function useLocationsController(
 		return buildCsvImportColumnOptions(pendingCsvImport, validColumnIndexes);
 	}, [pendingCsvImport]);
 
-	const onExportLocations = useCallback(() => {
-		if (locations.length === 0) return;
+	const exportAllLocations = useCallback(async (format: 'csv' | 'xlsx'): Promise<void> => {
+		if (totalItems === 0) {
+			return;
+		}
 
-		const csvContent = exportLocations(locations, logos, markers, tags);
-		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-		const url = URL.createObjectURL(blob);
-		triggerFileDownload(url, 'minimal-map-locations.csv');
-	}, [locations, logos, markers, tags]);
+		setIsExporting(true);
+		setActionNotice(null);
+
+		try {
+			const [allLocations, allLogos, allMarkers, allTags] = await Promise.all([
+				fetchAllLocations(config),
+				fetchAllLogos(logosConfig),
+				fetchAllMarkers(markersConfig),
+				fetchAllTags(tagsConfig),
+			]);
+
+			if (format === 'csv') {
+				const csvContent = exportLocations(allLocations, allLogos, allMarkers, allTags);
+				const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+				const url = URL.createObjectURL(blob);
+				triggerFileDownload(url, 'minimal-map-locations.csv');
+			} else {
+				const { headers, rows } = prepareExportData(allLocations, allLogos, allMarkers, allTags);
+				exportToExcel(headers, rows, 'minimal-map-locations.xlsx');
+			}
+		} catch (error) {
+			setActionNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Locations could not be exported.', 'minimal-map'),
+			});
+		} finally {
+			setIsExporting(false);
+		}
+	}, [config, logosConfig, markersConfig, tagsConfig, totalItems]);
+
+	const onExportLocations = useCallback(() => {
+		void exportAllLocations('csv');
+	}, [exportAllLocations]);
 
 	const onExportExcel = useCallback(() => {
-		if (locations.length === 0) return;
-
-		const { headers, rows } = prepareExportData(locations, logos, markers, tags);
-		exportToExcel(headers, rows, 'minimal-map-locations.xlsx');
-	}, [locations, logos, markers, tags]);
+		void exportAllLocations('xlsx');
+	}, [exportAllLocations]);
 
 	const onExportExample = useCallback(() => {
 		const headers = [...COMMON_CSV_HEADERS];
@@ -2181,11 +2306,11 @@ export function useLocationsController(
 				<div className="minimal-map-admin__header-actions-group">
 						<Button
 							variant="tertiary"
-							icon={<BrushCleaning size={18} strokeWidth={2} />}
-							label={__('Delete all locations', 'minimal-map')}
+						icon={<BrushCleaning size={18} strokeWidth={2} />}
+						label={__('Delete all locations', 'minimal-map')}
 						onClick={onOpenDeleteAllLocationsModal}
 						disabled={
-							locations.length === 0 ||
+							totalItems === 0 ||
 							isDeletingAllLocations ||
 							isRowActionPending ||
 							isImporting ||
@@ -2240,6 +2365,7 @@ export function useLocationsController(
 		isExporting,
 		loadError,
 		locations,
+		totalItems,
 		mapCenter,
 		modalTitle:
 			formMode === 'edit'
@@ -2290,6 +2416,7 @@ export function useLocationsController(
 		onChangeView: (nextView) => {
 			setView({
 				...nextView,
+				page: nextView.search !== view.search ? 1 : nextView.page,
 				perPage: LOCATIONS_TABLE_PER_PAGE,
 			});
 			setSelection([]);

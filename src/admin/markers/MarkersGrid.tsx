@@ -83,7 +83,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 				fields={fields}
 				getItemId={(item: MarkerRecord) => `${item.id}`}
 				paginationInfo={{
-					totalItems: controller.markers.length,
+					totalItems: controller.totalItems,
 					totalPages: controller.totalPages,
 				}}
 				defaultLayouts={{

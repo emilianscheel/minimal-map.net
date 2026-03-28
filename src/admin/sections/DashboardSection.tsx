@@ -86,7 +86,10 @@ export default function DashboardSection({
 		mapInstanceRef.current = createMinimalMap(
 			mapHostRef.current,
 			mapConfig,
-			appConfig.mapConfig ?? {}
+			{
+				...(appConfig.mapConfig ?? {}),
+				autoFetchLocations: false,
+			}
 		);
 
 		return () => {

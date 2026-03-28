@@ -73,10 +73,10 @@ export default function DeleteAllCollectionsModal({
 						_n(
 							'Are you sure you want to delete %d collection? This action cannot be undone.',
 							'Are you sure you want to delete %d collections? This action cannot be undone.',
-							controller.collections.length,
+							controller.totalItems,
 							'minimal-map'
 						),
-						controller.collections.length
+						controller.totalItems
 					)}
 				</p>
 				<div className="minimal-map-admin__collection-delete-dialog-options">

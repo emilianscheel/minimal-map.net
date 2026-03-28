@@ -88,13 +88,13 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 							{__('Select at least two collections to merge into a new one.', 'minimal-map')}
 						</p>
 						<DataViewsPicker
-							data={controller.collections}
+							data={controller.mergeCollections}
 							defaultLayouts={{ pickerTable: {} }}
 							fields={fields}
 							getItemId={(item: CollectionRecord) => `${item.id}`}
 							itemListLabel={__('Collections', 'minimal-map')}
 							paginationInfo={{
-								totalItems: controller.collections.length,
+								totalItems: controller.mergeCollectionsTotalItems,
 								totalPages: 1,
 							}}
 							search={false}

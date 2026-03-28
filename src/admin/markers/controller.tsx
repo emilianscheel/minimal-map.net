@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { BrushCleaning } from 'lucide-react';
 import type { ViewGrid } from '@wordpress/dataviews';
 import apiFetch from '@wordpress/api-fetch';
@@ -9,6 +9,7 @@ import type {
 	MarkersAdminConfig,
 	StyleThemeRecord,
 } from '../../types';
+import { fetchAdminMarkers } from '../../lib/admin/fetchPaginatedRecords';
 import { formatFilename, hasFilenameBasename, parseFilenameParts } from '../../lib/filenames';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
@@ -51,6 +52,7 @@ export function useMarkersController(
 	const [isDeletingAllMarkers, setDeletingAllMarkers] = useState(false);
 	const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
+	const [totalItems, setTotalItems] = useState(0);
 	const [isLoading, setLoading] = useState(enabled);
 	const [isRowActionPending, setRowActionPending] = useState(false);
 	const [isSubmitting, setSubmitting] = useState(false);
@@ -68,7 +70,13 @@ export function useMarkersController(
 		setLoadError(null);
 
 		try {
-			setMarkers(await fetchAllMarkers(config));
+			const result = await fetchAdminMarkers(config, {
+				page: view.page ?? 1,
+				perPage: view.perPage ?? DEFAULT_GRID_VIEW.perPage,
+				search: view.search ?? '',
+			});
+			setMarkers(result.items);
+			setTotalItems(result.totalItems);
 		} catch (error) {
 			setLoadError(
 				error instanceof Error
@@ -78,7 +86,7 @@ export function useMarkersController(
 		} finally {
 			setLoading(false);
 		}
-	}, [config.restPath, enabled]);
+	}, [config, enabled, view.page, view.perPage, view.search]);
 
 	useEffect(() => {
 		configureApiFetch(config.nonce);
@@ -169,7 +177,7 @@ export function useMarkersController(
 	);
 
 	const onDeleteAllMarkers = useCallback(async (): Promise<void> => {
-		if (markers.length === 0) {
+		if (totalItems === 0) {
 			setDeleteAllMarkersModalOpen(false);
 			return;
 		}
@@ -179,7 +187,9 @@ export function useMarkersController(
 		setActionNotice(null);
 
 		try {
-			for (const marker of markers) {
+			const allMarkers = await fetchAllMarkers(config);
+
+			for (const marker of allMarkers) {
 				await apiFetch({
 					path: `${config.restPath}/${marker.id}`,
 					method: 'DELETE',
@@ -191,8 +201,8 @@ export function useMarkersController(
 			setActionNotice({
 				status: 'success',
 				message: sprintf(
-					_n('%d marker deleted.', '%d markers deleted.', markers.length, 'minimal-map'),
-					markers.length
+					_n('%d marker deleted.', '%d markers deleted.', allMarkers.length, 'minimal-map'),
+					allMarkers.length
 				),
 			});
 		} catch (error) {
@@ -208,7 +218,7 @@ export function useMarkersController(
 			setDeletingAllMarkers(false);
 			setRowActionPending(false);
 		}
-	}, [config.restPath, loadMarkers, markers]);
+	}, [config, config.restPath, loadMarkers, totalItems]);
 
 	const onDownloadMarker = useCallback((marker: MarkerRecord): void => {
 		const blob = new Blob([marker.content], { type: 'image/svg+xml' });
@@ -317,22 +327,10 @@ export function useMarkersController(
 		[config.restPath, loadMarkers]
 	);
 
-	const { paginatedMarkers, totalPages } = useMemo(() => {
-		const search = view.search?.toLowerCase() || '';
-		const filtered = search
-			? markers.filter((m) => m.title.toLowerCase().includes(search))
-			: markers;
-
-		const page = view.page ?? 1;
-		const perPage = view.perPage ?? 12;
-		const pages = Math.max(1, Math.ceil(filtered.length / perPage));
-		const startIndex = (page - 1) * perPage;
-
-		return {
-			paginatedMarkers: filtered.slice(startIndex, startIndex + perPage),
-			totalPages: pages,
-		};
-	}, [markers, view]);
+	const totalPages = Math.max(
+		1,
+		Math.ceil(totalItems / Math.max(1, view.perPage ?? DEFAULT_GRID_VIEW.perPage ?? 1))
+	);
 
 	return {
 		actionNotice,
@@ -348,7 +346,7 @@ export function useMarkersController(
 					icon={<BrushCleaning size={18} strokeWidth={2} />}
 					label={__('Delete all markers', 'minimal-map')}
 					onClick={onOpenDeleteAllMarkersModal}
-					disabled={markers.length === 0 || isDeletingAllMarkers || isRowActionPending || isUploading}
+					disabled={totalItems === 0 || isDeletingAllMarkers || isRowActionPending || isUploading}
 					__next40pxDefaultSize
 				/>
 				<ThemeSelector
@@ -368,6 +366,7 @@ export function useMarkersController(
 		isUploading,
 		loadError,
 		markers,
+		totalItems,
 		onCancelEditMarker,
 		onChangeEditFilename,
 		onCloseDeleteAllMarkersModal,
@@ -379,7 +378,7 @@ export function useMarkersController(
 		onOpenDeleteAllMarkersModal,
 		onUploadMarkers,
 		onChangeView: (nextView: ViewGrid) => setView(nextView),
-		paginatedMarkers,
+		paginatedMarkers: markers,
 		submitError,
 		totalPages,
 		view,

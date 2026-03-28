@@ -1,9 +1,10 @@
 import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import type { ViewGrid } from '@wordpress/dataviews';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { BrushCleaning } from 'lucide-react';
+import { fetchAdminLogos } from '../../lib/admin/fetchPaginatedRecords';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { createLocationFormStateFromRecord } from '../../lib/locations/createLocationFormStateFromRecord';
 import { formatFilename, hasFilenameBasename, parseFilenameParts } from '../../lib/filenames';
@@ -79,6 +80,7 @@ export function useLogosController(
 	const [isUploading, setUploading] = useState(false);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [logos, setLogos] = useState<LogoRecord[]>([]);
+	const [totalItems, setTotalItems] = useState(0);
 	const [selectedLogo, setSelectedLogo] = useState<LogoRecord | null>(null);
 	const [submitError, setSubmitError] = useState<string | null>(null);
 	const [view, setView] = useState<ViewGrid>(DEFAULT_GRID_VIEW);
@@ -92,8 +94,13 @@ export function useLogosController(
 		setLoadError(null);
 
 		try {
-			const records = await fetchAllLogos(config);
-			setLogos(records);
+			const result = await fetchAdminLogos(config, {
+				page: view.page ?? 1,
+				perPage: view.perPage ?? DEFAULT_GRID_VIEW.perPage,
+				search: view.search ?? '',
+			});
+			setLogos(result.items);
+			setTotalItems(result.totalItems);
 		} catch (error) {
 			setLoadError(
 				error instanceof Error ? error.message : __('Logos could not be loaded.', 'minimal-map')
@@ -101,7 +108,7 @@ export function useLogosController(
 		} finally {
 			setLoading(false);
 		}
-	}, [config, enabled]);
+	}, [config, enabled, view.page, view.perPage, view.search]);
 
 	useEffect(() => {
 		configureApiFetch(config.nonce || locationsConfig.nonce);
@@ -229,7 +236,7 @@ export function useLogosController(
 	}, [deleteLogoWithAssignments, loadLogos, locationsConfig, selectedLogo]);
 
 	const onDeleteAllLogos = useCallback(async (): Promise<void> => {
-		if (logos.length === 0) {
+		if (totalItems === 0) {
 			setDeleteAllLogosModalOpen(false);
 			return;
 		}
@@ -240,8 +247,9 @@ export function useLogosController(
 
 		try {
 			const locations = await fetchAllLocations(locationsConfig);
+			const allLogos = await fetchAllLogos(config);
 
-			for (const logo of logos) {
+			for (const logo of allLogos) {
 				await deleteLogoWithAssignments(logo, locations);
 			}
 
@@ -250,8 +258,8 @@ export function useLogosController(
 			setActionNotice({
 				status: 'success',
 				message: sprintf(
-					_n('%d logo deleted.', '%d logos deleted.', logos.length, 'minimal-map'),
-					logos.length
+					_n('%d logo deleted.', '%d logos deleted.', allLogos.length, 'minimal-map'),
+					allLogos.length
 				),
 			});
 		} catch (error) {
@@ -265,7 +273,7 @@ export function useLogosController(
 			setDeletingAllLogos(false);
 			setRowActionPending(false);
 		}
-	}, [deleteLogoWithAssignments, loadLogos, locationsConfig, logos]);
+	}, [config, deleteLogoWithAssignments, loadLogos, locationsConfig, totalItems]);
 
 	const onConfirmEditLogo = useCallback(async (): Promise<void> => {
 		if (!editingLogo) {
@@ -379,22 +387,10 @@ export function useLogosController(
 		[config.restPath, loadLogos]
 	);
 
-	const { paginatedLogos, totalPages } = useMemo(() => {
-		const search = view.search?.toLowerCase() || '';
-		const filtered = search
-			? logos.filter((logo) => logo.title.toLowerCase().includes(search))
-			: logos;
-
-		const page = view.page ?? 1;
-		const perPage = view.perPage ?? 12;
-		const pages = Math.max(1, Math.ceil(filtered.length / perPage));
-		const startIndex = (page - 1) * perPage;
-
-		return {
-			paginatedLogos: filtered.slice(startIndex, startIndex + perPage),
-			totalPages: pages,
-		};
-	}, [logos, view]);
+	const totalPages = Math.max(
+		1,
+		Math.ceil(totalItems / Math.max(1, view.perPage ?? DEFAULT_GRID_VIEW.perPage ?? 1))
+	);
 
 	return {
 		actionNotice,
@@ -409,7 +405,7 @@ export function useLogosController(
 					icon={<BrushCleaning size={18} strokeWidth={2} />}
 					label={__('Delete all logos', 'minimal-map')}
 					onClick={onOpenDeleteAllLogosModal}
-					disabled={logos.length === 0 || isDeletingAllLogos || isRowActionPending || isUploading}
+					disabled={totalItems === 0 || isDeletingAllLogos || isRowActionPending || isUploading}
 					__next40pxDefaultSize
 				/>
 				<UploadLogoButton onUpload={(files) => void onUploadLogos(files)} isUploading={isUploading} />
@@ -425,6 +421,7 @@ export function useLogosController(
 		isUploading,
 		loadError,
 		logos,
+		totalItems,
 		onChangeView: (nextView: ViewGrid) => setView(nextView),
 		onCancelEditLogo,
 		onChangeEditFilename,
@@ -438,7 +435,7 @@ export function useLogosController(
 		onOpenDeleteAllLogosModal,
 		onOpenDeleteModal,
 		onUploadLogos,
-		paginatedLogos,
+		paginatedLogos: logos,
 		selectedLogo,
 		submitError,
 		totalPages,

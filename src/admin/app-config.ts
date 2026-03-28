@@ -18,22 +18,27 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		nonce: '',
 		restBase: '',
 		restPath: '',
+		queryPath: '',
 	},
 	locationsConfig: {
 		nonce: '',
 		restBase: '',
 		restPath: '',
 		geocodePath: '',
+		queryPath: '',
+		lookupPath: '',
 	},
 	markersConfig: {
 		nonce: '',
 		restBase: '',
 		restPath: '',
+		queryPath: '',
 	},
 	logosConfig: {
 		nonce: '',
 		restBase: '',
 		restPath: '',
+		queryPath: '',
 	},
 	tagsConfig: {
 		nonce: '',

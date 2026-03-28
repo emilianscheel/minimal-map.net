@@ -15,6 +15,7 @@ export default function MapStep({
   const runtimeConfig = useMemo(
     () => ({
       ...(window.MinimalMapAdminConfig?.mapConfig ?? {}),
+      autoFetchLocations: false,
       onMapClick: controller.onMapLocationSelect,
     }),
     [controller.onMapLocationSelect],

@@ -52,7 +52,7 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 					<div className="minimal-map-admin__locations-state minimal-map-admin__locations-state--loading">
 						<Spinner />
 					</div>
-				) : controller.locations.length === 0 ? (
+				) : controller.totalItems === 0 ? (
 					<LocationsEmptyState controller={controller} />
 				) : (
 					<LocationsTable controller={controller} />

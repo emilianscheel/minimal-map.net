@@ -106,6 +106,23 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Create one administrator user and authenticate as that user.
+	 *
+	 * @return int
+	 */
+	private function create_admin_user() {
+		$user_id = self::factory()->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+
+		wp_set_current_user( $user_id );
+
+		return $user_id;
+	}
+
+	/**
 	 * Encode one embed payload using the public base64url format.
 	 *
 	 * @param array<string, mixed> $payload Embed payload.
@@ -442,6 +459,68 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			),
 			$client_config['collections'][0]['locations']
 		);
+	}
+
+	/**
+	 * Admin config should keep map bootstrap data lightweight and expose admin query paths.
+	 *
+	 * @return void
+	 */
+	public function test_admin_app_config_omits_inline_location_payloads() {
+		$location_id = $this->create_location( '48.137154', '11.576124' );
+		$this->create_collection( array( $location_id ) );
+
+		$config       = new \MinimalMap\Config();
+		$admin_config = $config->get_admin_app_config();
+
+		$this->assertSame( array(), $admin_config['mapConfig']['locations'] );
+		$this->assertSame( array(), $admin_config['mapConfig']['collections'] );
+		$this->assertSame(
+			\MinimalMap\Rest\Admin_Query_Route::get_locations_rest_path(),
+			$admin_config['locationsConfig']['queryPath']
+		);
+		$this->assertSame(
+			\MinimalMap\Rest\Admin_Query_Route::get_location_lookups_rest_path(),
+			$admin_config['locationsConfig']['lookupPath']
+		);
+		$this->assertSame(
+			\MinimalMap\Rest\Admin_Query_Route::get_collections_rest_path(),
+			$admin_config['collectionsConfig']['queryPath']
+		);
+	}
+
+	/**
+	 * Admin locations queries should paginate and search across address fields.
+	 *
+	 * @return void
+	 */
+	public function test_admin_locations_route_paginates_and_searches_address_fields() {
+		$this->create_admin_user();
+
+		$matching_location_id = $this->create_location( '52.517', '13.388', 'Alpha Store' );
+		update_post_meta( $matching_location_id, 'city', 'Cologne' );
+		update_post_meta( $matching_location_id, 'street', 'Domkloster' );
+
+		$other_location_id = $this->create_location( '48.137', '11.576', 'Beta Store' );
+		update_post_meta( $other_location_id, 'city', 'Munich' );
+
+		$collection_id = $this->create_collection( array( $matching_location_id ) );
+
+		$request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Admin_Query_Route::get_locations_rest_path() );
+		$request->set_param( 'page', 1 );
+		$request->set_param( 'per_page', 1 );
+		$request->set_param( 'search', 'Cologne' );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 1, $data['totalItems'] );
+		$this->assertSame( 1, $data['totalPages'] );
+		$this->assertCount( 1, $data['items'] );
+		$this->assertSame( $matching_location_id, $data['items'][0]['id'] );
+		$this->assertSame( 'Cologne', $data['items'][0]['city'] );
+		$this->assertSame( $collection_id, $data['items'][0]['collections'][0]['id'] );
 	}
 
 	/**

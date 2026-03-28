@@ -53,7 +53,10 @@ export default function StylesView({ controller, runtimeConfig }: StylesViewProp
 			mapInstanceRef.current = createMinimalMap(
 				mapHostRef.current,
 				mapConfig,
-				runtimeConfig
+				{
+					...runtimeConfig,
+					autoFetchLocations: false,
+				}
 			);
 		} else {
 			mapInstanceRef.current.update(mapConfig);

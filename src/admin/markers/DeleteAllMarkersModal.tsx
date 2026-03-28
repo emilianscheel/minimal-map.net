@@ -61,10 +61,10 @@ export default function DeleteAllMarkersModal({
 						_n(
 							'Are you sure you want to delete %d marker? This action cannot be undone.',
 							'Are you sure you want to delete %d markers? This action cannot be undone.',
-							controller.markers.length,
+							controller.totalItems,
 							'minimal-map'
 						),
-						controller.markers.length
+						controller.totalItems
 					)}
 				</p>
 				<div className="minimal-map-admin__collection-delete-dialog-actions">

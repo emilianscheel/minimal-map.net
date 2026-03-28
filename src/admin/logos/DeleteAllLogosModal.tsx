@@ -61,10 +61,10 @@ export default function DeleteAllLogosModal({
 						_n(
 							'Are you sure you want to delete %d logo? This action cannot be undone.',
 							'Are you sure you want to delete %d logos? This action cannot be undone.',
-							controller.logos.length,
+							controller.totalItems,
 							'minimal-map'
 						),
-						controller.logos.length
+						controller.totalItems
 					)}
 				</p>
 				<div className="minimal-map-admin__collection-delete-dialog-actions">

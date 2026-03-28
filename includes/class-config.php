@@ -16,6 +16,7 @@ use MinimalMap\Rest\Analytics_Queries_Route;
 use MinimalMap\Rest\Analytics_Settings_Route;
 use MinimalMap\Rest\Analytics_Summary_Route;
 use MinimalMap\Rest\Analytics_Track_Route;
+use MinimalMap\Rest\Admin_Query_Route;
 use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
@@ -696,7 +697,7 @@ class Config {
 	 */
 	public function get_admin_app_config() {
 		$sections = array();
-		$map_config = $this->get_client_config( true );
+		$map_config = $this->get_client_config( false );
 		$analytics  = new Analytics();
 		$map_config['defaults']['mobileTwoFingerZoom'] = true;
 		$map_config['defaults']['cooperativeGestures'] = true;
@@ -727,21 +728,26 @@ class Config {
 				'restBase'    => Location_Post_Type::REST_BASE,
 				'restPath'    => Location_Post_Type::get_rest_path(),
 				'geocodePath' => Geocode_Route::get_rest_path(),
+				'queryPath'   => Admin_Query_Route::get_locations_rest_path(),
+				'lookupPath'  => Admin_Query_Route::get_location_lookups_rest_path(),
 			),
 			'collectionsConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => Collection_Post_Type::REST_BASE,
 				'restPath' => Collection_Post_Type::get_rest_path(),
+				'queryPath' => Admin_Query_Route::get_collections_rest_path(),
 			),
 			'markersConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => Marker_Post_Type::REST_BASE,
 				'restPath' => Marker_Post_Type::get_rest_path(),
+				'queryPath' => Admin_Query_Route::get_markers_rest_path(),
 			),
 			'logosConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => Logo_Post_Type::REST_BASE,
 				'restPath' => Logo_Post_Type::get_rest_path(),
+				'queryPath' => Admin_Query_Route::get_logos_rest_path(),
 			),
 			'tagsConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),

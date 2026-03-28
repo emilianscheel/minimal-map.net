@@ -42,7 +42,7 @@ export default function CollectionsView({ controller }: { controller: Collection
 					<div className="minimal-map-admin__collections-state minimal-map-admin__collections-state--loading">
 						<Spinner />
 					</div>
-				) : controller.collections.length === 0 ? (
+				) : controller.totalItems === 0 ? (
 					<CollectionsEmptyState controller={controller} />
 				) : (
 					<CollectionsGrid controller={controller} />

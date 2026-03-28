@@ -1,21 +1,20 @@
-import type { CollectionRecord, LocationRecord, StyleThemeRecord } from '../../types';
+import type { MapLocationPoint, StyleThemeRecord } from '../../types';
 
 export interface CollectionMiniMapComparableProps {
-	collection: Pick<CollectionRecord, 'id' | 'location_ids'>;
-	locations: LocationRecord[];
+	previewLocations: MapLocationPoint[];
 	theme: StyleThemeRecord | null;
 }
 
-export function haveSameCollectionLocationIds(
-	previousLocationIds: readonly number[],
-	nextLocationIds: readonly number[]
+export function haveSamePreviewLocations(
+	previousLocations: readonly MapLocationPoint[],
+	nextLocations: readonly MapLocationPoint[]
 ): boolean {
-	if (previousLocationIds.length !== nextLocationIds.length) {
+	if (previousLocations.length !== nextLocations.length) {
 		return false;
 	}
 
-	for (let index = 0; index < previousLocationIds.length; index += 1) {
-		if (previousLocationIds[index] !== nextLocationIds[index]) {
+	for (let index = 0; index < previousLocations.length; index += 1) {
+		if (previousLocations[index] !== nextLocations[index]) {
 			return false;
 		}
 	}
@@ -27,11 +26,7 @@ export function areCollectionMiniMapPropsEqual(
 	previousProps: CollectionMiniMapComparableProps,
 	nextProps: CollectionMiniMapComparableProps
 ): boolean {
-	if (previousProps.collection.id !== nextProps.collection.id) {
-		return false;
-	}
-
-	if (!haveSameCollectionLocationIds(previousProps.collection.location_ids, nextProps.collection.location_ids)) {
+	if (!haveSamePreviewLocations(previousProps.previewLocations, nextProps.previewLocations)) {
 		return false;
 	}
 
@@ -39,5 +34,5 @@ export function areCollectionMiniMapPropsEqual(
 		return false;
 	}
 
-	return previousProps.locations === nextProps.locations;
+	return true;
 }

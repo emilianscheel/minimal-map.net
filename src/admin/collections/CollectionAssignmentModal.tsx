@@ -4,14 +4,14 @@ import type { Field, View, ViewPickerTable } from '@wordpress/dataviews';
 import type { KeyboardEvent } from 'react';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { LocationRecord } from '../../types';
+import type { AdminLocationLookupItem } from '../../types';
 import { formatLocationAddressLines } from '../../lib/locations/formatLocationAddressLines';
 import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
 import Kbd from '../../components/Kbd';
 import type { CollectionsController } from './types';
 
-function useLocationFields(): Field<LocationRecord>[] {
-	return useMemo<Field<LocationRecord>[]>(
+function useLocationFields(): Field<AdminLocationLookupItem>[] {
+	return useMemo<Field<AdminLocationLookupItem>[]>(
 		() => [
 			{
 				id: 'title',
@@ -77,14 +77,14 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 					data={controller.assignmentLocations}
 					defaultLayouts={{ pickerTable: {} }}
 					fields={fields}
-					getItemId={(item: LocationRecord) => `${item.id}`}
+					getItemId={(item: AdminLocationLookupItem) => `${item.id}`}
 					itemListLabel={__('Locations', 'minimal-map')}
 					paginationInfo={{
-						totalItems: controller.filteredAssignmentLocationsCount,
+						totalItems: controller.assignmentTotalItems,
 						totalPages: Math.max(
 							1,
 							Math.ceil(
-								controller.filteredAssignmentLocationsCount /
+								controller.assignmentTotalItems /
 									(controller.assignmentLocationsView.perPage ?? 5)
 							)
 						),

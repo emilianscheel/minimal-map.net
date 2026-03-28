@@ -89,7 +89,7 @@ export default function LogosGrid({ controller }: { controller: LogosController 
 				fields={fields}
 				getItemId={(item: LogoRecord) => `${item.id}`}
 				paginationInfo={{
-					totalItems: controller.logos.length,
+					totalItems: controller.totalItems,
 					totalPages: controller.totalPages,
 				}}
 				defaultLayouts={{

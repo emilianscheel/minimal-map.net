@@ -1,13 +1,14 @@
 import { Button } from "@wordpress/components";
 import { __, _n, sprintf } from "@wordpress/i18n";
-import { useCallback, useEffect, useMemo, useState, useRef } from "@wordpress/element";
+import { useCallback, useEffect, useState, useRef } from "@wordpress/element";
 import { BrushCleaning, Merge, Plus } from "lucide-react";
 import type { ViewGrid, ViewPickerTable } from "@wordpress/dataviews";
 import type {
+  AdminCollectionListItem,
+  AdminLocationLookupItem,
   CollectionFormState,
   CollectionRecord,
   CollectionsAdminConfig,
-  LocationRecord,
   LocationsAdminConfig,
   StyleThemeRecord,
 } from "../../types";
@@ -16,9 +17,11 @@ import {
   DEFAULT_FORM_STATE,
   DEFAULT_GRID_VIEW,
 } from "./constants";
+import {
+  fetchAdminCollections,
+  fetchAdminLocationAssignmentOptions,
+} from "../../lib/admin/fetchPaginatedRecords";
 import { configureApiFetch } from "../../lib/locations/configureApiFetch";
-import { fetchAllLocations } from "../../lib/locations/fetchAllLocations";
-import { paginateLocations } from "../../lib/locations/paginateLocations";
 import { createCollection } from "../../lib/collections/createCollection";
 import { deleteCollection } from "../../lib/collections/deleteCollection";
 import {
@@ -28,8 +31,6 @@ import {
 } from "../../lib/collections/deleteCollectionLocations";
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
 import { importLocations } from '../../lib/locations/importLocations';
-import { filterLocationsForAssignment } from '../../lib/collections/filterLocationsForAssignment';
-import { paginateCollections } from "../../lib/collections/paginateCollections";
 import { updateCollection } from "../../lib/collections/updateCollection";
 import { deleteLocation } from "../../lib/locations/deleteLocation";
 import { ImportLocationsButton } from "../locations/ImportLocationsButton";
@@ -144,7 +145,8 @@ export function useCollectionsController(
   const [assignmentSearch, setAssignmentSearch] = useState("");
   const [assignmentLocationsView, setAssignmentLocationsView] =
     useState<ViewPickerTable>(DEFAULT_ASSIGNMENT_VIEW);
-  const [collections, setCollections] = useState<CollectionRecord[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionListItem[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [editingCollection, setEditingCollection] =
     useState<CollectionRecord | null>(null);
   const [form, setForm] = useState<CollectionFormState>(DEFAULT_FORM_STATE);
@@ -177,26 +179,56 @@ export function useCollectionsController(
     },
   );
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [locations, setLocations] = useState<LocationRecord[]>([]);
+  const [assignmentLocations, setAssignmentLocations] = useState<AdminLocationLookupItem[]>([]);
+  const [assignmentTotalItems, setAssignmentTotalItems] = useState(0);
   const [selectedAssignmentCollection, setSelectedAssignmentCollection] =
     useState<CollectionRecord | null>(null);
   const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [view, setView] = useState<ViewGrid>(DEFAULT_GRID_VIEW);
   const [isImporting, setIsImporting] = useState(false);
+  const [mergeCollections, setMergeCollections] = useState<CollectionRecord[]>([]);
+  const [mergeCollectionsTotalItems, setMergeCollectionsTotalItems] = useState(0);
   
   // The lock prevents DataViewsPicker from clearing selection during unmount transition
   const isMergeSelectionLocked = useRef(false);
 
   const loadCollections = useCallback(async (): Promise<void> => {
-    const records = await fetchAllCollections(collectionsConfig);
-    setCollections(records);
-  }, [collectionsConfig]);
+    if (!enabled) {
+      return;
+    }
 
-  const loadLocations = useCallback(async (): Promise<void> => {
-    const records = await fetchAllLocations(locationsConfig);
-    setLocations(records);
-  }, [locationsConfig]);
+    const result = await fetchAdminCollections(collectionsConfig, {
+      page: view.page ?? 1,
+      perPage: view.perPage ?? DEFAULT_GRID_VIEW.perPage,
+      search: view.search ?? "",
+    });
+
+    setCollections(result.items);
+    setTotalItems(result.totalItems);
+  }, [collectionsConfig, enabled, view.page, view.perPage, view.search]);
+
+  const loadAssignmentLocations = useCallback(async (): Promise<void> => {
+    if (!enabled || !selectedAssignmentCollection) {
+      return;
+    }
+
+    const result = await fetchAdminLocationAssignmentOptions(locationsConfig, {
+      page: assignmentLocationsView.page ?? 1,
+      perPage: assignmentLocationsView.perPage ?? DEFAULT_ASSIGNMENT_VIEW.perPage,
+      search: assignmentSearch,
+    });
+
+    setAssignmentLocations(result.items);
+    setAssignmentTotalItems(result.totalItems);
+  }, [
+    assignmentLocationsView.page,
+    assignmentLocationsView.perPage,
+    assignmentSearch,
+    enabled,
+    locationsConfig,
+    selectedAssignmentCollection,
+  ]);
 
   const loadData = useCallback(async (): Promise<void> => {
     if (!enabled) {
@@ -207,7 +239,7 @@ export function useCollectionsController(
     setLoadError(null);
 
     try {
-      await Promise.all([loadCollections(), loadLocations()]);
+      await loadCollections();
     } catch (error) {
       setLoadError(
         error instanceof Error
@@ -217,7 +249,7 @@ export function useCollectionsController(
     } finally {
       setLoading(false);
     }
-  }, [enabled, loadCollections, loadLocations]);
+  }, [enabled, loadCollections]);
 
   useEffect(() => {
     configureApiFetch(collectionsConfig.nonce || locationsConfig.nonce);
@@ -230,38 +262,23 @@ export function useCollectionsController(
   }, [collectionsConfig.nonce, enabled, loadData, locationsConfig.nonce]);
 
   useEffect(() => {
-    setView((currentView) => ({
-      ...currentView,
-      page: 1,
-    }));
-  }, [collections.length, view.search]);
+    if (!selectedAssignmentCollection) {
+      return;
+    }
 
-  const locationsById = useMemo(
-    () => new Map(locations.map((location) => [location.id, location])),
-    [locations],
+    void loadAssignmentLocations();
+  }, [loadAssignmentLocations, selectedAssignmentCollection]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / Math.max(1, view.perPage ?? DEFAULT_GRID_VIEW.perPage ?? 1)),
   );
-
-  const assignmentLocationsFiltered = useMemo(
-    () => filterLocationsForAssignment(locations, assignmentSearch),
-    [assignmentSearch, locations],
-  );
-
-  useEffect(() => {
-    setAssignmentLocationsView((currentView) => ({
-      ...currentView,
-      page: 1,
-    }));
-  }, [assignmentSearch]);
-
-  const { collections: paginatedCollections, totalPages } = useMemo(
-    () => paginateCollections(collections, view),
-    [collections, view],
-  );
-
-  const { locations: paginatedAssignmentLocations } = useMemo(
-    () =>
-      paginateLocations(assignmentLocationsFiltered, assignmentLocationsView),
-    [assignmentLocationsFiltered, assignmentLocationsView],
+  const assignmentTotalPages = Math.max(
+    1,
+    Math.ceil(
+      assignmentTotalItems /
+        Math.max(1, assignmentLocationsView.perPage ?? DEFAULT_ASSIGNMENT_VIEW.perPage ?? 1),
+    ),
   );
 
   const resetDialogState = useCallback((): void => {
@@ -388,12 +405,16 @@ export function useCollectionsController(
       try {
         let deletedLocationCount = 0;
         let sharedLocationCount = 0;
+        const allCollections =
+          options.deleteLocations || selectedAssignmentCollection
+            ? await fetchAllCollections(collectionsConfig)
+            : collections;
 
         if (options.deleteLocations) {
           const { deletedLocationIds, sharedLocationIds } =
             getDeleteCollectionLocationPlan(
               collection,
-              collections,
+              allCollections,
               options.skipSharedLocations,
             );
 
@@ -408,7 +429,7 @@ export function useCollectionsController(
           deletedLocationCount = deletedLocationIds.length;
 
           const collectionUpdates = getCollectionsWithoutDeletedLocationIds(
-            collections,
+            allCollections,
             deletedLocationIds,
             collection.id,
           );
@@ -424,7 +445,7 @@ export function useCollectionsController(
         }
 
         await deleteCollection(collectionsConfig, collection.id);
-        await Promise.all([loadCollections(), loadLocations()]);
+        await loadCollections();
         setActionNotice({
           status: "success",
           message: buildDeleteCollectionNotice(
@@ -451,20 +472,19 @@ export function useCollectionsController(
       collections,
       collectionsConfig,
       loadCollections,
-      loadLocations,
       locationsConfig,
+      selectedAssignmentCollection,
     ],
   );
 
   const onDeleteAllCollections = useCallback(
     async (options: DeleteCollectionOptions): Promise<void> => {
-      const collectionCount = collections.length;
       const normalizedOptions: DeleteCollectionOptions = {
         ...options,
         skipSharedLocations: false,
       };
 
-      if (collectionCount === 0) {
+      if (totalItems === 0) {
         setDeleteAllCollectionsModalOpen(false);
         return;
       }
@@ -476,11 +496,13 @@ export function useCollectionsController(
       try {
         let deletedLocationCount = 0;
         let sharedLocationCount = 0;
+        const allCollections = await fetchAllCollections(collectionsConfig);
+        const collectionCount = allCollections.length;
 
         if (normalizedOptions.deleteLocations) {
           const { deletedLocationIds, sharedLocationIds } =
             getDeleteAllCollectionsLocationPlan(
-              collections,
+              allCollections,
               normalizedOptions.skipSharedLocations,
             );
 
@@ -495,11 +517,11 @@ export function useCollectionsController(
           deletedLocationCount = deletedLocationIds.length;
         }
 
-        for (const collection of collections) {
+        for (const collection of allCollections) {
           await deleteCollection(collectionsConfig, collection.id);
         }
 
-        await Promise.all([loadCollections(), loadLocations()]);
+        await loadCollections();
         setDeleteAllCollectionsModalOpen(false);
         setActionNotice({
           status: "success",
@@ -526,11 +548,10 @@ export function useCollectionsController(
     },
     [
       buildDeleteCollectionsNotice,
-      collections,
       collectionsConfig,
       loadCollections,
-      loadLocations,
       locationsConfig,
+      totalItems,
     ],
   );
 
@@ -547,7 +568,7 @@ export function useCollectionsController(
 
   const onOpenDeleteAllCollectionsModal = useCallback((): void => {
     if (
-      collections.length === 0 ||
+      totalItems === 0 ||
       isRowActionPending ||
       isImporting ||
       isDeletingAllCollections
@@ -556,7 +577,7 @@ export function useCollectionsController(
     }
 
     setDeleteAllCollectionsModalOpen(true);
-  }, [collections.length, isDeletingAllCollections, isImporting, isRowActionPending]);
+  }, [isDeletingAllCollections, isImporting, isRowActionPending, totalItems]);
 
   const onCloseAssignmentModal = useCallback((): void => {
     if (isAssignmentSaving) {
@@ -571,16 +592,13 @@ export function useCollectionsController(
 
   const onChangeAssignmentLocationsSelection = useCallback(
     (nextSelection: string[]): void => {
-      const nextLocationIds = nextSelection
+      setSelectedLocationIds(
+        nextSelection
         .map((locationId) => Number.parseInt(locationId, 10))
-        .filter(
-          (locationId) =>
-            Number.isInteger(locationId) && locationsById.has(locationId),
-        );
-
-      setSelectedLocationIds(nextLocationIds);
+        .filter((locationId) => Number.isInteger(locationId) && locationId > 0),
+      );
     },
-    [locationsById],
+    [],
   );
 
   const onSaveAssignments = useCallback(async (): Promise<void> => {
@@ -599,6 +617,7 @@ export function useCollectionsController(
         selectedLocationIds,
       );
       await loadCollections();
+      await loadAssignmentLocations();
       setAssignmentModalOpen(false);
       setSelectedAssignmentCollection(null);
       setSelectedLocationIds([]);
@@ -617,7 +636,13 @@ export function useCollectionsController(
     } finally {
       setAssignmentSaving(false);
     }
-  }, [selectedAssignmentCollection, selectedLocationIds, collectionsConfig, loadCollections]);
+  }, [
+    collectionsConfig,
+    loadAssignmentLocations,
+    loadCollections,
+    selectedAssignmentCollection,
+    selectedLocationIds,
+  ]);
 
   const onOpenMergeModal = useCallback((): void => {
     isMergeSelectionLocked.current = false;
@@ -627,7 +652,20 @@ export function useCollectionsController(
     setShouldDeleteAfterMerge(false);
     setSubmitError(null);
     setMergeModalOpen(true);
-  }, []);
+
+    void fetchAllCollections(collectionsConfig)
+      .then((records) => {
+        setMergeCollections(records);
+        setMergeCollectionsTotalItems(records.length);
+      })
+      .catch((error) => {
+        setSubmitError(
+          error instanceof Error
+            ? error.message
+            : __("Collections could not be loaded.", "minimal-map"),
+        );
+      });
+  }, [collectionsConfig]);
 
   useSingleKeyShortcut({
     active: enabled,
@@ -642,6 +680,8 @@ export function useCollectionsController(
     }
 
     setMergeModalOpen(false);
+    setMergeCollections([]);
+    setMergeCollectionsTotalItems(0);
   }, [isMerging]);
 
   const onCloseDeleteAllCollectionsModal = useCallback((): void => {
@@ -677,37 +717,27 @@ export function useCollectionsController(
     setActionNotice(null);
 
     try {
-      // 1. Gather all unique location IDs
       const allLocationIds = new Set<number>();
-      console.log('Final merge started. IDs:', selectedMergeCollectionIds);
-      
-      collections.forEach((collection) => {
+
+      mergeCollections.forEach((collection) => {
         if (selectedMergeCollectionIds.includes(collection.id)) {
-          console.log(`Adding locations from collection ${collection.id}:`, collection.location_ids);
           collection.location_ids.forEach((id) => allLocationIds.add(id));
         }
       });
 
-      // 2. Create new collection
-      console.log('Creating new merged collection with locations:', Array.from(allLocationIds));
       await createCollection(
         collectionsConfig,
         mergeTitle,
         Array.from(allLocationIds),
       );
 
-      // 3. Delete old collections if requested
       if (shouldDeleteAfterMerge) {
         const idsToDelete = [...selectedMergeCollectionIds];
-        console.log('Deleting original collections:', idsToDelete);
         for (const id of idsToDelete) {
-          console.log(`Deleting collection ${id}...`);
           await deleteCollection(collectionsConfig, id);
-          console.log(`Deleted collection ${id}.`);
         }
       }
 
-      console.log('Merge complete. Reloading...');
       await loadCollections();
       setMergeModalOpen(false);
       setActionNotice({
@@ -727,7 +757,7 @@ export function useCollectionsController(
     mergeStep,
     selectedMergeCollectionIds,
     mergeTitle,
-    collections,
+    mergeCollections,
     collectionsConfig,
     shouldDeleteAfterMerge,
     loadCollections,
@@ -743,13 +773,10 @@ export function useCollectionsController(
 
   const onChangeMergeSelection = useCallback(
     (nextSelection: string[]): void => {
-      // Ignore updates if locked (transitioning) or not in selection step
       if (isMergeSelectionLocked.current || mergeStep !== "selection") {
-        console.log('onChangeMergeSelection ignored (locked or wrong step)');
         return;
       }
 
-      console.log('onChangeMergeSelection updated:', nextSelection);
       const nextIds = nextSelection
         .map((id) => Number.parseInt(id, 10))
         .filter((id) => !Number.isNaN(id));
@@ -811,11 +838,11 @@ export function useCollectionsController(
   return {
     actionNotice,
     activeTheme: themeData.activeTheme,
-    assignmentLocations: paginatedAssignmentLocations,
+    assignmentLocations,
     assignmentSearch,
     assignmentLocationsView,
     collections,
-    filteredAssignmentLocationsCount: assignmentLocationsFiltered.length,
+    filteredAssignmentLocationsCount: assignmentTotalItems,
     form,
     formMode,
     headerAction: enabled ? (
@@ -828,7 +855,7 @@ export function useCollectionsController(
             label={__("Delete all collections", "minimal-map")}
             onClick={onOpenDeleteAllCollectionsModal}
             disabled={
-              collections.length === 0 ||
+              totalItems === 0 ||
               isDeletingAllCollections ||
               isRowActionPending ||
               isImporting
@@ -884,13 +911,16 @@ export function useCollectionsController(
     isMergeModalOpen,
     isMerging,
     isImporting,
+    totalItems,
+    assignmentTotalItems,
+    mergeCollections,
+    mergeCollectionsTotalItems,
     mergeStep,
     mergeSelectionView,
     selectedMergeCollectionIds,
     mergeTitle,
     shouldDeleteAfterMerge,
     loadError,
-    locations,
     modalTitle:
       formMode === "edit"
         ? __("Edit collection", "minimal-map")
@@ -931,7 +961,7 @@ export function useCollectionsController(
     onChangeMergeTitle,
     onToggleDeleteAfterMerge,
     onAddCollection: openDialog,
-    paginatedCollections,
+    paginatedCollections: collections,
     totalPages: totalPages,
   };
 }
