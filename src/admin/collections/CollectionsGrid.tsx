@@ -92,6 +92,7 @@ function useCollectionActions(
         context: "single",
         disabled: isRowActionPending,
         supportsBulk: false,
+        callback: () => {},
         modalHeader: __("Delete collection", "minimal-map"),
         RenderModal: ({ items, closeModal, onActionPerformed }) => {
           if (!items[0]) {

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { filterLocationsForAssignment } from '../../src/lib/collections/filterLocationsForAssignment';
+import { normalizeAdminCollectionListItem } from '../../src/lib/admin/fetchPaginatedRecords';
 import {
 	getDeleteAllCollectionsLocationPlan,
 	getCollectionsWithoutDeletedLocationIds,
@@ -134,6 +135,29 @@ describe('collection helpers', () => {
 			id: 12,
 			title: 'Featured Cities',
 			location_ids: [ 3, 2 ],
+		});
+	});
+
+	test('normalizeAdminCollectionListItem tolerates legacy or malformed collection payloads', () => {
+		expect(
+			normalizeAdminCollectionListItem({
+				id: '12',
+				title: null,
+				location_ids: [ '3', 0, '2', 'x' ],
+				location_count: 'wrong',
+				preview_locations: [
+					{ lat: '52.517', lng: '13.388', title: 'Berlin' },
+					{ lat: null, lng: 13.4 },
+				],
+			})
+		).toEqual({
+			id: 12,
+			title: '',
+			location_ids: [ 3, 2 ],
+			location_count: 2,
+			preview_locations: [
+				{ lat: 52.517, lng: 13.388, title: 'Berlin' },
+			],
 		});
 	});
 
