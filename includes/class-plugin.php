@@ -278,15 +278,15 @@ final class Plugin {
 			return $actions;
 		}
 
-		$plugin_actions = array(
-			'dashboard' => sprintf(
+		$plugin_actions = array();
+
+		if ( License_Route::has_local_activation() ) {
+			$plugin_actions['dashboard'] = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( Admin_Menu::get_view_url( Admin_Menu::DEFAULT_VIEW ) ),
 				esc_html__( 'Dashboard', 'minimal-map' )
-			),
-		);
-
-		if ( ! License_Route::has_local_activation() ) {
+			);
+		} else {
 			$plugin_actions['buy-premium'] = sprintf(
 				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
 				esc_url( License_Route::PRODUCT_URL ),
