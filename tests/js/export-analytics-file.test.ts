@@ -1,5 +1,6 @@
 import { describe, expect, mock, test } from 'bun:test';
 import type { AnalyticsExportActionConfig, AnalyticsQueryRecord } from '../../src/types';
+import { buildTimestampedFileName } from '../../src/lib/downloadFileName';
 import { buildAnalyticsCsv, exportAnalyticsFile } from '../../src/lib/analytics/exportAnalyticsFile';
 
 const analyticsConfig: AnalyticsExportActionConfig = {
@@ -26,6 +27,16 @@ function createQueryRecord(overrides: Partial<AnalyticsQueryRecord> = {}): Analy
 }
 
 describe('exportAnalyticsFile', () => {
+	test('builds readable timestamped file names', () => {
+		expect(
+			buildTimestampedFileName(
+				'minimal-map-analytics-search',
+				'csv',
+				new Date('2026-03-28T14:05:09Z')
+			)
+		).toBe('minimal-map-analytics-search-2026-03-28_14-05-09.csv');
+	});
+
 	test('paginates all search rows and downloads a CSV', async () => {
 		const fetchQueries = mock(async (
 			_config: AnalyticsExportActionConfig,
@@ -64,7 +75,11 @@ describe('exportAnalyticsFile', () => {
 			{ page: 1, perPage: 50 },
 			{ page: 2, perPage: 50 },
 		]);
-		expect(downloadFile).toHaveBeenCalledWith('blob:analytics-search', 'minimal-map-analytics-search.csv');
+		expect(downloadFile).toHaveBeenCalledTimes(1);
+		expect(downloadFile.mock.calls[0]?.[0]).toBe('blob:analytics-search');
+		expect(downloadFile.mock.calls[0]?.[1]).toMatch(
+			/^minimal-map-analytics-search-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.csv$/
+		);
 		expect(csvContent).toContain('"ID","Event Category","Query Text","Query Type","Result Count","Nearest Distance Meters","Occurred At GMT"');
 		expect(csvContent).toContain('"1","search","Berlin Mitte","text","3","120","2026-03-21T08:00:00+00:00"');
 		expect(csvContent).toContain('"2","search","Hamburg","text","3","120","2026-03-21T08:00:00+00:00"');

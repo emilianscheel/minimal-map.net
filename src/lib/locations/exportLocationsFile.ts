@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import type { LocationsExportActionConfig } from '../../types';
+import { buildTimestampedFileName } from '../downloadFileName';
 import { triggerFileDownload } from '../download';
 import { fetchAllLogos } from '../logos/fetchAllLogos';
 import { fetchAllMarkers } from '../markers/fetchAllMarkers';
@@ -30,7 +31,7 @@ export async function exportLocationsFile(
 		const csvContent = exportLocations(allLocations, allLogos, allMarkers, allTags);
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
-		triggerFileDownload(url, 'minimal-map-locations.csv');
+		triggerFileDownload(url, buildTimestampedFileName('minimal-map-locations', 'csv'));
 		return;
 	}
 

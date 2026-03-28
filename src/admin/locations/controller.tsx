@@ -36,6 +36,7 @@ import {
 	fetchAllLocationLookupResource,
 } from '../../lib/admin/fetchPaginatedRecords';
 import { triggerFileDownload } from '../../lib/download';
+import { buildTimestampedFileName } from '../../lib/downloadFileName';
 import { fetchAllCollections } from '../../lib/collections/fetchAllCollections';
 import { fetchAllLogos } from '../../lib/logos/fetchAllLogos';
 import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
@@ -2225,7 +2226,7 @@ export function useLocationsController(
 		const csvContent = [headers.join(','), ...exampleData].join('\n');
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
-		triggerFileDownload(url, 'minimal-map-example.csv');
+		triggerFileDownload(url, buildTimestampedFileName('minimal-map-example', 'csv'));
 	}, []);
 
 	const onExportExampleExcel = useCallback(() => {

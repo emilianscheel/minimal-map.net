@@ -6,6 +6,7 @@ import type {
 	AnalyticsQueryRecord,
 	AnalyticsRangeKey,
 } from '../../types';
+import { buildTimestampedFileName } from '../downloadFileName';
 import { triggerFileDownload } from '../download';
 import { configureApiFetch } from '../locations/configureApiFetch';
 import { fetchAnalyticsQueries } from './fetchAnalyticsQueries';
@@ -91,7 +92,7 @@ function escapeCsvValue(value: string | number | null): string {
 }
 
 function getAnalyticsExportFileName(category: AnalyticsEventCategory): string {
-	return `minimal-map-analytics-${category}.csv`;
+	return buildTimestampedFileName(`minimal-map-analytics-${category}`, 'csv');
 }
 
 function buildAnalyticsExportRows(
