@@ -693,6 +693,13 @@ svg.lucide {
   }
 }
 
+.dataviews-view-grid .dataviews-view-grid__media img {
+  height: 100%;
+  -o-object-fit: contain;
+  object-fit: contain;
+  width: 50%;
+}
+
 .minimal-map-admin__logos-grid-wrap {
   .dataviews-view-grid__media {
     background: transparent;
@@ -1820,4 +1827,3 @@ svg.lucide {
 .minimal-map-admin__location-social-media-empty {
   color: #dcdcde;
 }
-
