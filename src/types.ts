@@ -314,7 +314,10 @@ export interface AdminCommandSection {
 
 export type AdminCommandActionKey =
 	| 'export-locations-csv'
-	| 'export-locations-excel';
+	| 'export-locations-excel'
+	| 'export-analytics-search-csv'
+	| 'export-analytics-selection-csv'
+	| 'export-analytics-action-csv';
 
 export interface AdminCommandAction {
 	key: AdminCommandActionKey;
@@ -330,9 +333,15 @@ export interface LocationsExportActionConfig {
 	tagsRestPath: string;
 }
 
+export interface AnalyticsExportActionConfig {
+	nonce: string;
+	queriesPath: string;
+}
+
 export interface AdminCommandsConfig {
 	sections: AdminCommandSection[];
 	actions: AdminCommandAction[];
+	analyticsExportConfig: AnalyticsExportActionConfig | null;
 	locationsExportConfig: LocationsExportActionConfig | null;
 }
 

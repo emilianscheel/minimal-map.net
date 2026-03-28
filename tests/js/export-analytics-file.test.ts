@@ -1,13 +1,9 @@
 import { describe, expect, mock, test } from 'bun:test';
-import type { AnalyticsAdminConfig, AnalyticsQueryRecord } from '../../src/types';
+import type { AnalyticsExportActionConfig, AnalyticsQueryRecord } from '../../src/types';
 import { buildAnalyticsCsv, exportAnalyticsFile } from '../../src/lib/analytics/exportAnalyticsFile';
 
-const analyticsConfig: AnalyticsAdminConfig = {
+const analyticsConfig: AnalyticsExportActionConfig = {
 	nonce: '',
-	enabled: true,
-	complianzEnabled: false,
-	settingsPath: '/settings',
-	summaryPath: '/summary',
 	queriesPath: '/queries',
 };
 
@@ -32,7 +28,7 @@ function createQueryRecord(overrides: Partial<AnalyticsQueryRecord> = {}): Analy
 describe('exportAnalyticsFile', () => {
 	test('paginates all search rows and downloads a CSV', async () => {
 		const fetchQueries = mock(async (
-			_config: AnalyticsAdminConfig,
+			_config: AnalyticsExportActionConfig,
 			view: { page?: number; perPage?: number; search?: string }
 		) => ({
 			items: [

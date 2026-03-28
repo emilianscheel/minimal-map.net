@@ -737,10 +737,47 @@ class Config {
 				'xlsx',
 			),
 		);
+		$actions[] = array(
+			'key'      => 'export-analytics-search-csv',
+			'label'    => __( 'Minimal Map: Export Analytics Search Data as CSV', 'minimal-map' ),
+			'keywords' => array(
+				'minimal map',
+				'analytics',
+				'search',
+				'export',
+				'csv',
+			),
+		);
+		$actions[] = array(
+			'key'      => 'export-analytics-selection-csv',
+			'label'    => __( 'Minimal Map: Export Analytics Selection Data as CSV', 'minimal-map' ),
+			'keywords' => array(
+				'minimal map',
+				'analytics',
+				'selection',
+				'export',
+				'csv',
+			),
+		);
+		$actions[] = array(
+			'key'      => 'export-analytics-action-csv',
+			'label'    => __( 'Minimal Map: Export Analytics Action Data as CSV', 'minimal-map' ),
+			'keywords' => array(
+				'minimal map',
+				'analytics',
+				'action',
+				'export',
+				'csv',
+			),
+		);
 
 		return array(
 			'sections'              => $sections,
 			'actions'               => $actions,
+			'analyticsExportConfig' => array(
+				'nonce'      => wp_create_nonce( 'wp_rest' ),
+				'queriesPath' => Analytics_Queries_Route::get_rest_path(),
+			),
 			'locationsExportConfig' => array(
 				'nonce'             => wp_create_nonce( 'wp_rest' ),
 				'locationsRestPath' => Location_Post_Type::get_rest_path(),

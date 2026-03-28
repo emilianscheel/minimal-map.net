@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import type {
-	AnalyticsAdminConfig,
+	AnalyticsExportActionConfig,
 	AnalyticsEventCategory,
 	AnalyticsQueriesResponse,
 	AnalyticsQueryRecord,
@@ -78,7 +78,7 @@ interface ExportAnalyticsFileDependencies {
 	createObjectURL?: (blob: Blob) => string;
 	downloadFile?: (url: string, fileName: string) => void;
 	fetchQueries?: (
-		config: AnalyticsAdminConfig,
+		config: AnalyticsExportActionConfig,
 		view: { page?: number; perPage?: number; search?: string },
 		range: AnalyticsRangeKey,
 		category: AnalyticsEventCategory,
@@ -114,7 +114,7 @@ export function buildAnalyticsCsv(
 }
 
 async function fetchAllAnalyticsRows(
-	config: AnalyticsAdminConfig,
+	config: AnalyticsExportActionConfig,
 	range: AnalyticsRangeKey,
 	category: AnalyticsEventCategory,
 	fetchQueries: NonNullable<ExportAnalyticsFileDependencies['fetchQueries']>,
@@ -148,7 +148,7 @@ async function fetchAllAnalyticsRows(
 }
 
 export async function exportAnalyticsFile(
-	config: AnalyticsAdminConfig,
+	config: AnalyticsExportActionConfig,
 	range: AnalyticsRangeKey,
 	category: AnalyticsEventCategory,
 	dependencies: ExportAnalyticsFileDependencies = {},
