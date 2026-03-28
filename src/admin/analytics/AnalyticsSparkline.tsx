@@ -354,7 +354,7 @@ function AnalyticsBarChart({
 					})}
 				</svg>
 			) : (
-				<div className="minimal-map-admin__analytics-breakdown-empty" />
+				<div className="minimal-map-admin__analytics-breakdown-chart-spacer" />
 			)}
 		</div>
 	);
@@ -413,7 +413,7 @@ function AnalyticsDonutChart({
 						</div>
 					</>
 				) : (
-					<div className="minimal-map-admin__analytics-breakdown-empty" />
+					<div className="minimal-map-admin__analytics-breakdown-chart-spacer" />
 				)}
 			</div>
 

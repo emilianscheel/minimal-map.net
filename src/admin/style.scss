@@ -746,18 +746,8 @@ svg.lucide {
   color: #1e1e1e;
 }
 
-.minimal-map-admin__analytics-breakdown-empty {
+.minimal-map-admin__analytics-breakdown-chart-spacer {
   min-height: 112px;
-  border: 1px dashed #c3c4c7;
-  border-radius: 14px;
-  background: linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.04) 0,
-      rgba(0, 0, 0, 0.04) 24%,
-      transparent 24%,
-      transparent 100%
-    ),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02));
 }
 
 .minimal-map-admin__analytics-header-actions {
