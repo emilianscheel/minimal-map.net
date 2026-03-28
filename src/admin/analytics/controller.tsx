@@ -1,7 +1,7 @@
-import { FormToggle } from '@wordpress/components';
 import type { ViewTable } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { exportAnalyticsFile, getAnalyticsExportErrorMessage } from '../../lib/analytics/exportAnalyticsFile';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAnalyticsQueries } from '../../lib/analytics/fetchAnalyticsQueries';
 import { fetchAnalyticsSummary } from '../../lib/analytics/fetchAnalyticsSummary';
@@ -17,7 +17,7 @@ import type {
 	SearchAnalyticsSummary,
 	SelectionAnalyticsSummary,
 } from '../../types';
-import AnalyticsRangeSelector from './AnalyticsRangeSelector';
+import AnalyticsHeaderActions from './AnalyticsHeaderActions';
 import {
 	DEFAULT_ANALYTICS_RANGE,
 	EMPTY_ACTION_ANALYTICS_SUMMARY,
@@ -31,6 +31,13 @@ import type {
 	AnalyticsTableState,
 	AnalyticsTablesByCategory,
 } from './types';
+
+interface AnalyticsControllerDependencies {
+	exportFile?: typeof exportAnalyticsFile;
+	fetchQueries?: typeof fetchAnalyticsQueries;
+	fetchSummary?: typeof fetchAnalyticsSummary;
+	updateSettings?: typeof updateAnalyticsSettings;
+}
 
 function toSearchSummary(summary: AnalyticsSummary): SearchAnalyticsSummary {
 	return summary.category === 'search' ? summary : EMPTY_SEARCH_ANALYTICS_SUMMARY;
@@ -59,11 +66,17 @@ function updateTableState(
 }
 
 export function useAnalyticsController(
-	config: AnalyticsAdminConfig
+	config: AnalyticsAdminConfig,
+	dependencies: AnalyticsControllerDependencies = {},
 ): AnalyticsController {
+	const exportFile = dependencies.exportFile ?? exportAnalyticsFile;
+	const fetchQueries = dependencies.fetchQueries ?? fetchAnalyticsQueries;
+	const fetchSummary = dependencies.fetchSummary ?? fetchAnalyticsSummary;
+	const updateSettings = dependencies.updateSettings ?? updateAnalyticsSettings;
 	const [enabled, setEnabled] = useState(config.enabled);
 	const [complianzEnabled, setComplianzEnabled] = useState(config.complianzEnabled);
 	const [isConfirmEnableModalOpen, setConfirmEnableModalOpen] = useState(false);
+	const [isExporting, setIsExporting] = useState(false);
 	const [isLoadingSummary, setLoadingSummary] = useState(true);
 	const [isLoadingTables, setLoadingTables] = useState<Record<AnalyticsEventCategory, boolean>>({
 		search: true,
@@ -83,9 +96,9 @@ export function useAnalyticsController(
 
 	const loadSummary = useCallback(async () => {
 		const [searchSummary, selectionSummary, actionSummary] = await Promise.all([
-			fetchAnalyticsSummary(config, range, 'search'),
-			fetchAnalyticsSummary(config, range, 'selection'),
-			fetchAnalyticsSummary(config, range, 'action'),
+			fetchSummary(config, range, 'search'),
+			fetchSummary(config, range, 'selection'),
+			fetchSummary(config, range, 'action'),
 		]);
 
 		setSummaries({
@@ -93,13 +106,13 @@ export function useAnalyticsController(
 			selection: toSelectionSummary(selectionSummary),
 			action: toActionSummary(actionSummary),
 		});
-	}, [config, range]);
+	}, [config, fetchSummary, range]);
 
 	const loadQueries = useCallback(async (
 		category: AnalyticsEventCategory,
 		nextView: ViewTable,
 	) => {
-		const response: AnalyticsQueriesResponse = await fetchAnalyticsQueries(
+		const response: AnalyticsQueriesResponse = await fetchQueries(
 			config,
 			{
 				page: nextView.page,
@@ -115,7 +128,7 @@ export function useAnalyticsController(
 			totalItems: response.totalItems,
 			totalPages: response.totalPages,
 		}));
-	}, [config, range]);
+	}, [config, fetchQueries, range]);
 
 	useEffect(() => {
 		configureApiFetch(config.nonce);
@@ -286,7 +299,7 @@ export function useAnalyticsController(
 		setNotice(null);
 
 		try {
-			const response = await updateAnalyticsSettings(config, nextSettings);
+			const response = await updateSettings(config, nextSettings);
 			if (response.enabled !== undefined) {
 				setEnabled(response.enabled);
 			}
@@ -305,46 +318,57 @@ export function useAnalyticsController(
 		} finally {
 			setSavingSettings(false);
 		}
-	}, [config]);
+	}, [config, updateSettings]);
+
+	const onExportCategory = useCallback(async (category: AnalyticsEventCategory) => {
+		setIsExporting(true);
+		setNotice(null);
+
+		try {
+			await exportFile(config, range, category);
+		} catch (error) {
+			setNotice({
+				status: 'error',
+				message: getAnalyticsExportErrorMessage(error),
+			});
+		} finally {
+			setIsExporting(false);
+		}
+	}, [config, exportFile, range]);
 
 	const headerAction = useMemo(() => (
-		<div className="minimal-map-admin__analytics-header-actions">
-			<AnalyticsRangeSelector activeRange={range} onSelect={onChangeRange} />
-			<div className="minimal-map-admin__analytics-toggle-group">
-				<label className="minimal-map-admin__analytics-toggle" htmlFor="minimal-map-analytics-complianz-toggle">
-					<span className="minimal-map-admin__analytics-toggle-label">
-						{__('Only track if Complianz confirmed', 'minimal-map')}
-					</span>
-					<FormToggle
-						id="minimal-map-analytics-complianz-toggle"
-						checked={complianzEnabled}
-						disabled={isSavingSettings}
-						onChange={() => {
-							void persistSettings({ complianzEnabled: !complianzEnabled });
-						}}
-					/>
-				</label>
-				<label className="minimal-map-admin__analytics-toggle" htmlFor="minimal-map-analytics-toggle">
-					<span className="minimal-map-admin__analytics-toggle-label">
-						{__('Analytics tracking', 'minimal-map')}
-					</span>
-					<FormToggle
-						id="minimal-map-analytics-toggle"
-						checked={enabled}
-						disabled={isSavingSettings}
-						onChange={() => {
-							if (enabled) {
-								void persistSettings({ enabled: false });
-								return;
-							}
+		<AnalyticsHeaderActions
+			complianzEnabled={complianzEnabled}
+			enabled={enabled}
+			isExporting={isExporting}
+			isSavingSettings={isSavingSettings}
+			range={range}
+			onChangeRange={onChangeRange}
+			onExportCategory={(category) => {
+				void onExportCategory(category);
+			}}
+			onToggleComplianz={() => {
+				void persistSettings({ complianzEnabled: !complianzEnabled });
+			}}
+			onToggleAnalytics={() => {
+				if (enabled) {
+					void persistSettings({ enabled: false });
+					return;
+				}
 
-							setConfirmEnableModalOpen(true);
-						}}
-					/>
-				</label>
-			</div>
-		</div>
-	), [complianzEnabled, enabled, isSavingSettings, onChangeRange, persistSettings, range]);
+				setConfirmEnableModalOpen(true);
+			}}
+		/>
+	), [
+		complianzEnabled,
+		enabled,
+		isExporting,
+		isSavingSettings,
+		onChangeRange,
+		onExportCategory,
+		persistSettings,
+		range,
+	]);
 
 	return {
 		enabled,
