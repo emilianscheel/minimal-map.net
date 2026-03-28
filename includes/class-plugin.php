@@ -249,6 +249,7 @@ final class Plugin {
 		add_action( 'init', array( $this->map_block, 'register' ) );
 		add_action( 'template_redirect', array( $this->iframe_endpoint, 'maybe_render' ) );
 		add_action( 'admin_menu', array( $this->admin_menu, 'register' ) );
+		add_action( 'admin_enqueue_scripts', array( $this->assets, 'enqueue_admin_command_palette_assets' ) );
 		add_action( 'admin_enqueue_scripts', array( $this->assets, 'enqueue_admin_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this->assets, 'enqueue_frontend_assets' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this->assets, 'enqueue_frontend_assets' ) );

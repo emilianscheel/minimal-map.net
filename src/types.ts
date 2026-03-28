@@ -305,6 +305,17 @@ export interface AdminSection {
 	url: string;
 }
 
+export interface AdminCommandSection {
+	view: Exclude<AdminSectionView, 'dashboard'>;
+	title: string;
+	url: string;
+	keywords: string[];
+}
+
+export interface AdminCommandsConfig {
+	sections: AdminCommandSection[];
+}
+
 export interface AdminStats {
 	locations: number;
 	collections: number;

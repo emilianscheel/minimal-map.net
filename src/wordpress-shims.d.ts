@@ -23,3 +23,9 @@ declare module '@wordpress/blocks' {
 		settings: BlockConfiguration<TAttributes>
 	): void;
 }
+
+declare module '@wordpress/commands' {
+	import type { StoreDescriptor } from '@wordpress/data';
+
+	export const store: StoreDescriptor;
+}

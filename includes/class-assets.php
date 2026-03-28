@@ -36,6 +36,20 @@ class Assets {
 		$this->register_script( 'minimal-map-block-editor', 'index.js' );
 		$this->register_script( 'minimal-map-frontend', 'frontend.js' );
 		$this->register_script( 'minimal-map-admin', 'admin.js' );
+		$this->register_script( 'minimal-map-admin-commands', 'admin-commands.js' );
+
+		if ( wp_script_is( 'minimal-map-admin-commands', 'registered' ) ) {
+			$script = wp_scripts();
+			if ( isset( $script->registered['minimal-map-admin-commands'] ) ) {
+				$dependencies = $script->registered['minimal-map-admin-commands']->deps;
+
+				if ( ! in_array( 'wp-core-commands', $dependencies, true ) ) {
+					$dependencies[] = 'wp-core-commands';
+				}
+
+				$script->registered['minimal-map-admin-commands']->deps = $dependencies;
+			}
+		}
 
 		$this->register_style( 'minimal-map-editor-style', 'index.css', array( 'wp-edit-blocks', 'wp-components' ) );
 		$this->register_style( 'minimal-map-style', 'style-frontend.css', array( 'wp-components' ) );
@@ -73,6 +87,27 @@ class Assets {
 		$this->attach_inline_data();
 		wp_enqueue_script( 'minimal-map-admin' );
 		wp_enqueue_style( 'minimal-map-admin-style' );
+	}
+
+	/**
+	 * Enqueue admin-wide command palette integration.
+	 *
+	 * @param string $hook_suffix Current admin page hook suffix.
+	 * @return void
+	 */
+	public function enqueue_admin_command_palette_assets( $hook_suffix ) {
+		unset( $hook_suffix );
+
+		if ( is_network_admin() || ! current_user_can( Admin\Admin_Menu::CAPABILITY ) ) {
+			return;
+		}
+
+		if ( ! wp_script_is( 'wp-core-commands', 'registered' ) ) {
+			return;
+		}
+
+		$this->attach_admin_commands_inline_data();
+		wp_enqueue_script( 'minimal-map-admin-commands' );
 	}
 
 	/**
@@ -205,6 +240,23 @@ class Assets {
 				'before'
 			);
 		}
+	}
+
+	/**
+	 * Attach command palette config for admin-wide navigation commands.
+	 *
+	 * @return void
+	 */
+	private function attach_admin_commands_inline_data() {
+		if ( ! wp_script_is( 'minimal-map-admin-commands', 'registered' ) ) {
+			return;
+		}
+
+		wp_add_inline_script(
+			'minimal-map-admin-commands',
+			'window.MinimalMapAdminCommandsConfig = ' . wp_json_encode( $this->config->get_admin_commands_config() ) . ';',
+			'before'
+		);
 	}
 
 	/**

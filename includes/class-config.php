@@ -691,6 +691,36 @@ class Config {
 	}
 
 	/**
+	 * Build config for admin command palette integration.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_admin_commands_config() {
+		$sections = array();
+
+		foreach ( Admin\Admin_Menu::get_sections() as $view => $section ) {
+			if ( Admin\Admin_Menu::DEFAULT_VIEW === $view ) {
+				continue;
+			}
+
+			$sections[] = array(
+				'view'     => $view,
+				'title'    => $section['title'],
+				'url'      => Admin\Admin_Menu::get_view_url( $view ),
+				'keywords' => array(
+					'minimal map',
+					$view,
+					$section['title'],
+				),
+			);
+		}
+
+		return array(
+			'sections' => $sections,
+		);
+	}
+
+	/**
 	 * Build client configuration for the admin app.
 	 *
 	 * @return array<string, mixed>

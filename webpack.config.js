@@ -28,6 +28,7 @@ module.exports = {
 		index: path.resolve( process.cwd(), 'src/block/index.tsx' ),
 		frontend: path.resolve( process.cwd(), 'src/frontend/index.ts' ),
 		admin: path.resolve( process.cwd(), 'src/admin/index.tsx' ),
+		'admin-commands': path.resolve( process.cwd(), 'src/admin/commands.ts' ),
 	},
 	plugins,
 	output: {
