@@ -27,6 +27,16 @@ class License_Route {
 	const PRODUCT_ID = 'u8ew5xq0SpeZ0StSxqWbKg==';
 
 	/**
+	 * Premium activation option key.
+	 */
+	const PREMIUM_ACTIVE_OPTION = 'minimal_map_premium_active';
+
+	/**
+	 * Stored license option key.
+	 */
+	const LICENSE_KEY_OPTION = 'minimal_map_license_key';
+
+	/**
 	 * Register the route.
 	 *
 	 * @return void
@@ -66,14 +76,26 @@ class License_Route {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function handle_request( $request ) {
-		$license_key = $request->get_param( 'license_key' );
+		$license_key = sanitize_text_field( (string) $request->get_param( 'license_key' ) );
+		$stored_license_key = $this->get_stored_license_key();
+		$has_local_activation = $this->has_local_activation();
+		$is_same_license_key = '' !== $stored_license_key && hash_equals( $stored_license_key, $license_key );
+
+		if ( $has_local_activation && ! $is_same_license_key ) {
+			return new \WP_Error(
+				'license_already_redeemed',
+				__( 'A license key has already been redeemed on this site.', 'minimal-map' ),
+				array( 'status' => 409 )
+			);
+		}
 
 		$response = wp_remote_post(
 			'https://api.gumroad.com/v2/licenses/verify',
 			array(
 				'body' => array(
-					'product_id'  => self::PRODUCT_ID,
-					'license_key' => $license_key,
+					'product_id'           => self::PRODUCT_ID,
+					'license_key'          => $license_key,
+					'increment_uses_count' => $is_same_license_key ? 'false' : 'true',
 				),
 			)
 		);
@@ -89,8 +111,8 @@ class License_Route {
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( isset( $body['success'] ) && $body['success'] ) {
-			update_option( 'minimal_map_premium_active', true );
-			update_option( 'minimal_map_license_key', $license_key );
+			update_option( self::PREMIUM_ACTIVE_OPTION, true );
+			update_option( self::LICENSE_KEY_OPTION, $license_key );
 
 			return rest_ensure_response( array( 'success' => true ) );
 		}
@@ -111,5 +133,23 @@ class License_Route {
 	 */
 	public static function get_rest_path() {
 		return '/' . self::REST_NAMESPACE . self::REST_ROUTE;
+	}
+
+	/**
+	 * Check whether this site already has one local activation.
+	 *
+	 * @return bool
+	 */
+	private function has_local_activation() {
+		return (bool) get_option( self::PREMIUM_ACTIVE_OPTION, false ) || '' !== $this->get_stored_license_key();
+	}
+
+	/**
+	 * Get the stored local license key.
+	 *
+	 * @return string
+	 */
+	private function get_stored_license_key() {
+		return trim( (string) get_option( self::LICENSE_KEY_OPTION, '' ) );
 	}
 }

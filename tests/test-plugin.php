@@ -145,6 +145,27 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Build one successful Gumroad verify response.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function get_successful_gumroad_verify_response() {
+		return array(
+			'response' => array(
+				'code'    => 200,
+				'message' => 'OK',
+			),
+			'headers'  => array(),
+			'cookies'  => array(),
+			'body'     => wp_json_encode(
+				array(
+					'success' => true,
+				)
+			),
+		);
+	}
+
+	/**
 	 * Encode one embed payload using the public base64url format.
 	 *
 	 * @param array<string, mixed> $payload Embed payload.
@@ -574,6 +595,128 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertCount( 1, $data['items'] );
 		$this->assertSame( 'Bakery', $data['items'][0]['name'] );
 		$this->assertSame( '#111111', $data['items'][0]['background_color'] );
+	}
+
+	/**
+	 * First-time license activation should increment Gumroad usage.
+	 *
+	 * @return void
+	 */
+	public function test_license_key_first_activation_increments_usage_count() {
+		$this->create_admin_user();
+
+		$captured_increment_uses_count = null;
+		$gumroad_filter                = function ( $preempt, $parsed_args, $url ) use ( &$captured_increment_uses_count ) {
+			if ( 'https://api.gumroad.com/v2/licenses/verify' !== $url ) {
+				return $preempt;
+			}
+
+			$captured_increment_uses_count = isset( $parsed_args['body']['increment_uses_count'] )
+				? $parsed_args['body']['increment_uses_count']
+				: null;
+
+			return $this->get_successful_gumroad_verify_response();
+		};
+
+		add_filter( 'pre_http_request', $gumroad_filter, 10, 3 );
+
+		try {
+			$request = new WP_REST_Request( 'POST', \MinimalMap\Rest\License_Route::get_rest_path() );
+			$request->set_param( 'license_key', 'TEST-KEY-ONE' );
+
+			$response = rest_do_request( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertTrue( $data['success'] );
+			$this->assertSame( 'true', $captured_increment_uses_count );
+			$this->assertTrue( (bool) get_option( 'minimal_map_premium_active', false ) );
+			$this->assertSame( 'TEST-KEY-ONE', get_option( 'minimal_map_license_key', '' ) );
+		} finally {
+			remove_filter( 'pre_http_request', $gumroad_filter, 10 );
+		}
+	}
+
+	/**
+	 * Revalidating the same stored license should not increment Gumroad usage.
+	 *
+	 * @return void
+	 */
+	public function test_license_key_revalidation_does_not_increment_usage_count() {
+		$this->create_admin_user();
+
+		update_option( 'minimal_map_premium_active', true );
+		update_option( 'minimal_map_license_key', 'TEST-KEY-ONE' );
+
+		$captured_increment_uses_count = null;
+		$gumroad_filter                = function ( $preempt, $parsed_args, $url ) use ( &$captured_increment_uses_count ) {
+			if ( 'https://api.gumroad.com/v2/licenses/verify' !== $url ) {
+				return $preempt;
+			}
+
+			$captured_increment_uses_count = isset( $parsed_args['body']['increment_uses_count'] )
+				? $parsed_args['body']['increment_uses_count']
+				: null;
+
+			return $this->get_successful_gumroad_verify_response();
+		};
+
+		add_filter( 'pre_http_request', $gumroad_filter, 10, 3 );
+
+		try {
+			$request = new WP_REST_Request( 'POST', \MinimalMap\Rest\License_Route::get_rest_path() );
+			$request->set_param( 'license_key', 'TEST-KEY-ONE' );
+
+			$response = rest_do_request( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertTrue( $data['success'] );
+			$this->assertSame( 'false', $captured_increment_uses_count );
+			$this->assertSame( 'TEST-KEY-ONE', get_option( 'minimal_map_license_key', '' ) );
+		} finally {
+			remove_filter( 'pre_http_request', $gumroad_filter, 10 );
+		}
+	}
+
+	/**
+	 * A different key should still be rejected once the site already has a stored activation.
+	 *
+	 * @return void
+	 */
+	public function test_license_key_rejects_different_key_after_activation() {
+		$this->create_admin_user();
+
+		update_option( 'minimal_map_premium_active', true );
+		update_option( 'minimal_map_license_key', 'TEST-KEY-ONE' );
+
+		$gumroad_call_count = 0;
+		$gumroad_filter     = function ( $preempt, $parsed_args, $url ) use ( &$gumroad_call_count ) {
+			if ( 'https://api.gumroad.com/v2/licenses/verify' !== $url ) {
+				return $preempt;
+			}
+
+			++$gumroad_call_count;
+
+			return $this->get_successful_gumroad_verify_response();
+		};
+
+		add_filter( 'pre_http_request', $gumroad_filter, 10, 3 );
+
+		try {
+			$request = new WP_REST_Request( 'POST', \MinimalMap\Rest\License_Route::get_rest_path() );
+			$request->set_param( 'license_key', 'TEST-KEY-TWO' );
+
+			$response = rest_do_request( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 409, $response->get_status() );
+			$this->assertSame( 'license_already_redeemed', $data['code'] );
+			$this->assertSame( 0, $gumroad_call_count );
+			$this->assertSame( 'TEST-KEY-ONE', get_option( 'minimal_map_license_key', '' ) );
+		} finally {
+			remove_filter( 'pre_http_request', $gumroad_filter, 10 );
+		}
 	}
 
 	/**
