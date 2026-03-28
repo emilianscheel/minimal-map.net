@@ -470,7 +470,7 @@ export interface LicenseAdminConfig {
 
 export type DashboardCardView = Extract<
 	AdminSectionView,
-	'locations' | 'collections' | 'logos' | 'markers' | 'tags'
+	'analytics' | 'locations' | 'collections' | 'logos' | 'markers' | 'tags' | 'styles'
 >;
 
 export interface MapBlockAttributes {

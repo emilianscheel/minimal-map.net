@@ -9,27 +9,35 @@ import type { DashboardCardView, MinimalMapInstance, RawMapConfig } from '../../
 import type { AdminSectionComponentProps } from './types';
 
 const CARD_COPY: Record<DashboardCardView, string> = {
+	analytics: __('Inspect search demand, result quality, and nearest-distance patterns without leaving the admin panel.', 'minimal-map'),
 	locations: __('Manage every place you want to render on your maps and prepare it for future block integrations.', 'minimal-map'),
 	collections: __('Build reusable groups of locations and curate map-ready sets without changing the location editor flow.', 'minimal-map'),
 	logos: __('Upload reusable SVG logos and assign them across multiple locations without duplicating assets.', 'minimal-map'),
 	markers: __('Create marker variants and keep your map pin system consistent across locations and styles.', 'minimal-map'),
 	tags: __('Add lightweight labels that make large map datasets easier to sort, search, and evolve.', 'minimal-map'),
+	styles: __('Shape the visual language of your maps with reusable themes and live preview adjustments.', 'minimal-map'),
 };
 
 const CTA_COPY: Record<DashboardCardView, string> = {
+	analytics: __('Open analytics', 'minimal-map'),
 	locations: __('Open locations', 'minimal-map'),
 	collections: __('Open collections', 'minimal-map'),
 	logos: __('Open logos', 'minimal-map'),
 	markers: __('Open markers', 'minimal-map'),
 	tags: __('Open tags', 'minimal-map'),
+	styles: __('Open styles', 'minimal-map'),
 };
 
-const COUNT_KEYS: Record<DashboardCardView, keyof AdminSectionComponentProps['appConfig']['stats']> = {
-	locations: 'locations',
-	collections: 'collections',
-	logos: 'logos',
-	markers: 'markers',
-	tags: 'tags',
+const COUNT_LABELS: Record<DashboardCardView, (appConfig: AdminSectionComponentProps['appConfig']) => string> = {
+	analytics: (appConfig) => appConfig.analyticsConfig.enabled
+		? __('On', 'minimal-map')
+		: __('Off', 'minimal-map'),
+	locations: (appConfig) => `${typeof appConfig.stats.locations === 'number' ? appConfig.stats.locations : 0}`,
+	collections: (appConfig) => `${typeof appConfig.stats.collections === 'number' ? appConfig.stats.collections : 0}`,
+	logos: (appConfig) => `${typeof appConfig.stats.logos === 'number' ? appConfig.stats.logos : 0}`,
+	markers: (appConfig) => `${typeof appConfig.stats.markers === 'number' ? appConfig.stats.markers : 0}`,
+	tags: (appConfig) => `${typeof appConfig.stats.tags === 'number' ? appConfig.stats.tags : 0}`,
+	styles: (appConfig) => `${appConfig.mapConfig.styleThemes?.length ?? 0}`,
 };
 
 function DashboardCard({ appConfig, view, title, url }: {
@@ -38,8 +46,7 @@ function DashboardCard({ appConfig, view, title, url }: {
 	title: string;
 	url: string;
 }) {
-	const countKey = COUNT_KEYS[view];
-	const count = typeof appConfig.stats[countKey] === 'number' ? appConfig.stats[countKey] : 0;
+	const count = COUNT_LABELS[view](appConfig);
 
 	return (
 		<Card className="minimal-map-admin__feature-card">

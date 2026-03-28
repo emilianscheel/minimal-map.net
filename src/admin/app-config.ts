@@ -68,7 +68,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 
 export const adminConfig: AdminAppConfig = window.MinimalMapAdminConfig ?? DEFAULT_ADMIN_CONFIG;
 
-export const CARD_VIEWS: DashboardCardView[] = [ 'locations', 'collections', 'logos', 'markers', 'tags' ];
+export const CARD_VIEWS: DashboardCardView[] = [ 'analytics', 'locations', 'collections', 'logos', 'markers', 'tags', 'styles' ];
 
 export function isAdminSectionView(value: string): value is AdminSectionView {
 	return value === 'dashboard' ||
