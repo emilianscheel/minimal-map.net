@@ -4,7 +4,7 @@ Tags: maps, gutenberg, blocks, geolocation
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 8.3
-Stable tag: 0.6.1
+Stable tag: 0.6.2
 License: MIT
 License URI: https://opensource.org/license/mit/
 
