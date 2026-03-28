@@ -1,8 +1,7 @@
 import { __ } from '@wordpress/i18n';
-import type { CSSProperties } from 'react';
-import { DEFAULT_POSITRON_THEME_COLORS } from '../lib/styles/defaultThemeColors';
 import type { LocationRecord, StyleThemeRecord } from '../types';
 import { darkenColor, lightenColor } from '../lib/colors';
+import StaticMiniMapPreview from './StaticMiniMapPreview';
 
 function createDefaultStaticMarker(color = '#3fb1ce'): string {
 	const borderColor = darkenColor(color, 20);
@@ -52,46 +51,18 @@ export default function LocationMiniMap({
 	markerContent?: string | null;
 	onClick?: () => void;
 }) {
-	const colors = theme?.colors ?? DEFAULT_POSITRON_THEME_COLORS;
-	const previewStyle = {
-		'--minimal-map-mini-map-background': colors.background,
-		'--minimal-map-mini-map-water': colors.water,
-		'--minimal-map-mini-map-park': colors.park,
-		'--minimal-map-mini-map-road-casing': colors.roadMajorCasing,
-		'--minimal-map-mini-map-road-fill': colors.roadMajorFill,
-		cursor: onClick ? 'pointer' : 'default',
-	} as CSSProperties;
-
 	const previewMarkerContent =
 		markerContent ??
 		location.markerContent ??
 		createDefaultStaticMarker(location.marker_color);
 
-	const Container = onClick ? 'button' : 'div';
-
 	return (
-		<Container
-			className="minimal-map-admin__location-mini-map minimal-map-admin__location-mini-map--static"
-			style={previewStyle}
-			onClick={(e) => {
-				e.stopPropagation();
-				onClick?.();
-			}}
-			type={onClick ? 'button' : undefined}
-			aria-label={onClick ? __('Change marker color', 'minimal-map') : undefined}
-			aria-hidden={onClick ? undefined : 'true'}
-		>
-			<div className="minimal-map-admin__location-mini-map-surface">
-				<span className="minimal-map-admin__location-mini-map-water" />
-				<span className="minimal-map-admin__location-mini-map-park" />
-				<span className="minimal-map-admin__location-mini-map-road minimal-map-admin__location-mini-map-road--primary" />
-				<span className="minimal-map-admin__location-mini-map-road minimal-map-admin__location-mini-map-road--secondary" />
-			</div>
-			<div
-				className="minimal-map-admin__location-mini-map-preview-marker"
-				dangerouslySetInnerHTML={{ __html: previewMarkerContent }}
-			/>
-			{onClick && <div className="minimal-map-admin__location-mini-map-click-overlay" />}
-		</Container>
+		<StaticMiniMapPreview
+			theme={theme}
+			markerContent={previewMarkerContent}
+			onClick={onClick}
+			ariaLabel={onClick ? __('Change marker color', 'minimal-map') : undefined}
+			className="minimal-map-admin__location-mini-map"
+		/>
 	);
 }

@@ -936,21 +936,6 @@ svg.lucide {
   display: none;
 }
 
-.minimal-map-admin__marker-mini-map-wrap {
-  width: 100%;
-  height: 100%;
-  background: #f0f0f1;
-}
-
-.minimal-map-admin__marker-mini-map {
-  width: 100%;
-  height: 100%;
-
-  .maplibregl-control-container {
-    display: none !important;
-  }
-}
-
 .minimal-map-admin__collections-grid-wrap .dataviews-view-grid__row {
   gap: 24px;
   margin-bottom: 24px;
@@ -1112,7 +1097,7 @@ svg.lucide {
   height: 1px;
 }
 
-.minimal-map-admin__location-mini-map {
+.minimal-map-admin__mini-map-preview {
   position: relative;
   display: flex;
   align-items: center;
@@ -1125,64 +1110,71 @@ svg.lucide {
   padding: 0;
   border: 0;
   cursor: default;
+}
 
-  &--static:is(button) {
-    cursor: pointer;
+.minimal-map-admin__mini-map-preview--interactive {
+  cursor: pointer;
 
-    &:hover {
-      z-index: 2;
-    }
+  &:hover {
+    z-index: 2;
   }
 }
 
-.minimal-map-admin__location-mini-map-click-overlay {
+.minimal-map-admin__mini-map-preview--card {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  border-radius: 0;
+}
+
+.minimal-map-admin__mini-map-preview-click-overlay {
   position: absolute;
   inset: 0;
   z-index: 10;
   background: transparent;
 }
 
-.minimal-map-admin__location-mini-map-surface {
+.minimal-map-admin__mini-map-preview-surface {
   position: absolute;
   inset: 0;
   background: var(--minimal-map-mini-map-background, #f2f3f0);
 }
 
-.minimal-map-admin__location-mini-map-water,
-.minimal-map-admin__location-mini-map-park,
-.minimal-map-admin__location-mini-map-road {
+.minimal-map-admin__mini-map-preview-water,
+.minimal-map-admin__mini-map-preview-park,
+.minimal-map-admin__mini-map-preview-road {
   position: absolute;
   display: block;
 }
 
-.minimal-map-admin__location-mini-map-water {
-  top: -8px;
-  right: -10px;
-  width: 34px;
-  height: 30px;
+.minimal-map-admin__mini-map-preview-water {
+  top: -12%;
+  right: -16%;
+  width: 56%;
+  height: 48%;
   background: var(--minimal-map-mini-map-water, #cad2d3);
   border-radius: 18px 0 20px 12px;
   opacity: 0.95;
 }
 
-.minimal-map-admin__location-mini-map-park {
-  left: -8px;
-  bottom: -10px;
-  width: 30px;
-  height: 30px;
+.minimal-map-admin__mini-map-preview-park {
+  left: -12%;
+  bottom: -16%;
+  width: 48%;
+  height: 48%;
   background: var(--minimal-map-mini-map-park, #d2e8d4);
   border-radius: 18px 16px 0 12px;
 }
 
-.minimal-map-admin__location-mini-map-road {
-  left: -8px;
-  right: -8px;
-  height: 8px;
+.minimal-map-admin__mini-map-preview-road {
+  left: -12%;
+  right: -12%;
+  height: clamp(8px, 13%, 18px);
   background: var(--minimal-map-mini-map-road-casing, #e5e5e5);
   border-radius: 999px;
 }
 
-.minimal-map-admin__location-mini-map-road::after {
+.minimal-map-admin__mini-map-preview-road::after {
   content: "";
   position: absolute;
   inset: 1px;
@@ -1190,17 +1182,17 @@ svg.lucide {
   border-radius: inherit;
 }
 
-.minimal-map-admin__location-mini-map-road--primary {
-  top: 14px;
+.minimal-map-admin__mini-map-preview-road--primary {
+  top: 22%;
   transform: rotate(-18deg);
 }
 
-.minimal-map-admin__location-mini-map-road--secondary {
-  bottom: 12px;
+.minimal-map-admin__mini-map-preview-road--secondary {
+  bottom: 20%;
   transform: rotate(24deg);
 }
 
-.minimal-map-admin__location-mini-map-preview-marker {
+.minimal-map-admin__mini-map-preview-marker {
   position: relative;
   z-index: 1;
   width: 18px;
@@ -1211,29 +1203,21 @@ svg.lucide {
   filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.18));
 }
 
-.minimal-map-admin__location-mini-map-preview-marker > * {
+.minimal-map-admin__mini-map-preview--card .minimal-map-admin__mini-map-preview-marker {
+  width: 56px;
+  height: 84px;
+}
+
+.minimal-map-admin__mini-map-preview-marker > * {
   width: 100%;
   height: 100%;
 }
 
-.minimal-map-admin__location-mini-map-preview-marker img,
-.minimal-map-admin__location-mini-map-preview-marker svg {
+.minimal-map-admin__mini-map-preview-marker img,
+.minimal-map-admin__mini-map-preview-marker svg {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.minimal-map-admin__location-mini-map .maplibregl-control-container,
-.minimal-map-admin__location-mini-map .maplibregl-ctrl-bottom-left,
-.minimal-map-admin__location-mini-map .maplibregl-ctrl-bottom-right,
-.minimal-map-admin__location-mini-map .maplibregl-ctrl-top-left,
-.minimal-map-admin__location-mini-map .maplibregl-ctrl-top-right,
-.minimal-map-admin__location-mini-map .minimal-map-controls {
-  display: none !important;
-}
-
-.minimal-map-admin__location-mini-map .maplibregl-canvas {
-  cursor: default;
 }
 
 .minimal-map-admin__location-logo-cell {
