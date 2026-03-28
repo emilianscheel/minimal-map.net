@@ -155,12 +155,26 @@ function buildDonutSegmentPath(
 	].join(' ');
 }
 
-function truncateLabel(label: string, maxLength = 18): string {
-	if (label.length <= maxLength) {
+function normalizeLabel(label: unknown): string {
+	if (typeof label === 'string') {
 		return label;
 	}
 
-	return `${label.slice(0, Math.max(0, maxLength - 1))}…`;
+	if (label === null || label === undefined) {
+		return '';
+	}
+
+	return String(label);
+}
+
+function truncateLabel(label: unknown, maxLength = 18): string {
+	const normalizedLabel = normalizeLabel(label);
+
+	if (normalizedLabel.length <= maxLength) {
+		return normalizedLabel;
+	}
+
+	return `${normalizedLabel.slice(0, Math.max(0, maxLength - 1))}…`;
 }
 
 function formatWholeNumber(value: number): string {
@@ -427,14 +441,14 @@ function AnalyticsDonutChart({
 						onMouseLeave={() => setActiveIndex(null)}
 						onFocus={() => setActiveIndex(index)}
 						onBlur={() => setActiveIndex((currentIndex) => currentIndex === index ? null : currentIndex)}
-						aria-label={`${item.label}: ${formatWholeNumber(item.value)}`}
+						aria-label={`${normalizeLabel(item.label)}: ${formatWholeNumber(item.value)}`}
 					>
 						<span
 							className="minimal-map-admin__analytics-donut-legend-swatch"
 							style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
 						/>
 						<span className="minimal-map-admin__analytics-donut-legend-label">
-							{item.label}
+							{normalizeLabel(item.label)}
 						</span>
 						<span className="minimal-map-admin__analytics-donut-legend-value">
 							{formatWholeNumber(item.value)}
