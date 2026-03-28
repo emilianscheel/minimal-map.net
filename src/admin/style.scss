@@ -1,6 +1,9 @@
 @import "@wordpress/dataviews/build-style/style.css";
 
 body.toplevel_page_minimal-map {
+  #wpcontent {
+    padding-left: 0;
+  }
   #wpbody-content {
     height: calc(100vh - 32px);
     min-height: calc(100vh - 32px);
@@ -26,9 +29,10 @@ svg.lucide {
 }
 
 .minimal-map-admin-wrap {
-  margin: 0px 0 0 -20px;
+  margin: 0px 0px 0px 0px;
   height: calc(100vh - 32px);
   min-height: calc(100vh - 32px);
+  max-width: 100%;
 }
 
 .minimal-map-admin-wrap > [data-minimal-map-admin-root] {
