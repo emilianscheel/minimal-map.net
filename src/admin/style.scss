@@ -591,6 +591,30 @@ svg.lucide {
   color: #50575e;
 }
 
+.minimal-map-admin__analytics-card-chart {
+  position: relative;
+  display: grid;
+  flex: 1 1 auto;
+  align-content: center;
+}
+
+.minimal-map-admin__analytics-card-chart-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.minimal-map-admin__analytics-card-chart-spinner .components-spinner {
+  color: #000;
+  margin: 0;
+}
+
 .minimal-map-admin__analytics-sparkline {
   flex: 1 1 auto;
   position: relative;

@@ -1,4 +1,4 @@
-import { Card, CardBody } from '@wordpress/components';
+import { Card, CardBody, Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BarChart3,
@@ -70,8 +70,10 @@ export function getAnalyticsSectionTitle(category: AnalyticsSummary['category'])
 }
 
 export default function AnalyticsCards({
+	isLoading,
 	summary,
 }: {
+	isLoading: boolean;
 	summary: AnalyticsSummary;
 }) {
 	if (summary.category === 'selection') {
@@ -160,7 +162,14 @@ export default function AnalyticsCards({
 				{cards.map((card) => (
 					<Card key={card.id} className="minimal-map-admin__feature-card minimal-map-admin__analytics-card">
 						<CardBody>
-							{card.chart}
+							<div className="minimal-map-admin__analytics-card-chart" aria-busy={isLoading}>
+								{card.chart}
+								{isLoading ? (
+									<div className="minimal-map-admin__analytics-card-chart-spinner">
+										<Spinner />
+									</div>
+								) : null}
+							</div>
 							<div className="minimal-map-admin__feature-meta">
 								<span className="minimal-map-admin__feature-icon">{card.icon}</span>
 								<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
@@ -269,7 +278,14 @@ export default function AnalyticsCards({
 				{cards.map((card) => (
 					<Card key={card.id} className="minimal-map-admin__feature-card minimal-map-admin__analytics-card">
 						<CardBody>
-							{card.chart}
+							<div className="minimal-map-admin__analytics-card-chart" aria-busy={isLoading}>
+								{card.chart}
+								{isLoading ? (
+									<div className="minimal-map-admin__analytics-card-chart-spinner">
+										<Spinner />
+									</div>
+								) : null}
+							</div>
 							<div className="minimal-map-admin__feature-meta">
 								<span className="minimal-map-admin__feature-icon">{card.icon}</span>
 								<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
@@ -443,7 +459,14 @@ export default function AnalyticsCards({
 			{cards.map((card) => (
 				<Card key={card.id} className="minimal-map-admin__feature-card minimal-map-admin__analytics-card">
 					<CardBody>
-						{card.chart}
+						<div className="minimal-map-admin__analytics-card-chart" aria-busy={isLoading}>
+							{card.chart}
+							{isLoading ? (
+								<div className="minimal-map-admin__analytics-card-chart-spinner">
+									<Spinner />
+								</div>
+							) : null}
+						</div>
 						<div className="minimal-map-admin__feature-meta">
 							<span className="minimal-map-admin__feature-icon">{card.icon}</span>
 							<span className="minimal-map-admin__analytics-card-value">{card.value}</span>

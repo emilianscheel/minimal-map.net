@@ -44,7 +44,7 @@ function AnalyticsSection({
 					{getAnalyticsSectionTitle(category)}
 				</h2>
 			</div>
-			<AnalyticsCards summary={summary} />
+			<AnalyticsCards isLoading={controller.isLoadingSummary} summary={summary} />
 			{controller.isLoadingSummary ? (
 				<div className="minimal-map-admin__analytics-state">
 					<Spinner />

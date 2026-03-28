@@ -366,4 +366,36 @@ describe('AnalyticsView', () => {
 
 		root.unmount();
 	});
+
+	test('renders a loading spinner in every analytics card chart while summaries load', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub({
+						isLoading: true,
+						isLoadingSummary: true,
+					}),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
+		);
+
+		await flushRender();
+
+		const cards = dom.window.document.querySelectorAll('.minimal-map-admin__analytics-card');
+		const chartSpinners = dom.window.document.querySelectorAll('.minimal-map-admin__analytics-card-chart-spinner');
+
+		expect(cards.length).toBeGreaterThan(0);
+		expect(chartSpinners).toHaveLength(cards.length);
+
+		root.unmount();
+	});
 });
