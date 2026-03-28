@@ -5,17 +5,17 @@ const buildDir = path.resolve(process.cwd(), 'build');
 const kibibyte = 1024;
 
 const requiredBudgets = [
-	{ file: 'admin.js', limitKiB: 400 },
-	{ file: 'index.js', limitKiB: 350 },
-	{ file: 'frontend.js', limitKiB: 150 },
-	{ file: 'map-runtime.js', limitKiB: 900 },
+	{ label: 'admin.js', pattern: /^admin\.js$/, limitKiB: 400 },
+	{ label: 'index.js', pattern: /^index\.js$/, limitKiB: 350 },
+	{ label: 'frontend.js', pattern: /^frontend\.js$/, limitKiB: 150 },
+	{ label: 'map-runtime', pattern: /^map-runtime(?:\.[a-f0-9]{8})?\.js$/, limitKiB: 900 },
 ];
 
 const optionalBudgets = [
-	{ pattern: /^admin-section-[\w-]+\.js$/, limitKiB: 700 },
-	{ pattern: /^map-runtime-vendor\.js$/, limitKiB: 1100 },
-	{ pattern: /^shared-vendor\.js$/, limitKiB: 500 },
-	{ pattern: /^admin-dataviews\.js$/, limitKiB: 1700 },
+	{ pattern: /^admin-section-[\w-]+(?:\.[a-f0-9]{8})?\.js$/, limitKiB: 700 },
+	{ pattern: /^map-runtime-vendor(?:\.[a-f0-9]{8})?\.js$/, limitKiB: 1100 },
+	{ pattern: /^shared-vendor(?:\.[a-f0-9]{8})?\.js$/, limitKiB: 500 },
+	{ pattern: /^admin-dataviews(?:\.[a-f0-9]{8})?\.js$/, limitKiB: 1700 },
 ];
 
 function getSizeKiB(filePath) {
@@ -32,25 +32,26 @@ if (!existsSync(buildDir)) {
 }
 
 const failures = [];
+const buildFiles = readdirSync(buildDir);
 
 for (const budget of requiredBudgets) {
-	const filePath = path.join(buildDir, budget.file);
+	const matchingFiles = buildFiles.filter( ( entry ) => budget.pattern.test( entry ) );
 
-	if (!existsSync(filePath)) {
-		failures.push(`Missing required bundle: ${budget.file}`);
+	if ( matchingFiles.length === 0 ) {
+		failures.push( `Missing required bundle: ${budget.label}` );
 		continue;
 	}
 
-	const sizeKiB = getSizeKiB(filePath);
+	for (const file of matchingFiles) {
+		const sizeKiB = getSizeKiB(path.join(buildDir, file));
 
-	if (sizeKiB > budget.limitKiB) {
-		failures.push(
-			`${budget.file} is ${formatSize(sizeKiB)} and exceeds the ${budget.limitKiB} KiB budget.`
-		);
+		if (sizeKiB > budget.limitKiB) {
+			failures.push(
+				`${file} is ${formatSize(sizeKiB)} and exceeds the ${budget.limitKiB} KiB budget.`
+			);
+		}
 	}
 }
-
-const buildFiles = readdirSync(buildDir);
 
 for (const budget of optionalBudgets) {
 	for (const file of buildFiles.filter((entry) => budget.pattern.test(entry))) {

@@ -8,7 +8,7 @@ const plugins = ( defaultConfig.plugins ?? [] ).map( ( plugin ) => {
 	if ( plugin instanceof MiniCssExtractPlugin ) {
 		return new MiniCssExtractPlugin( {
 			...plugin.options,
-			chunkFilename: '[name].css',
+			chunkFilename: '[name].[contenthash:8].css',
 			ignoreOrder: true,
 		} );
 	}
@@ -33,7 +33,10 @@ module.exports = {
 	plugins,
 	output: {
 		...defaultConfig.output,
-		chunkFilename: '[name].js',
+		// Keep async asset URLs unique across plugin updates so browsers do not
+		// reuse stale lazy chunks with a newer entry bundle.
+		chunkFilename: '[name].[contenthash:8].js',
+		clean: true,
 	},
 	optimization: {
 		...defaultConfig.optimization,
