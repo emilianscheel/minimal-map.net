@@ -1,10 +1,11 @@
 {
   "name": "minimal-map",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "license": "MIT",
   "description": "Minimal WordPress-native map plugin.",
   "scripts": {
+    "version:bump": "bash ./bin/bump-version.sh",
     "typecheck": "bunx tsc --noEmit",
     "build": "bun run build:bundle && bun run build:check",
     "build:bundle": "wp-scripts build",

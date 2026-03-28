@@ -79,3 +79,9 @@ ln -s "$(pwd)" ~/Studio/my-wordpress-website/wp-content/plugins/minimal-map.net
 
 rm ~/Studio/my-wordpress-website/wp-content/plugins/minimal-map.net
 ```
+
+```bash
+bun run version:bump --major
+bun run version:bump --minor
+bun run version:bump --patch
+```
