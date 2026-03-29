@@ -19,6 +19,7 @@ interface HslColor {
 interface PaletteColorAnalysis {
 	color: string;
 	hsl: HslColor;
+	index: number;
 	luminance: number;
 }
 
@@ -62,31 +63,40 @@ export function deriveThemeFromPalette(
 	defaultColors: StyleThemeColors = DEFAULT_POSITRON_THEME_COLORS
 ): StyleThemeColors {
 	const analyzedPalette = palette
-		.map((entry) => normalizePaletteHexColor(entry.color))
-		.filter((color): color is string => Boolean(color))
-		.map((color) => analyzeColor(color));
+		.map((entry, index) => {
+			const color = normalizePaletteHexColor(entry.color);
+			return color ? analyzeColor(color, index) : null;
+		})
+		.filter((color): color is PaletteColorAnalysis => Boolean(color));
 
 	if (analyzedPalette.length === 0) {
 		return { ...defaultColors };
 	}
 
-	const backgroundAnchor = pickBackgroundAnchor(analyzedPalette).color;
-	const textAnchor = pickDarkestColor(analyzedPalette).color;
-	const waterAnchor = pickWaterAnchor(analyzedPalette);
-	const landAnchor = pickLandAnchor(analyzedPalette);
+	const backgroundAnchorAnalysis = pickBackgroundAnchor(analyzedPalette);
+	const textAnchorAnalysis = pickDarkestColor(analyzedPalette);
+	const backgroundAnchor = backgroundAnchorAnalysis.color;
+	const textAnchor = textAnchorAnalysis.color;
+	const accentCandidates = getAccentCandidates(
+		analyzedPalette,
+		backgroundAnchorAnalysis,
+		textAnchorAnalysis
+	);
 	const structureAnchor = pickStructureAnchor(analyzedPalette, backgroundAnchor, textAnchor);
+	const waterAnchor = pickWaterAnchor(accentCandidates, structureAnchor);
+	const landAnchor = pickLandAnchor(accentCandidates, waterAnchor, structureAnchor);
 
-	const background = blend(defaultColors.background, lighten(backgroundAnchor, 3), 0.58);
+	const background = blend(defaultColors.background, lighten(backgroundAnchor, 1), 0.72);
 	const residential = blend(
 		defaultColors.residential,
-		blend(background, structureAnchor, 0.14),
-		0.68
+		blend(background, structureAnchor, 0.16),
+		0.64
 	);
-	const park = blend(defaultColors.park, blend(background, landAnchor, 0.22), 0.82);
-	const forest = blend(defaultColors.forest, blend(background, landAnchor, 0.3), 0.86);
-	const ice = blend(defaultColors.ice, blend(background, waterAnchor, 0.08), 0.72);
-	const water = blend(defaultColors.water, blend(background, waterAnchor, 0.34), 0.82);
-	const waterway = blend(defaultColors.waterway, darken(water, 8), 0.82);
+	const park = blend(defaultColors.park, blend(background, landAnchor, 0.18), 0.84);
+	const forest = blend(defaultColors.forest, blend(background, landAnchor, 0.28), 0.88);
+	const ice = blend(defaultColors.ice, blend(background, waterAnchor, 0.1), 0.76);
+	const water = blend(defaultColors.water, blend(background, waterAnchor, 0.38), 0.88);
+	const waterway = blend(defaultColors.waterway, darken(water, 10), 0.86);
 	const building = blend(defaultColors.building, blend(background, structureAnchor, 0.2), 0.74);
 	const buildingOutline = blend(defaultColors.buildingOutline, darken(building, 10), 0.78);
 	const path = blend(defaultColors.path, lighten(background, 9), 0.8);
@@ -171,18 +181,19 @@ export function deriveThemeFromPalette(
 	};
 }
 
-function analyzeColor(color: string): PaletteColorAnalysis {
+function analyzeColor(color: string, index: number): PaletteColorAnalysis {
 	const rgb = hexToRgb(color);
 	return {
 		color,
 		hsl: rgbToHsl(rgb),
+		index,
 		luminance: getRelativeLuminance(rgb),
 	};
 }
 
 function pickBackgroundAnchor(colors: PaletteColorAnalysis[]): PaletteColorAnalysis {
 	const neutralCandidate = [ ...colors ]
-		.filter(({ hsl }) => hsl.s <= 0.18)
+		.filter(({ hsl, luminance }) => hsl.s <= 0.18 && luminance >= 0.45)
 		.sort((left, right) => right.luminance - left.luminance)[0];
 
 	if (neutralCandidate) {
@@ -196,36 +207,74 @@ function pickDarkestColor(colors: PaletteColorAnalysis[]): PaletteColorAnalysis 
 	return [ ...colors ].sort((left, right) => left.luminance - right.luminance)[0];
 }
 
-function pickWaterAnchor(colors: PaletteColorAnalysis[]): string {
-	const blueCandidate = [ ...colors ]
-		.filter(({ hsl }) => hsl.s >= 0.18 && isHueBetween(hsl.h, 170, 250))
-		.sort((left, right) => right.hsl.s - left.hsl.s)[0];
+function getAccentCandidates(
+	colors: PaletteColorAnalysis[],
+	background: PaletteColorAnalysis,
+	text: PaletteColorAnalysis
+): PaletteColorAnalysis[] {
+	return colors.filter((color) => {
+		if (color.color === background.color || color.color === text.color) {
+			return false;
+		}
 
-	if (blueCandidate) {
-		return blueCandidate.color;
-	}
-
-	const coolestCandidate = [ ...colors ]
-		.filter(({ hsl }) => hsl.s >= 0.18)
-		.sort((left, right) => hueDistance(left.hsl.h, 205) - hueDistance(right.hsl.h, 205))[0];
-
-	return blend(coolestCandidate?.color ?? colors[0].color, '#4f8fcf', 0.48);
+		return color.hsl.s >= 0.08 ||
+			colorDistance(color.color, background.color) >= 28 ||
+			colorDistance(color.color, text.color) >= 28;
+	});
 }
 
-function pickLandAnchor(colors: PaletteColorAnalysis[]): string {
+function pickWaterAnchor(colors: PaletteColorAnalysis[], fallback: string): string {
+	if (colors.length === 0) {
+		return fallback;
+	}
+
+	const preferredCoolCandidate = [ ...colors ]
+		.filter(({ hsl }) => isHueBetween(hsl.h, 170, 250))
+		.sort((left, right) => {
+			const leftScore = (1 - hueDistance(left.hsl.h, 205) / 180) * 100 + left.hsl.s * 35 - Math.abs(left.hsl.l - 0.62) * 20;
+			const rightScore = (1 - hueDistance(right.hsl.h, 205) / 180) * 100 + right.hsl.s * 35 - Math.abs(right.hsl.l - 0.62) * 20;
+			return rightScore - leftScore || left.index - right.index;
+		})[0];
+
+	if (preferredCoolCandidate) {
+		return preferredCoolCandidate.color;
+	}
+
+	return [ ...colors ]
+		.sort((left, right) => {
+			const leftScore = (1 - hueDistance(left.hsl.h, 205) / 180) * 100 + left.hsl.s * 30 - Math.abs(left.hsl.l - 0.62) * 18;
+			const rightScore = (1 - hueDistance(right.hsl.h, 205) / 180) * 100 + right.hsl.s * 30 - Math.abs(right.hsl.l - 0.62) * 18;
+			return rightScore - leftScore || left.index - right.index;
+		})[0]?.color ?? fallback;
+}
+
+function pickLandAnchor(
+	colors: PaletteColorAnalysis[],
+	waterAnchor: string,
+	fallback: string
+): string {
+	if (colors.length === 0) {
+		return fallback;
+	}
+
 	const greenCandidate = [ ...colors ]
-		.filter(({ hsl }) => hsl.s >= 0.16 && isHueBetween(hsl.h, 70, 170))
-		.sort((left, right) => right.hsl.s - left.hsl.s)[0];
+		.filter(({ hsl }) => hsl.s >= 0.1 && isHueBetween(hsl.h, 70, 170))
+		.sort((left, right) => right.hsl.s - left.hsl.s || left.index - right.index)[0];
 
 	if (greenCandidate) {
 		return greenCandidate.color;
 	}
 
-	const naturalCandidate = [ ...colors ]
-		.filter(({ hsl }) => hsl.s >= 0.12)
-		.sort((left, right) => hueDistance(left.hsl.h, 110) - hueDistance(right.hsl.h, 110))[0];
+	const distinctCandidates = colors.filter((candidate) => candidate.color !== waterAnchor);
+	const scoredCandidatePool = distinctCandidates.length > 0 ? distinctCandidates : colors;
+	const waterAnalysis = analyzeColor(waterAnchor, -1);
 
-	return blend(naturalCandidate?.color ?? colors[0].color, '#78a95b', 0.52);
+	return [ ...scoredCandidatePool ]
+		.sort((left, right) => {
+			const leftScore = hueDistance(left.hsl.h, waterAnalysis.hsl.h) + left.hsl.s * 60 - Math.abs(left.hsl.l - 0.6) * 14;
+			const rightScore = hueDistance(right.hsl.h, waterAnalysis.hsl.h) + right.hsl.s * 60 - Math.abs(right.hsl.l - 0.6) * 14;
+			return rightScore - leftScore || left.index - right.index;
+		})[0]?.color ?? fallback;
 }
 
 function pickStructureAnchor(
@@ -242,6 +291,17 @@ function pickStructureAnchor(
 	}
 
 	return blend(background, text, 0.32);
+}
+
+function colorDistance(first: string, second: string): number {
+	const left = hexToRgb(first);
+	const right = hexToRgb(second);
+
+	return Math.sqrt(
+		(left.r - right.r) ** 2 +
+		(left.g - right.g) ** 2 +
+		(left.b - right.b) ** 2
+	);
 }
 
 function blend(start: string, end: string, weight: number): string {
