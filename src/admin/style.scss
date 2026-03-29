@@ -532,6 +532,10 @@ svg.lucide {
   flex: 0 0 auto;
 }
 
+body.toplevel_page_minimal-map .dataviews-config__popover .dataviews-field-control {
+  display: none;
+}
+
 .minimal-map-admin__collections-grid-wrap {
   --wp-dataviews-color-background: #fff;
   display: block;
