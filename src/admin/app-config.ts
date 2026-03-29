@@ -27,6 +27,8 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		geocodePath: '',
 		queryPath: '',
 		lookupPath: '',
+		settingsPath: '',
+		preferredPerPage: 8,
 	},
 	markersConfig: {
 		nonce: '',

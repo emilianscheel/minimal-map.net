@@ -513,6 +513,7 @@ svg.lucide {
   padding: 0 0 16px;
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 16px;
 
   .dataviews-search {
@@ -524,6 +525,11 @@ svg.lucide {
       border-radius: 8px;
     }
   }
+}
+
+.minimal-map-admin__locations-dataviews-header-actions {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .minimal-map-admin__collections-grid-wrap {

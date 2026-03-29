@@ -76,7 +76,13 @@ import { updateLocation } from '../../lib/locations/updateLocation';
 import { validateAddressStep } from '../../lib/locations/validateAddressStep';
 import { validateDetailsStep } from '../../lib/locations/validateDetailsStep';
 import { validateOpeningHoursStep } from '../../lib/locations/validateOpeningHoursStep';
-import { DEFAULT_FORM_STATE, DEFAULT_VIEW, LOCATIONS_TABLE_PER_PAGE } from './constants';
+import { updateLocationsSettings } from '../../lib/locations/updateLocationsSettings';
+import {
+	applyLocationsTableViewChange,
+	createDefaultLocationsView,
+	DEFAULT_FORM_STATE,
+	DEFAULT_LOCATIONS_TABLE_PER_PAGE,
+} from './constants';
 import {
 	getLocationsWithAssignedLogos,
 	getLocationsWithAssignedMarkers,
@@ -127,7 +133,9 @@ export function useLocationsController(
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
 	const [tags, setTags] = useState<TagRecord[]>([]);
 	const [step, setStep] = useState<LocationDialogStep>('details');
-	const [view, setView] = useState<ViewTable>(DEFAULT_VIEW);
+	const [view, setView] = useState<ViewTable>(() =>
+		createDefaultLocationsView(config.preferredPerPage)
+	);
 	const [mapCenter, setMapCenter] = useState<MapCoordinates | null>(null);
 	const [selectedCoordinates, setSelectedCoordinates] = useState<MapCoordinates | null>(null);
 	const [isAssignToCollectionModalOpen, setAssignToCollectionModalOpen] = useState(false);
@@ -214,8 +222,10 @@ export function useLocationsController(
 		try {
 			const result = await fetchAdminLocations(config, {
 				page: view.page ?? 1,
-				perPage: LOCATIONS_TABLE_PER_PAGE,
+				perPage: view.perPage ?? DEFAULT_LOCATIONS_TABLE_PER_PAGE,
 				search: debouncedSearch,
+				orderBy: view.sort?.field === 'title' ? 'title' : undefined,
+				order: view.sort?.direction === 'desc' ? 'desc' : 'asc',
 			});
 			setLocations(result.items);
 			setTotalItems(result.totalItems);
@@ -228,7 +238,7 @@ export function useLocationsController(
 		} finally {
 			setLoading(false);
 		}
-	}, [config, debouncedSearch, enabled, view.page]);
+	}, [config, debouncedSearch, enabled, view.page, view.perPage, view.sort?.direction, view.sort?.field]);
 
 	useEffect(() => {
 		configureApiFetch(collectionsConfig.nonce || config.nonce);
@@ -243,7 +253,24 @@ export function useLocationsController(
 	const paginatedLocations = locations;
 	const totalPages = Math.max(
 		1,
-		Math.ceil(totalItems / Math.max(1, view.perPage ?? LOCATIONS_TABLE_PER_PAGE))
+		Math.ceil(totalItems / Math.max(1, view.perPage ?? DEFAULT_LOCATIONS_TABLE_PER_PAGE))
+	);
+
+	const persistLocationsPerPagePreference = useCallback(
+		async (perPage: number): Promise<void> => {
+			try {
+				await updateLocationsSettings(config, { perPage });
+			} catch (error) {
+				setActionNotice({
+					status: 'error',
+					message:
+						error instanceof Error
+							? error.message
+							: __('The locations page size could not be saved.', 'minimal-map'),
+				});
+			}
+		},
+		[config]
 	);
 
 	const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
@@ -2405,12 +2432,19 @@ export function useLocationsController(
 		onOpenShowLocationConfirmationModal,
 		onOpenRemoveCollectionAssignmentModal,
 		onChangeView: (nextView) => {
-			setView({
-				...nextView,
-				page: nextView.search !== view.search ? 1 : nextView.page,
-				perPage: LOCATIONS_TABLE_PER_PAGE,
-			});
+			const nextViewState = applyLocationsTableViewChange(
+				view,
+				nextView,
+				config.preferredPerPage
+			);
+			setView(nextViewState.view);
 			setSelection([]);
+
+			if (nextViewState.hasPerPageChanged) {
+				void persistLocationsPerPagePreference(
+					nextViewState.view.perPage ?? DEFAULT_LOCATIONS_TABLE_PER_PAGE
+				);
+			}
 		},
 		onChangeSelection: (nextSelection) => setSelection(nextSelection),
 		onConfirm,

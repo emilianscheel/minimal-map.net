@@ -510,8 +510,10 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_admin_app_config_omits_inline_location_payloads() {
+		$user_id = $this->create_admin_user();
 		$location_id = $this->create_location( '48.137154', '11.576124' );
 		$this->create_collection( array( $location_id ) );
+		update_user_meta( $user_id, \MinimalMap\Rest\Locations_Settings_Route::USER_META_KEY, 24 );
 
 		$config       = new \MinimalMap\Config();
 		$admin_config = $config->get_admin_app_config();
@@ -526,6 +528,11 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			\MinimalMap\Rest\Admin_Query_Route::get_location_lookups_rest_path(),
 			$admin_config['locationsConfig']['lookupPath']
 		);
+		$this->assertSame(
+			\MinimalMap\Rest\Locations_Settings_Route::get_rest_path(),
+			$admin_config['locationsConfig']['settingsPath']
+		);
+		$this->assertSame( 24, $admin_config['locationsConfig']['preferredPerPage'] );
 		$this->assertSame(
 			\MinimalMap\Rest\Admin_Query_Route::get_collections_rest_path(),
 			$admin_config['collectionsConfig']['queryPath']
@@ -568,6 +575,80 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 		$this->assertSame( $matching_location_id, $data['items'][0]['id'] );
 		$this->assertSame( 'Cologne', $data['items'][0]['city'] );
 		$this->assertSame( $collection_id, $data['items'][0]['collections'][0]['id'] );
+	}
+
+	/**
+	 * Locations settings should round-trip the current user's preferred page size.
+	 *
+	 * @return void
+	 */
+	public function test_locations_settings_route_persists_per_user_page_size() {
+		$user_id = $this->create_admin_user();
+
+		$get_request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Locations_Settings_Route::get_rest_path() );
+		$get_response = rest_do_request( $get_request );
+
+		$this->assertSame( 200, $get_response->get_status() );
+		$this->assertSame( 8, $get_response->get_data()['perPage'] );
+
+		$update_request = new WP_REST_Request( 'POST', \MinimalMap\Rest\Locations_Settings_Route::get_rest_path() );
+		$update_request->set_body_params(
+			array(
+				'perPage' => 48,
+			)
+		);
+		$update_response = rest_do_request( $update_request );
+
+		$this->assertSame( 200, $update_response->get_status() );
+		$this->assertSame( 48, $update_response->get_data()['perPage'] );
+		$this->assertSame( 48, (int) get_user_meta( $user_id, \MinimalMap\Rest\Locations_Settings_Route::USER_META_KEY, true ) );
+
+		$invalid_request = new WP_REST_Request( 'POST', \MinimalMap\Rest\Locations_Settings_Route::get_rest_path() );
+		$invalid_request->set_body_params(
+			array(
+				'perPage' => 12,
+			)
+		);
+		$invalid_response = rest_do_request( $invalid_request );
+
+		$this->assertSame( 400, $invalid_response->get_status() );
+		$this->assertSame( 48, \MinimalMap\Rest\Locations_Settings_Route::get_user_preferred_per_page( $user_id ) );
+	}
+
+	/**
+	 * Admin locations queries should respect title sort direction.
+	 *
+	 * @return void
+	 */
+	public function test_admin_locations_route_sorts_by_title_direction() {
+		$this->create_admin_user();
+
+		$this->create_location( '52.517', '13.388', 'Beta Store' );
+		$this->create_location( '48.137', '11.576', 'Alpha Store' );
+
+		$ascending_request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Admin_Query_Route::get_locations_rest_path() );
+		$ascending_request->set_param( 'page', 1 );
+		$ascending_request->set_param( 'per_page', 2 );
+		$ascending_request->set_param( 'orderby', 'title' );
+		$ascending_request->set_param( 'order', 'asc' );
+
+		$ascending_response = rest_do_request( $ascending_request );
+		$ascending_items    = $ascending_response->get_data()['items'];
+
+		$this->assertSame( 'Alpha Store', $ascending_items[0]['title'] );
+		$this->assertSame( 'Beta Store', $ascending_items[1]['title'] );
+
+		$descending_request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Admin_Query_Route::get_locations_rest_path() );
+		$descending_request->set_param( 'page', 1 );
+		$descending_request->set_param( 'per_page', 2 );
+		$descending_request->set_param( 'orderby', 'title' );
+		$descending_request->set_param( 'order', 'desc' );
+
+		$descending_response = rest_do_request( $descending_request );
+		$descending_items    = $descending_response->get_data()['items'];
+
+		$this->assertSame( 'Beta Store', $descending_items[0]['title'] );
+		$this->assertSame( 'Alpha Store', $descending_items[1]['title'] );
 	}
 
 	/**

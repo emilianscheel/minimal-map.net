@@ -362,6 +362,8 @@ export interface LocationsAdminConfig {
 	geocodePath: string;
 	queryPath: string;
 	lookupPath: string;
+	settingsPath: string;
+	preferredPerPage: number;
 }
 
 export interface CollectionsAdminConfig {

@@ -37,7 +37,7 @@ import {
 	getQuickAssignableMarker,
 	getQuickAssignableTag,
 } from './assignmentHelpers';
-import { LOCATIONS_TABLE_PER_PAGE } from './constants';
+import { LOCATIONS_TABLE_PER_PAGE_OPTIONS } from './constants';
 import type { LocationsController } from './types';
 
 function useLocationFields(controller: LocationsController): Field<LocationRecord>[] {
@@ -116,7 +116,7 @@ function useLocationFields(controller: LocationsController): Field<LocationRecor
 				id: 'title',
 				label: __('Title', 'minimal-map'),
 				enableHiding: false,
-				enableSorting: false,
+				enableSorting: true,
 				filterBy: false,
 				enableGlobalSearch: true,
 				render: ({ item }) => (
@@ -699,7 +699,7 @@ export default function LocationsTable({ controller }: { controller: LocationsCo
 		<div className="minimal-map-admin__locations-table-wrap">
 			<DataViews
 				actions={actions}
-				config={{ perPageSizes: [ LOCATIONS_TABLE_PER_PAGE ] }}
+				config={{ perPageSizes: [...LOCATIONS_TABLE_PER_PAGE_OPTIONS] }}
 				data={controller.paginatedLocations}
 				defaultLayouts={{ table: {} }}
 				fields={fields}
@@ -715,6 +715,9 @@ export default function LocationsTable({ controller }: { controller: LocationsCo
 			>
 				<div className="minimal-map-admin__locations-dataviews-header">
 					<DataViews.Search />
+					<div className="minimal-map-admin__locations-dataviews-header-actions">
+						<DataViews.ViewConfig />
+					</div>
 				</div>
 				<DataViews.Layout className="minimal-map-admin__locations-dataviews-layout" />
 				<DataViews.Footer />

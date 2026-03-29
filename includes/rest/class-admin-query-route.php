@@ -48,7 +48,7 @@ class Admin_Query_Route {
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'handle_locations_request' ),
 				'permission_callback' => array( $this, 'can_manage_admin_data' ),
-				'args'                => $this->get_pagination_args(),
+				'args'                => $this->get_location_query_args(),
 			)
 		);
 
@@ -134,8 +134,14 @@ class Admin_Query_Route {
 	 * @return \WP_REST_Response
 	 */
 	public function handle_locations_request( WP_REST_Request $request ) {
-		$params = $this->get_pagination_params( $request );
-		$query  = $this->query_location_posts( $params['page'], $params['per_page'], $params['search'] );
+		$params = $this->get_location_query_params( $request );
+		$query  = $this->query_location_posts(
+			$params['page'],
+			$params['per_page'],
+			$params['search'],
+			$params['orderby'],
+			$params['order']
+		);
 
 		return rest_ensure_response(
 			$this->build_paginated_payload(
@@ -375,6 +381,31 @@ class Admin_Query_Route {
 	}
 
 	/**
+	 * Build locations query args, including supported sort inputs.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	private function get_location_query_args() {
+		return array_merge(
+			$this->get_pagination_args(),
+			array(
+				'orderby' => array(
+					'required'          => false,
+					'type'              => 'string',
+					'default'           => 'title',
+					'sanitize_callback' => 'sanitize_key',
+				),
+				'order'   => array(
+					'required'          => false,
+					'type'              => 'string',
+					'default'           => 'asc',
+					'sanitize_callback' => 'sanitize_key',
+				),
+			)
+		);
+	}
+
+	/**
 	 * Normalize pagination params from one request.
 	 *
 	 * @param WP_REST_Request $request Request object.
@@ -393,6 +424,30 @@ class Admin_Query_Route {
 	}
 
 	/**
+	 * Normalize one locations query request.
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return array<string, int|string>
+	 */
+	private function get_location_query_params( WP_REST_Request $request ) {
+		$params  = $this->get_pagination_params( $request );
+		$orderby = 'title';
+		$order   = 'desc' === strtolower( (string) $request->get_param( 'order' ) ) ? 'DESC' : 'ASC';
+
+		if ( 'title' !== sanitize_key( (string) $request->get_param( 'orderby' ) ) ) {
+			$orderby = 'title';
+		}
+
+		return array_merge(
+			$params,
+			array(
+				'orderby' => $orderby,
+				'order'   => $order,
+			)
+		);
+	}
+
+	/**
 	 * Query paginated locations.
 	 *
 	 * @param int    $page Page number.
@@ -400,7 +455,7 @@ class Admin_Query_Route {
 	 * @param string $search Search term.
 	 * @return array<string, mixed>
 	 */
-	private function query_location_posts( $page, $per_page, $search ) {
+	private function query_location_posts( $page, $per_page, $search, $orderby = 'title', $order = 'ASC' ) {
 		if ( '' === $search ) {
 			$query = new WP_Query(
 				array(
@@ -408,8 +463,8 @@ class Admin_Query_Route {
 					'post_type'              => Location_Post_Type::POST_TYPE,
 					'posts_per_page'         => $per_page,
 					'paged'                  => $page,
-					'orderby'                => 'menu_order title',
-					'order'                  => 'ASC',
+					'orderby'                => 'title' === $orderby ? 'title' : 'title',
+					'order'                  => 'DESC' === $order ? 'DESC' : 'ASC',
 					'update_post_meta_cache' => true,
 					'update_post_term_cache' => false,
 				)
@@ -426,8 +481,8 @@ class Admin_Query_Route {
 				'post_status'            => 'publish',
 				'post_type'              => Location_Post_Type::POST_TYPE,
 				'posts_per_page'         => -1,
-				'orderby'                => 'menu_order title',
-				'order'                  => 'ASC',
+				'orderby'                => 'title' === $orderby ? 'title' : 'title',
+				'order'                  => 'DESC' === $order ? 'DESC' : 'ASC',
 				'update_post_meta_cache' => true,
 				'update_post_term_cache' => false,
 			)
@@ -440,6 +495,19 @@ class Admin_Query_Route {
 					return $post instanceof WP_Post && $this->matches_location_search( $post, $search );
 				}
 			)
+		);
+
+		usort(
+			$filtered_posts,
+			static function ( WP_Post $left, WP_Post $right ) use ( $order ) {
+				$comparison = strcasecmp( $left->post_title, $right->post_title );
+
+				if ( 0 === $comparison ) {
+					return 0;
+				}
+
+				return 'DESC' === $order ? -$comparison : $comparison;
+			}
 		);
 
 		$offset = ( $page - 1 ) * $per_page;

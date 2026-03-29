@@ -20,6 +20,8 @@ export interface AdminQueryParams {
 	page?: number;
 	perPage?: number;
 	search?: string;
+	orderBy?: 'title';
+	order?: 'asc' | 'desc';
 }
 
 function buildQueryString(params: AdminQueryParams): string {
@@ -35,6 +37,14 @@ function buildQueryString(params: AdminQueryParams): string {
 
 	if (params.search?.trim()) {
 		searchParams.set('search', params.search.trim());
+	}
+
+	if (params.orderBy) {
+		searchParams.set('orderby', params.orderBy);
+	}
+
+	if (params.order) {
+		searchParams.set('order', params.order);
 	}
 
 	const query = searchParams.toString();

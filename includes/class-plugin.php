@@ -24,6 +24,7 @@ use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
 use MinimalMap\Rest\License_Route;
 use MinimalMap\Rest\Locations_Route;
+use MinimalMap\Rest\Locations_Settings_Route;
 use MinimalMap\Rest\Styles_Route;
 
 /**
@@ -129,6 +130,13 @@ final class Plugin {
 	private $locations_route;
 
 	/**
+	 * Locations settings REST route service.
+	 *
+	 * @var Locations_Settings_Route
+	 */
+	private $locations_settings_route;
+
+	/**
 	 * License verification REST route service.
 	 *
 	 * @var License_Route
@@ -209,6 +217,7 @@ final class Plugin {
 		$this->frontend_geocode_route = new Frontend_Geocode_Route();
 		$this->geocode_route      = new Geocode_Route();
 		$this->locations_route    = new Locations_Route( $config );
+		$this->locations_settings_route = new Locations_Settings_Route();
 		$this->license_route      = new License_Route();
 		$this->styles_route       = new Styles_Route();
 		$this->analytics_settings_route = new Analytics_Settings_Route( $this->analytics );
@@ -263,6 +272,7 @@ final class Plugin {
 		add_action( 'rest_api_init', array( $this->frontend_geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->locations_route, 'register' ) );
+		add_action( 'rest_api_init', array( $this->locations_settings_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->license_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->styles_route, 'register' ) );
 	}

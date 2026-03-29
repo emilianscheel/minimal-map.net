@@ -22,6 +22,7 @@ use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
 use MinimalMap\Rest\License_Route;
 use MinimalMap\Rest\Locations_Route;
+use MinimalMap\Rest\Locations_Settings_Route;
 use MinimalMap\Rest\Styles_Route;
 use WP_Post;
 
@@ -906,6 +907,8 @@ class Config {
 				'geocodePath' => Geocode_Route::get_rest_path(),
 				'queryPath'   => Admin_Query_Route::get_locations_rest_path(),
 				'lookupPath'  => Admin_Query_Route::get_location_lookups_rest_path(),
+				'settingsPath' => Locations_Settings_Route::get_rest_path(),
+				'preferredPerPage' => Locations_Settings_Route::get_user_preferred_per_page(),
 			),
 			'collectionsConfig' => array(
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
