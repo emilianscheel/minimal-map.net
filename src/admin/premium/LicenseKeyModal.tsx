@@ -71,10 +71,7 @@ export default function LicenseKeyModal({
       shouldCloseOnEsc={!isBusy}
       onKeyDown={handleKeyDown}
     >
-      <div
-        className="minimal-map-admin__license-dialog"
-        style={{ maxWidth: "400px" }}
-      >
+      <div className="minimal-map-admin__license-dialog">
         <div style={{ marginBottom: "24px" }}>
           <TextControl
             label={__("License Key", "minimal-map")}

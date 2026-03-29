@@ -1,6 +1,10 @@
 @import "@wordpress/dataviews/build-style/style.css";
 
 body.toplevel_page_minimal-map {
+  --minimal-map-admin-modal-width-default: min(782px, calc(100vw - 48px));
+  --minimal-map-admin-modal-width-wide: min(828px, calc(100vw - 48px));
+  --minimal-map-admin-modal-width-xwide: min(1120px, calc(100vw - 48px));
+
   #wpcontent {
     padding-left: 0;
   }
@@ -14,6 +18,13 @@ body.toplevel_page_minimal-map {
   #wpfooter {
     display: none;
   }
+}
+
+body.toplevel_page_minimal-map .components-modal__content {
+  width: var(
+    --minimal-map-admin-modal-width,
+    var(--minimal-map-admin-modal-width-default)
+  );
 }
 
 svg.lucide,
@@ -1504,16 +1515,8 @@ body.toplevel_page_minimal-map
   min-width: min(480px, calc(100vw - 64px));
 }
 
-.minimal-map-admin__location-modal .components-modal__content {
-  width: min(782px, calc(100vw - 48px));
-}
-
-.minimal-map-admin__collection-modal .components-modal__content {
-  width: min(528px, calc(100vw - 48px));
-}
-
-.minimal-map-admin__custom-csv-import-modal .components-modal__content {
-  width: min(828px, calc(100vw - 48px));
+.minimal-map-admin__custom-csv-import-modal {
+  --minimal-map-admin-modal-width: var(--minimal-map-admin-modal-width-wide);
 }
 
 .minimal-map-admin__location-dialog-fields {
@@ -1672,8 +1675,8 @@ body.toplevel_page_minimal-map
   gap: 8px;
 }
 
-.minimal-map-admin__collection-assignment-modal .components-modal__content {
-  width: min(1120px, calc(100vw - 48px));
+.minimal-map-admin__collection-assignment-modal {
+  --minimal-map-admin-modal-width: var(--minimal-map-admin-modal-width-xwide);
 }
 
 .minimal-map-admin__collection-assignment-dialog {
