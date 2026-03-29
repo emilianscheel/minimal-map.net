@@ -48,11 +48,11 @@ Features include:
 * Duplicate existing locations for faster data entry.
 * Retrieve coordinates automatically from addresses (re-geocoding).
 * Manual map pin placement and coordinate editing.
-* Excel (XLSX) import and export for seamless data management.
-* Custom CSV/Excel field mapping for flexible location imports.
-* Import opening hours and lunch breaks from external files.
-* CSV export for locations and analytics.
-* Example CSV/Excel export for faster onboarding.
+* CSV, Excel (XLSX), and JSON import/export for seamless location data management.
+* Custom CSV/Excel/JSON field mapping for flexible location imports.
+* Import opening hours and lunch breaks from external CSV, Excel, and JSON files.
+* CSV export for analytics.
+* Example CSV/Excel/JSON export for faster onboarding.
 * Bulk-friendly location management in a native WordPress admin UI.
 * Bulk-assign logos, markers, tags, and opening hours to multiple locations.
 * Power-user keyboard shortcuts for lightning-fast admin workflows (n, m).
@@ -113,7 +113,8 @@ Yes. English is the source language and German translations are included.
 = 0.7.0 =
 * Added comprehensive search, selection, and action analytics with CSV export.
 * Added support for Excel (XLSX) import and export.
-* Added custom CSV/Excel field mapping for location and opening hours import.
+* Added JSON import and export for locations, including custom-schema JSON imports via the existing mapping workflow.
+* Added custom CSV/Excel/JSON field mapping for location and opening hours import.
 * Added duplicate location and retrieve coordinates (re-geocoding) features.
 * Added bulk actions for assigning logos, markers, tags, and opening hours.
 * Added bulk marker color updates for multiple locations.

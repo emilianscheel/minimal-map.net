@@ -41,11 +41,10 @@ Render a minimalist MapLibre-powered map in Wordpress.
 - **Duplicate existing locations** to quickly create similar entries
 - **Retrieve coordinates automatically** from addresses (re-geocoding)
 - Manual map pin placement and coordinate editing
-- **Excel (XLSX) import and export** for seamless data management
-- **Custom CSV/Excel import mapping** for flexible location imports
-- **Import opening hours and lunch breaks** from external files
-- CSV export for locations
-- Example CSV/Excel export for faster onboarding
+- **CSV, Excel (XLSX), and JSON import/export** for seamless location data management
+- **Custom CSV/Excel/JSON import mapping** for flexible location imports
+- **Import opening hours and lunch breaks** from external CSV, Excel, and JSON files
+- Example CSV/Excel/JSON export for faster onboarding
 - Bulk-friendly location management in a native WordPress admin UI
 - **Bulk-assign logos, markers, tags, and opening hours** to multiple locations
 - **Power-user keyboard shortcuts** for lightning-fast admin workflows (New: `n`, Merge: `m`)
