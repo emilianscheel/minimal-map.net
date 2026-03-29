@@ -20,6 +20,8 @@ Render a minimalist MapLibre-powered map in Wordpress.
 - Live block editor map preview
 - Dedicated admin workspace for locations, collections, tags, markers, logos, and styles
 - **Privacy-first search analytics** with search query trends and metrics
+- **Advanced interaction analytics** for location selections and actions (website, email, phone, etc.)
+- **Export analytics reports** to CSV for offline reporting
 - **GDPR-ready tracking** with built-in **Complianz** script blocking support
 - **Marker clustering** to easily handle hundreds of locations on a single map
 - **"Find Me" button** for real-time user location centering and distance calculation
@@ -36,16 +38,21 @@ Render a minimalist MapLibre-powered map in Wordpress.
 - Real-time "Open Now" status with customizable indicator colors
 - **Dynamic opening status hints** like "Opens soon" or "Closes soon"
 - Address geocoding for fast location entry
+- **Duplicate existing locations** to quickly create similar entries
+- **Retrieve coordinates automatically** from addresses (re-geocoding)
 - Manual map pin placement and coordinate editing
 - **Excel (XLSX) import and export** for seamless data management
-- CSV import for locations with custom field mapping
+- **Custom CSV/Excel import mapping** for flexible location imports
+- **Import opening hours and lunch breaks** from external files
 - CSV export for locations
 - Example CSV/Excel export for faster onboarding
 - Bulk-friendly location management in a native WordPress admin UI
+- **Bulk-assign logos, markers, tags, and opening hours** to multiple locations
 - **Power-user keyboard shortcuts** for lightning-fast admin workflows (New: `n`, Merge: `m`)
 - Custom SVG logo library for location branding
 - Custom marker presets and visual pin styles
 - **Individual location pin colors** to override global marker styles per location
+- **Bulk-set marker colors** for multiple locations at once
 - Multiple map style presets including Liberty, Bright, and Positron
 - Custom style themes for map colors and visual branding
 - **Custom font family** support to match your site's typography perfectly
@@ -62,6 +69,7 @@ Render a minimalist MapLibre-powered map in Wordpress.
 - Scroll zoom, mobile two-finger zoom, and **cooperative gesture** settings
 - English source strings with German translations
 - Feels native to WordPress and built for modern WordPress sites
+- **Premium license key support** to unlock advanced features and support
 
 ## Development
 

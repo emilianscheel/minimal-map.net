@@ -27,28 +27,46 @@ Features include:
 * Frontend map powered by MapLibre.
 * Live block editor map preview.
 * Dedicated admin workspace for locations, collections, tags, markers, logos, and styles.
+* Privacy-first search analytics with search query trends and metrics.
+* Advanced interaction analytics for location selections and actions (website, email, phone, etc.).
+* Export analytics reports to CSV for offline analysis.
+* GDPR-ready tracking with built-in Complianz script blocking support.
+* Marker clustering to handle hundreds of locations on a single map.
+* "Find Me" button for real-time user location centering.
+* Live user location "blue dot" indicator.
 * Reusable location collections for grouped maps and filtered map views.
 * Merge location collections to easily consolidate data.
 * Searchable map with integrated search panel.
 * Distance-based search results with real-time distance calculation (m/km).
 * Automatic nearest-location highlighting in search results.
 * Store locator cards with address, phone, email, website, logo, and tags.
+* Social media links for locations (Instagram, X, Facebook, Threads, YouTube, Telegram).
 * Detailed opening hours with support for lunch breaks and seasonal notes.
 * Real-time "Open Now" status with customizable indicator colors.
+* Dynamic opening status hints like "Opens soon" or "Closes soon".
 * Address geocoding for fast location entry.
+* Duplicate existing locations for faster data entry.
+* Retrieve coordinates automatically from addresses (re-geocoding).
 * Manual map pin placement and coordinate editing.
-* CSV import for locations with custom field mapping.
-* CSV export for locations.
-* Example CSV export for faster onboarding.
+* Excel (XLSX) import and export for seamless data management.
+* Custom CSV/Excel field mapping for flexible location imports.
+* Import opening hours and lunch breaks from external files.
+* CSV export for locations and analytics.
+* Example CSV/Excel export for faster onboarding.
 * Bulk-friendly location management in a native WordPress admin UI.
+* Bulk-assign logos, markers, tags, and opening hours to multiple locations.
+* Power-user keyboard shortcuts for lightning-fast admin workflows (n, m).
 * Custom SVG logo library for location branding.
 * Custom marker presets and visual pin styles.
+* Individual location pin colors and bulk marker color updates.
 * Multiple map style presets including Liberty, Bright, and Positron.
 * Custom style themes for map colors and visual branding.
 * Map theme import from Minimal Map JSON or MapLibre style JSON v8.
+* Custom font family support for perfect typography matching.
 * Configurable zoom controls with custom position, colors, spacing, radius, and icons.
 * Choose from multiple zoom icon sets (plus/minus, circles, lines).
 * Configurable search panel colors, spacing, width, and card styling.
+* In-map location cards for modern overlay-style details.
 * Customizable "View on Google Maps" navigation button styling.
 * Customizable map attribution (credits) styling and positioning.
 * Collection-based map output for store groups, regions, teams, and categories.
@@ -57,6 +75,7 @@ Features include:
 * Scroll zoom, mobile two-finger zoom, and cooperative gesture settings.
 * English source strings with German translations.
 * Feels native to WordPress and built for modern WordPress sites.
+* Premium license key support to unlock advanced features.
 
 Only the latest stable WordPress release is supported. Older WordPress and PHP versions are intentionally out of scope for this plugin.
 
@@ -90,6 +109,22 @@ Yes. English is the source language and German translations are included.
 10. Map preview (`preview.png`)
 
 == Changelog ==
+
+= 0.7.0 =
+* Added comprehensive search, selection, and action analytics with CSV export.
+* Added support for Excel (XLSX) import and export.
+* Added custom CSV/Excel field mapping for location and opening hours import.
+* Added duplicate location and retrieve coordinates (re-geocoding) features.
+* Added bulk actions for assigning logos, markers, tags, and opening hours.
+* Added bulk marker color updates for multiple locations.
+* Added social media links (Instagram, X, Facebook, Threads, YouTube, Telegram) to locations.
+* Added "Find Me" button and live user location "blue dot" indicator.
+* Added marker clustering for handling large datasets.
+* Added in-map location cards for modern overlay layouts.
+* Added premium license key support and purchase integration.
+* Added power-user keyboard shortcuts (n for new, m for merge).
+* Refined admin modal layouts and stabilized collection previews.
+* Unified modal widths and polished the dashboard experience.
 
 = 0.2.0 =
 * Added detailed opening hours with lunch breaks, seasonal notes, and "Open Now" status indicators.
