@@ -34,26 +34,15 @@ export function ApplyPaletteTemplateDropdown({
 					<ChevronDown size={16} />
 				</Button>
 			)}
-			renderContent={({ onClose }) => (
+				renderContent={({ onClose }) => (
 				<MenuGroup label={__('Palette Templates', 'minimal-map')}>
 					{templates.map((template) => (
 						<MenuItem
 							key={template.id}
-							onClick={() => {
-								onSelect(template.id);
-								onClose();
-							}}
-						>
-							<div className="minimal-map-styles__palette-template-option">
-								<div className="minimal-map-styles__palette-template-copy">
-									<span className="minimal-map-styles__palette-template-label">
-										{template.label}
-									</span>
-									<span className="minimal-map-styles__palette-template-source">
-										{template.source}
-									</span>
-								</div>
-								<div
+							className="minimal-map-styles__palette-template-menu-item"
+							info={template.source}
+							suffix={
+								<span
 									className="minimal-map-styles__palette-template-swatches"
 									aria-hidden="true"
 								>
@@ -66,8 +55,14 @@ export function ApplyPaletteTemplateDropdown({
 											<ColorIndicator colorValue={color.color} />
 										</span>
 									))}
-								</div>
-							</div>
+								</span>
+							}
+							onClick={() => {
+								onSelect(template.id);
+								onClose();
+							}}
+						>
+							{template.label}
 						</MenuItem>
 					))}
 				</MenuGroup>
