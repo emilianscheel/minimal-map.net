@@ -1791,6 +1791,10 @@ body.toplevel_page_minimal-map
     height: 100%;
   }
 
+  > .components-notice {
+    margin-bottom: 16px;
+  }
+
   &__layout {
     display: grid;
     grid-template-columns: minmax(360px, 1fr) 2fr;
