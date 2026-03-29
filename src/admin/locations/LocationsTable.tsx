@@ -655,21 +655,29 @@ export function createLocationActions(controller: LocationsController): Action<L
 				controller.onOpenRemoveTagsConfirmationModal(items);
 			},
 		},
-		{
+		({
 			id: 'delete-location',
 			label: __('Delete', 'minimal-map'),
 			icon: <Trash2 size={16} strokeWidth={2} />,
 			isDestructive: true,
 			disabled: controller.isRowActionPending,
 			supportsBulk: true,
-			modalHeader: (items) =>
+			modalHeader: (items: LocationRecord[]) =>
 				items.length === 1
 					? __('Delete location', 'minimal-map')
 					: sprintf(
 						_n( 'Delete %d location', 'Delete %d locations', items.length, 'minimal-map' ),
 						items.length
 					),
-			RenderModal: ({ items, closeModal, onActionPerformed }) => {
+			RenderModal: ({
+				items,
+				closeModal,
+				onActionPerformed,
+			}: {
+				items: LocationRecord[];
+				closeModal: () => void;
+				onActionPerformed: (items: LocationRecord[]) => void;
+			}) => {
 				return (
 					<DeleteLocationActionModal
 						items={items}
@@ -680,7 +688,7 @@ export function createLocationActions(controller: LocationsController): Action<L
 					/>
 				);
 			},
-		},
+		} as any),
 	];
 }
 

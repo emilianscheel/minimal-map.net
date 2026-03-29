@@ -336,7 +336,7 @@ export function createMarkerRenderer({
 		return (map.getSource(sourceId) as GeoJSONSource | undefined) ?? null;
 	}
 
-	function getClusterRadiusExpression(): [string, string, number, number, number, number, number] {
+	function getClusterRadiusExpression(): any[] {
 		return [
 			'step',
 			['get', 'point_count'],
@@ -428,7 +428,7 @@ export function createMarkerRenderer({
 			return;
 		}
 
-		const layer = {
+		const layer: any = {
 			id: markerLayerId,
 			type: 'symbol',
 			source: sourceId,
@@ -440,7 +440,7 @@ export function createMarkerRenderer({
 				'icon-allow-overlap': true,
 				'icon-ignore-placement': true,
 			},
-		} as Record<string, unknown>;
+		};
 
 		if (clusterEnabled) {
 			layer.filter = ['!', ['has', 'point_count']] as never;

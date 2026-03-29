@@ -1,5 +1,5 @@
 import { Notice } from '@wordpress/components';
-import { Component, type ReactNode } from '@wordpress/element';
+import { Component, type ReactNode } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 
 interface AnalyticsSectionBoundaryProps {

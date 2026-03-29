@@ -1,7 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import type { ViewTable } from '@wordpress/dataviews';
 import type {
-	AnalyticsAdminConfig,
+	AnalyticsExportActionConfig,
 	AnalyticsEventCategory,
 	AnalyticsQueriesResponse,
 	AnalyticsRangeKey,
@@ -9,7 +9,7 @@ import type {
 import { normalizeAnalyticsQueriesResponse } from './normalizeAnalyticsQueries';
 
 export async function fetchAnalyticsQueries(
-	config: AnalyticsAdminConfig,
+	config: AnalyticsExportActionConfig,
 	view: Pick<ViewTable, 'page' | 'perPage' | 'search'>,
 	range: AnalyticsRangeKey,
 	category: AnalyticsEventCategory,

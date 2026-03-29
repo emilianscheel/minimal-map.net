@@ -1,6 +1,6 @@
 import { Button, Modal, TextControl, Notice } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useState, type KeyboardEvent } from "@wordpress/element";
+import { useState, type KeyboardEvent } from "react";
 import apiFetch from "@wordpress/api-fetch";
 import Kbd from "../../components/Kbd";
 import { adminConfig } from "../app-config";

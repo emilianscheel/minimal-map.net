@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { AdminSectionView } from '../types';
 
-const SECTION_ICONS: Record<AdminSectionView | 'premium', LucideIcon> = {
+const SECTION_ICONS: Record<AdminSectionView | 'premium' | 'license', LucideIcon> = {
 	dashboard: LayoutDashboard,
 	analytics: ChartColumn,
 	locations: MapPinned,

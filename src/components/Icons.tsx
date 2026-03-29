@@ -130,8 +130,21 @@ export function TagsIcon(props: IconProps) {
   );
 }
 
+export function AnalyticsIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M3 3v18h18" />
+      <path d="M7 16V10" />
+      <path d="M11 16V7" />
+      <path d="M15 16V12" />
+      <path d="M19 16V9" />
+    </IconBase>
+  );
+}
+
 const SECTION_ICONS: Record<AdminSectionView, ComponentType<IconProps>> = {
   dashboard: DashboardIcon,
+  analytics: AnalyticsIcon,
   locations: MapPinnedIcon,
   collections: LayersIcon,
   logos: ImageIcon,
