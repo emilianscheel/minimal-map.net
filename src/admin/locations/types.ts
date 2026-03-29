@@ -45,7 +45,7 @@ export interface LocationsController {
 	csvImportMapping: CsvImportMapping;
 	csvImportProgressCompleted: number;
 	csvImportProgressTotal: number;
-	csvImportStep: 'mapping' | 'opening_hours' | 'progress';
+	csvImportStep: 'mapping' | 'opening_hours';
 	collections: CollectionRecord[];
 	logos: LogoRecord[];
 	markers: MarkerRecord[];
@@ -72,6 +72,7 @@ export interface LocationsController {
 	isGeocoding: boolean;
 	isLoading: boolean;
 	isCustomCsvImportModalOpen: boolean;
+	isLocationImportProgressModalOpen: boolean;
 	isDeleteAllLocationsModalOpen: boolean;
 	isRemoveCollectionAssignmentModalOpen: boolean;
 	isDeletingAllLocations: boolean;
@@ -131,6 +132,7 @@ export interface LocationsController {
 	onBackCustomCsvImportStep: () => void;
 	onMapLocationSelect: (coordinates: MapCoordinates) => void;
 	onCloseCustomCsvImportModal: () => void;
+	onCloseLocationImportProgressModal: () => void;
 	onCloseDeleteAllLocationsModal: () => void;
 	onCloseRemoveCollectionAssignmentModal: () => void;
 	onCloseAssignToCollectionModal: () => void;

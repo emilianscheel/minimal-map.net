@@ -271,6 +271,7 @@ interface ImportDependencies {
 	geocodeAddressFn?: typeof geocodeAddress;
 	now?: () => Date;
 	sleep?: (ms: number) => Promise<void>;
+	onProgress?: (completed: number, total: number) => void;
 	logos?: any[];
 	markers?: any[];
 	tags?: any[];
@@ -686,10 +687,13 @@ export async function runCommonCsvImport(
 	const createLocationFn = dependencies.createLocationFn ?? createLocation;
 	const now = dependencies.now ?? (() => new Date());
 	const importedLocationIds: number[] = [];
+	const totalRows = parsedCsv.rows.length;
 
 	if (!isCommonCsvFormat(parsedCsv)) {
 		throw new Error(__('CSV file does not match the supported import format.', 'minimal-map'));
 	}
+
+	dependencies.onProgress?.(0, totalRows);
 
 	for (const row of parsedCsv.rows) {
 		const record = createRowRecord(parsedCsv, row) as Record<CommonCsvHeader, string | undefined>;
@@ -703,6 +707,7 @@ export async function runCommonCsvImport(
 			)
 		);
 		importedLocationIds.push(createdLocation.id);
+		dependencies.onProgress?.(importedLocationIds.length, totalRows);
 	}
 
 	await maybeCreateImportCollection(
@@ -727,9 +732,7 @@ export async function runMappedCsvImport(
 	assignments: CsvImportAssignments,
 	locationsConfig: LocationsAdminConfig,
 	collectionsConfig: CollectionsAdminConfig,
-	dependencies: ImportDependencies & {
-		onGeocodeProgress?: (completed: number, total: number) => void;
-	} = {}
+	dependencies: ImportDependencies = {}
 ): Promise<ImportBatchResult> {
 	const createCollectionFn = dependencies.createCollectionFn ?? createCollection;
 	const createLocationFn = dependencies.createLocationFn ?? createLocation;
@@ -737,10 +740,10 @@ export async function runMappedCsvImport(
 	const now = dependencies.now ?? (() => new Date());
 	const sleepFn = dependencies.sleep ?? sleep;
 	const totalGeocodeRequests = countMappedCsvGeocodeRequests(parsedCsv, mapping);
+	const totalRows = parsedCsv.rows.length;
 	const importedLocationIds: number[] = [];
 	let completedGeocodeRequests = 0;
-
-	dependencies.onGeocodeProgress?.(completedGeocodeRequests, totalGeocodeRequests);
+	dependencies.onProgress?.(0, totalRows);
 
 	for (const row of parsedCsv.rows) {
 		const form = applyCsvImportAssignments(
@@ -761,7 +764,6 @@ export async function runMappedCsvImport(
 			}
 
 			completedGeocodeRequests += 1;
-			dependencies.onGeocodeProgress?.(completedGeocodeRequests, totalGeocodeRequests);
 
 			if (completedGeocodeRequests < totalGeocodeRequests) {
 				await sleepFn(1000);
@@ -770,6 +772,7 @@ export async function runMappedCsvImport(
 
 		const createdLocation = await createLocationFn(locationsConfig, form);
 		importedLocationIds.push(createdLocation.id);
+		dependencies.onProgress?.(importedLocationIds.length, totalRows);
 	}
 
 	await maybeCreateImportCollection(

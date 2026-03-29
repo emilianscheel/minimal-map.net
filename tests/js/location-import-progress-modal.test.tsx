@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { JSDOM } from 'jsdom';
 import { createElement, createRoot } from '@wordpress/element';
-import CustomCsvImportModal from '../../src/admin/locations/CustomCsvImportModal';
+import LocationImportProgressModal from '../../src/admin/locations/LocationImportProgressModal';
 import type { LocationsController } from '../../src/admin/locations/types';
 import {
 	createEmptyCsvImportMapping,
@@ -58,26 +58,20 @@ function createControllerStub(
 		assignmentMarkerId: '',
 		assignmentTagIds: [],
 		collections: [],
-		csvImportColumnOptions: [
-			{ label: 'None', value: '' },
-			{ label: 'Monday Hours (8-12)', value: '0' },
-			{ label: 'Notes (Summer)', value: '1' },
-		],
-		csvImportHeaders: ['Monday Hours', 'Notes'],
+		csvImportColumnOptions: [],
+		csvImportHeaders: [],
 		csvImportLogoId: '',
 		csvImportMarkerId: '',
-		csvImportOpeningHoursColumnOptions: [
-			{ label: 'None', value: '' },
-			{ label: 'Monday Hours (8-12)', value: '0' },
-		],
+		csvImportOpeningHoursColumnOptions: [],
 		csvImportOpeningHoursMapping: createEmptyCsvOpeningHoursImportMapping(),
 		csvImportMapping: createEmptyCsvImportMapping(),
-		csvImportProgressCompleted: 0,
-		csvImportProgressTotal: 0,
-		csvImportRows: [['8-12', 'Summer']],
+		csvImportProgressCompleted: 2,
+		csvImportProgressTotal: 5,
+		csvImportRows: [],
 		csvImportStep: 'mapping',
 		csvImportTagIds: [],
 		dismissActionNotice() {},
+		editingLocation: null,
 		fieldErrors: {},
 		form: {} as never,
 		formMode: 'create',
@@ -100,22 +94,25 @@ function createControllerStub(
 		isAssignMarkerModalOpen: false,
 		isAssignTagsModalOpen: false,
 		isAssignToCollectionModalOpen: false,
+		isAssignOpeningHoursModalOpen: false,
 		isAssignmentSaving: false,
-		isCustomCsvImportModalOpen: true,
-		isLocationImportProgressModalOpen: false,
+		isCustomCsvImportModalOpen: false,
+		isLocationImportProgressModalOpen: true,
 		isDeleteAllLocationsModalOpen: false,
 		isDeletingAllLocations: false,
 		isDeleteLogoConfirmationModalOpen: false,
 		isDialogOpen: false,
 		isExporting: false,
 		isGeocoding: false,
-		isImporting: false,
+		isImporting: true,
 		isLoading: false,
+		isMarkerColorModalOpen: false,
 		isRemoveCollectionAssignmentModalOpen: false,
 		isRemoveMarkerConfirmationModalOpen: false,
 		isRemoveTagsConfirmationModalOpen: false,
 		isRemovingCollectionAssignment: false,
 		isRowActionPending: false,
+		isShowLocationConfirmationModalOpen: false,
 		isSubmitting: false,
 		loadError: null,
 		locations: [],
@@ -129,6 +126,7 @@ function createControllerStub(
 		onAssignLogoToLocation: async () => {},
 		onAssignMarkerToLocation: async () => {},
 		onAssignTagsToLocation: async () => {},
+		onAssignOpeningHoursToLocations: async () => {},
 		onBack() {},
 		onBackCustomCsvImportStep() {},
 		onCancel() {},
@@ -146,20 +144,27 @@ function createControllerStub(
 		onCloseAssignMarkerModal() {},
 		onCloseAssignTagsModal() {},
 		onCloseAssignToCollectionModal() {},
+		onCloseAssignOpeningHoursModal() {},
 		onCloseCustomCsvImportModal() {},
 		onCloseLocationImportProgressModal() {},
 		onCloseDeleteAllLocationsModal() {},
 		onCloseDeleteLogoConfirmationModal() {},
+		onCloseMarkerColorModal() {},
 		onCloseRemoveCollectionAssignmentModal() {},
 		onCloseRemoveMarkerConfirmationModal() {},
 		onCloseRemoveTagsConfirmationModal() {},
+		onCloseShowLocationConfirmationModal() {},
 		onConfirm: async () => {},
+		onConfirmMarkerColor: async () => {},
+		onConfirmShowLocation: async () => {},
+		onDeleteAllLocations: async () => {},
 		onDeleteLocation: async () => {},
 		onDeleteLocations: async () => {},
-		onDeleteAllLocations: async () => {},
 		onDuplicateLocation: async () => {},
 		onEditLocation() {},
 		onExportExample() {},
+		onExportExampleExcel() {},
+		onExportExcel() {},
 		onExportLocations() {},
 		onImportLocations: async () => {},
 		onMapLocationSelect() {},
@@ -167,11 +172,14 @@ function createControllerStub(
 		onOpenAssignMarkerModal() {},
 		onOpenAssignTagsModal() {},
 		onOpenAssignToCollectionModal() {},
+		onOpenAssignOpeningHoursModal() {},
 		onOpenDeleteAllLocationsModal() {},
 		onOpenDeleteLogoConfirmationModal() {},
+		onOpenMarkerColorModal() {},
 		onOpenRemoveCollectionAssignmentModal() {},
 		onOpenRemoveMarkerConfirmationModal() {},
 		onOpenRemoveTagsConfirmationModal() {},
+		onOpenShowLocationConfirmationModal() {},
 		onQuickAssignLogo: async () => {},
 		onQuickAssignMarker: async () => {},
 		onQuickAssignTag: async () => {},
@@ -184,16 +192,20 @@ function createControllerStub(
 		onSelectCsvImportLogo() {},
 		onSelectCsvImportMarker() {},
 		onSelectCsvImportTags() {},
+		onSetLocationVisibility: async () => {},
 		onStartCustomCsvImport: async () => {},
 		paginatedLocations: [],
 		selectedAssignmentLocation: null,
 		selectedCoordinates: null,
 		selectedLogoLocations: [],
 		selectedLogoRemovalLocations: [],
+		selectedMarkerColorLocations: [],
 		selectedMarkerLocations: [],
 		selectedMarkerRemovalLocations: [],
+		selectedOpeningHoursLocations: [],
 		selectedRemovalCollection: null,
 		selectedRemovalLocation: null,
+		selectedShownLocation: null,
 		selectedTagRemovalLocations: [],
 		selectedTagsLocations: [],
 		selection: [],
@@ -201,6 +213,7 @@ function createControllerStub(
 		submitError: null,
 		submitLabel: '',
 		tags: [],
+		totalItems: 0,
 		totalPages: 1,
 		view: { type: 'table', page: 1, perPage: 10, fields: [], layout: {} },
 		...overrides,
@@ -214,79 +227,25 @@ afterEach(() => {
 	globalThis.HTMLElement = originalGlobals.HTMLElement;
 });
 
-describe('CustomCsvImportModal', () => {
-	test('uses the first next action to advance from mapping to opening hours', async () => {
+describe('LocationImportProgressModal', () => {
+	test('renders the shared progress bar with row-based progress values', async () => {
 		const dom = new JSDOM('<!doctype html><div id="host"></div>');
 		setGlobalDom(dom);
 		const host = dom.window.document.getElementById('host') as HTMLDivElement;
 		const root = createRoot(host);
-		let advanced = 0;
 
 		root.render(
-			createElement(CustomCsvImportModal, {
-				controller: createControllerStub({
-					onAdvanceCustomCsvImportStep() {
-						advanced += 1;
-					},
-				}),
+			createElement(LocationImportProgressModal, {
+				controller: createControllerStub(),
 			})
 		);
 
 		await flushRender();
 
-		const buttons = Array.from(dom.window.document.querySelectorAll('button'));
-		const nextButton = buttons.find((button) => button.textContent?.includes('Next'));
-		nextButton?.click();
-
-		expect(advanced).toBe(1);
-
-		root.unmount();
-	});
-
-	test('renders opening-hours rows with filtered day options and unrestricted notes options', async () => {
-		const dom = new JSDOM('<!doctype html><div id="host"></div>');
-		setGlobalDom(dom);
-		const host = dom.window.document.getElementById('host') as HTMLDivElement;
-		const root = createRoot(host);
-		let wentBack = 0;
-
-		root.render(
-			createElement(CustomCsvImportModal, {
-				controller: createControllerStub({
-					csvImportStep: 'opening_hours',
-					onBackCustomCsvImportStep() {
-						wentBack += 1;
-					},
-				}),
-			})
-		);
-
-		await flushRender();
-
-		expect(dom.window.document.body.textContent).toContain('Mon');
-		expect(dom.window.document.body.textContent).toContain('Opening hours notes');
-
-		const activeSelects = Array.from(
-			dom.window.document.querySelectorAll('select:not([disabled])')
-		);
-		const mondayOptions = Array.from(activeSelects[0]?.querySelectorAll('option') ?? []).map(
-			(option) => option.textContent
-		);
-		const notesOptions = Array.from(activeSelects[7]?.querySelectorAll('option') ?? []).map(
-			(option) => option.textContent
-		);
-
-		expect(mondayOptions).toContain('Monday Hours (8-12)');
-		expect(mondayOptions).not.toContain('Notes (Summer)');
-		expect(notesOptions).toContain('Monday Hours (8-12)');
-		expect(notesOptions).toContain('Notes (Summer)');
-
-		const backButton = Array.from(dom.window.document.querySelectorAll('button')).find((button) =>
-			button.textContent?.includes('Back')
-		);
-		backButton?.click();
-
-		expect(wentBack).toBe(1);
+		const progress = dom.window.document.querySelector('progress');
+		expect(progress).not.toBeNull();
+		expect(progress?.getAttribute('max')).toBe('5');
+		expect(progress?.getAttribute('value')).toBe('2');
 
 		root.unmount();
 	});

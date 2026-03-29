@@ -51,7 +51,6 @@ import { duplicateLocation } from '../../lib/locations/duplicateLocation';
 import { fetchAllLocations } from '../../lib/locations/fetchAllLocations';
 import {
 	COMMON_CSV_HEADERS,
-	countMappedCsvGeocodeRequests,
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
 	createEmptyCsvOpeningHoursImportMapping,
@@ -180,10 +179,9 @@ export function useLocationsController(
 	const [isImporting, setIsImporting] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
 	const [isCustomCsvImportModalOpen, setCustomCsvImportModalOpen] = useState(false);
+	const [isLocationImportProgressModalOpen, setLocationImportProgressModalOpen] = useState(false);
 	const [isDeleteAllLocationsModalOpen, setDeleteAllLocationsModalOpen] = useState(false);
-	const [customCsvImportStep, setCustomCsvImportStep] = useState<
-		'mapping' | 'opening_hours' | 'progress'
-	>(
+	const [customCsvImportStep, setCustomCsvImportStep] = useState<'mapping' | 'opening_hours'>(
 		'mapping'
 	);
 	const [pendingCsvImport, setPendingCsvImport] = useState<ParsedCsvData | null>(null);
@@ -494,6 +492,18 @@ export function useLocationsController(
 		setCsvImportProgressTotal(0);
 	}, []);
 
+	const resetLocationImportProgressState = useCallback((): void => {
+		setLocationImportProgressModalOpen(false);
+		setCsvImportProgressCompleted(0);
+		setCsvImportProgressTotal(0);
+	}, []);
+
+	const openLocationImportProgressModal = useCallback((total: number): void => {
+		setCsvImportProgressCompleted(0);
+		setCsvImportProgressTotal(total);
+		setLocationImportProgressModalOpen(true);
+	}, []);
+
 	const resetDeleteAllLocationsState = useCallback((): void => {
 		setDeleteAllLocationsModalOpen(false);
 	}, []);
@@ -638,6 +648,14 @@ export function useLocationsController(
 
 		resetCustomCsvImportState();
 	}, [isImporting, resetCustomCsvImportState]);
+
+	const closeLocationImportProgressModal = useCallback((): void => {
+		if (isImporting) {
+			return;
+		}
+
+		resetLocationImportProgressState();
+	}, [isImporting, resetLocationImportProgressState]);
 
 	const closeDeleteAllLocationsModal = useCallback((): void => {
 		if (isDeletingAllLocations) {
@@ -2047,6 +2065,7 @@ export function useLocationsController(
 			const parsedData = isExcel ? await parseExcelFile(file) : await parseCsvFile(file);
 
 			if (isCommonCsvFormat(parsedData)) {
+				openLocationImportProgressModal(parsedData.rows.length);
 				setIsImporting(true);
 
 				try {
@@ -2054,6 +2073,10 @@ export function useLocationsController(
 						logos,
 						markers,
 						tags,
+						onProgress: (completed, total) => {
+							setCsvImportProgressCompleted(completed);
+							setCsvImportProgressTotal(total);
+						},
 					});
 
 					await loadLocations();
@@ -2070,6 +2093,7 @@ export function useLocationsController(
 						),
 					});
 				} finally {
+					resetLocationImportProgressState();
 					setIsImporting(false);
 				}
 
@@ -2086,7 +2110,17 @@ export function useLocationsController(
 				message: error instanceof Error ? error.message : __('Failed to import locations.', 'minimal-map'),
 			});
 		}
-	}, [collectionsConfig, config, loadLocations, resetCustomCsvImportState]);
+	}, [
+		collectionsConfig,
+		config,
+		loadLocations,
+		logos,
+		markers,
+		openLocationImportProgressModal,
+		resetCustomCsvImportState,
+		resetLocationImportProgressState,
+		tags,
+	]);
 
 	const onStartCustomCsvImport = useCallback(async (): Promise<void> => {
 		if (!pendingCsvImport) {
@@ -2099,12 +2133,10 @@ export function useLocationsController(
 			markerId: csvImportMarkerId === '' ? 0 : Number(csvImportMarkerId),
 			tagIds: csvImportTagIds,
 		};
-		const totalGeocodeRequests = countMappedCsvGeocodeRequests(pendingCsvImport, csvImportMapping);
 
 		setActionNotice(null);
-		setCustomCsvImportStep('progress');
-		setCsvImportProgressCompleted(0);
-		setCsvImportProgressTotal(totalGeocodeRequests);
+		setCustomCsvImportModalOpen(false);
+		openLocationImportProgressModal(pendingCsvImport.rows.length);
 		setIsImporting(true);
 
 		try {
@@ -2116,7 +2148,7 @@ export function useLocationsController(
 				config,
 				collectionsConfig,
 				{
-					onGeocodeProgress: (completed, total) => {
+					onProgress: (completed, total) => {
 						setCsvImportProgressCompleted(completed);
 						setCsvImportProgressTotal(total);
 					},
@@ -2137,8 +2169,10 @@ export function useLocationsController(
 				),
 			});
 			resetCustomCsvImportState();
+			resetLocationImportProgressState();
 		} catch (error) {
 			resetCustomCsvImportState();
+			resetLocationImportProgressState();
 			setActionNotice({
 				status: 'error',
 				message:
@@ -2158,8 +2192,10 @@ export function useLocationsController(
 		csvImportMarkerId,
 		csvImportTagIds,
 		loadLocations,
+		openLocationImportProgressModal,
 		pendingCsvImport,
 		resetCustomCsvImportState,
+		resetLocationImportProgressState,
 	]);
 
 	const csvImportColumnOptions = useMemo(
@@ -2373,6 +2409,7 @@ export function useLocationsController(
 		isDialogOpen,
 		isMarkerColorModalOpen,
 		isCustomCsvImportModalOpen,
+		isLocationImportProgressModalOpen,
 		isGeocoding,
 		isLoading,
 		isRemoveCollectionAssignmentModalOpen,
@@ -2405,6 +2442,7 @@ export function useLocationsController(
 		onBackCustomCsvImportStep,
 		onCloseAssignToCollectionModal: closeAssignToCollectionModal,
 		onCloseCustomCsvImportModal: closeCustomCsvImportModal,
+		onCloseLocationImportProgressModal: closeLocationImportProgressModal,
 		onCloseDeleteAllLocationsModal: closeDeleteAllLocationsModal,
 		onCloseAssignLogoModal: closeAssignLogoModal,
 		onCloseAssignMarkerModal: closeAssignMarkerModal,

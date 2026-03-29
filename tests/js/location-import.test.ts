@@ -237,7 +237,7 @@ describe('location import helpers', () => {
 				sleep: async (ms) => {
 					sleepCalls.push(ms);
 				},
-				onGeocodeProgress: (completed, total) => {
+				onProgress: (completed, total) => {
 					progressUpdates.push([completed, total]);
 				},
 			}
@@ -252,9 +252,10 @@ describe('location import helpers', () => {
 		expect(geocodeTitles).toEqual(['Berlin Office', 'Broken Geocode']);
 		expect(sleepCalls).toEqual([1000]);
 		expect(progressUpdates).toEqual([
-			[0, 2],
-			[1, 2],
-			[2, 2],
+			[0, 3],
+			[1, 3],
+			[2, 3],
+			[3, 3],
 		]);
 		expect(createdForms[0].latitude).toBe('52.517');
 		expect(createdForms[0].longitude).toBe('13.388');
@@ -332,7 +333,7 @@ describe('location import helpers', () => {
 			[]
 		);
 
-		expect(csv).toContain('"hidden"');
+		expect(csv).toContain(',hidden,');
 		expect(csv).toContain('"false"');
 		expect(csv).toContain('"true"');
 	});
@@ -346,6 +347,7 @@ describe('location import helpers', () => {
 		);
 		const createdForms: LocationFormState[] = [];
 		const collectionAssignments: number[][] = [];
+		const progressUpdates: Array<[number, number]> = [];
 
 		const result = await runCommonCsvImport(parsed, LOCATIONS_CONFIG, COLLECTIONS_CONFIG, {
 			createLocationFn: async (_config, form) => {
@@ -355,6 +357,9 @@ describe('location import helpers', () => {
 			createCollectionFn: async (_config, _title, locationIds) => {
 				collectionAssignments.push(locationIds);
 			},
+			onProgress: (completed, total) => {
+				progressUpdates.push([completed, total]);
+			},
 		});
 
 		expect(result.importedCount).toBe(1);
@@ -363,5 +368,9 @@ describe('location import helpers', () => {
 		expect(createdForms[0].longitude).toBe('13.3777');
 		expect(createdForms[0].is_hidden).toBe(true);
 		expect(collectionAssignments).toEqual([[77]]);
+		expect(progressUpdates).toEqual([
+			[0, 1],
+			[1, 1],
+		]);
 	});
 });

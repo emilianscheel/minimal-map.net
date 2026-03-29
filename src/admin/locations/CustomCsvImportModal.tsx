@@ -67,7 +67,7 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 			<div
 				className="minimal-map-admin__location-dialog minimal-map-admin__custom-csv-import-dialog"
 				onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-					if (controller.csvImportStep === 'progress' || controller.isImporting) {
+					if (controller.isImporting) {
 						return;
 					}
 
@@ -95,19 +95,7 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 					void controller.onStartCustomCsvImport();
 				}}
 			>
-				{controller.csvImportStep === 'progress' ? (
-					<div className="minimal-map-admin__custom-csv-import-progress">
-						<progress
-							className="minimal-map-admin__custom-csv-import-progress-bar"
-							max={Math.max(controller.csvImportProgressTotal, 1)}
-							value={
-								controller.csvImportProgressTotal === 0
-									? 1
-									: controller.csvImportProgressCompleted
-							}
-						/>
-					</div>
-				) : controller.csvImportStep === 'mapping' ? (
+				{controller.csvImportStep === 'mapping' ? (
 					<>
 						<CustomCsvImportMappingGrid
 							rows={baseMappingRows}
