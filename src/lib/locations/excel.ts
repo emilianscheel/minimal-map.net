@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
 import { __ } from '@wordpress/i18n';
 import { triggerFileDownload } from '../download';
-import type { ParsedCsvData } from './importLocations';
+import type { ParsedLocationImportData } from './importLocations';
 
 /**
  * Convert a 2D array of data into an Excel file (XLSX) and trigger a download.
@@ -24,12 +24,12 @@ export function exportToExcel(headers: string[], rows: (string | number)[][], fi
 }
 
 /**
- * Parse an Excel file and return data in a format compatible with our CSV importer.
+ * Parse an Excel file and return data in a normalized table format.
  *
  * @param file The Excel file to parse.
- * @returns Parsed data in a format compatible with ParsedCsvData.
+ * @returns Parsed data in a format compatible with location imports.
  */
-export async function parseExcelFile(file: File): Promise<ParsedCsvData> {
+export async function parseExcelFile(file: File): Promise<ParsedLocationImportData> {
 	const data = await file.arrayBuffer();
 	const workbook = XLSX.read(data, { type: 'array' });
 	const firstSheetName = workbook.SheetNames[0];
@@ -49,7 +49,6 @@ export async function parseExcelFile(file: File): Promise<ParsedCsvData> {
 	);
 
 	return {
-		delimiter: ',', // Not used for Excel but required for ParsedCsvData type
 		headers,
 		normalizedHeaders,
 		rows: dataRows,

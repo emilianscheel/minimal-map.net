@@ -190,8 +190,10 @@ export interface LocationsController {
 	onStartCustomCsvImport: () => Promise<void>;
 	onExportLocations: () => void;
 	onExportExcel: () => void;
+	onExportJson: () => void;
 	onExportExample: () => void;
 	onExportExampleExcel: () => void;
+	onExportExampleJson: () => void;
 	onAddLocation: () => void;
 	paginatedLocations: AdminLocationListItem[];
 	totalPages: number;

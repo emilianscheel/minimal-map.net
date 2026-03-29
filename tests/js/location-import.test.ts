@@ -7,15 +7,19 @@ import type {
 import {
 	analyzeCsvOpeningHoursColumn,
 	buildMappedLocationForm,
+	buildLocationExportJson,
 	countMappedCsvGeocodeRequests,
+	createExampleLocationExportData,
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
 	createEmptyCsvOpeningHoursImportMapping,
 	detectCsvDelimiter,
 	exportLocations,
 	getValidCsvOpeningHoursColumnIndexes,
+	importLocations,
 	isCommonCsvFormat,
 	parseCsvText,
+	parseJsonText,
 	parseCsvOpeningHoursValue,
 	runCommonCsvImport,
 	runMappedCsvImport,
@@ -51,6 +55,28 @@ describe('location import helpers', () => {
 		expect(parsed.delimiter).toBe(';');
 		expect(parsed.headers).toEqual(['title', 'city']);
 		expect(parsed.rows).toEqual([['Brandenburg Gate', 'Berlin']]);
+	});
+
+	test('parses JSON object arrays into the shared import table shape', () => {
+		const parsed = parseJsonText(
+			JSON.stringify([
+				{ title: 'Brandenburg Gate', city: 'Berlin', meta: { featured: true } },
+				{ city: 'Paris', country: 'France' },
+			])
+		);
+
+		expect(parsed.headers).toEqual(['title', 'city', 'meta', 'country']);
+		expect(parsed.normalizedHeaders).toEqual(['title', 'city', 'meta', 'country']);
+		expect(parsed.rows).toEqual([
+			['Brandenburg Gate', 'Berlin', '{"featured":true}', ''],
+			['', 'Paris', '', 'France'],
+		]);
+	});
+
+	test('rejects invalid JSON import roots', () => {
+		expect(() => parseJsonText('{}')).toThrow('JSON file must contain a non-empty array of objects.');
+		expect(() => parseJsonText('[1]')).toThrow('JSON file must contain only objects.');
+		expect(() => parseJsonText('[{}]')).toThrow('JSON file is empty or missing fields.');
 	});
 
 	test('recognizes only the exact built-in common CSV header set', () => {
@@ -374,6 +400,95 @@ describe('location import helpers', () => {
 		]);
 	});
 
+	test('runs common imports for JSON records and deserializes opening hours JSON', async () => {
+		const parsed = parseJsonText(
+			JSON.stringify([
+				{
+					title: 'Brandenburg Gate',
+					street: 'Pariser Platz',
+					house_number: '',
+					postal_code: '10117',
+					city: 'Berlin',
+					state: 'Berlin',
+					country: 'Germany',
+					latitude: '52.5162',
+					longitude: '13.3777',
+					opening_hours: {
+						monday: {
+							open: '09:00',
+							close: '18:00',
+							lunch_start: '12:00',
+							lunch_duration_minutes: 60,
+						},
+					},
+				},
+			])
+		);
+		const createdForms: LocationFormState[] = [];
+
+		const result = await runCommonCsvImport(parsed, LOCATIONS_CONFIG, COLLECTIONS_CONFIG, {
+			createLocationFn: async (_config, form) => {
+				createdForms.push({ ...form });
+				return { id: 91 };
+			},
+			createCollectionFn: async () => {},
+		});
+
+		expect(result.importedCount).toBe(1);
+		expect(createdForms[0].opening_hours.monday.open).toBe('09:00');
+		expect(createdForms[0].opening_hours.monday.close).toBe('18:00');
+		expect(createdForms[0].opening_hours.monday.lunch_start).toBe('12:00');
+		expect(createdForms[0].opening_hours.monday.lunch_duration_minutes).toBe(60);
+	});
+
+	test('runs mapped imports with JSON-derived custom headers', async () => {
+		const parsed = parseJsonText(
+			JSON.stringify([
+				{
+					name: 'Berlin Office',
+					street_name: 'Unter den Linden',
+					house_no: '1',
+					zip_code: '10117',
+					town: 'Berlin',
+					country_name: 'Germany',
+				},
+			])
+		);
+		const mapping = createEmptyCsvImportMapping();
+		mapping.title = 0;
+		mapping.street = 1;
+		mapping.house_number = 2;
+		mapping.postal_code = 3;
+		mapping.city = 4;
+		mapping.country = 5;
+		const createdForms: LocationFormState[] = [];
+
+		const result = await runMappedCsvImport(
+			parsed,
+			mapping,
+			createEmptyCsvOpeningHoursImportMapping(),
+			createEmptyCsvImportAssignments(),
+			LOCATIONS_CONFIG,
+			COLLECTIONS_CONFIG,
+			{
+				createLocationFn: async (_config, form) => {
+					createdForms.push({ ...form });
+					return { id: 101 };
+				},
+				createCollectionFn: async () => {},
+				geocodeAddressFn: async () => {
+					throw new Error('skip');
+				},
+				sleep: async () => {},
+			}
+		);
+
+		expect(result.importedCount).toBe(1);
+		expect(createdForms[0].title).toBe('Berlin Office');
+		expect(createdForms[0].street).toBe('Unter den Linden');
+		expect(createdForms[0].city).toBe('Berlin');
+	});
+
 	test('runs common imports with filename-based logo and marker values plus named tags', async () => {
 		const parsed = parseCsvText(
 			[
@@ -408,5 +523,67 @@ describe('location import helpers', () => {
 		expect(createdForms[1].logo_id).toBe(11);
 		expect(createdForms[1].marker_id).toBe(22);
 		expect(createdForms[1].tag_ids).toEqual([31, 32]);
+	});
+
+	test('imports common-schema JSON files through the shared importLocations helper', async () => {
+		const file = new File(
+			[
+				JSON.stringify([
+					{
+						title: 'Store One',
+						street: 'Main Street',
+						house_number: '1',
+						postal_code: '10115',
+						city: 'Berlin',
+						country: 'Germany',
+						latitude: '52.5',
+						longitude: '13.4',
+					},
+				]),
+			],
+			'locations.json',
+			{ type: 'application/json' }
+		);
+		const createdForms: LocationFormState[] = [];
+		const collectionAssignments: number[][] = [];
+
+		const importedCount = await importLocations(file, LOCATIONS_CONFIG, COLLECTIONS_CONFIG, {
+			createLocationFn: async (_config, form) => {
+				createdForms.push({ ...form });
+				return { id: 301 };
+			},
+			createCollectionFn: async (_config, _title, locationIds) => {
+				collectionAssignments.push(locationIds);
+			},
+		});
+
+		expect(importedCount).toBe(1);
+		expect(createdForms[0].title).toBe('Store One');
+		expect(collectionAssignments).toEqual([[301]]);
+	});
+
+	test('builds JSON export records from the shared dynamic export data shape', () => {
+		const json = buildLocationExportJson({
+			headers: ['title', 'city', 'tags'],
+			rows: [['Brandenburg Gate', 'Berlin', 'landmark|historical']],
+		});
+
+		expect(JSON.parse(json)).toEqual([
+			{
+				title: 'Brandenburg Gate',
+				city: 'Berlin',
+				tags: 'landmark|historical',
+			},
+		]);
+	});
+
+	test('builds example export data that can be serialized as JSON', () => {
+		const json = buildLocationExportJson(createExampleLocationExportData());
+		const records = JSON.parse(json) as Array<Record<string, string>>;
+
+		expect(records).toHaveLength(2);
+		expect(records[0]?.title).toBe('Brandenburg Gate');
+		expect(records[1]?.title).toBe('Eiffel Tower');
+		expect(Object.keys(records[0] ?? {})).toEqual(createExampleLocationExportData().headers);
 	});
 });

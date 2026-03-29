@@ -16,7 +16,7 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 		return null;
 	}
 
-	const modalTitle = __('Import custom CSV', 'minimal-map');
+	const modalTitle = __('Import custom data', 'minimal-map');
 	const allColumnOptions = controller.csvImportColumnOptions;
 	const logoOptions = [
 		{ label: __('None', 'minimal-map'), value: '' },

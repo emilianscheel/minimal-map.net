@@ -317,6 +317,7 @@ export interface AdminCommandSection {
 export type AdminCommandActionKey =
 	| 'export-locations-csv'
 	| 'export-locations-excel'
+	| 'export-locations-json'
 	| 'export-analytics-search-csv'
 	| 'export-analytics-selection-csv'
 	| 'export-analytics-action-csv';

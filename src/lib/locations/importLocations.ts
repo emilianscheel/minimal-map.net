@@ -76,6 +76,12 @@ export interface LocationExportData {
 	rows: (string | number)[][];
 }
 
+export interface ParsedLocationImportData {
+	headers: string[];
+	normalizedHeaders: string[];
+	rows: string[][];
+}
+
 export function prepareExportData(
 	locations: any[],
 	logos: any[],
@@ -205,13 +211,7 @@ export function prepareExportData(
 	return { headers, rows: dataRows };
 }
 
-export function exportLocations(
-	locations: any[],
-	logos: any[],
-	markers: any[],
-	tags: any[]
-): string {
-	const { headers, rows } = prepareExportData(locations, logos, markers, tags);
+export function buildLocationExportCsv({ headers, rows }: LocationExportData): string {
 	const csvRows = [headers.join(',')];
 
 	for (const row of rows) {
@@ -220,6 +220,68 @@ export function exportLocations(
 	}
 
 	return csvRows.join('\n');
+}
+
+export function buildLocationExportJson({ headers, rows }: LocationExportData): string {
+	return JSON.stringify(
+		rows.map((row) => {
+			const record: Record<string, string | number> = {};
+
+			headers.forEach((header, index) => {
+				record[header] = row[index] ?? '';
+			});
+
+			return record;
+		}),
+		null,
+		2
+	);
+}
+
+export function createExampleLocationExportData(): LocationExportData {
+	return {
+		headers: [...COMMON_CSV_HEADERS],
+		rows: [
+			[
+				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '',
+				'', '', '', '', '', '', '#3FB1CE',
+				'52.5162', '13.3777',
+				'false',
+				'', '', 'Seasonal opening: March-October 9am-6pm',
+				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00',
+				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '10:00-16:00', '', '', '',
+				'', '', 'landmark|historical'
+			],
+			[
+				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '',
+				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '', '#3FB1CE',
+				'48.8584', '2.2945',
+				'true',
+				'', '', '',
+				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
+				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
+				'', '', 'popular'
+			],
+		],
+	};
+}
+
+export function exportLocations(
+	locations: any[],
+	logos: any[],
+	markers: any[],
+	tags: any[]
+): string {
+	return buildLocationExportCsv(prepareExportData(locations, logos, markers, tags));
+}
+
+export function exportLocationsJson(
+	locations: any[],
+	logos: any[],
+	markers: any[],
+	tags: any[]
+): string {
+	return buildLocationExportJson(prepareExportData(locations, logos, markers, tags));
 }
 
 export const CUSTOM_CSV_MAPPING_FIELDS = [
@@ -252,12 +314,9 @@ export interface CsvImportAssignments {
 	tagIds: number[];
 }
 
-export interface ParsedCsvData {
+export type ParsedCsvData = ParsedLocationImportData & {
 	delimiter: CsvDelimiter;
-	headers: string[];
-	normalizedHeaders: string[];
-	rows: string[][];
-}
+};
 
 export interface ImportBatchResult {
 	importedCount: number;
@@ -282,6 +341,19 @@ function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => {
 		globalThis.setTimeout(resolve, ms);
 	});
+}
+
+function createParsedLocationImportData(
+	headers: string[],
+	rows: string[][]
+): ParsedLocationImportData {
+	const normalizedHeaders = headers.map(normalizeHeader);
+
+	return {
+		headers,
+		normalizedHeaders,
+		rows,
+	};
 }
 
 function normalizeHeader(header: string): string {
@@ -395,19 +467,102 @@ export function parseCsvText(text: string): ParsedCsvData {
 	}
 
 	const headers = parsedRows[0].map((header) => header.replace(/^\uFEFF/, '').trim());
-	const normalizedHeaders = headers.map(normalizeHeader);
 	const rows = parsedRows.slice(1);
 
 	return {
 		delimiter,
-		headers,
-		normalizedHeaders,
-		rows,
+		...createParsedLocationImportData(headers, rows),
 	};
 }
 
 export async function parseCsvFile(file: File): Promise<ParsedCsvData> {
 	return parseCsvText(await file.text());
+}
+
+function stringifyJsonImportValue(value: unknown): string {
+	if (value === null || value === undefined) {
+		return '';
+	}
+
+	if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+		return JSON.stringify(value);
+	}
+
+	return sanitizeCellValue(String(value));
+}
+
+export function parseJsonText(text: string): ParsedLocationImportData {
+	let parsedJson: unknown;
+
+	try {
+		parsedJson = JSON.parse(text);
+	} catch {
+		throw new Error(__('JSON file is invalid.', 'minimal-map'));
+	}
+
+	if (!Array.isArray(parsedJson) || parsedJson.length === 0) {
+		throw new Error(__('JSON file must contain a non-empty array of objects.', 'minimal-map'));
+	}
+
+	const headers: string[] = [];
+
+	for (const entry of parsedJson) {
+		if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+			throw new Error(__('JSON file must contain only objects.', 'minimal-map'));
+		}
+
+		Object.keys(entry).forEach((key) => {
+			if (!headers.includes(key)) {
+				headers.push(key);
+			}
+		});
+	}
+
+	if (headers.length === 0) {
+		throw new Error(__('JSON file is empty or missing fields.', 'minimal-map'));
+	}
+
+	const rows = parsedJson.map((entry) => {
+		const record = entry as Record<string, unknown>;
+
+		return headers.map((header) => stringifyJsonImportValue(record[header]));
+	});
+
+	return createParsedLocationImportData(headers, rows);
+}
+
+export async function parseJsonFile(file: File): Promise<ParsedLocationImportData> {
+	return parseJsonText(await file.text());
+}
+
+export type LocationImportFileFormat = 'csv' | 'xlsx' | 'json';
+
+export function detectLocationImportFileFormat(fileName: string): LocationImportFileFormat {
+	const normalizedFileName = fileName.trim().toLowerCase();
+
+	if (normalizedFileName.endsWith('.json')) {
+		return 'json';
+	}
+
+	if (normalizedFileName.endsWith('.xlsx') || normalizedFileName.endsWith('.xls')) {
+		return 'xlsx';
+	}
+
+	return 'csv';
+}
+
+export async function parseLocationImportFile(file: File): Promise<ParsedLocationImportData> {
+	switch (detectLocationImportFileFormat(file.name)) {
+		case 'json':
+			return parseJsonFile(file);
+		case 'xlsx': {
+			const { parseExcelFile } = await import('./excel');
+			return parseExcelFile(file);
+		}
+		case 'csv':
+		default:
+			return parseCsvFile(file);
+	}
 }
 
 export {
@@ -735,7 +890,7 @@ async function maybeCreateImportCollection(
 }
 
 export async function runCommonCsvImport(
-	parsedCsv: ParsedCsvData,
+	parsedCsv: ParsedLocationImportData,
 	locationsConfig: LocationsAdminConfig,
 	collectionsConfig: CollectionsAdminConfig,
 	dependencies: ImportDependencies = {}
@@ -783,7 +938,7 @@ export async function runCommonCsvImport(
 }
 
 export async function runMappedCsvImport(
-	parsedCsv: ParsedCsvData,
+	parsedCsv: ParsedLocationImportData,
 	mapping: CsvImportMapping,
 	openingHoursMapping: CsvOpeningHoursImportMapping,
 	assignments: CsvImportAssignments,
@@ -851,13 +1006,9 @@ export async function importLocations(
 	file: File,
 	locationsConfig: LocationsAdminConfig,
 	collectionsConfig: CollectionsAdminConfig,
-	dependencies: {
-		logos?: any[];
-		markers?: any[];
-		tags?: any[];
-	} = {}
+	dependencies: ImportDependencies = {}
 ): Promise<number> {
-	const parsedCsv = await parseCsvFile(file);
+	const parsedCsv = await parseLocationImportFile(file);
 	const result = await runCommonCsvImport(parsedCsv, locationsConfig, collectionsConfig, dependencies);
 
 	return result.importedCount;

@@ -6,12 +6,15 @@ import { fetchAllLogos } from '../logos/fetchAllLogos';
 import { fetchAllMarkers } from '../markers/fetchAllMarkers';
 import { fetchAllTags } from '../tags/fetchAllTags';
 import { configureApiFetch } from './configureApiFetch';
-import { exportToExcel } from './excel';
 import { fetchAllLocations } from './fetchAllLocations';
-import { exportLocations, prepareExportData } from './importLocations';
+import {
+	buildLocationExportJson,
+	exportLocations,
+	prepareExportData,
+} from './importLocations';
 
 export async function exportLocationsFile(
-	format: 'csv' | 'xlsx',
+	format: 'csv' | 'xlsx' | 'json',
 	config: LocationsExportActionConfig
 ): Promise<void> {
 	configureApiFetch(config.nonce);
@@ -36,6 +39,16 @@ export async function exportLocationsFile(
 	}
 
 	const { headers, rows } = prepareExportData(allLocations, allLogos, allMarkers, allTags);
+
+	if (format === 'json') {
+		const jsonContent = buildLocationExportJson({ headers, rows });
+		const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		triggerFileDownload(url, buildTimestampedFileName('minimal-map-locations', 'json'));
+		return;
+	}
+
+	const { exportToExcel } = await import('./excel');
 	exportToExcel(headers, rows, 'minimal-map-locations.xlsx');
 }
 

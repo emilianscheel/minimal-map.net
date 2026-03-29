@@ -9,7 +9,7 @@ import { KeyboardShortcut, getShortcutAriaKeys } from '../../components/Kbd';
 import type {
 	CsvImportAssignments,
 	CsvImportMapping,
-	ParsedCsvData,
+	ParsedLocationImportData,
 } from '../../lib/locations/importLocations';
 import type {
 	AdminLocationListItem,
@@ -50,18 +50,19 @@ import { deleteLocation } from '../../lib/locations/deleteLocation';
 import { duplicateLocation } from '../../lib/locations/duplicateLocation';
 import { fetchAllLocations } from '../../lib/locations/fetchAllLocations';
 import {
-	COMMON_CSV_HEADERS,
+	buildLocationExportCsv,
+	buildLocationExportJson,
+	createExampleLocationExportData,
 	createEmptyCsvImportAssignments,
 	createEmptyCsvImportMapping,
 	createEmptyCsvOpeningHoursImportMapping,
 	getValidCsvOpeningHoursColumnIndexes,
 	isCommonCsvFormat,
-	parseCsvFile,
+	parseLocationImportFile,
 	runCommonCsvImport,
 	runMappedCsvImport,
 	type CsvOpeningHoursImportMapping,
 } from '../../lib/locations/importLocations';
-import { exportToExcel, parseExcelFile } from '../../lib/locations/excel';
 import {
 	exportLocationsFile,
 	getLocationsExportErrorMessage,
@@ -184,7 +185,7 @@ export function useLocationsController(
 	const [customCsvImportStep, setCustomCsvImportStep] = useState<'mapping' | 'opening_hours'>(
 		'mapping'
 	);
-	const [pendingCsvImport, setPendingCsvImport] = useState<ParsedCsvData | null>(null);
+	const [pendingCsvImport, setPendingCsvImport] = useState<ParsedLocationImportData | null>(null);
 	const [csvImportMapping, setCsvImportMapping] = useState<CsvImportMapping>(
 		createEmptyCsvImportMapping()
 	);
@@ -2061,8 +2062,7 @@ export function useLocationsController(
 		setActionNotice(null);
 
 		try {
-			const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
-			const parsedData = isExcel ? await parseExcelFile(file) : await parseCsvFile(file);
+			const parsedData = await parseLocationImportFile(file);
 			const [logoRecords, markerRecords, tagRecords] = await Promise.all([
 				ensureLogoLookups(),
 				ensureMarkerLookups(),
@@ -2221,7 +2221,7 @@ export function useLocationsController(
 		return buildCsvImportColumnOptions(pendingCsvImport, validColumnIndexes);
 	}, [pendingCsvImport]);
 
-	const exportAllLocations = useCallback(async (format: 'csv' | 'xlsx'): Promise<void> => {
+	const exportAllLocations = useCallback(async (format: 'csv' | 'xlsx' | 'json'): Promise<void> => {
 		if (totalItems === 0) {
 			return;
 		}
@@ -2255,75 +2255,28 @@ export function useLocationsController(
 		void exportAllLocations('xlsx');
 	}, [exportAllLocations]);
 
+	const onExportJson = useCallback(() => {
+		void exportAllLocations('json');
+	}, [exportAllLocations]);
+
 	const onExportExample = useCallback(() => {
-		const headers = [...COMMON_CSV_HEADERS];
-		// Headers are:
-		// 0: title, 1: street, 2: house_number, 3: postal_code, 4: city, 5: state, 6: country, 7: telephone, 8: email, 9: website,
-		// 10: instagram, 11: x, 12: facebook, 13: threads, 14: youtube, 15: telegram, 16: marker_color,
-		// 17: latitude, 18: longitude, 19: hidden, 20: opening_hours, 21: opening_hours_notes, 22: additional information opening hours,
-		// 23: monday, 24: monday lunch break, 25: tuesday, 26: tuesday lunch break, 27: wednesday, 28: wednesday lunch break,
-		// 29: thursday, 30: thursday lunch break, 31: friday, 32: friday lunch break, 33: saturday, 34: saturday lunch break, 35: sunday, 36: sunday lunch break,
-		// 37: logo, 38: marker, 39: tags
-
-		const exampleData = [
-			// Brandenburg Gate: Full info with lunch breaks and notes
-			[
-				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '',
-				'', '', '', '', '', '', '#3FB1CE',
-				'52.5162', '13.3777',
-				'false',
-				'', '', 'Seasonal opening: March-October 9am-6pm',
-				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00',
-				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '10:00-16:00', '', '', '',
-				'', '', 'landmark|historical'
-			].map(v => `"${v.replace(/"/g, '""')}"`).join(','),
-
-			// Eiffel Tower: Basic info
-			[
-				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '',
-				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '', '#3FB1CE',
-				'48.8584', '2.2945',
-				'true',
-				'', '', '',
-				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
-				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
-				'', '', 'popular'
-			].map(v => `"${v.replace(/"/g, '""')}"`).join(',')
-		];
-
-		const csvContent = [headers.join(','), ...exampleData].join('\n');
+		const csvContent = buildLocationExportCsv(createExampleLocationExportData());
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		triggerFileDownload(url, buildTimestampedFileName('minimal-map-example', 'csv'));
 	}, []);
 
-	const onExportExampleExcel = useCallback(() => {
-		const headers = [...COMMON_CSV_HEADERS];
-		const exampleRows = [
-			// Brandenburg Gate
-			[
-				'Brandenburg Gate', 'Pariser Platz', '', '10117', 'Berlin', 'Berlin', 'Germany', '', '', '',
-				'', '', '', '', '', '', '#3FB1CE',
-				'52.5162', '13.3777',
-				'false',
-				'', '', 'Seasonal opening: March-October 9am-6pm',
-				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00',
-				'09:00-18:00', '12:00-13:00', '09:00-18:00', '12:00-13:00', '10:00-16:00', '', '', '',
-				'', '', 'landmark|historical'
-			],
-			// Eiffel Tower
-			[
-				'Eiffel Tower', 'Champ de Mars', '5 Avenue Anatole France', '75007', 'Paris', '', 'France', '', '', '',
-				'https://www.instagram.com/toureiffelofficielle/', 'https://x.com/toureiffel', '', '', '', '', '#3FB1CE',
-				'48.8584', '2.2945',
-				'true',
-				'', '', '',
-				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
-				'09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '', '09:00-00:45', '',
-				'', '', 'popular'
-			]
-		];
-		exportToExcel(headers, exampleRows, 'minimal-map-example.xlsx');
+	const onExportExampleExcel = useCallback(async () => {
+		const { headers, rows } = createExampleLocationExportData();
+		const { exportToExcel } = await import('../../lib/locations/excel');
+		exportToExcel(headers, rows, 'minimal-map-example.xlsx');
+	}, []);
+
+	const onExportExampleJson = useCallback(() => {
+		const jsonContent = buildLocationExportJson(createExampleLocationExportData());
+		const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		triggerFileDownload(url, buildTimestampedFileName('minimal-map-example', 'json'));
 	}, []);
 
 	return {
@@ -2381,8 +2334,10 @@ export function useLocationsController(
 					<ExportLocationsDropdown
 						onExport={onExportLocations}
 						onExportExcel={onExportExcel}
+						onExportJson={onExportJson}
 						onExportExample={onExportExample}
 						onExportExampleExcel={onExportExampleExcel}
+						onExportExampleJson={onExportExampleJson}
 					/>
 				</div>
 				<Button
@@ -2501,8 +2456,10 @@ export function useLocationsController(
 		onStartCustomCsvImport,
 		onExportLocations,
 		onExportExcel,
+		onExportJson,
 		onExportExample,
 		onExportExampleExcel,
+		onExportExampleJson,
 		onSetLocationVisibility,
 		onMapLocationSelect,
 		onClearLogosFromLocations,

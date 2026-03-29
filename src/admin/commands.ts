@@ -52,6 +52,13 @@ const ACTION_HANDLERS: Record<
 
 		await exportLocationsFile('xlsx', config.locationsExportConfig);
 	},
+	'export-locations-json': async (config) => {
+		if (!config.locationsExportConfig) {
+			return;
+		}
+
+		await exportLocationsFile('json', config.locationsExportConfig);
+	},
 	'export-analytics-search-csv': async (config) => {
 		if (!config.analyticsExportConfig) {
 			return;

@@ -815,6 +815,16 @@ class Config {
 			),
 		);
 		$actions[] = array(
+			'key'      => 'export-locations-json',
+			'label'    => __( 'Minimal Map: Export Locations as JSON', 'minimal-map' ),
+			'keywords' => array(
+				'minimal map',
+				'locations',
+				'export',
+				'json',
+			),
+		);
+		$actions[] = array(
 			'key'      => 'export-analytics-search-csv',
 			'label'    => __( 'Minimal Map: Export Analytics Search Data as CSV', 'minimal-map' ),
 			'keywords' => array(
