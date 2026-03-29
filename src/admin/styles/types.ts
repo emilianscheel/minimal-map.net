@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { StyleThemeRecord, StyleThemeColors } from '../../types';
+import { StyleThemeRecord, StyleThemeColors, StylePaletteTemplate } from '../../types';
 
 export interface StylesNotice {
 	status: 'success' | 'warning' | 'error' | 'info';
@@ -9,14 +9,17 @@ export interface StylesNotice {
 export interface StylesController {
 	themes: StyleThemeRecord[];
 	activeTheme: StyleThemeRecord | null;
+	paletteTemplates: StylePaletteTemplate[];
 	isLoading: boolean;
 	isSaving: boolean;
+	isApplyingPaletteTemplate: boolean;
 	draftColors: StyleThemeColors | null;
 	actionNotice: StylesNotice | null;
 	setDraftColor: (slot: string, color: string) => void;
 	saveTheme: () => Promise<void>;
 	createTheme: (label: string) => Promise<void>;
 	deleteTheme: (slug: string) => Promise<void>;
+	applyPaletteTemplate: (templateId: string) => Promise<void>;
 	switchTheme: (slug: string) => void;
 	onImportFiles: (files: FileList) => Promise<void>;
 	exportTheme: () => void;

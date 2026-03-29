@@ -52,6 +52,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		nonce: '',
 		restBase: '',
 		restPath: '',
+		paletteTemplates: [],
 	},
 	analyticsConfig: {
 		nonce: '',

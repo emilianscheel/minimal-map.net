@@ -4,26 +4,48 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { KeyboardShortcut, getShortcutAriaKeys } from '../../components/Kbd';
 import { useSingleKeyShortcut } from '../../lib/keyboard/useSingleKeyShortcut';
-import type { StylesAdminConfig, StyleThemeRecord, StyleThemeColors } from '../../types';
+import type {
+	StylesAdminConfig,
+	StyleThemeRecord,
+	StyleThemeColors,
+	StylePaletteEntry,
+} from '../../types';
 import type { StylesController } from './types';
 import { ThemeSelector } from './ThemeSelector';
 import { CreateThemeButton } from './CreateThemeButton';
 import { DeleteThemeButton } from './DeleteThemeButton';
 import { ExportThemeButton } from './ExportThemeButton';
 import { ImportThemeButton } from './ImportThemeButton';
+import { ApplyPaletteTemplateDropdown } from './ApplyPaletteTemplateDropdown';
 import { parseThemeImport } from '../../lib/styles/importStyleTheme';
 import { DEFAULT_POSITRON_THEME_COLORS } from '../../lib/styles/defaultThemeColors';
 import { SLOT_LABELS } from './constants';
 import { triggerFileDownload } from '../../lib/download';
+import { deriveThemeFromPalette } from '../../lib/styles/deriveThemeFromPalette';
+
+interface StylesControllerDependencies {
+	apiFetch: typeof apiFetch;
+	deriveThemeFromPalette: (
+		palette: StylePaletteEntry[],
+		defaultColors?: StyleThemeColors
+	) => StyleThemeColors;
+}
+
+const DEFAULT_CONTROLLER_DEPENDENCIES: StylesControllerDependencies = {
+	apiFetch,
+	deriveThemeFromPalette,
+};
 
 export function useStylesController(
 	config: StylesAdminConfig,
-	active = false
+	active = false,
+	dependencies: StylesControllerDependencies = DEFAULT_CONTROLLER_DEPENDENCIES
 ): StylesController {
 	const [ themes, setThemes ] = useState<StyleThemeRecord[]>([]);
 	const [ activeThemeSlug, setActiveThemeSlug ] = useState<string>('default');
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ isSaving, setIsSaving ] = useState(false);
+	const [ isApplyingPaletteTemplate, setIsApplyingPaletteTemplate ] = useState(false);
 	const [ draftColors, setDraftColors ] = useState<StyleThemeColors | null>(null);
 	const [ actionNotice, setActionNotice ] = useState<StylesController['actionNotice']>(null);
 
@@ -34,6 +56,7 @@ export function useStylesController(
 	const activeTheme = useMemo(() => {
 		return themes.find((t) => t.slug === activeThemeSlug) || themes[0] || null;
 	}, [ themes, activeThemeSlug ]);
+	const paletteTemplates = config.paletteTemplates ?? [];
 
 	const hasChanges = useMemo(
 		() => Boolean(
@@ -47,7 +70,7 @@ export function useStylesController(
 	const fetchThemes = useCallback(async () => {
 		setIsLoading(true);
 		try {
-			const data = await apiFetch<StyleThemeRecord[]>({
+			const data = await dependencies.apiFetch<StyleThemeRecord[]>({
 				path: config.restPath,
 			});
 			setThemes(data);
@@ -61,7 +84,7 @@ export function useStylesController(
 		} finally {
 			setIsLoading(false);
 		}
-	}, [ config.restPath, activeThemeSlug ]);
+	}, [ config.restPath, activeThemeSlug, dependencies ]);
 
 	useEffect(() => {
 		if (active) {
@@ -89,7 +112,7 @@ export function useStylesController(
 
 		setIsSaving(true);
 		try {
-			const updatedTheme = await apiFetch<StyleThemeRecord>({
+			const updatedTheme = await dependencies.apiFetch<StyleThemeRecord>({
 				path: `${ config.restPath }/${ activeTheme.slug }`,
 				method: 'PUT',
 				data: { colors: draftColors },
@@ -104,13 +127,13 @@ export function useStylesController(
 		} finally {
 			setIsSaving(false);
 		}
-	}, [ activeTheme, config.restPath, draftColors ]);
+	}, [ activeTheme, config.restPath, dependencies, draftColors ]);
 
 	const createTheme = useCallback(async (label: string) => {
 		setIsLoading(true);
 		try {
 			setActionNotice(null);
-			const newTheme = await apiFetch<StyleThemeRecord>({
+			const newTheme = await dependencies.apiFetch<StyleThemeRecord>({
 				path: config.restPath,
 				method: 'POST',
 				data: { label },
@@ -124,7 +147,7 @@ export function useStylesController(
 		} finally {
 			setIsLoading(false);
 		}
-	}, [ config.restPath ]);
+	}, [ config.restPath, dependencies ]);
 
 	const deleteTheme = useCallback(async (slug: string) => {
 		if (slug === 'default') return;
@@ -149,6 +172,49 @@ export function useStylesController(
 			setIsLoading(false);
 		}
 	}, [ config.restPath, themes ]);
+
+	const applyPaletteTemplate = useCallback(async (templateId: string) => {
+		const template = paletteTemplates.find((item) => item.id === templateId);
+		if (!template) {
+			return;
+		}
+
+		setIsApplyingPaletteTemplate(true);
+		try {
+			setActionNotice(null);
+			const label = getTemplateThemeLabel(themes, __('WordPress Palette', 'minimal-map'));
+			const newTheme = await dependencies.apiFetch<StyleThemeRecord>({
+				path: config.restPath,
+				method: 'POST',
+				data: { label },
+			});
+			const derivedColors = dependencies.deriveThemeFromPalette(
+				template.colors,
+				DEFAULT_POSITRON_THEME_COLORS
+			);
+			const updatedTheme = await dependencies.apiFetch<StyleThemeRecord>({
+				path: `${ config.restPath }/${ newTheme.slug }`,
+				method: 'PUT',
+				data: { colors: derivedColors },
+			});
+
+			setThemes((prev) => [ ...prev, updatedTheme ]);
+			setActiveThemeSlug(updatedTheme.slug);
+			setDraftColors(updatedTheme.colors);
+			setActionNotice({
+				status: 'success',
+				message: __('Created a new theme from the current WordPress palette.', 'minimal-map'),
+			});
+		} catch (error) {
+			console.error('Failed to apply palette template', error);
+			setActionNotice({
+				status: 'error',
+				message: __('Failed to create a theme from the WordPress palette.', 'minimal-map'),
+			});
+		} finally {
+			setIsApplyingPaletteTemplate(false);
+		}
+	}, [ config.restPath, dependencies, paletteTemplates, themes ]);
 
 	const exportTheme = useCallback(() => {
 		if (!activeTheme || !draftColors) return;
@@ -254,6 +320,14 @@ export function useStylesController(
 					<DeleteThemeButton slug={activeThemeSlug} onClick={openDeleteModal} />
 					<ExportThemeButton onExport={exportTheme} />
 					<ImportThemeButton onImport={onImportFiles} />
+					<ApplyPaletteTemplateDropdown
+						templates={paletteTemplates}
+						disabled={paletteTemplates.length === 0 || isApplyingPaletteTemplate || isLoading}
+						isBusy={isApplyingPaletteTemplate}
+						onSelect={(templateId) => {
+							void applyPaletteTemplate(templateId);
+						}}
+					/>
 				</div>
 
 				<ThemeSelector
@@ -266,7 +340,7 @@ export function useStylesController(
 					variant="primary"
 					onClick={saveTheme}
 					isBusy={isSaving}
-					disabled={isSaving || !hasChanges}
+					disabled={isSaving || isApplyingPaletteTemplate || !hasChanges}
 					aria-keyshortcuts={getShortcutAriaKeys(['s'])}
 					__next40pxDefaultSize
 				>
@@ -277,19 +351,37 @@ export function useStylesController(
 				</Button>
 			</div>
 		);
-	}, [ active, activeTheme, activeThemeSlug, themes, draftColors, isSaving, saveTheme, exportTheme, onImportFiles, switchTheme ]);
+	}, [
+		active,
+		activeTheme,
+		activeThemeSlug,
+		themes,
+		draftColors,
+		isSaving,
+		isApplyingPaletteTemplate,
+		paletteTemplates,
+		saveTheme,
+		exportTheme,
+		onImportFiles,
+		applyPaletteTemplate,
+		switchTheme,
+		isLoading,
+	]);
 
 	return {
 		themes,
 		activeTheme,
+		paletteTemplates,
 		isLoading,
 		isSaving,
+		isApplyingPaletteTemplate,
 		draftColors,
 		actionNotice,
 		setDraftColor,
 		saveTheme,
 		createTheme,
 		deleteTheme,
+		applyPaletteTemplate,
 		switchTheme,
 		onImportFiles,
 		exportTheme,
@@ -302,4 +394,19 @@ export function useStylesController(
 		openDeleteModal,
 		closeDeleteModal,
 	};
+}
+
+function getTemplateThemeLabel(themes: StyleThemeRecord[], baseLabel: string): string {
+	const existingLabels = new Set(themes.map((theme) => theme.label.toLowerCase()));
+
+	if (!existingLabels.has(baseLabel.toLowerCase())) {
+		return baseLabel;
+	}
+
+	let suffix = 2;
+	while (existingLabels.has(`${baseLabel} ${suffix}`.toLowerCase())) {
+		suffix += 1;
+	}
+
+	return `${baseLabel} ${suffix}`;
 }

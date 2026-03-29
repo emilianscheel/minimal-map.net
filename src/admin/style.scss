@@ -1968,6 +1968,54 @@ body.toplevel_page_minimal-map .dataviews-config__popover .dataviews-field-contr
     padding-right: 16px;
     border-right: 1px solid #dcdcde;
   }
+
+  &__palette-template-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 280px;
+  }
+
+  &__palette-template-copy {
+    display: grid;
+    gap: 4px;
+  }
+
+  &__palette-template-label {
+    display: block;
+    font-weight: 500;
+    color: #1e1e1e;
+  }
+
+  &__palette-template-source {
+    display: block;
+    font-size: 12px;
+    color: #646970;
+  }
+
+  &__palette-template-swatches {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    flex-shrink: 0;
+  }
+
+  &__palette-template-swatch {
+    display: inline-flex;
+    margin-left: -10px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 2px #fff;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    .components-color-indicator {
+      width: 24px;
+      height: 24px;
+    }
+  }
 }
 
 @media (max-width: 1280px) {

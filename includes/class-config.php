@@ -938,6 +938,7 @@ class Config {
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'restBase' => 'styles',
 				'restPath' => Styles_Route::get_rest_path(),
+				'paletteTemplates' => $this->get_admin_palette_templates(),
 			),
 			'analyticsConfig' => array(
 				'nonce'            => wp_create_nonce( 'wp_rest' ),
@@ -1248,6 +1249,157 @@ class Config {
 		$sanitized = sanitize_hex_color( is_string( $value ) ? $value : '' );
 
 		return $sanitized ? $sanitized : $fallback;
+	}
+
+	/**
+	 * Get palette templates available to the styles admin.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function get_admin_palette_templates() {
+		$templates          = array();
+		$wordpress_template = $this->get_wordpress_palette_template();
+
+		if ( is_array( $wordpress_template ) ) {
+			$templates[] = $wordpress_template;
+		}
+
+		return $templates;
+	}
+
+	/**
+	 * Build a palette template from WordPress global styles.
+	 *
+	 * @return array<string, mixed>|null
+	 */
+	private function get_wordpress_palette_template() {
+		if ( ! function_exists( 'wp_get_global_settings' ) ) {
+			return null;
+		}
+
+		$palette = $this->normalize_palette_entries(
+			wp_get_global_settings( array( 'color', 'palette' ) )
+		);
+
+		if ( count( $palette ) < 3 ) {
+			return null;
+		}
+
+		return array(
+			'id'     => 'wordpress-theme-palette',
+			'label'  => __( 'WordPress Theme Palette', 'minimal-map' ),
+			'source' => __( 'Current WordPress theme palette', 'minimal-map' ),
+			'colors' => $palette,
+		);
+	}
+
+	/**
+	 * Normalize palette entries for the admin config.
+	 *
+	 * @param mixed $palette Raw palette settings.
+	 * @return array<int, array<string, string>>
+	 */
+	private function normalize_palette_entries( $palette ) {
+		$entries          = array();
+		$normalized       = array();
+		$seen_colors      = array();
+		$fallback_counter = 1;
+
+		$this->collect_palette_color_entries( $palette, $entries );
+
+		foreach ( $entries as $entry ) {
+			if ( ! is_array( $entry ) || empty( $entry['color'] ) ) {
+				continue;
+			}
+
+			$color = $this->normalize_hex_color( (string) $entry['color'] );
+			if ( ! $color || isset( $seen_colors[ $color ] ) ) {
+				continue;
+			}
+
+			$name = '';
+			if ( ! empty( $entry['name'] ) && is_scalar( $entry['name'] ) ) {
+				$name = sanitize_text_field( (string) $entry['name'] );
+			}
+
+			$slug = '';
+			if ( ! empty( $entry['slug'] ) && is_scalar( $entry['slug'] ) ) {
+				$slug = sanitize_title( (string) $entry['slug'] );
+			}
+
+			if ( '' === $name ) {
+				$name = sprintf(
+					/* translators: %d: fallback palette color position. */
+					__( 'Color %d', 'minimal-map' ),
+					$fallback_counter
+				);
+			}
+
+			if ( '' === $slug ) {
+				$slug = 'color-' . $fallback_counter;
+			}
+
+			$normalized[]         = array(
+				'name'  => $name,
+				'slug'  => $slug,
+				'color' => $color,
+			);
+			$seen_colors[ $color ] = true;
+			++$fallback_counter;
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Collect color entries from nested palette settings.
+	 *
+	 * @param mixed                            $value Raw palette subtree.
+	 * @param array<int, array<string, mixed>> $entries Collected entries.
+	 * @return void
+	 */
+	private function collect_palette_color_entries( $value, &$entries ) {
+		if ( ! is_array( $value ) ) {
+			return;
+		}
+
+		if ( isset( $value['color'] ) ) {
+			$entries[] = $value;
+			return;
+		}
+
+		foreach ( $value as $nested_value ) {
+			if ( is_array( $nested_value ) ) {
+				$this->collect_palette_color_entries( $nested_value, $entries );
+			}
+		}
+	}
+
+	/**
+	 * Normalize a hex color to lowercase six-digit format.
+	 *
+	 * @param string $value Raw color value.
+	 * @return string|null
+	 */
+	private function normalize_hex_color( $value ) {
+		$sanitized = sanitize_hex_color( $value );
+
+		if ( ! $sanitized ) {
+			return null;
+		}
+
+		$sanitized = strtolower( $sanitized );
+
+		if ( 4 === strlen( $sanitized ) ) {
+			return sprintf(
+				'#%1$s%1$s%2$s%2$s%3$s%3$s',
+				$sanitized[1],
+				$sanitized[2],
+				$sanitized[3]
+			);
+		}
+
+		return $sanitized;
 	}
 
 	/**

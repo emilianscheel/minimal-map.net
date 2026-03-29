@@ -398,6 +398,7 @@ export interface StylesAdminConfig {
 	nonce: string;
 	restBase: string;
 	restPath: string;
+	paletteTemplates: StylePaletteTemplate[];
 }
 
 export interface AnalyticsAdminConfig {
@@ -939,6 +940,19 @@ export type StyleThemeSlot =
 	| 'placeLabelHalo';
 
 export type StyleThemeColors = Record<StyleThemeSlot, string>;
+
+export interface StylePaletteEntry {
+	name: string;
+	slug: string;
+	color: string;
+}
+
+export interface StylePaletteTemplate {
+	id: string;
+	label: string;
+	source: string;
+	colors: StylePaletteEntry[];
+}
 
 export interface StyleThemeRecord {
 	slug: string;

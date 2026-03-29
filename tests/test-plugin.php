@@ -544,6 +544,142 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Admin config should expose the current normalized Gutenberg palette template.
+	 *
+	 * @return void
+	 */
+	public function test_admin_app_config_includes_wordpress_palette_template() {
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => 3,
+					'settings' => array(
+						'color' => array(
+							'palette' => array(
+								array(
+									'name'  => 'Canvas',
+									'slug'  => 'canvas',
+									'color' => '#ABC',
+								),
+								array(
+									'name'  => 'Ink',
+									'slug'  => 'ink',
+									'color' => '#112233',
+								),
+								array(
+									'name'  => 'Accent',
+									'slug'  => 'accent',
+									'color' => '#45a7ef',
+								),
+								array(
+									'name'  => 'Duplicate',
+									'slug'  => 'duplicate',
+									'color' => '#112233',
+								),
+								array(
+									'name'  => 'Invalid',
+									'slug'  => 'invalid',
+									'color' => 'rgb(0, 0, 0)',
+								),
+							),
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_user', $filter );
+		wp_clean_theme_json_cache();
+
+		try {
+			$config       = new \MinimalMap\Config();
+			$admin_config = $config->get_admin_app_config();
+			$templates    = $admin_config['stylesConfig']['paletteTemplates'];
+
+			$this->assertCount( 1, $templates );
+			$this->assertSame( 'wordpress-theme-palette', $templates[0]['id'] );
+			$this->assertSame( 'WordPress Theme Palette', $templates[0]['label'] );
+			$this->assertSame(
+				array(
+					array(
+						'name'  => 'Canvas',
+						'slug'  => 'canvas',
+						'color' => '#aabbcc',
+					),
+					array(
+						'name'  => 'Ink',
+						'slug'  => 'ink',
+						'color' => '#112233',
+					),
+					array(
+						'name'  => 'Accent',
+						'slug'  => 'accent',
+						'color' => '#45a7ef',
+					),
+				),
+				$templates[0]['colors']
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_user', $filter );
+			wp_clean_theme_json_cache();
+		}
+	}
+
+	/**
+	 * Admin config should omit the WordPress palette template when too few colors remain.
+	 *
+	 * @return void
+	 */
+	public function test_admin_app_config_omits_wordpress_palette_template_when_too_small() {
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => 3,
+					'settings' => array(
+						'color' => array(
+							'palette' => array(
+								array(
+									'name'  => 'Canvas',
+									'slug'  => 'canvas',
+									'color' => '#ffffff',
+								),
+								array(
+									'name'  => 'Duplicate Canvas',
+									'slug'  => 'duplicate-canvas',
+									'color' => '#fff',
+								),
+								array(
+									'name'  => 'Broken',
+									'slug'  => 'broken',
+									'color' => 'not-a-color',
+								),
+								array(
+									'name'  => 'Ink',
+									'slug'  => 'ink',
+									'color' => '#000000',
+								),
+							),
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_user', $filter );
+		wp_clean_theme_json_cache();
+
+		try {
+			$config       = new \MinimalMap\Config();
+			$admin_config = $config->get_admin_app_config();
+
+			$this->assertSame( array(), $admin_config['stylesConfig']['paletteTemplates'] );
+		} finally {
+			remove_filter( 'wp_theme_json_data_user', $filter );
+			wp_clean_theme_json_cache();
+		}
+	}
+
+	/**
 	 * Admin locations queries should paginate and search across address fields.
 	 *
 	 * @return void
