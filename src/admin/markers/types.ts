@@ -17,7 +17,7 @@ export interface MarkersController {
 	headerAction: ReactNode;
 	isDeleteAllMarkersModalOpen: boolean;
 	isDeletingAllMarkers: boolean;
-	isEditDialogOpen: boolean;
+	isEditModalOpen: boolean;
 	isLoading: boolean;
 	isRowActionPending: boolean;
 	isSubmitting: boolean;

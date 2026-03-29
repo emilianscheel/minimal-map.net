@@ -1,12 +1,12 @@
 import { FormTokenField, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import type { FieldErrors, LocationDialogStep, LocationFormState, TagRecord } from '../../types';
+import type { FieldErrors, LocationModalStep, LocationFormState, TagRecord } from '../../types';
 
-interface LocationDialogFieldsProps {
+interface LocationModalFieldsProps {
 	fieldErrors: FieldErrors;
 	form: LocationFormState;
 	onChange: (key: keyof LocationFormState, value: any) => void;
-	step: LocationDialogStep;
+	step: LocationModalStep;
 	tags: TagRecord[];
 }
 
@@ -21,13 +21,13 @@ function OptionalLabel({ label }: { label: string }) {
 	);
 }
 
-export default function LocationDialogFields({
+export default function LocationModalFields({
 	fieldErrors,
 	form,
 	onChange,
 	step,
 	tags,
-}: LocationDialogFieldsProps) {
+}: LocationModalFieldsProps) {
 	if (step === 'details') {
 		return (
 			<div className="minimal-map-admin__location-dialog-fields">

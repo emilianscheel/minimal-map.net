@@ -2,31 +2,31 @@ import { Button, Modal, Notice, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
-import type { MarkersController } from './types';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
+import type { LogosController } from './types';
 
-export default function EditMarkerDialog({ controller }: { controller: MarkersController }) {
-	if (!controller.isEditDialogOpen || !controller.editingMarker) {
+export default function EditLogoModal({ controller }: { controller: LogosController }) {
+	if (!controller.isEditModalOpen || !controller.editingLogo) {
 		return null;
 	}
 
 	return (
 		<Modal
 			className="minimal-map-admin__collection-modal"
-			title={__('Edit marker filename', 'minimal-map')}
-			onRequestClose={controller.onCancelEditMarker}
+			title={__('Edit logo filename', 'minimal-map')}
+			onRequestClose={controller.onCancelEditLogo}
 			shouldCloseOnClickOutside={!controller.isSubmitting}
 			shouldCloseOnEsc={!controller.isSubmitting}
 		>
 			<div
 				className="minimal-map-admin__collection-dialog"
 				onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-					if (controller.isSubmitting || !shouldHandleDialogEnter(event)) {
+					if (controller.isSubmitting || !shouldHandleModalEnter(event)) {
 						return;
 					}
 
 					event.preventDefault();
-					void controller.onConfirmEditMarker();
+					void controller.onConfirmEditLogo();
 				}}
 			>
 				{controller.submitError ? (
@@ -58,7 +58,7 @@ export default function EditMarkerDialog({ controller }: { controller: MarkersCo
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
-						onClick={controller.onCancelEditMarker}
+						onClick={controller.onCancelEditLogo}
 						disabled={controller.isSubmitting}
 					>
 						{__('Cancel', 'minimal-map')}
@@ -66,7 +66,7 @@ export default function EditMarkerDialog({ controller }: { controller: MarkersCo
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
-						onClick={() => void controller.onConfirmEditMarker()}
+						onClick={() => void controller.onConfirmEditLogo()}
 						isBusy={controller.isSubmitting}
 						disabled={controller.isSubmitting}
 					>

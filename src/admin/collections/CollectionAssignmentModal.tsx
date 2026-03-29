@@ -6,7 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { AdminLocationLookupItem } from '../../types';
 import { formatLocationAddressLines } from '../../lib/locations/formatLocationAddressLines';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import Kbd from '../../components/Kbd';
 import type { CollectionsController } from './types';
 
@@ -53,7 +53,7 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 					controller.isAssignmentSaving ||
 					(isHTMLElement &&
 						target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
-					!shouldHandleDialogEnter(event)
+					!shouldHandleModalEnter(event)
 				) {
 					return;
 				}

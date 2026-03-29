@@ -2,7 +2,7 @@ import { Button, Modal, Notice } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import { ColorControl } from '../styles/ColorControl';
 import type { LocationsController } from './types';
 
@@ -24,7 +24,7 @@ export default function MarkerColorModal({ controller }: { controller: Locations
 			<div
 				className="minimal-map-admin__collection-dialog"
 				onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-					if (controller.isSubmitting || !shouldHandleDialogEnter(event)) {
+					if (controller.isSubmitting || !shouldHandleModalEnter(event)) {
 						return;
 					}
 

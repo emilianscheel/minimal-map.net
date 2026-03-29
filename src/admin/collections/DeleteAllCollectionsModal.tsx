@@ -3,7 +3,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import type { CollectionsController } from './types';
 
 export default function DeleteAllCollectionsModal({
@@ -59,7 +59,7 @@ export default function DeleteAllCollectionsModal({
 						isCheckboxInput ||
 						(isHTMLElement &&
 							target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
-						!shouldHandleDialogEnter(event)
+						!shouldHandleModalEnter(event)
 					) {
 						return;
 					}

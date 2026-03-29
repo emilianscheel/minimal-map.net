@@ -50,7 +50,7 @@ export function useMarkersController(
 	const [editingMarker, setEditingMarker] = useState<MarkerRecord | null>(null);
 	const [isDeleteAllMarkersModalOpen, setDeleteAllMarkersModalOpen] = useState(false);
 	const [isDeletingAllMarkers, setDeletingAllMarkers] = useState(false);
-	const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+	const [isEditModalOpen, setEditModalOpen] = useState(false);
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
 	const [totalItems, setTotalItems] = useState(0);
 	const [isLoading, setLoading] = useState(enabled);
@@ -102,7 +102,7 @@ export function useMarkersController(
 		setActionNotice(null);
 	}, []);
 
-	const resetEditDialogState = useCallback((): void => {
+	const resetEditModalState = useCallback((): void => {
 		setEditingMarker(null);
 		setEditFilenameBasename('');
 		setEditFilenameExtension('');
@@ -116,7 +116,7 @@ export function useMarkersController(
 		setEditFilenameBasename(basename);
 		setEditFilenameExtension(extension);
 		setSubmitError(null);
-		setEditDialogOpen(true);
+		setEditModalOpen(true);
 	}, []);
 
 	const onCancelEditMarker = useCallback((): void => {
@@ -124,9 +124,9 @@ export function useMarkersController(
 			return;
 		}
 
-		setEditDialogOpen(false);
-		resetEditDialogState();
-	}, [isSubmitting, resetEditDialogState]);
+		setEditModalOpen(false);
+		resetEditModalState();
+	}, [isSubmitting, resetEditModalState]);
 
 	const onChangeEditFilename = useCallback((value: string): void => {
 		setEditFilenameBasename(value);
@@ -248,8 +248,8 @@ export function useMarkersController(
 				formatFilename(editFilenameBasename, editFilenameExtension)
 			);
 			await loadMarkers();
-			setEditDialogOpen(false);
-			resetEditDialogState();
+			setEditModalOpen(false);
+			resetEditModalState();
 			setActionNotice({
 				status: 'success',
 				message: __('Marker updated.', 'minimal-map'),
@@ -267,7 +267,7 @@ export function useMarkersController(
 		editFilenameExtension,
 		editingMarker,
 		loadMarkers,
-		resetEditDialogState,
+		resetEditModalState,
 	]);
 
 	const onUploadMarkers = useCallback(
@@ -359,7 +359,7 @@ export function useMarkersController(
 		) : null,
 		isDeleteAllMarkersModalOpen,
 		isDeletingAllMarkers,
-		isEditDialogOpen,
+		isEditModalOpen,
 		isLoading,
 		isRowActionPending,
 		isSubmitting,

@@ -4,7 +4,7 @@ import DeleteAllTagsModal from './DeleteAllTagsModal';
 import DeleteTagModal from './DeleteTagModal';
 import TagsEmptyState from './TagsEmptyState';
 import TagsGrid from './TagsGrid';
-import TagDialog from './TagDialog';
+import TagModal from './TagModal';
 import type { TagsController } from './types';
 
 export default function TagsView({ controller }: { controller: TagsController }) {
@@ -38,7 +38,7 @@ export default function TagsView({ controller }: { controller: TagsController })
 				)}
 			</div>
 
-			<TagDialog controller={controller} />
+			<TagModal controller={controller} />
 			<DeleteAllTagsModal controller={controller} />
 			<DeleteTagModal controller={controller} />
 		</div>

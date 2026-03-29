@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "@wordpress/element";
 import type { KeyboardEvent } from "react";
 import type { LocationRecord } from "../../types";
 import Kbd from "../../components/Kbd";
-import { shouldHandleDialogEnter } from "../../lib/locations/shouldHandleDialogEnter";
+import { shouldHandleModalEnter } from "../../lib/locations/shouldHandleModalEnter";
 
 interface DeleteLocationActionModalProps {
   items: LocationRecord[];
@@ -70,7 +70,7 @@ export default function DeleteLocationActionModal({
           isDeleting ||
           (isHTMLElement &&
             target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
-          !shouldHandleDialogEnter(event)
+          !shouldHandleModalEnter(event)
         ) {
           return;
         }

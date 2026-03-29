@@ -9,7 +9,7 @@ import CustomCsvImportModal from './CustomCsvImportModal';
 import DeleteAllLocationsModal from './DeleteAllLocationsModal';
 import DeleteLogoConfirmationModal from './DeleteLogoConfirmationModal';
 import LocationImportProgressModal from './LocationImportProgressModal';
-import LocationDialog from './LocationDialog';
+import LocationModal from './LocationModal';
 import LocationsEmptyState from './LocationsEmptyState';
 import LocationsTable from './LocationsTable';
 import MarkerColorModal from './MarkerColorModal';
@@ -59,7 +59,7 @@ export default function LocationsView({ controller }: { controller: LocationsCon
 					<LocationsTable controller={controller} />
 				)}
 			</div>
-			<LocationDialog controller={controller} />
+			<LocationModal controller={controller} />
 			<MarkerColorModal controller={controller} />
 			<AssignToCollectionModal controller={controller} />
 			<AssignLogoModal controller={controller} />

@@ -15,7 +15,7 @@ import type {
 	AdminLocationListItem,
 	CollectionRecord,
 	CollectionsAdminConfig,
-	LocationDialogStep,
+	LocationModalStep,
 	LocationFormMode,
 	LocationFormState,
 	LocationOpeningHoursDay,
@@ -114,7 +114,7 @@ export function useLocationsController(
 	const [editingLocation, setEditingLocation] = useState<LocationRecord | null>(null);
 	const [originalForm, setOriginalForm] = useState<LocationFormState | null>(null);
 	const [fieldErrors, setFieldErrors] = useState(createEmptyFieldErrors());
-	const [isDialogOpen, setDialogOpen] = useState(false);
+	const [isModalOpen, setModalOpen] = useState(false);
 	const [isMarkerColorModalOpen, setMarkerColorModalOpen] = useState(false);
 	const [isSubmitting, setSubmitting] = useState(false);
 	const [isGeocoding, setGeocoding] = useState(false);
@@ -131,7 +131,7 @@ export function useLocationsController(
 	const [logos, setLogos] = useState<LogoRecord[]>([]);
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
 	const [tags, setTags] = useState<TagRecord[]>([]);
-	const [step, setStep] = useState<LocationDialogStep>('details');
+	const [step, setStep] = useState<LocationModalStep>('details');
 	const [view, setView] = useState<ViewTable>(() =>
 		createDefaultLocationsView(config.preferredPerPage)
 	);
@@ -458,7 +458,7 @@ export function useLocationsController(
 		[clearSelectionAfterBulkAction, config, loadLocations]
 	);
 
-	const resetDialogState = useCallback((): void => {
+	const resetModalState = useCallback((): void => {
 		setFormMode('create');
 		setEditingLocation(null);
 		setOriginalForm(null);
@@ -673,13 +673,13 @@ export function useLocationsController(
 		resetRemoveCollectionAssignmentState();
 	}, [isRemovingCollectionAssignment, resetRemoveCollectionAssignmentState]);
 
-	const openDialog = useCallback((): void => {
-		resetDialogState();
-		setDialogOpen(true);
-	}, [resetDialogState]);
+	const openModal = useCallback((): void => {
+		resetModalState();
+		setModalOpen(true);
+	}, [resetModalState]);
 
 	const isAddLocationShortcutBlocked =
-		isDialogOpen ||
+		isModalOpen ||
 		isAssignToCollectionModalOpen ||
 		isAssignLogoModalOpen ||
 		isAssignMarkerModalOpen ||
@@ -703,7 +703,7 @@ export function useLocationsController(
 		active: enabled,
 		blocked: isAddLocationShortcutBlocked,
 		key: 'n',
-		onTrigger: openDialog,
+		onTrigger: openModal,
 	});
 
 	const onEditLocation = (location: LocationRecord): void => {
@@ -713,14 +713,14 @@ export function useLocationsController(
 		const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude);
 		const coordinates = hasCoordinates ? { lat: latitude, lng: longitude } : null;
 
-		resetDialogState();
+		resetModalState();
 		setFormMode('edit');
 		setEditingLocation(location);
 		setOriginalForm(nextForm);
 		setForm(nextForm);
 		setMapCenter(coordinates);
 		setSelectedCoordinates(coordinates);
-		setDialogOpen(true);
+		setModalOpen(true);
 	};
 
 	const onCancel = (): void => {
@@ -728,7 +728,7 @@ export function useLocationsController(
 			return;
 		}
 
-		setDialogOpen(false);
+		setModalOpen(false);
 	};
 
 	const onOpenMarkerColorModal = useCallback(
@@ -2001,8 +2001,8 @@ export function useLocationsController(
 				await createLocation(config, nextForm);
 			}
 			await loadLocations();
-			setDialogOpen(false);
-			resetDialogState();
+			setModalOpen(false);
+			resetModalState();
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error
@@ -2387,7 +2387,7 @@ export function useLocationsController(
 				</div>
 				<Button
 					variant="primary"
-					onClick={openDialog}
+					onClick={openModal}
 					icon={<Plus size={18} strokeWidth={2} />}
 					iconPosition="left"
 					aria-keyshortcuts={getShortcutAriaKeys(['n'])}
@@ -2411,7 +2411,7 @@ export function useLocationsController(
 		isRemoveMarkerConfirmationModalOpen,
 		isRemoveTagsConfirmationModalOpen,
 		isShowLocationConfirmationModalOpen,
-		isDialogOpen,
+		isModalOpen,
 		isMarkerColorModalOpen,
 		isCustomCsvImportModalOpen,
 		isLocationImportProgressModalOpen,
@@ -2518,7 +2518,7 @@ export function useLocationsController(
 		onSelectCsvImportLogo: setCsvImportLogoId,
 		onSelectCsvImportMarker: setCsvImportMarkerId,
 		onSelectCsvImportTags: setCsvImportTagIds,
-		onAddLocation: openDialog,
+		onAddLocation: openModal,
 		paginatedLocations,
 		selection,
 		selectedAssignmentLocation,

@@ -11,7 +11,7 @@ import type {
 	LogoRecord,
 	MarkerRecord,
 	LocationFormMode,
-	LocationDialogStep,
+	LocationModalStep,
 	LocationFormState,
 	LocationRecord,
 	MapCoordinates,
@@ -67,7 +67,7 @@ export interface LocationsController {
 	isRemoveMarkerConfirmationModalOpen: boolean;
 	isRemoveTagsConfirmationModalOpen: boolean;
 	isShowLocationConfirmationModalOpen: boolean;
-	isDialogOpen: boolean;
+	isModalOpen: boolean;
 	isMarkerColorModalOpen: boolean;
 	isGeocoding: boolean;
 	isLoading: boolean;
@@ -106,7 +106,7 @@ export interface LocationsController {
 	selection: string[];
 	submitLabel: string;
 	submitError: string | null;
-	step: LocationDialogStep;
+	step: LocationModalStep;
 	view: ViewTable;
 	onAssignLocationToCollection: () => Promise<void>;
 	onAssignLogoToLocation: () => Promise<void>;

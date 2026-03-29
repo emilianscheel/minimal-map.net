@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import CollectionAssignmentModal from './CollectionAssignmentModal';
 import DeleteAllCollectionsModal from './DeleteAllCollectionsModal';
 import MergeCollectionsModal from './MergeCollectionsModal';
-import CollectionDialog from './CollectionDialog';
+import CollectionModal from './CollectionModal';
 import CollectionsEmptyState from './CollectionsEmptyState';
 import CollectionsGrid from './CollectionsGrid';
 import type { CollectionsController } from './types';
@@ -48,7 +48,7 @@ export default function CollectionsView({ controller }: { controller: Collection
 					<CollectionsGrid controller={controller} />
 				)}
 			</div>
-			<CollectionDialog controller={controller} />
+			<CollectionModal controller={controller} />
 			<CollectionAssignmentModal controller={controller} />
 			<DeleteAllCollectionsModal controller={controller} />
 			<MergeCollectionsModal controller={controller} />

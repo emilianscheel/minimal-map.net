@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
 import Kbd from '../../components/Kbd';
 import { CUSTOM_CSV_MAPPING_FIELDS } from '../../lib/locations/importLocations';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import CustomCsvImportMappingGrid from './CustomCsvImportMappingGrid';
 import {
 	CSV_OPENING_HOURS_MAPPING_FIELDS,
@@ -81,7 +81,7 @@ export default function CustomCsvImportModal({ controller }: { controller: Locat
 					if (
 						(isHTMLElement &&
 							target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
-						!shouldHandleDialogEnter(event)
+						!shouldHandleModalEnter(event)
 					) {
 						return;
 					}

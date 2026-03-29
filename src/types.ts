@@ -716,7 +716,7 @@ export interface LocationFormState extends LocationMeta {
 
 export type LocationFormMode = 'create' | 'edit';
 
-export type LocationDialogStep =
+export type LocationModalStep =
 	| 'details'
 	| 'social_media'
 	| 'opening_hours'

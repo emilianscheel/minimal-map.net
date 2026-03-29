@@ -36,7 +36,7 @@ export interface CollectionsController {
 	isAssignmentSaving: boolean;
 	isDeleteAllCollectionsModalOpen: boolean;
 	isDeletingAllCollections: boolean;
-	isDialogOpen: boolean;
+	isModalOpen: boolean;
 	isLoading: boolean;
 	isRowActionPending: boolean;
 	isSubmitting: boolean;

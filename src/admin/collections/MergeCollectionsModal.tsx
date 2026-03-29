@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { ArrowLeft } from 'lucide-react';
 import { useMemo, type KeyboardEvent } from 'react';
 import type { CollectionRecord } from '../../types';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import Kbd from '../../components/Kbd';
 import type { CollectionsController } from './types';
 
@@ -67,7 +67,7 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 						controller.isMerging ||
 						(isHTMLElement &&
 							target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
-						!shouldHandleDialogEnter(event)
+						!shouldHandleModalEnter(event)
 					) {
 						return;
 					}

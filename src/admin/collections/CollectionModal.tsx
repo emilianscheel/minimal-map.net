@@ -1,12 +1,12 @@
 import { Button, Modal, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import Kbd from '../../components/Kbd';
 import type { CollectionsController } from './types';
 
-export default function CollectionDialog({ controller }: { controller: CollectionsController }) {
-	if (!controller.isDialogOpen) {
+export default function CollectionModal({ controller }: { controller: CollectionsController }) {
+	if (!controller.isModalOpen) {
 		return null;
 	}
 
@@ -23,7 +23,7 @@ export default function CollectionDialog({ controller }: { controller: Collectio
 					controller.isSubmitting ||
 					(isHTMLElement &&
 						target.closest('[data-minimal-map-dialog-ignore-enter="true"]')) ||
-					!shouldHandleDialogEnter(event)
+					!shouldHandleModalEnter(event)
 				) {
 					return;
 				}

@@ -157,7 +157,7 @@ export function useCollectionsController(
   const [isDeleteAllCollectionsModalOpen, setDeleteAllCollectionsModalOpen] =
     useState(false);
   const [isDeletingAllCollections, setDeletingAllCollections] = useState(false);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setLoading] = useState(enabled);
   const [isRowActionPending, setRowActionPending] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
@@ -281,7 +281,7 @@ export function useCollectionsController(
     ),
   );
 
-  const resetDialogState = useCallback((): void => {
+  const resetModalState = useCallback((): void => {
     setEditingCollection(null);
     setForm(DEFAULT_FORM_STATE);
     setFormMode("create");
@@ -292,13 +292,13 @@ export function useCollectionsController(
     setActionNotice(null);
   }, []);
 
-  const openDialog = useCallback((): void => {
-    resetDialogState();
-    setDialogOpen(true);
-  }, [resetDialogState]);
+  const openModal = useCallback((): void => {
+    resetModalState();
+    setModalOpen(true);
+  }, [resetModalState]);
 
   const isAddCollectionShortcutBlocked =
-    isDialogOpen ||
+    isModalOpen ||
     isAssignmentModalOpen ||
     isDeleteAllCollectionsModalOpen ||
     isMergeModalOpen ||
@@ -314,20 +314,20 @@ export function useCollectionsController(
     active: enabled,
     blocked: isAddCollectionShortcutBlocked,
     key: "n",
-    onTrigger: openDialog,
+    onTrigger: openModal,
   });
 
   const onEditCollection = useCallback(
     (collection: CollectionRecord): void => {
-      resetDialogState();
+      resetModalState();
       setEditingCollection(collection);
       setFormMode("edit");
       setForm({
         title: collection.title,
       });
-      setDialogOpen(true);
+      setModalOpen(true);
     },
-    [resetDialogState],
+    [resetModalState],
   );
 
   const onCancel = useCallback((): void => {
@@ -335,7 +335,7 @@ export function useCollectionsController(
       return;
     }
 
-    setDialogOpen(false);
+    setModalOpen(false);
   }, [isSubmitting]);
 
   const onChangeFormValue = useCallback((
@@ -372,8 +372,8 @@ export function useCollectionsController(
       }
 
       await loadCollections();
-      setDialogOpen(false);
-      resetDialogState();
+      setModalOpen(false);
+      resetModalState();
       setActionNotice({
         status: "success",
         message:
@@ -392,7 +392,7 @@ export function useCollectionsController(
     } finally {
       setSubmitting(false);
     }
-  }, [form, formMode, editingCollection, collectionsConfig, loadCollections, resetDialogState]);
+  }, [form, formMode, editingCollection, collectionsConfig, loadCollections, resetModalState]);
 
   const onDeleteCollection = useCallback(
     async (
@@ -888,7 +888,7 @@ export function useCollectionsController(
         <Button
           __next40pxDefaultSize
           variant="primary"
-          onClick={openDialog}
+          onClick={openModal}
           icon={<Plus size={18} strokeWidth={2} />}
           iconPosition="left"
           aria-keyshortcuts={getShortcutAriaKeys(["n"])}
@@ -904,7 +904,7 @@ export function useCollectionsController(
     isAssignmentSaving,
     isDeleteAllCollectionsModalOpen,
     isDeletingAllCollections,
-    isDialogOpen,
+    isModalOpen,
     isLoading,
     isRowActionPending,
     isSubmitting,
@@ -960,7 +960,7 @@ export function useCollectionsController(
       setMergeSelectionView(nextView),
     onChangeMergeTitle,
     onToggleDeleteAfterMerge,
-    onAddCollection: openDialog,
+    onAddCollection: openModal,
     paginatedCollections: collections,
     totalPages: totalPages,
   };

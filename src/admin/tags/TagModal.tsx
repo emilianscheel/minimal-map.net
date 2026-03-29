@@ -1,13 +1,13 @@
 import { Button, Modal, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { KeyboardEvent } from 'react';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import Kbd from '../../components/Kbd';
 import { ColorControl } from '../styles/ColorControl';
 import type { TagsController } from './types';
 
-export default function TagDialog({ controller }: { controller: TagsController }) {
-	if (!controller.isDialogOpen) {
+export default function TagModal({ controller }: { controller: TagsController }) {
+	if (!controller.isModalOpen) {
 		return null;
 	}
 
@@ -22,7 +22,7 @@ export default function TagDialog({ controller }: { controller: TagsController }
 			<div
 				className="minimal-map-admin__collection-dialog"
 				onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-					if (controller.isSubmitting || !shouldHandleDialogEnter(event)) {
+					if (controller.isSubmitting || !shouldHandleModalEnter(event)) {
 						return;
 					}
 

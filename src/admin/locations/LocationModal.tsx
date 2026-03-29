@@ -6,16 +6,16 @@ import {
 import { __ } from '@wordpress/i18n';
 import { ArrowLeft } from 'lucide-react';
 import type { KeyboardEvent } from 'react';
-import { shouldHandleDialogEnter } from '../../lib/locations/shouldHandleDialogEnter';
+import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import Kbd from '../../components/Kbd';
 import MapStep from './MapStep';
 import type { LocationsController } from './types';
-import LocationDialogFields from './LocationDialogFields';
+import LocationModalFields from './LocationModalFields';
 import OpeningHoursStep from './OpeningHoursStep';
 import SocialMediaStep from './SocialMediaStep';
 
-export default function LocationDialog({ controller }: { controller: LocationsController }) {
-	if (!controller.isDialogOpen) {
+export default function LocationModal({ controller }: { controller: LocationsController }) {
+	if (!controller.isModalOpen) {
 		return null;
 	}
 
@@ -58,7 +58,7 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 						return;
 					}
 
-					if (!shouldHandleDialogEnter(event)) {
+					if (!shouldHandleModalEnter(event)) {
 						return;
 					}
 
@@ -86,7 +86,7 @@ export default function LocationDialog({ controller }: { controller: LocationsCo
 						onChange={controller.onChangeFormValue}
 					/>
 				) : (
-					<LocationDialogFields
+					<LocationModalFields
 						fieldErrors={controller.fieldErrors}
 						form={controller.form}
 						onChange={controller.onChangeFormValue}

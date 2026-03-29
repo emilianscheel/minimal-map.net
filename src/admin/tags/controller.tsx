@@ -39,7 +39,7 @@ export function useTagsController(
 	const [isDeleteAllTagsModalOpen, setDeleteAllTagsModalOpen] = useState(false);
 	const [isDeletingAllTags, setDeletingAllTags] = useState(false);
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-	const [isDialogOpen, setDialogOpen] = useState(false);
+	const [isModalOpen, setModalOpen] = useState(false);
 	const [isLoading, setLoading] = useState(enabled);
 	const [isRowActionPending, setRowActionPending] = useState(false);
 	const [selectedTag, setSelectedTag] = useState<TagRecord | null>(null);
@@ -85,7 +85,7 @@ export function useTagsController(
 		void loadTags();
 	}, [config.nonce, enabled, loadTags]);
 
-	const resetDialogState = useCallback((): void => {
+	const resetModalState = useCallback((): void => {
 		setEditingTag(null);
 		setForm(DEFAULT_FORM_STATE);
 		setFormMode('create');
@@ -93,12 +93,12 @@ export function useTagsController(
 	}, []);
 
 	const onAddTag = useCallback((): void => {
-		resetDialogState();
-		setDialogOpen(true);
-	}, [resetDialogState]);
+		resetModalState();
+		setModalOpen(true);
+	}, [resetModalState]);
 
 	const isAddTagShortcutBlocked =
-		isDialogOpen ||
+		isModalOpen ||
 		isDeleteAllTagsModalOpen ||
 		isDeleteModalOpen ||
 		isDeletingAllTags ||
@@ -115,7 +115,7 @@ export function useTagsController(
 
 	const onEditTag = useCallback(
 		(tag: TagRecord): void => {
-			resetDialogState();
+			resetModalState();
 			setEditingTag(tag);
 			setFormMode('edit');
 			setForm({
@@ -123,9 +123,9 @@ export function useTagsController(
 				background_color: tag.background_color,
 				foreground_color: tag.foreground_color,
 			});
-			setDialogOpen(true);
+			setModalOpen(true);
 		},
-		[resetDialogState]
+		[resetModalState]
 	);
 
 	const onCancel = useCallback((): void => {
@@ -133,7 +133,7 @@ export function useTagsController(
 			return;
 		}
 
-		setDialogOpen(false);
+		setModalOpen(false);
 	}, [isSubmitting]);
 
 	const onCloseDeleteModal = useCallback((): void => {
@@ -191,8 +191,8 @@ export function useTagsController(
 			}
 
 			await loadTags();
-			setDialogOpen(false);
-			resetDialogState();
+			setModalOpen(false);
+			resetModalState();
 			setActionNotice({
 				status: 'success',
 				message:
@@ -211,7 +211,7 @@ export function useTagsController(
 		} finally {
 			setSubmitting(false);
 		}
-	}, [config, editingTag, form, formMode, loadTags, resetDialogState]);
+	}, [config, editingTag, form, formMode, loadTags, resetModalState]);
 
 	const onDeleteTag = useCallback(
 		async (tag: TagRecord): Promise<void> => {
@@ -334,7 +334,7 @@ export function useTagsController(
 		isLoading,
 		isRowActionPending,
 		isSubmitting,
-		isDialogOpen,
+		isModalOpen,
 		loadError,
 		tags,
 		totalItems,

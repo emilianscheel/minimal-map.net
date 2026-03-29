@@ -17,7 +17,7 @@ export interface LogosController {
 	isDeleteAllLogosModalOpen: boolean;
 	isDeletingAllLogos: boolean;
 	isDeleteModalOpen: boolean;
-	isEditDialogOpen: boolean;
+	isEditModalOpen: boolean;
 	isLoading: boolean;
 	isRowActionPending: boolean;
 	isSubmitting: boolean;

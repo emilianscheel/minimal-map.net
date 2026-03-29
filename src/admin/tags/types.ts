@@ -18,7 +18,7 @@ export interface TagsController {
 	isLoading: boolean;
 	isRowActionPending: boolean;
 	isSubmitting: boolean;
-	isDialogOpen: boolean;
+	isModalOpen: boolean;
 	loadError: string | null;
 	tags: TagRecord[];
 	totalItems: number;

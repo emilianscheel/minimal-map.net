@@ -73,7 +73,7 @@ export function useLogosController(
 	const [isDeleteAllLogosModalOpen, setDeleteAllLogosModalOpen] = useState(false);
 	const [isDeletingAllLogos, setDeletingAllLogos] = useState(false);
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-	const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+	const [isEditModalOpen, setEditModalOpen] = useState(false);
 	const [isLoading, setLoading] = useState(enabled);
 	const [isRowActionPending, setRowActionPending] = useState(false);
 	const [isSubmitting, setSubmitting] = useState(false);
@@ -124,7 +124,7 @@ export function useLogosController(
 		setActionNotice(null);
 	}, []);
 
-	const resetEditDialogState = useCallback((): void => {
+	const resetEditModalState = useCallback((): void => {
 		setEditingLogo(null);
 		setEditFilenameBasename('');
 		setEditFilenameExtension('');
@@ -139,7 +139,7 @@ export function useLogosController(
 			setEditFilenameBasename(basename);
 			setEditFilenameExtension(extension);
 			setSubmitError(null);
-			setEditDialogOpen(true);
+			setEditModalOpen(true);
 		},
 		[]
 	);
@@ -149,9 +149,9 @@ export function useLogosController(
 			return;
 		}
 
-		setEditDialogOpen(false);
-		resetEditDialogState();
-	}, [isSubmitting, resetEditDialogState]);
+		setEditModalOpen(false);
+		resetEditModalState();
+	}, [isSubmitting, resetEditModalState]);
 
 	const onChangeEditFilename = useCallback((value: string): void => {
 		setEditFilenameBasename(value);
@@ -296,8 +296,8 @@ export function useLogosController(
 				formatFilename(editFilenameBasename, editFilenameExtension)
 			);
 			await loadLogos();
-			setEditDialogOpen(false);
-			resetEditDialogState();
+			setEditModalOpen(false);
+			resetEditModalState();
 			setActionNotice({
 				status: 'success',
 				message: __('Logo updated.', 'minimal-map'),
@@ -315,7 +315,7 @@ export function useLogosController(
 		editFilenameExtension,
 		editingLogo,
 		loadLogos,
-		resetEditDialogState,
+		resetEditModalState,
 	]);
 
 	const onDownloadLogo = useCallback((logo: LogoRecord): void => {
@@ -414,7 +414,7 @@ export function useLogosController(
 		isDeleteAllLogosModalOpen,
 		isDeletingAllLogos,
 		isDeleteModalOpen,
-		isEditDialogOpen,
+		isEditModalOpen,
 		isLoading,
 		isRowActionPending,
 		isSubmitting,

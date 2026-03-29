@@ -1,6 +1,6 @@
 import type { KeyboardEvent } from 'react';
 
-export function shouldHandleDialogEnter(event: KeyboardEvent<HTMLDivElement>): boolean {
+export function shouldHandleModalEnter(event: KeyboardEvent<HTMLDivElement>): boolean {
 	const target = event.target;
 
 	if (!(target instanceof HTMLElement)) {
