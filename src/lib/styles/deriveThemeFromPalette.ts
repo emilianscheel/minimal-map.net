@@ -85,6 +85,12 @@ export function deriveThemeFromPalette(
 	const structureAnchor = pickStructureAnchor(analyzedPalette, backgroundAnchor, textAnchor);
 	const waterAnchor = pickWaterAnchor(accentCandidates, structureAnchor);
 	const landAnchor = pickLandAnchor(accentCandidates, waterAnchor, structureAnchor);
+	const transportAnchor = pickTransportAnchor(
+		accentCandidates,
+		waterAnchor,
+		landAnchor,
+		structureAnchor
+	);
 
 	const background = blend(defaultColors.background, lighten(backgroundAnchor, 1), 0.72);
 	const residential = blend(
@@ -92,34 +98,34 @@ export function deriveThemeFromPalette(
 		blend(background, structureAnchor, 0.16),
 		0.64
 	);
-	const park = blend(defaultColors.park, blend(background, landAnchor, 0.18), 0.84);
-	const forest = blend(defaultColors.forest, blend(background, landAnchor, 0.28), 0.88);
-	const ice = blend(defaultColors.ice, blend(background, waterAnchor, 0.1), 0.76);
-	const water = blend(defaultColors.water, blend(background, waterAnchor, 0.38), 0.88);
-	const waterway = blend(defaultColors.waterway, darken(water, 10), 0.86);
+	const park = blend(defaultColors.park, blend(background, landAnchor, 0.36), 0.9);
+	const forest = blend(defaultColors.forest, blend(background, landAnchor, 0.52), 0.94);
+	const ice = blend(defaultColors.ice, blend(background, waterAnchor, 0.16), 0.8);
+	const water = blend(defaultColors.water, blend(background, waterAnchor, 0.54), 0.94);
+	const waterway = blend(defaultColors.waterway, darken(blend(background, waterAnchor, 0.62), 8), 0.92);
 	const building = blend(defaultColors.building, blend(background, structureAnchor, 0.2), 0.74);
 	const buildingOutline = blend(defaultColors.buildingOutline, darken(building, 10), 0.78);
 	const path = blend(defaultColors.path, lighten(background, 9), 0.8);
 	const roadMinor = blend(defaultColors.roadMinor, lighten(background, 12), 0.86);
 	const roadMajorCasing = blend(
 		defaultColors.roadMajorCasing,
-		blend(background, structureAnchor, 0.16),
-		0.78
+		blend(background, transportAnchor, 0.1),
+		0.76
 	);
 	const roadMajorFill = blend(defaultColors.roadMajorFill, lighten(background, 10), 0.86);
 	const motorwayCasing = blend(
 		defaultColors.motorwayCasing,
-		blend(roadMajorCasing, waterAnchor, 0.06),
-		0.7
+		blend(background, transportAnchor, 0.28),
+		0.84
 	);
 	const motorwayFill = blend(
 		defaultColors.motorwayFill,
-		blend(roadMajorFill, structureAnchor, 0.08),
-		0.78
+		blend(background, transportAnchor, 0.4),
+		0.88
 	);
 	const rail = blend(defaultColors.rail, blend(background, textAnchor, 0.22), 0.74);
 	const railDash = blend(defaultColors.railDash, lighten(background, 15), 0.84);
-	const boundary = blend(defaultColors.boundary, blend(background, textAnchor, 0.18), 0.74);
+	const boundary = blend(defaultColors.boundary, blend(background, transportAnchor, 0.18), 0.8);
 	const aerowayLine = blend(
 		defaultColors.aerowayLine,
 		blend(background, structureAnchor, 0.18),
@@ -275,6 +281,29 @@ function pickLandAnchor(
 			const rightScore = hueDistance(right.hsl.h, waterAnalysis.hsl.h) + right.hsl.s * 60 - Math.abs(right.hsl.l - 0.6) * 14;
 			return rightScore - leftScore || left.index - right.index;
 		})[0]?.color ?? fallback;
+}
+
+function pickTransportAnchor(
+	colors: PaletteColorAnalysis[],
+	waterAnchor: string,
+	landAnchor: string,
+	fallback: string
+): string {
+	const candidatePool = colors.filter(
+		(candidate) => candidate.color !== waterAnchor && candidate.color !== landAnchor
+	);
+
+	if (candidatePool.length > 0) {
+		return [ ...candidatePool ]
+			.sort((left, right) => {
+				const leftScore = left.hsl.s * 70 - Math.abs(left.hsl.l - 0.55) * 18;
+				const rightScore = right.hsl.s * 70 - Math.abs(right.hsl.l - 0.55) * 18;
+				return rightScore - leftScore || left.index - right.index;
+			})[0].color;
+	}
+
+	const fallbackPool = colors.filter((candidate) => candidate.color !== waterAnchor);
+	return fallbackPool[0]?.color ?? landAnchor ?? fallback;
 }
 
 function pickStructureAnchor(

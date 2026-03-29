@@ -1,6 +1,7 @@
 import { Button, ColorIndicator, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ChevronDown, Palette } from 'lucide-react';
+import { deriveThemeFromPalette } from '../../lib/styles/deriveThemeFromPalette';
 import type { StylePaletteTemplate } from '../../types';
 
 interface ApplyPaletteTemplateDropdownProps {
@@ -36,7 +37,10 @@ export function ApplyPaletteTemplateDropdown({
 			)}
 				renderContent={({ onClose }) => (
 				<MenuGroup label={__('Palette Templates', 'minimal-map')}>
-					{templates.map((template) => (
+					{templates.map((template) => {
+						const previewColors = getTemplatePreviewColors(template);
+
+						return (
 						<MenuItem
 							key={template.id}
 							className="minimal-map-styles__palette-template-menu-item"
@@ -45,13 +49,13 @@ export function ApplyPaletteTemplateDropdown({
 									className="minimal-map-styles__palette-template-swatches"
 									aria-hidden="true"
 								>
-									{template.colors.slice(0, 5).map((color, index, palette) => (
+									{previewColors.map((color, index, palette) => (
 										<span
-											key={`${template.id}-${color.slug}-${index}`}
+											key={`${template.id}-${color}-${index}`}
 											className="minimal-map-styles__palette-template-swatch"
 											style={{ zIndex: palette.length - index }}
 										>
-											<ColorIndicator colorValue={color.color} />
+											<ColorIndicator colorValue={color} />
 										</span>
 									))}
 								</span>
@@ -63,9 +67,22 @@ export function ApplyPaletteTemplateDropdown({
 						>
 							{template.label}
 						</MenuItem>
-					))}
+						);
+					})}
 				</MenuGroup>
 			)}
 		/>
 	);
+}
+
+function getTemplatePreviewColors(template: StylePaletteTemplate): string[] {
+	const derivedTheme = deriveThemeFromPalette(template.colors);
+
+	return [
+		derivedTheme.placeLabel,
+		derivedTheme.background,
+		derivedTheme.water,
+		derivedTheme.forest,
+		derivedTheme.motorwayFill,
+	].slice(0, 5);
 }
