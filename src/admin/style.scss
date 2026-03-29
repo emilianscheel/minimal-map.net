@@ -221,13 +221,16 @@ svg.lucide {
 }
 
 .minimal-map-admin__content {
-  padding: 28px 34px 32px;
+  --minimal-map-admin-content-padding-x: 34px;
+  --minimal-map-admin-content-padding-top: 28px;
+  --minimal-map-admin-content-padding-bottom: 32px;
+  padding: var(--minimal-map-admin-content-padding-top)
+    var(--minimal-map-admin-content-padding-x)
+    var(--minimal-map-admin-content-padding-bottom);
   background: #fff;
   min-width: 0;
   min-height: 0;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
+  box-sizing: border-box;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -237,7 +240,8 @@ svg.lucide {
 .minimal-map-admin__collections-view,
 .minimal-map-admin__markers-view,
 .minimal-map-admin__logos-view,
-.minimal-map-admin__tags-view {
+.minimal-map-admin__tags-view,
+.minimal-map-admin__dashboard {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
