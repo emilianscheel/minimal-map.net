@@ -13,7 +13,6 @@ import {
   FlexItem,
   PanelBody,
   RangeControl,
-  SelectControl,
   TextareaControl,
   TextControl,
   ToggleControl,
@@ -28,6 +27,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { CheckIcon, ChevronDownIcon, MapPinnedIcon } from "../components/Icons";
+import OptionDropdown from "./OptionDropdown";
 import { collectLocationTags } from "../map/category-filter";
 import { buildIframeSnippet } from "./embed";
 import { createMinimalMap } from "../map/bootstrap";
@@ -641,69 +641,41 @@ function ThemeDropdown({
   selectedSlug: string;
   onChange: (value: string) => void;
 }) {
-  const selectedTheme =
-    themes.find((theme) => theme.slug === selectedSlug) ||
-    themes.find((theme) => theme.slug === "default");
-  const selectedLabel = selectedTheme?.label || __("Default", "minimal-map");
-
   return (
-    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
-      <span>{__("Style Theme", "minimal-map")}</span>
-      <Dropdown
-        className="minimal-map-editor__theme-dropdown"
-        popoverProps={{
-          placement: "left-start",
-          offset: 36,
-          shift: true,
-        }}
-        renderToggle={({ isOpen, onToggle }) => (
-          <Button
-            __next40pxDefaultSize
-            className="minimal-map-editor__dropdown-toggle"
-            variant="tertiary"
-            onClick={onToggle}
-            aria-expanded={isOpen}
-            style={{
-              width: "100%",
-              justifyContent: "space-between",
-              paddingInline: "12px",
-            }}
-          >
-            <span>{selectedLabel}</span>
-            <ChevronDownIcon size={16} style={{ flexShrink: 0 }} />
-          </Button>
-        )}
-        renderContent={({ onClose }) => (
-          <MenuGroup label={__("Switch Theme", "minimal-map")}>
-            {themes.map((theme) => {
-              const isSelected = theme.slug === selectedSlug;
-              return (
-                <MenuItem
-                  key={theme.slug}
-                  onClick={() => {
-                    onChange(theme.slug);
-                    onClose();
-                  }}
-                >
-                  <HStack justify="space-between" style={{ width: "100%" }}>
-                    <span>{theme.label}</span>
-                    {isSelected && (
-                      <CheckIcon
-                        size={16}
-                        style={{
-                          flexShrink: 0,
-                          color: "var(--wp-admin-theme-color, #3858e8)",
-                        }}
-                      />
-                    )}
-                  </HStack>
-                </MenuItem>
-              );
-            })}
-          </MenuGroup>
-        )}
-      />
-    </div>
+    <OptionDropdown
+      className="minimal-map-editor__theme-dropdown"
+      emptyLabel={__("Default", "minimal-map")}
+      groupLabel={__("Switch Theme", "minimal-map")}
+      label={__("Style Theme", "minimal-map")}
+      onChange={onChange}
+      options={themes.map((theme) => ({
+        label: theme.label,
+        value: theme.slug,
+      }))}
+      selectedValue={selectedSlug}
+    />
+  );
+}
+
+function StylePresetDropdown({
+  options,
+  selectedValue,
+  onChange,
+}: {
+  options: StyleOption[];
+  selectedValue: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <OptionDropdown
+      className="minimal-map-editor__style-preset-dropdown"
+      emptyLabel={__("Select style preset", "minimal-map")}
+      groupLabel={__("Switch Style Preset", "minimal-map")}
+      label={__("Style Preset", "minimal-map")}
+      onChange={onChange}
+      options={options}
+      selectedValue={selectedValue}
+    />
   );
 }
 
@@ -1375,11 +1347,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             selectedSlug={attributes.styleThemeSlug}
             onChange={(value) => setAttributes({ styleThemeSlug: value })}
           />
-          <SelectControl
-            label={__("Style Preset", "minimal-map")}
-            value={attributes.stylePreset}
+          <StylePresetDropdown
             options={styleOptions}
-            onChange={(value: string) => setAttributes({ stylePreset: value })}
+            selectedValue={attributes.stylePreset}
+            onChange={(value) => setAttributes({ stylePreset: value })}
           />
           <UnitControl
             className="minimal-map-editor__height-control components-border-radius-control__unit-control"
