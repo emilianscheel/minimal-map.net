@@ -73,8 +73,9 @@ class Analytics_Settings_Route {
 	public function get_settings() {
 		return rest_ensure_response(
 			array(
-				'enabled'           => $this->analytics->is_enabled(),
-				'complianzEnabled'  => $this->analytics->is_complianz_enabled(),
+				'enabled'            => $this->analytics->is_enabled(),
+				'complianzEnabled'   => $this->analytics->is_complianz_enabled(),
+				'complianzInstalled' => $this->analytics->is_complianz_installed(),
 			)
 		);
 	}

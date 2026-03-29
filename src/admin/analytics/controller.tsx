@@ -76,6 +76,7 @@ export function useAnalyticsController(
 	const updateSettings = dependencies.updateSettings ?? updateAnalyticsSettings;
 	const [enabled, setEnabled] = useState(config.enabled);
 	const [complianzEnabled, setComplianzEnabled] = useState(config.complianzEnabled);
+	const complianzInstalled = config.complianzInstalled;
 	const [isConfirmEnableModalOpen, setConfirmEnableModalOpen] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
 	const [isLoadingSummary, setLoadingSummary] = useState(true);
@@ -342,6 +343,7 @@ export function useAnalyticsController(
 	const headerAction = useMemo(() => (
 		<AnalyticsHeaderActions
 			complianzEnabled={complianzEnabled}
+			complianzInstalled={complianzInstalled}
 			enabled={enabled}
 			isExporting={isExporting}
 			isSavingSettings={isSavingSettings}
@@ -364,6 +366,7 @@ export function useAnalyticsController(
 		/>
 	), [
 		complianzEnabled,
+		complianzInstalled,
 		enabled,
 		isExporting,
 		isSavingSettings,
@@ -376,6 +379,7 @@ export function useAnalyticsController(
 	return {
 		enabled,
 		complianzEnabled,
+		complianzInstalled,
 		headerAction,
 		isConfirmEnableModalOpen,
 		isLoading: isLoadingSummary || isLoadingTables.search || isLoadingTables.selection || isLoadingTables.action,

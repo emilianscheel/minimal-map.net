@@ -6,6 +6,7 @@ import AnalyticsRangeSelector from './AnalyticsRangeSelector';
 
 interface AnalyticsHeaderActionsProps {
 	complianzEnabled: boolean;
+	complianzInstalled: boolean;
 	enabled: boolean;
 	isExporting: boolean;
 	isSavingSettings: boolean;
@@ -18,6 +19,7 @@ interface AnalyticsHeaderActionsProps {
 
 export default function AnalyticsHeaderActions({
 	complianzEnabled,
+	complianzInstalled,
 	enabled,
 	isExporting,
 	isSavingSettings,
@@ -39,17 +41,19 @@ export default function AnalyticsHeaderActions({
 				<AnalyticsRangeSelector activeRange={range} onSelect={onChangeRange} />
 			</div>
 			<div className="minimal-map-admin__analytics-toggle-group">
-				<label className="minimal-map-admin__analytics-toggle" htmlFor="minimal-map-analytics-complianz-toggle">
-					<span className="minimal-map-admin__analytics-toggle-label">
-						{__('Only track if Complianz confirmed', 'minimal-map')}
-					</span>
-					<FormToggle
-						id="minimal-map-analytics-complianz-toggle"
-						checked={complianzEnabled}
-						disabled={isSavingSettings}
-						onChange={onToggleComplianz}
-					/>
-				</label>
+				{complianzInstalled && (
+					<label className="minimal-map-admin__analytics-toggle" htmlFor="minimal-map-analytics-complianz-toggle">
+						<span className="minimal-map-admin__analytics-toggle-label">
+							{__('Only track if Complianz confirmed', 'minimal-map')}
+						</span>
+						<FormToggle
+							id="minimal-map-analytics-complianz-toggle"
+							checked={complianzEnabled}
+							disabled={isSavingSettings}
+							onChange={onToggleComplianz}
+						/>
+					</label>
+				)}
 				<label className="minimal-map-admin__analytics-toggle" htmlFor="minimal-map-analytics-toggle">
 					<span className="minimal-map-admin__analytics-toggle-label">
 						{__('Analytics tracking', 'minimal-map')}

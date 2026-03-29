@@ -406,6 +406,7 @@ export interface AnalyticsAdminConfig {
 	nonce: string;
 	enabled: boolean;
 	complianzEnabled: boolean;
+	complianzInstalled: boolean;
 	settingsPath: string;
 	summaryPath: string;
 	queriesPath: string;

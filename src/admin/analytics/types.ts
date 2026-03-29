@@ -36,6 +36,7 @@ export interface AnalyticsTablesByCategory {
 export interface AnalyticsController {
 	enabled: boolean;
 	complianzEnabled: boolean;
+	complianzInstalled: boolean;
 	headerAction: ReactNode;
 	isConfirmEnableModalOpen: boolean;
 	isLoading: boolean;

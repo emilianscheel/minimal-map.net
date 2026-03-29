@@ -58,6 +58,7 @@ export const DEFAULT_ADMIN_CONFIG: AdminAppConfig = {
 		nonce: '',
 		enabled: false,
 		complianzEnabled: false,
+		complianzInstalled: false,
 		settingsPath: '',
 		summaryPath: '',
 		queriesPath: '',

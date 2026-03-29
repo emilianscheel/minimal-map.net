@@ -214,6 +214,15 @@ class Analytics {
 	}
 
 	/**
+	 * Whether the Complianz plugin is installed and active.
+	 *
+	 * @return bool
+	 */
+	public function is_complianz_installed(): bool {
+		return function_exists( 'cmplz_has_consent' );
+	}
+
+	/**
 	 * Track one analytics query if analytics is enabled.
 	 *
 	 * @param array<string, mixed> $payload Raw query payload.
