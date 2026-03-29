@@ -9,6 +9,7 @@ import {
   BoxControl,
   ColorIndicator,
   Dropdown,
+  FormTokenField,
   FlexItem,
   PanelBody,
   RangeControl,
@@ -27,6 +28,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { CheckIcon, ChevronDownIcon, MapPinnedIcon } from "../components/Icons";
+import { collectLocationTags } from "../map/category-filter";
 import { buildIframeSnippet } from "./embed";
 import { createMinimalMap } from "../map/bootstrap";
 import { normalizeHeightUnit, normalizeMapConfig } from "../map/defaults";
@@ -40,6 +42,7 @@ import type {
   BoxValue,
   MapBlockAttributes,
   MapCollectionOption,
+  MapLocationTag,
   MapRuntimeConfig,
   MinimalMapInstance,
   RawMapConfig,
@@ -61,6 +64,22 @@ const BORDER_UNITS: StyleOption[] = ["px", "em", "rem"].map((value) => ({
 }));
 const BOX_CONTROL_INPUT_PROPS = { min: 0, max: 50 };
 const BORDER_RADIUS_RANGE_MAX = 50;
+
+function mapTagNamesToIds(
+  tokenNames: Array<string | { value?: string }>,
+  tags: MapLocationTag[],
+): number[] {
+  const tagIdsByName = new Map(tags.map((tag) => [tag.name, tag.id]));
+
+  return Array.from(
+    new Set(
+      tokenNames
+        .map((token) => (typeof token === "string" ? token : token.value ?? ""))
+        .map((name) => tagIdsByName.get(name))
+        .filter((tagId): tagId is number => typeof tagId === "number"),
+    ),
+  );
+}
 
 function clampRangeInputs(root: HTMLElement | null, max: number): void {
   if (!root) {
@@ -640,7 +659,8 @@ function ThemeDropdown({
         renderToggle={({ isOpen, onToggle }) => (
           <Button
             __next40pxDefaultSize
-            variant="secondary"
+            className="minimal-map-editor__dropdown-toggle"
+            variant="tertiary"
             onClick={onToggle}
             aria-expanded={isOpen}
             style={{
@@ -715,7 +735,8 @@ function CollectionDropdown({
         renderToggle={({ isOpen, onToggle }) => (
           <Button
             __next40pxDefaultSize
-            variant="secondary"
+            className="minimal-map-editor__dropdown-toggle"
+            variant="tertiary"
             onClick={onToggle}
             aria-expanded={isOpen}
             style={{
@@ -792,6 +813,38 @@ function CollectionDropdown({
   );
 }
 
+function SelectedTagsControl({
+  allTags,
+  selectedTagIds,
+  suggestionTags,
+  onChange,
+}: {
+  allTags: MapLocationTag[];
+  selectedTagIds: number[];
+  suggestionTags: MapLocationTag[];
+  onChange: (value: number[]) => void;
+}) {
+  const currentTagNames = selectedTagIds
+    .map((id) => allTags.find((tag) => tag.id === id)?.name)
+    .filter(
+      (name): name is string => typeof name === "string" && name.length > 0,
+    );
+
+  return (
+    <div style={{ display: "grid", gap: "8px", marginBottom: "16px" }}>
+      <FormTokenField
+        label={__("Tags", "minimal-map")}
+        value={currentTagNames}
+        suggestions={suggestionTags.map((tag) => tag.name)}
+        onChange={(tokenNames) =>
+          onChange(mapTagNamesToIds(tokenNames, allTags))
+        }
+        __next40pxDefaultSize
+      />
+    </div>
+  );
+}
+
 export default function Edit({ attributes, setAttributes }: EditProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
@@ -807,6 +860,16 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     () => getStyleOptions(runtimeConfig.stylePresets),
     [],
   );
+  const allKnownTags = useMemo(
+    () =>
+      collectLocationTags([
+        ...(runtimeConfig.locations ?? []),
+        ...(runtimeConfig.collections ?? []).flatMap(
+          (collection) => collection.locations ?? [],
+        ),
+      ]),
+    [],
+  );
   const selectedCollection = useMemo(
     () =>
       attributes.collectionId > 0
@@ -816,8 +879,18 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         : null,
     [attributes.collectionId],
   );
+  const selectableTags = useMemo(
+    () =>
+      collectLocationTags(
+        attributes.collectionId > 0
+          ? selectedCollection?.locations ?? []
+          : runtimeConfig.locations ?? [],
+      ),
+    [attributes.collectionId, selectedCollection],
+  );
   const effectiveFontFamily =
-    typeof attributes.fontFamily === "string" && attributes.fontFamily.trim() !== ""
+    typeof attributes.fontFamily === "string" &&
+    attributes.fontFamily.trim() !== ""
       ? attributes.fontFamily
       : runtimeConfig.defaults?.fontFamily ?? "";
   const effectiveAttributes = useMemo(
@@ -1109,6 +1182,12 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             options={runtimeConfig.collections ?? []}
             selectedId={attributes.collectionId}
             onChange={(value) => setAttributes({ collectionId: value })}
+          />
+          <SelectedTagsControl
+            allTags={allKnownTags}
+            selectedTagIds={attributes.selectedTagIds}
+            suggestionTags={selectableTags}
+            onChange={(value) => setAttributes({ selectedTagIds: value })}
           />
           <ThemeDropdown
             themes={runtimeConfig.styleThemes ?? []}

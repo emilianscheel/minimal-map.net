@@ -1,4 +1,5 @@
 import { getStylePresets } from './style-presets';
+import { filterLocationsByCategoryTagIds } from './category-filter';
 import {
 	DEFAULT_ZOOM_CONTROLS_BACKGROUND_COLOR,
 	DEFAULT_ZOOM_CONTROLS_BORDER_COLOR,
@@ -34,6 +35,7 @@ const DEFAULT_MAP_DEFAULTS: MapDefaults = {
 	centerLng: 13.388,
 	zoom: 9.5,
 	collectionId: 0,
+	selectedTagIds: [],
 	height: 420,
 	heightUnit: 'px',
 	stylePreset: 'liberty',
@@ -188,6 +190,31 @@ function normalizeZoomControlIcon(value: string | undefined, fallback: ZoomContr
 		: fallback;
 }
 
+function normalizeSelectedTagIds(value: number[] | string | null | undefined): number[] {
+	if (Array.isArray(value)) {
+		return Array.from(
+			new Set(
+				value
+					.map((tagId) => Number(tagId))
+					.filter((tagId) => Number.isInteger(tagId) && tagId > 0)
+			)
+		);
+	}
+
+	if (typeof value !== 'string' || value.trim() === '') {
+		return [];
+	}
+
+	return Array.from(
+		new Set(
+			value
+				.split(',')
+				.map((tagId) => Number(tagId.trim()))
+				.filter((tagId) => Number.isInteger(tagId) && tagId > 0)
+		)
+	);
+}
+
 function normalizeBorderRadiusValue(value: string | BoxValue | null | undefined, fallback: string): string {
 	if (!value) {
 		return fallback;
@@ -240,6 +267,7 @@ function getDefaults(runtimeConfig: MapRuntimeConfig): MapDefaults {
 				? normalizeHeightUnit(runtimeConfig.defaults?.heightMobileUnit ?? heightUnit)
 				: undefined,
 		stylePreset: `${runtimeConfig.defaults?.stylePreset ?? DEFAULT_MAP_DEFAULTS.stylePreset}`,
+		selectedTagIds: normalizeSelectedTagIds(runtimeConfig.defaults?.selectedTagIds),
 		fontFamily: normalizeFontFamily(
 			runtimeConfig.defaults?.fontFamily,
 			DEFAULT_MAP_DEFAULTS.fontFamily
@@ -445,6 +473,9 @@ export function normalizeMapConfig(
 	const centerLng = clampNumber(rawConfig.centerLng ?? defaults.centerLng, -180, 180);
 	const zoom = clampNumber(rawConfig.zoom ?? defaults.zoom, 0, 22);
 	const collectionId = Math.max(0, Number(rawConfig.collectionId ?? defaults.collectionId) || 0);
+	const selectedTagIds = normalizeSelectedTagIds(
+		rawConfig.selectedTagIds ?? defaults.selectedTagIds
+	);
 	const height = Math.max(1, Number(rawConfig.height ?? defaults.height));
 	const heightUnit = normalizeHeightUnit(rawConfig.heightUnit ?? defaults.heightUnit);
 	const heightMobile = normalizeOptionalHeight(rawConfig.heightMobile ?? defaults.heightMobile);
@@ -605,6 +636,10 @@ export function normalizeMapConfig(
 			: 1;
 	const centerOffsetY = Number.isFinite(Number(rawConfig.centerOffsetY)) ? Number(rawConfig.centerOffsetY) : 0;
 	const locations = normalizeLocations(rawConfig.locations ?? runtimeConfig.locations);
+	const filteredLocations =
+		selectedTagIds.length > 0
+			? filterLocationsByCategoryTagIds(locations, selectedTagIds)
+			: locations;
 
 	let styleTheme = rawConfig.styleTheme || {};
 
@@ -622,6 +657,7 @@ export function normalizeMapConfig(
 		centerLng,
 		zoom,
 		collectionId,
+		selectedTagIds,
 		height,
 		heightUnit,
 		heightMobile,
@@ -710,7 +746,7 @@ export function normalizeMapConfig(
 		markerOffsetY,
 		markerScale,
 		centerOffsetY,
-		locations,
+		locations: filteredLocations,
 		interactive: rawConfig.interactive ?? true,
 		showAttribution: rawConfig.showAttribution ?? true,
 		siteTimezone: `${rawConfig.siteTimezone ?? runtimeConfig.siteTimezone ?? 'UTC'}`,

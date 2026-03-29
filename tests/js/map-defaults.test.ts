@@ -33,6 +33,12 @@ describe('map defaults normalization', () => {
 		expect(config.enableCategoryFilter).toBe(false);
 	});
 
+	test('falls back to an empty selected tag list for shared maps without overrides', () => {
+		const config = normalizeMapConfig();
+
+		expect(config.selectedTagIds).toEqual([]);
+	});
+
 	test('falls back to a disabled opened quick filter for shared maps without overrides', () => {
 		const config = normalizeMapConfig();
 
@@ -97,6 +103,35 @@ describe('map defaults normalization', () => {
 
 		expect(config.enableLiveLocationSearch).toBe(true);
 		expect(config.enableLiveLocationMap).toBe(true);
+	});
+
+	test('filters locations by selected tag ids using OR semantics', () => {
+		const config = normalizeMapConfig({
+			selectedTagIds: [3, 7],
+			locations: [
+				{
+					id: 1,
+					lat: 52.517,
+					lng: 13.388,
+					tags: [{ id: 3, name: 'Coffee', background_color: '#111111', foreground_color: '#ffffff' }],
+				},
+				{
+					id: 2,
+					lat: 48.137154,
+					lng: 11.576124,
+					tags: [{ id: 7, name: 'Bakery', background_color: '#111111', foreground_color: '#ffffff' }],
+				},
+				{
+					id: 3,
+					lat: 50.110924,
+					lng: 8.682127,
+					tags: [{ id: 9, name: 'Tea', background_color: '#111111', foreground_color: '#ffffff' }],
+				},
+			],
+		});
+
+		expect(config.selectedTagIds).toEqual([3, 7]);
+		expect(config.locations.map((location) => location.id)).toEqual([1, 2]);
 	});
 
 	test('allows raw config to override runtime live-location defaults', () => {

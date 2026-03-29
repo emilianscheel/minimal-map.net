@@ -33,6 +33,7 @@ export interface MapDefaults {
 	centerLng: number;
 	zoom: number;
 	collectionId: number;
+	selectedTagIds: number[];
 	height: number;
 	heightUnit: HeightUnit;
 	heightMobile?: number;
@@ -176,6 +177,7 @@ export interface RawMapConfig {
 	centerLng?: number | string;
 	zoom?: number | string;
 	collectionId?: number | string;
+	selectedTagIds?: number[] | string | null;
 	height?: number | string;
 	heightUnit?: string;
 	heightMobile?: number | string | null;
@@ -521,6 +523,7 @@ export interface MapBlockAttributes {
 	centerLng: number;
 	zoom: number;
 	collectionId: number;
+	selectedTagIds: number[];
 	height: number;
 	heightUnit: HeightUnit;
 	heightMobile?: number;

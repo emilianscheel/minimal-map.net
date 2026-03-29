@@ -749,6 +749,111 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Selected tag ids should default to an empty array for backward compatibility.
+	 *
+	 * @return void
+	 */
+	public function test_normalize_block_attributes_defaults_selected_tag_ids_to_empty_array() {
+		$config     = new \MinimalMap\Config();
+		$attributes = $config->normalize_block_attributes( array() );
+
+		$this->assertSame( array(), $attributes['selectedTagIds'] );
+	}
+
+	/**
+	 * Selected tag ids should restrict the rendered block payload to matching locations.
+	 *
+	 * @return void
+	 */
+	public function test_normalize_block_attributes_filters_locations_by_selected_tags() {
+		$config              = new \MinimalMap\Config();
+		$coffee_tag_id       = $this->create_tag( 'Coffee' );
+		$matching_location   = $this->create_location( '52.517', '13.388' );
+		$this->create_location( '48.137154', '11.576124' );
+
+		wp_set_object_terms( $matching_location, array( $coffee_tag_id ), \MinimalMap\Tags\Tag_Taxonomy::TAXONOMY );
+
+		$attributes = $config->normalize_block_attributes(
+			array(
+				'selectedTagIds' => array( $coffee_tag_id ),
+			)
+		);
+
+		$this->assertSame( array( $coffee_tag_id ), $attributes['selectedTagIds'] );
+		$this->assertCount( 1, $attributes['locations'] );
+		$this->assertSame( $matching_location, $attributes['locations'][0]['id'] );
+		$this->assertSame( $coffee_tag_id, $attributes['locations'][0]['tags'][0]['id'] );
+	}
+
+	/**
+	 * Selected tag ids should combine with collection filters.
+	 *
+	 * @return void
+	 */
+	public function test_normalize_block_attributes_filters_locations_by_collection_and_selected_tags() {
+		$config               = new \MinimalMap\Config();
+		$coffee_tag_id        = $this->create_tag( 'Coffee' );
+		$matching_location    = $this->create_location( '52.517', '13.388' );
+		$other_collection_loc = $this->create_location( '48.137154', '11.576124' );
+		$collection_id        = $this->create_collection( array( $matching_location, $other_collection_loc ) );
+
+		wp_set_object_terms( $matching_location, array( $coffee_tag_id ), \MinimalMap\Tags\Tag_Taxonomy::TAXONOMY );
+
+		$attributes = $config->normalize_block_attributes(
+			array(
+				'collectionId' => $collection_id,
+				'selectedTagIds' => array( $coffee_tag_id ),
+			)
+		);
+
+		$this->assertSame( $collection_id, $attributes['collectionId'] );
+		$this->assertCount( 1, $attributes['locations'] );
+		$this->assertSame( $matching_location, $attributes['locations'][0]['id'] );
+	}
+
+	/**
+	 * The public locations route should treat an empty selected-tag list like the legacy behavior.
+	 *
+	 * @return void
+	 */
+	public function test_public_locations_route_treats_empty_selected_tag_ids_as_no_filter() {
+		$this->create_location( '52.517', '13.388' );
+		$this->create_location( '48.137154', '11.576124' );
+
+		$request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Locations_Route::get_rest_path() );
+		$request->set_param( 'selected_tag_ids', '' );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertCount( 2, $data['locations'] );
+	}
+
+	/**
+	 * The public locations route should filter optimized locations by selected tag ids.
+	 *
+	 * @return void
+	 */
+	public function test_public_locations_route_filters_by_selected_tag_ids() {
+		$coffee_tag_id        = $this->create_tag( 'Coffee' );
+		$matching_location    = $this->create_location( '52.517', '13.388' );
+		$this->create_location( '48.137154', '11.576124' );
+
+		wp_set_object_terms( $matching_location, array( $coffee_tag_id ), \MinimalMap\Tags\Tag_Taxonomy::TAXONOMY );
+
+		$request = new WP_REST_Request( 'GET', \MinimalMap\Rest\Locations_Route::get_rest_path() );
+		$request->set_param( 'selected_tag_ids', (string) $coffee_tag_id );
+
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertCount( 1, $data['locations'] );
+		$this->assertSame( $matching_location, $data['locations'][0]['id'] );
+	}
+
+	/**
 	 * Embed payloads should decode and sanitize through the shared block config pipeline.
 	 *
 	 * @return void

@@ -65,8 +65,9 @@ class Locations_Route {
 	 */
 	public function handle_request( $request ) {
 		$collection_id = absint( $request->get_param( 'collection_id' ) );
-		
-		$data = $this->config->get_optimized_map_data( $collection_id );
+		$selected_tag_ids = $request->get_param( 'selected_tag_ids' );
+
+		$data = $this->config->get_optimized_map_data( $collection_id, $selected_tag_ids );
 
 		return rest_ensure_response( $data );
 	}
@@ -82,6 +83,11 @@ class Locations_Route {
 				'required'          => false,
 				'type'              => 'integer',
 				'sanitize_callback' => 'absint',
+			),
+			'selected_tag_ids' => array(
+				'required'          => false,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
 			),
 		);
 	}

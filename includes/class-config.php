@@ -79,6 +79,7 @@ class Config {
 			'centerLng'        => 13.388,
 			'zoom'             => 9.5,
 			'collectionId'     => 0,
+			'selectedTagIds'   => array(),
 			'height'           => 420,
 			'heightUnit'       => 'px',
 			'stylePreset'      => self::DEFAULT_STYLE_PRESET,
@@ -185,6 +186,7 @@ class Config {
 		$center_lng = isset( $attributes['centerLng'] ) ? (float) $attributes['centerLng'] : 0.0;
 		$zoom       = isset( $attributes['zoom'] ) ? (float) $attributes['zoom'] : 0.0;
 		$collection_id = isset( $attributes['collectionId'] ) ? absint( $attributes['collectionId'] ) : 0;
+		$selected_tag_ids = $this->normalize_tag_ids( $attributes['selectedTagIds'] ?? array() );
 		$height     = isset( $attributes['height'] ) ? (float) $attributes['height'] : 0.0;
 		$height     = $height > 0 ? $height : (float) $defaults['height'];
 		$height_unit = isset( $attributes['heightUnit'] ) ? sanitize_text_field( (string) $attributes['heightUnit'] ) : 'px';
@@ -203,6 +205,7 @@ class Config {
 			$locations = $collection_id > 0
 				? $this->get_map_locations( $this->get_collection_location_ids( $collection_id ) )
 				: $this->get_map_locations();
+			$locations = $this->filter_locations_by_tag_ids( $locations, $selected_tag_ids );
 		}
 
 		$style_theme_slug = isset( $attributes['styleThemeSlug'] ) ? sanitize_key( (string) $attributes['styleThemeSlug'] ) : 'default';
@@ -229,6 +232,7 @@ class Config {
 			'centerLng'        => max( -180, min( 180, $center_lng ) ),
 			'zoom'             => max( 0, min( 22, $zoom ) ),
 			'collectionId'     => $collection_id,
+			'selectedTagIds'   => $selected_tag_ids,
 			'height'           => $height,
 			'heightUnit'       => $height_unit,
 			'heightMobile'     => $height_mobile,
@@ -336,10 +340,12 @@ class Config {
 	 * Get optimized map data with deduplicated markers and logos.
 	 *
 	 * @param int|null $collection_id Optional collection filter.
+	 * @param int[]    $selected_tag_ids Optional tag filter.
 	 * @return array<string, mixed>
 	 */
-	public function get_optimized_map_data( $collection_id = null ) {
+	public function get_optimized_map_data( $collection_id = null, $selected_tag_ids = array() ) {
 		$location_ids = null;
+		$selected_tag_ids = $this->normalize_tag_ids( $selected_tag_ids );
 		if ( $collection_id > 0 ) {
 			$location_ids = $this->get_collection_location_ids( $collection_id );
 		}
@@ -350,6 +356,7 @@ class Config {
 		} else {
 			$locations_list = array_values( $locations );
 		}
+		$locations_list = $this->filter_locations_by_tag_ids( $locations_list, $selected_tag_ids );
 
 		$markers = array();
 		$logos   = array();
@@ -688,6 +695,75 @@ class Config {
 		);
 
 		return array_values( array_unique( $location_ids ) );
+	}
+
+	/**
+	 * Normalize a list of tag ids into unique positive integers.
+	 *
+	 * @param mixed $tag_ids Raw tag ids.
+	 * @return int[]
+	 */
+	private function normalize_tag_ids( $tag_ids ) {
+		if ( is_string( $tag_ids ) ) {
+			$tag_ids = array_filter(
+				array_map( 'trim', explode( ',', $tag_ids ) ),
+				static function ( $tag_id ) {
+					return '' !== $tag_id;
+				}
+			);
+		}
+
+		if ( ! is_array( $tag_ids ) ) {
+			return array();
+		}
+
+		$tag_ids = array_map( 'absint', $tag_ids );
+		$tag_ids = array_filter(
+			$tag_ids,
+			static function ( $tag_id ) {
+				return $tag_id > 0;
+			}
+		);
+
+		return array_values( array_unique( $tag_ids ) );
+	}
+
+	/**
+	 * Filter locations by selected tag ids using OR semantics.
+	 *
+	 * @param array<int, array<string, mixed>> $locations Indexed or sequential locations.
+	 * @param int[]                            $selected_tag_ids Selected tag ids.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function filter_locations_by_tag_ids( $locations, $selected_tag_ids ) {
+		$selected_tag_ids = $this->normalize_tag_ids( $selected_tag_ids );
+
+		if ( empty( $selected_tag_ids ) ) {
+			return array_values( $locations );
+		}
+
+		$selected_lookup = array_fill_keys( $selected_tag_ids, true );
+
+		return array_values(
+			array_filter(
+				$locations,
+				static function ( $location ) use ( $selected_lookup ) {
+					if ( empty( $location['tags'] ) || ! is_array( $location['tags'] ) ) {
+						return false;
+					}
+
+					foreach ( $location['tags'] as $tag ) {
+						$tag_id = isset( $tag['id'] ) ? absint( $tag['id'] ) : 0;
+
+						if ( $tag_id > 0 && isset( $selected_lookup[ $tag_id ] ) ) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+			)
+		);
 	}
 
 	/**

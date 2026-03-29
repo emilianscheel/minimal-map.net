@@ -14,6 +14,7 @@ const EMBED_ATTRIBUTE_KEYS: Array<keyof EmbedAttributes> = [
 	'centerLng',
 	'zoom',
 	'collectionId',
+	'selectedTagIds',
 	'height',
 	'heightUnit',
 	'heightMobile',

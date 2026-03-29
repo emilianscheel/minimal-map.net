@@ -456,11 +456,15 @@ export function syncViewport(
 
 async function fetchOptimizedLocations(
 	urlStr: string,
-	collectionId?: number
+	collectionId?: number,
+	selectedTagIds: number[] = []
 ): Promise<{ locations: MapLocationPoint[]; markers: Record<string, string>; logos: Record<string, string> }> {
 	const url = new URL(urlStr);
 	if (collectionId) {
 		url.searchParams.set('collection_id', collectionId.toString());
+	}
+	if (selectedTagIds.length > 0) {
+		url.searchParams.set('selected_tag_ids', selectedTagIds.join(','));
 	}
 
 	const response = await fetch(url.toString());
@@ -553,7 +557,8 @@ export function createMinimalMap(
 			try {
 				const { locations, markers, logos } = await fetchOptimizedLocations(
 					runtimeConfig.locationsUrl!,
-					config.collectionId
+					config.collectionId,
+					config.selectedTagIds
 				);
 
 			if (destroyed) {
