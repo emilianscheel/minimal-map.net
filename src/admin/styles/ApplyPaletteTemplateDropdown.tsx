@@ -40,7 +40,6 @@ export function ApplyPaletteTemplateDropdown({
 						<MenuItem
 							key={template.id}
 							className="minimal-map-styles__palette-template-menu-item"
-							info={template.source}
 							suffix={
 								<span
 									className="minimal-map-styles__palette-template-swatches"

@@ -1288,7 +1288,6 @@ class Config {
 		return array(
 			'id'     => 'wordpress-theme-palette',
 			'label'  => __( 'WordPress Theme Palette', 'minimal-map' ),
-			'source' => __( 'Current WordPress theme palette', 'minimal-map' ),
 			'colors' => $palette,
 		);
 	}

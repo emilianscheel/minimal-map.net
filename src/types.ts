@@ -950,7 +950,6 @@ export interface StylePaletteEntry {
 export interface StylePaletteTemplate {
 	id: string;
 	label: string;
-	source: string;
 	colors: StylePaletteEntry[];
 }
 

@@ -62,7 +62,6 @@ const config: StylesAdminConfig = {
 		{
 			id: 'wordpress-theme-palette',
 			label: 'WordPress Theme Palette',
-			source: 'Current WordPress theme palette',
 			colors: [
 				{ name: 'Canvas', slug: 'canvas', color: '#f5efe7' },
 				{ name: 'Ink', slug: 'ink', color: '#1f2933' },
