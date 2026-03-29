@@ -1177,7 +1177,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
   return (
     <>
       <InspectorControls group="settings">
-        <PanelBody title={__("Settings", "minimal-map")} initialOpen={false}>
+        <PanelBody title={__("Data", "minimal-map")} initialOpen={false}>
           <CollectionDropdown
             options={runtimeConfig.collections ?? []}
             selectedId={attributes.collectionId}
@@ -1189,11 +1189,8 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             suggestionTags={selectableTags}
             onChange={(value) => setAttributes({ selectedTagIds: value })}
           />
-          <ThemeDropdown
-            themes={runtimeConfig.styleThemes ?? []}
-            selectedSlug={attributes.styleThemeSlug}
-            onChange={(value) => setAttributes({ styleThemeSlug: value })}
-          />
+        </PanelBody>
+        <PanelBody title={__("Frame", "minimal-map")} initialOpen={false}>
           <TextControl
             label={__("Center Latitude", "minimal-map")}
             type="number"
@@ -1209,7 +1206,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={updateNumberAttribute("centerLng")}
           />
           <RangeControl
-            label={__("Zoom", "minimal-map")}
+            label={__("Zoom Level", "minimal-map")}
             value={attributes.zoom}
             onChange={updateZoom}
             min={0}
@@ -1373,6 +1370,17 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
       </InspectorControls>
       <InspectorControls group="styles">
         <PanelBody title={__("Appearance", "minimal-map")} initialOpen={false}>
+          <ThemeDropdown
+            themes={runtimeConfig.styleThemes ?? []}
+            selectedSlug={attributes.styleThemeSlug}
+            onChange={(value) => setAttributes({ styleThemeSlug: value })}
+          />
+          <SelectControl
+            label={__("Style Preset", "minimal-map")}
+            value={attributes.stylePreset}
+            options={styleOptions}
+            onChange={(value: string) => setAttributes({ stylePreset: value })}
+          />
           <UnitControl
             className="minimal-map-editor__height-control components-border-radius-control__unit-control"
             label={__("Height", "minimal-map")}
@@ -1394,12 +1402,6 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             onChange={updateHeightMobile}
             units={HEIGHT_UNITS}
             size="__unstable-large"
-          />
-          <SelectControl
-            label={__("Style Preset", "minimal-map")}
-            value={attributes.stylePreset}
-            options={styleOptions}
-            onChange={(value: string) => setAttributes({ stylePreset: value })}
           />
         </PanelBody>
         <PanelBody
