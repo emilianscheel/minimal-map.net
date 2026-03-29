@@ -373,4 +373,40 @@ describe('location import helpers', () => {
 			[1, 1],
 		]);
 	});
+
+	test('runs common imports with filename-based logo and marker values plus named tags', async () => {
+		const parsed = parseCsvText(
+			[
+				'title,street,house_number,postal_code,city,country,latitude,longitude,logo,marker,tags',
+				'Store One,Main Street,1,10115,Berlin,Germany,52.5,13.4,bioland.png,dennss.svg,Rewe',
+				'Store Two,Side Street,2,20095,Hamburg,Germany,53.5,10.0,Bioland,DennsS,Rewe|Organic',
+			].join('\n')
+		);
+		const createdForms: LocationFormState[] = [];
+
+		await runCommonCsvImport(parsed, LOCATIONS_CONFIG, COLLECTIONS_CONFIG, {
+			logos: [
+				{ id: 11, title: 'bioland.png' },
+			],
+			markers: [
+				{ id: 22, title: 'dennss.svg' },
+			],
+			tags: [
+				{ id: 31, name: 'Rewe' },
+				{ id: 32, name: 'Organic' },
+			],
+			createLocationFn: async (_config, form) => {
+				createdForms.push({ ...form });
+				return { id: createdForms.length };
+			},
+			createCollectionFn: async () => {},
+		});
+
+		expect(createdForms[0].logo_id).toBe(11);
+		expect(createdForms[0].marker_id).toBe(22);
+		expect(createdForms[0].tag_ids).toEqual([31]);
+		expect(createdForms[1].logo_id).toBe(11);
+		expect(createdForms[1].marker_id).toBe(22);
+		expect(createdForms[1].tag_ids).toEqual([31, 32]);
+	});
 });

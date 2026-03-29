@@ -2063,6 +2063,11 @@ export function useLocationsController(
 		try {
 			const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
 			const parsedData = isExcel ? await parseExcelFile(file) : await parseCsvFile(file);
+			const [logoRecords, markerRecords, tagRecords] = await Promise.all([
+				ensureLogoLookups(),
+				ensureMarkerLookups(),
+				ensureTagLookups(),
+			]);
 
 			if (isCommonCsvFormat(parsedData)) {
 				openLocationImportProgressModal(parsedData.rows.length);
@@ -2070,9 +2075,9 @@ export function useLocationsController(
 
 				try {
 					const result = await runCommonCsvImport(parsedData, config, collectionsConfig, {
-						logos,
-						markers,
-						tags,
+						logos: logoRecords,
+						markers: markerRecords,
+						tags: tagRecords,
 						onProgress: (completed, total) => {
 							setCsvImportProgressCompleted(completed);
 							setCsvImportProgressTotal(total);
@@ -2113,13 +2118,13 @@ export function useLocationsController(
 	}, [
 		collectionsConfig,
 		config,
+		ensureLogoLookups,
+		ensureMarkerLookups,
+		ensureTagLookups,
 		loadLocations,
-		logos,
-		markers,
 		openLocationImportProgressModal,
 		resetCustomCsvImportState,
 		resetLocationImportProgressState,
-		tags,
 	]);
 
 	const onStartCustomCsvImport = useCallback(async (): Promise<void> => {

@@ -26,6 +26,7 @@ import {
 	formatLocationVisibilityCsvValue,
 	normalizeLocationVisibilityValue,
 } from './visibility';
+import { parseFilenameParts } from '../filenames';
 
 export const COMMON_CSV_HEADERS = [
 	'title',
@@ -543,15 +544,72 @@ function applyCsvImportAssignments(
 	};
 }
 
+function normalizeLookupValue(value: string | undefined): string {
+	return (value || '').trim().toLowerCase();
+}
+
+function createAssetLookupMap(records: Array<{ id: number; title?: string }>): Map<string, number> {
+	const lookup = new Map<string, number>();
+
+	for (const record of records) {
+		const rawTitle = record.title?.trim();
+		const normalizedTitle = normalizeLookupValue(rawTitle);
+
+		if (!normalizedTitle) {
+			continue;
+		}
+
+		lookup.set(normalizedTitle, record.id);
+
+		const { basename } = parseFilenameParts(normalizedTitle);
+		if (basename && basename !== normalizedTitle) {
+			lookup.set(basename, record.id);
+		}
+	}
+
+	return lookup;
+}
+
+function resolveAssetId(
+	value: string | undefined,
+	lookup: Map<string, number>
+): number {
+	const normalizedValue = normalizeLookupValue(value);
+
+	if (!normalizedValue) {
+		return 0;
+	}
+
+	return lookup.get(normalizedValue) || lookup.get(parseFilenameParts(normalizedValue).basename) || 0;
+}
+
+function splitImportedTagValues(value: string | undefined): string[] {
+	if (!value) {
+		return [];
+	}
+
+	return value
+		.split(/[|,;]+/)
+		.map((part) => part.trim())
+		.filter((part) => part.length > 0);
+}
+
 function buildCommonLocationForm(
 	rowRecord: Record<CommonCsvHeader, string | undefined>,
 	logos: any[] = [],
 	markers: any[] = [],
 	tags: any[] = []
 ): LocationFormState {
-	const logosByTitle = new Map(logos.map((l) => [l.title, l.id]));
-	const markersByTitle = new Map(markers.map((m) => [m.title, m.id]));
-	const tagsByName = new Map(tags.map((t) => [t.name, t.id]));
+	const logosByTitle = createAssetLookupMap(logos);
+	const markersByTitle = createAssetLookupMap(markers);
+	const tagsByName = new Map(
+		tags
+			.map((tag) => {
+				const normalizedName = normalizeLookupValue(tag.name);
+				return normalizedName ? [normalizedName, tag.id] : null;
+			})
+			.filter((entry): entry is [string, number] => entry !== null)
+	);
 
 	let openingHours = createDefaultOpeningHours();
 	let openingHoursNotes = rowRecord.opening_hours_notes || rowRecord['additional information opening hours'] || '';
@@ -594,11 +652,10 @@ function buildCommonLocationForm(
 		}
 	});
 
-	const logoId = rowRecord.logo ? logosByTitle.get(rowRecord.logo) || 0 : 0;
-	const markerId = rowRecord.marker ? markersByTitle.get(rowRecord.marker) || 0 : 0;
-	const tagIds = (rowRecord.tags || '')
-		.split('|')
-		.map((name) => tagsByName.get(name.trim()))
+	const logoId = resolveAssetId(rowRecord.logo, logosByTitle);
+	const markerId = resolveAssetId(rowRecord.marker, markersByTitle);
+	const tagIds = splitImportedTagValues(rowRecord.tags)
+		.map((name) => tagsByName.get(normalizeLookupValue(name)))
 		.filter((id): id is number => !!id);
 
 	const socialMedia: any[] = [];
