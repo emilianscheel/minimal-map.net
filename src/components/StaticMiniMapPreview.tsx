@@ -59,7 +59,7 @@ export default function StaticMiniMapPreview({
 			) : null}
 			{overlay}
 			{badge !== null && badge !== undefined && badge !== '' ? (
-				<span className="minimal-map-admin__mini-map-preview-count">#{badge}</span>
+				<span className="minimal-map-admin__mini-map-preview-count">{badge}</span>
 			) : null}
 			{onClick && <div className="minimal-map-admin__mini-map-preview-click-overlay" />}
 		</>
