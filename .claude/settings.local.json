@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(msgfmt /Users/coderdojo/Developer/minimal-map.net/languages/minimal-map-fr_FR.po -o /Users/coderdojo/Developer/minimal-map.net/languages/minimal-map-fr_FR.mo)"
+    ]
+  }
+}
