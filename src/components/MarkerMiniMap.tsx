@@ -8,6 +8,7 @@ export default function MarkerMiniMap({ marker, theme }: { marker: MarkerRecord;
 			markerContent={marker.content}
 			variant="card"
 			className="minimal-map-admin__marker-mini-map"
+			badge={1}
 		/>
 	);
 }

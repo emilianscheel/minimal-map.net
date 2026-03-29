@@ -1,14 +1,16 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { DEFAULT_POSITRON_THEME_COLORS } from '../lib/styles/defaultThemeColors';
 import type { StyleThemeRecord } from '../types';
 
 interface StaticMiniMapPreviewProps {
 	theme: StyleThemeRecord | null;
-	markerContent: string;
+	markerContent?: string | null;
 	variant?: 'compact' | 'card';
 	onClick?: () => void;
 	ariaLabel?: string;
 	className?: string;
+	overlay?: ReactNode;
+	badge?: string | number | null;
 }
 
 function joinClassNames(...classNames: Array<string | false | null | undefined>): string {
@@ -22,6 +24,8 @@ export default function StaticMiniMapPreview({
 	onClick,
 	ariaLabel,
 	className,
+	overlay,
+	badge,
 }: StaticMiniMapPreviewProps) {
 	const colors = theme?.colors ?? DEFAULT_POSITRON_THEME_COLORS;
 	const previewStyle = {
@@ -47,10 +51,16 @@ export default function StaticMiniMapPreview({
 				<span className="minimal-map-admin__mini-map-preview-road minimal-map-admin__mini-map-preview-road--primary" />
 				<span className="minimal-map-admin__mini-map-preview-road minimal-map-admin__mini-map-preview-road--secondary" />
 			</div>
-			<div
-				className="minimal-map-admin__mini-map-preview-marker"
-				dangerouslySetInnerHTML={{ __html: markerContent }}
-			/>
+			{markerContent ? (
+				<div
+					className="minimal-map-admin__mini-map-preview-marker"
+					dangerouslySetInnerHTML={{ __html: markerContent }}
+				/>
+			) : null}
+			{overlay}
+			{badge !== null && badge !== undefined && badge !== '' ? (
+				<span className="minimal-map-admin__mini-map-preview-count">#{badge}</span>
+			) : null}
 			{onClick && <div className="minimal-map-admin__mini-map-preview-click-overlay" />}
 		</>
 	);

@@ -26,6 +26,7 @@ function useCollectionFields(
         render: ({ item }) => (
           <CollectionMiniMap
             previewLocations={item.preview_locations}
+            locationCount={item.location_count}
             theme={activeTheme}
           />
         ),

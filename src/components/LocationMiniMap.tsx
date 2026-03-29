@@ -63,6 +63,7 @@ export default function LocationMiniMap({
 			onClick={onClick}
 			ariaLabel={onClick ? __('Change marker color', 'minimal-map') : undefined}
 			className="minimal-map-admin__location-mini-map"
+			badge={1}
 		/>
 	);
 }

@@ -1,67 +1,47 @@
-import { memo, useEffect, useMemo, useRef } from '@wordpress/element';
-import { createMinimalMap } from '../map/bootstrap';
-import { areCollectionMiniMapPropsEqual } from '../lib/collections/collectionMiniMap';
-import type {
-	MapLocationPoint,
-	MinimalMapInstance,
-	RawMapConfig,
-	StyleThemeRecord,
-} from '../types';
-
-const COLLECTION_MARKER_SCALE = 24 / 41;
+import { memo } from '@wordpress/element';
+import type { MapLocationPoint, StyleThemeRecord } from '../types';
+import {
+	areCollectionMiniMapPropsEqual,
+	getCollectionMiniMapPointLayouts,
+} from '../lib/collections/collectionMiniMap';
+import StaticMiniMapPreview from './StaticMiniMapPreview';
 
 function CollectionMiniMap({
 	previewLocations,
+	locationCount,
 	theme,
 }: {
 	previewLocations: MapLocationPoint[];
+	locationCount: number;
 	theme: StyleThemeRecord | null;
 }) {
-	const hostRef = useRef<HTMLDivElement | null>(null);
-	const mapRef = useRef<MinimalMapInstance | null>(null);
-	const mapConfig = useMemo<RawMapConfig>(() => ({
-		centerLat: 52.517,
-		centerLng: 13.388,
-		zoom: previewLocations.length > 1 ? 7.5 : 11,
-		height: 100,
-		heightUnit: '%',
-		stylePreset: theme?.basePreset || 'positron',
-		styleTheme: theme?.colors,
-		showZoomControls: false,
-		allowSearch: false,
-		markerOffsetY: 0,
-		markerScale: COLLECTION_MARKER_SCALE,
-		centerOffsetY: 0,
-		locations: previewLocations,
-		interactive: false,
-		showAttribution: false,
-	}), [previewLocations, theme]);
+	const pointLayouts = getCollectionMiniMapPointLayouts(previewLocations, locationCount);
 
-	useEffect(() => {
-		if (!hostRef.current) {
-			return undefined;
-		}
-
-		mapRef.current = createMinimalMap(
-			hostRef.current,
-			mapConfig,
-			{
-				...(window.MinimalMapAdminConfig?.mapConfig ?? {}),
-				autoFetchLocations: false,
+	return (
+		<StaticMiniMapPreview
+			theme={theme}
+			markerContent={null}
+			variant="card"
+			className="minimal-map-admin__collection-mini-map"
+			badge={locationCount}
+			overlay={
+				<>
+					{pointLayouts.map((layout) => (
+						<span
+							key={layout.key}
+							className="minimal-map-admin__collection-mini-map-point"
+							style={{
+								left: `${layout.left}%`,
+								top: `${layout.top}%`,
+								opacity: layout.opacity,
+								transform: `translate(-50%, -50%) scale(${layout.scale})`,
+							}}
+						/>
+					))}
+				</>
 			}
-		);
-
-		return () => {
-			mapRef.current?.destroy();
-			mapRef.current = null;
-		};
-	}, []);
-
-	useEffect(() => {
-		mapRef.current?.update(mapConfig);
-	}, [mapConfig]);
-
-	return <div ref={hostRef} className="minimal-map-admin__collection-mini-map" aria-hidden="true" />;
+		/>
+	);
 }
 
 export default memo(CollectionMiniMap, areCollectionMiniMapPropsEqual);
