@@ -1,7 +1,7 @@
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState } from '@wordpress/element';
-import { BrushCleaning } from 'lucide-react';
+import { BrushCleaning, Library } from 'lucide-react';
 import type { ViewGrid } from '@wordpress/dataviews';
 import apiFetch from '@wordpress/api-fetch';
 import type {
@@ -47,6 +47,7 @@ export function useMarkersController(
 	const [isDeletingAllMarkers, setDeletingAllMarkers] = useState(false);
 	const [isEditModalOpen, setEditModalOpen] = useState(false);
 	const [isColorEditModalOpen, setColorEditModalOpen] = useState(false);
+	const [isLibraryModalOpen, setLibraryModalOpen] = useState(false);
 	const [colorEditingMarker, setColorEditingMarker] = useState<MarkerRecord | null>(null);
 	const [draftSvgColors, setDraftSvgColors] = useState<SvgColorEntry[]>([]);
 	const [colorEditSubmitError, setColorEditSubmitError] = useState<string | null>(null);
@@ -194,6 +195,14 @@ export function useMarkersController(
 			setSubmitting(false);
 		}
 	}, [colorEditingMarker, config, draftSvgColors, loadMarkers, resetColorEditModalState]);
+
+	const onOpenLibraryModal = useCallback((): void => {
+		setLibraryModalOpen(true);
+	}, []);
+
+	const onCloseLibraryModal = useCallback((): void => {
+		setLibraryModalOpen(false);
+	}, []);
 
 	const onCloseDeleteAllMarkersModal = useCallback((): void => {
 		if (isDeletingAllMarkers || isRowActionPending) {
@@ -410,6 +419,14 @@ export function useMarkersController(
 					disabled={totalItems === 0 || isDeletingAllMarkers || isRowActionPending || isUploading}
 					__next40pxDefaultSize
 				/>
+				<Button
+					variant="tertiary"
+					icon={<Library size={18} strokeWidth={2} />}
+					label={__('Marker library', 'minimal-map')}
+					onClick={onOpenLibraryModal}
+					disabled={isUploading || isDeletingAllMarkers || isRowActionPending}
+					__next40pxDefaultSize
+				/>
 				<UploadMarkerButton onUpload={onUploadMarkers} isUploading={isUploading} />
 			</div>
 		) : null,
@@ -447,5 +464,8 @@ export function useMarkersController(
 		onChangeMarkerColor,
 		onToggleMarkerColorNone,
 		onConfirmEditMarkerColors,
+		isLibraryModalOpen,
+		onOpenLibraryModal,
+		onCloseLibraryModal,
 	};
 }

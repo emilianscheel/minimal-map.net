@@ -49,4 +49,7 @@ export interface MarkersController {
 	onChangeMarkerColor: (id: string, color: string) => void;
 	onToggleMarkerColorNone: (id: string) => void;
 	onConfirmEditMarkerColors: () => Promise<void>;
+	isLibraryModalOpen: boolean;
+	onOpenLibraryModal: () => void;
+	onCloseLibraryModal: () => void;
 }
