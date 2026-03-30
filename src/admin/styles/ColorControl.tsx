@@ -51,14 +51,14 @@ export function ColorControl({
 					>
 						<CheckboxControl
 							label={checkboxLabel ?? label}
-							hideLabelFromVision
 							checked={checked}
 							onChange={(nextChecked) => onCheckedChange?.(nextChecked)}
 							__nextHasNoMarginBottom
 						/>
 					</div>
-				) : null}
-				<span className="minimal-map-styles__color-label">{label}</span>
+				) : (
+					<span className="minimal-map-styles__color-label">{label}</span>
+				)}
 			</div>
 			<Dropdown
 				renderToggle={({ isOpen, onToggle }) => (

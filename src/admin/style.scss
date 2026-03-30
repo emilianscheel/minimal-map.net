@@ -1899,8 +1899,19 @@ body.toplevel_page_minimal-map
       margin-bottom: 0;
     }
 
+    .components-base-control__field {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
     .components-checkbox-control__input-container {
       margin: 0;
+    }
+
+    .components-checkbox-control__label {
+      font-size: 14px;
+      color: #1e1e1e;
     }
   }
 
@@ -1954,6 +1965,9 @@ body.toplevel_page_minimal-map
   }
 
   &__color-indicator--mixed {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
   }
 

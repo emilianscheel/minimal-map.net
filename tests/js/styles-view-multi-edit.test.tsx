@@ -89,10 +89,12 @@ beforeAll(() => {
       createElement("div", { className: "components-card__body" }, children),
     CheckboxControl: ({
       label,
+      hideLabelFromVision,
       checked,
       onChange,
     }: {
       label: string;
+      hideLabelFromVision?: boolean;
       checked?: boolean;
       onChange: (checked: boolean) => void;
     }) =>
@@ -106,6 +108,7 @@ beforeAll(() => {
             onChange((event.currentTarget as HTMLInputElement).checked),
           type: "checkbox",
         }),
+        hideLabelFromVision ? null : label,
       ),
     ColorIndicator: ({ colorValue }: { colorValue: string }) =>
       createElement("span", {
