@@ -76,7 +76,9 @@ export function ApplyPaletteTemplateDropdown({
 }
 
 function getTemplatePreviewColors(template: StylePaletteTemplate): string[] {
-	const derivedTheme = deriveThemeFromPalette(template.colors);
+	const derivedTheme = deriveThemeFromPalette(template.colors, undefined, {
+		accentVariant: template.deriveVariant,
+	});
 
 	return [
 		derivedTheme.placeLabel,

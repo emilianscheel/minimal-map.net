@@ -949,10 +949,13 @@ export interface StylePaletteEntry {
 	color: string;
 }
 
+export type StylePaletteTemplateVariant = 'default' | 'swap-1' | 'swap-2';
+
 export interface StylePaletteTemplate {
 	id: string;
 	label: string;
 	colors: StylePaletteEntry[];
+	deriveVariant?: StylePaletteTemplateVariant;
 }
 
 export interface StyleThemeRecord {

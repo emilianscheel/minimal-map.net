@@ -1268,24 +1268,19 @@ class Config {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function get_admin_palette_templates() {
-		$templates          = array();
-		$wordpress_template = $this->get_wordpress_palette_template();
-
-		if ( is_array( $wordpress_template ) ) {
-			$templates[] = $wordpress_template;
-		}
+		$templates = $this->get_wordpress_palette_templates();
 
 		return $templates;
 	}
 
 	/**
-	 * Build a palette template from WordPress global styles.
+	 * Build palette templates from WordPress global styles.
 	 *
-	 * @return array<string, mixed>|null
+	 * @return array<int, array<string, mixed>>
 	 */
-	private function get_wordpress_palette_template() {
+	private function get_wordpress_palette_templates() {
 		if ( ! function_exists( 'wp_get_global_settings' ) ) {
-			return null;
+			return array();
 		}
 
 		$palette = $this->normalize_palette_entries(
@@ -1293,13 +1288,41 @@ class Config {
 		);
 
 		if ( count( $palette ) < 3 ) {
-			return null;
+			return array();
 		}
 
-		return array(
-			'id'     => 'wordpress-theme-palette',
-			'label'  => __( 'WordPress Theme Palette', 'minimal-map' ),
-			'colors' => $palette,
+		$variants = array(
+			array(
+				'id'             => 'wordpress-theme-palette-1',
+				'derive_variant' => 'default',
+				'number'         => 1,
+			),
+			array(
+				'id'             => 'wordpress-theme-palette-2',
+				'derive_variant' => 'swap-1',
+				'number'         => 2,
+			),
+			array(
+				'id'             => 'wordpress-theme-palette-3',
+				'derive_variant' => 'swap-2',
+				'number'         => 3,
+			),
+		);
+
+		return array_map(
+			function ( $variant ) use ( $palette ) {
+				return array(
+					'id'            => $variant['id'],
+					'label'         => sprintf(
+						/* translators: %d: WordPress palette template number. */
+						__( 'WordPress Theme Palette #%d', 'minimal-map' ),
+						$variant['number']
+					),
+					'colors'        => $palette,
+					'deriveVariant' => $variant['derive_variant'],
+				);
+			},
+			$variants
 		);
 	}
 

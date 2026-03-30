@@ -9,6 +9,7 @@ import type {
 	StyleThemeRecord,
 	StyleThemeColors,
 	StylePaletteEntry,
+	StylePaletteTemplateVariant,
 } from '../../types';
 import type { StylesController } from './types';
 import { ThemeSelector } from './ThemeSelector';
@@ -27,7 +28,10 @@ interface StylesControllerDependencies {
 	apiFetch: typeof apiFetch;
 	deriveThemeFromPalette: (
 		palette: StylePaletteEntry[],
-		defaultColors?: StyleThemeColors
+		defaultColors?: StyleThemeColors,
+		options?: {
+			accentVariant?: StylePaletteTemplateVariant;
+		}
 	) => StyleThemeColors;
 }
 
@@ -182,7 +186,7 @@ export function useStylesController(
 		setIsApplyingPaletteTemplate(true);
 		try {
 			setActionNotice(null);
-			const label = getTemplateThemeLabel(themes, __('WordPress Palette', 'minimal-map'));
+			const label = getTemplateThemeLabel(themes, template.label);
 			const newTheme = await dependencies.apiFetch<StyleThemeRecord>({
 				path: config.restPath,
 				method: 'POST',
@@ -190,7 +194,10 @@ export function useStylesController(
 			});
 			const derivedColors = dependencies.deriveThemeFromPalette(
 				template.colors,
-				DEFAULT_POSITRON_THEME_COLORS
+				DEFAULT_POSITRON_THEME_COLORS,
+				{
+					accentVariant: template.deriveVariant,
+				}
 			);
 			const updatedTheme = await dependencies.apiFetch<StyleThemeRecord>({
 				path: `${ config.restPath }/${ newTheme.slug }`,
@@ -203,13 +210,19 @@ export function useStylesController(
 			setDraftColors(updatedTheme.colors);
 			setActionNotice({
 				status: 'success',
-				message: __('Created a new theme from the current WordPress palette.', 'minimal-map'),
+				message: sprintf(
+					__('Created a new theme from %s.', 'minimal-map'),
+					template.label
+				),
 			});
 		} catch (error) {
 			console.error('Failed to apply palette template', error);
 			setActionNotice({
 				status: 'error',
-				message: __('Failed to create a theme from the WordPress palette.', 'minimal-map'),
+				message: sprintf(
+					__('Failed to create a theme from %s.', 'minimal-map'),
+					template.label
+				),
 			});
 		} finally {
 			setIsApplyingPaletteTemplate(false);

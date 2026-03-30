@@ -1,4 +1,8 @@
-import type { StylePaletteEntry, StyleThemeColors } from '../../types';
+import type {
+	StylePaletteEntry,
+	StylePaletteTemplateVariant,
+	StyleThemeColors,
+} from '../../types';
 import { DEFAULT_POSITRON_THEME_COLORS } from './defaultThemeColors';
 
 const MIN_LABEL_CONTRAST = 4.5;
@@ -21,6 +25,16 @@ interface PaletteColorAnalysis {
 	hsl: HslColor;
 	index: number;
 	luminance: number;
+}
+
+interface DeriveThemeFromPaletteOptions {
+	accentVariant?: StylePaletteTemplateVariant;
+}
+
+interface AccentAnchors {
+	waterAnchor: string;
+	landAnchor: string;
+	transportAnchor: string;
 }
 
 export function normalizePaletteHexColor(value: string): string | null {
@@ -60,7 +74,8 @@ export function getContrastRatio(foreground: string, background: string): number
 
 export function deriveThemeFromPalette(
 	palette: StylePaletteEntry[],
-	defaultColors: StyleThemeColors = DEFAULT_POSITRON_THEME_COLORS
+	defaultColors: StyleThemeColors = DEFAULT_POSITRON_THEME_COLORS,
+	options: DeriveThemeFromPaletteOptions = {}
 ): StyleThemeColors {
 	const analyzedPalette = palette
 		.map((entry, index) => {
@@ -83,14 +98,25 @@ export function deriveThemeFromPalette(
 		textAnchorAnalysis
 	);
 	const structureAnchor = pickStructureAnchor(analyzedPalette, backgroundAnchor, textAnchor);
-	const waterAnchor = pickWaterAnchor(accentCandidates, structureAnchor);
-	const landAnchor = pickLandAnchor(accentCandidates, waterAnchor, structureAnchor);
-	const transportAnchor = pickTransportAnchor(
+	const baseWaterAnchor = pickWaterAnchor(accentCandidates, structureAnchor);
+	const baseLandAnchor = pickLandAnchor(accentCandidates, baseWaterAnchor, structureAnchor);
+	const baseTransportAnchor = pickTransportAnchor(
 		accentCandidates,
-		waterAnchor,
-		landAnchor,
+		baseWaterAnchor,
+		baseLandAnchor,
 		structureAnchor
 	);
+	const normalizedAccentAnchors = applyAccentVariant(
+		{
+			waterAnchor: baseWaterAnchor,
+			landAnchor: baseLandAnchor,
+			transportAnchor: baseTransportAnchor,
+		},
+		options.accentVariant ?? 'default'
+	);
+	const finalWaterAnchor = normalizedAccentAnchors.waterAnchor;
+	const finalLandAnchor = normalizedAccentAnchors.landAnchor;
+	const finalTransportAnchor = normalizedAccentAnchors.transportAnchor;
 
 	const background = blend(defaultColors.background, lighten(backgroundAnchor, 1), 0.72);
 	const residential = blend(
@@ -98,34 +124,34 @@ export function deriveThemeFromPalette(
 		blend(background, structureAnchor, 0.16),
 		0.64
 	);
-	const park = blend(defaultColors.park, blend(background, landAnchor, 0.36), 0.9);
-	const forest = blend(defaultColors.forest, blend(background, landAnchor, 0.52), 0.94);
-	const ice = blend(defaultColors.ice, blend(background, waterAnchor, 0.16), 0.8);
-	const water = blend(defaultColors.water, blend(background, waterAnchor, 0.54), 0.94);
-	const waterway = blend(defaultColors.waterway, darken(blend(background, waterAnchor, 0.62), 8), 0.92);
+	const park = blend(defaultColors.park, blend(background, finalLandAnchor, 0.36), 0.9);
+	const forest = blend(defaultColors.forest, blend(background, finalLandAnchor, 0.52), 0.94);
+	const ice = blend(defaultColors.ice, blend(background, finalWaterAnchor, 0.16), 0.8);
+	const water = blend(defaultColors.water, blend(background, finalWaterAnchor, 0.54), 0.94);
+	const waterway = blend(defaultColors.waterway, darken(blend(background, finalWaterAnchor, 0.62), 8), 0.92);
 	const building = blend(defaultColors.building, blend(background, structureAnchor, 0.2), 0.74);
 	const buildingOutline = blend(defaultColors.buildingOutline, darken(building, 10), 0.78);
 	const path = blend(defaultColors.path, lighten(background, 9), 0.8);
 	const roadMinor = blend(defaultColors.roadMinor, lighten(background, 12), 0.86);
 	const roadMajorCasing = blend(
 		defaultColors.roadMajorCasing,
-		blend(background, transportAnchor, 0.1),
+		blend(background, finalTransportAnchor, 0.1),
 		0.76
 	);
 	const roadMajorFill = blend(defaultColors.roadMajorFill, lighten(background, 10), 0.86);
 	const motorwayCasing = blend(
 		defaultColors.motorwayCasing,
-		blend(background, transportAnchor, 0.28),
+		blend(background, finalTransportAnchor, 0.28),
 		0.84
 	);
 	const motorwayFill = blend(
 		defaultColors.motorwayFill,
-		blend(background, transportAnchor, 0.4),
+		blend(background, finalTransportAnchor, 0.4),
 		0.88
 	);
 	const rail = blend(defaultColors.rail, blend(background, textAnchor, 0.22), 0.74);
 	const railDash = blend(defaultColors.railDash, lighten(background, 15), 0.84);
-	const boundary = blend(defaultColors.boundary, blend(background, transportAnchor, 0.18), 0.8);
+	const boundary = blend(defaultColors.boundary, blend(background, finalTransportAnchor, 0.18), 0.8);
 	const aerowayLine = blend(
 		defaultColors.aerowayLine,
 		blend(background, structureAnchor, 0.18),
@@ -148,7 +174,7 @@ export function deriveThemeFromPalette(
 		MIN_LABEL_CONTRAST
 	);
 	const waterLabel = ensureContrast(
-		blend(defaultColors.waterLabel, blend(textAnchor, waterAnchor, 0.32), 0.66),
+		blend(defaultColors.waterLabel, blend(textAnchor, finalWaterAnchor, 0.32), 0.66),
 		water,
 		MIN_LABEL_CONTRAST
 	);
@@ -185,6 +211,29 @@ export function deriveThemeFromPalette(
 		placeLabel,
 		placeLabelHalo,
 	};
+}
+
+function applyAccentVariant(
+	anchors: AccentAnchors,
+	variant: StylePaletteTemplateVariant
+): AccentAnchors {
+	switch (variant) {
+		case 'swap-1':
+			return {
+				waterAnchor: anchors.landAnchor,
+				landAnchor: anchors.transportAnchor,
+				transportAnchor: anchors.waterAnchor,
+			};
+		case 'swap-2':
+			return {
+				waterAnchor: anchors.transportAnchor,
+				landAnchor: anchors.waterAnchor,
+				transportAnchor: anchors.landAnchor,
+			};
+		case 'default':
+		default:
+			return anchors;
+	}
 }
 
 function analyzeColor(color: string, index: number): PaletteColorAnalysis {

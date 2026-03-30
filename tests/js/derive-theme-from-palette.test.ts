@@ -139,6 +139,23 @@ describe('deriveThemeFromPalette', () => {
 		expect(getContrastRatio(theme.roadLabelHalo, theme.roadLabel)).toBeGreaterThanOrEqual(2.25);
 		expect(getContrastRatio(theme.waterLabelHalo, theme.waterLabel)).toBeGreaterThanOrEqual(2.25);
 	});
+
+	test('supports accent-swapped palette variants for the same WordPress palette', () => {
+		const palette = createPalette(['#f8f4ec', '#1f2933', '#5b8def', '#7aa95c', '#d97706']);
+		const variant1 = deriveThemeFromPalette(palette, DEFAULT_POSITRON_THEME_COLORS, {
+			accentVariant: 'default',
+		});
+		const variant2 = deriveThemeFromPalette(palette, DEFAULT_POSITRON_THEME_COLORS, {
+			accentVariant: 'swap-1',
+		});
+		const variant3 = deriveThemeFromPalette(palette, DEFAULT_POSITRON_THEME_COLORS, {
+			accentVariant: 'swap-2',
+		});
+
+		expect(variant1.water).not.toBe(variant2.water);
+		expect(variant1.park).not.toBe(variant3.park);
+		expect(variant2.motorwayFill).not.toBe(variant3.motorwayFill);
+	});
 });
 
 describe('normalizePaletteHexColor', () => {
