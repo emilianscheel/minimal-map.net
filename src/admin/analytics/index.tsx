@@ -49,7 +49,11 @@ function AnalyticsSection({
 				resetKey={`${category}-${controller.range}`}
 				title={getAnalyticsSectionTitle(category)}
 			>
-				<AnalyticsCards isLoading={controller.isLoadingSummary} summary={summary} />
+				<AnalyticsCards
+					isLoading={controller.isLoadingSummary}
+					siteLocale={siteLocale}
+					summary={summary}
+				/>
 				{controller.isLoadingSummary ? (
 					<div className="minimal-map-admin__analytics-state">
 						<Spinner />

@@ -37,7 +37,10 @@ function setGlobalDom(dom: JSDOM): void {
 			}) as MediaQueryList);
 	globalThis.window.requestAnimationFrame =
 		globalThis.window.requestAnimationFrame ??
-		((callback: FrameRequestCallback) => globalThis.window.setTimeout(callback, 0));
+		((callback: FrameRequestCallback) => globalThis.window.setTimeout(
+			() => callback(globalThis.window.performance.now()),
+			0
+		));
 	globalThis.window.cancelAnimationFrame =
 		globalThis.window.cancelAnimationFrame ??
 		((handle: number) => globalThis.window.clearTimeout(handle));
@@ -60,6 +63,10 @@ function setGlobalDom(dom: JSDOM): void {
 
 async function flushRender(): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+async function waitForCountAnimation(): Promise<void> {
+	await new Promise((resolve) => setTimeout(resolve, 1300));
 }
 
 function createTestCache(dom: JSDOM) {
@@ -245,6 +252,25 @@ function createControllerStub(
 	};
 }
 
+function getAnalyticsCardValue(container: HTMLElement, title: string): string {
+	const heading = Array.from(
+		container.querySelectorAll('.minimal-map-admin__feature-title')
+	).find((candidate) => candidate.textContent === title);
+
+	if (!heading) {
+		throw new Error(`Analytics card "${title}" not found`);
+	}
+
+	const card = heading.closest('.minimal-map-admin__analytics-card');
+	const value = card?.querySelector('.minimal-map-admin__analytics-card-value');
+
+	if (!value?.textContent) {
+		throw new Error(`Analytics card "${title}" has no value`);
+	}
+
+	return value.textContent;
+}
+
 afterEach(() => {
 	globalThis.window = originalGlobals.window;
 	globalThis.document = originalGlobals.document;
@@ -395,6 +421,38 @@ describe('AnalyticsView', () => {
 
 		expect(cards.length).toBeGreaterThan(0);
 		expect(chartSpinners).toHaveLength(cards.length);
+
+		root.unmount();
+	});
+
+	test('renders animated analytics values with the expected final formatting', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+		const controller = createControllerStub();
+
+		controller.summaries.search.successRate = 83.4;
+		controller.summaries.search.averageNearestDistanceMeters = 1840;
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller,
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
+		);
+
+		await flushRender();
+		await waitForCountAnimation();
+
+		expect(getAnalyticsCardValue(host, 'Total searches')).toBe('12');
+		expect(getAnalyticsCardValue(host, 'Success rate')).toBe('83%');
+		expect(getAnalyticsCardValue(host, 'Average distance to nearest store')).toBe('1.8 km');
 
 		root.unmount();
 	});

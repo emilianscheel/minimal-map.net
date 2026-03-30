@@ -13,6 +13,7 @@ import {
 import type { AnalyticsBreakdownDatum, AnalyticsSummary } from '../../types';
 import { normalizeAnalyticsSummary } from '../../lib/analytics/normalizeAnalyticsSummary';
 import AnalyticsSparkline, { formatPercentage } from './AnalyticsSparkline';
+import AnimatedNumber, { type AnimatedNumberProps } from '../AnimatedNumber';
 
 function formatMetricValue(value: number | null, suffix = ''): string {
 	if (value === null) {
@@ -20,18 +21,6 @@ function formatMetricValue(value: number | null, suffix = ''): string {
 	}
 
 	return `${Math.round(value)}${suffix}`;
-}
-
-function formatDistanceValue(distanceMeters: number | null, hasData: boolean): string {
-	if (!hasData || distanceMeters === null) {
-		return '—';
-	}
-
-	if (distanceMeters >= 1000) {
-		return `${(distanceMeters / 1000).toFixed(1)} km`;
-	}
-
-	return `${Math.round(distanceMeters)} m`;
 }
 
 function formatSparklineDistance(value: number | null): string {
@@ -72,12 +61,50 @@ export function getAnalyticsSectionTitle(category: AnalyticsSummary['category'])
 
 export default function AnalyticsCards({
 	isLoading,
+	siteLocale,
 	summary,
 }: {
 	isLoading: boolean;
+	siteLocale: string;
 	summary: AnalyticsSummary;
 }) {
 	const safeSummary = normalizeAnalyticsSummary(summary);
+
+	const createCountValue = (value: number | null, suffix = ''): AnimatedNumberProps => ({
+		locale: siteLocale,
+		suffix,
+		value,
+	});
+
+	const createPercentageValue = (value: number | null): AnimatedNumberProps => ({
+		locale: siteLocale,
+		suffix: '%',
+		value,
+	});
+
+	const createDistanceValue = (distanceMeters: number | null, hasData: boolean): AnimatedNumberProps => {
+		if (!hasData || distanceMeters === null) {
+			return {
+				locale: siteLocale,
+				value: null,
+			};
+		}
+
+		if (distanceMeters >= 1000) {
+			return {
+				decimals: 1,
+				locale: siteLocale,
+				suffix: ' km',
+				value: distanceMeters / 1000,
+			};
+		}
+
+		return {
+			locale: siteLocale,
+			suffix: ' m',
+			value: Math.round(distanceMeters),
+		};
+	};
 
 	if (safeSummary.category === 'selection') {
 		const hasData = safeSummary.totalSelections > 0;
@@ -92,7 +119,7 @@ export default function AnalyticsCards({
 				id: 'selection-total',
 				icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Total selections', 'minimal-map'),
-				value: hasData ? formatMetricValue(safeSummary.totalSelections) : '—',
+				value: createCountValue(hasData ? safeSummary.totalSelections : null),
 				description: __('Explicit location picks from search or marker clicks.', 'minimal-map'),
 				chart: (
 					<AnalyticsSparkline
@@ -108,7 +135,7 @@ export default function AnalyticsCards({
 				id: 'selection-conversion',
 				icon: <Target aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Search-to-selection conversion', 'minimal-map'),
-				value: hasData ? formatPercentage(safeSummary.conversionRate) : '—',
+				value: createPercentageValue(hasData ? safeSummary.conversionRate : null),
 				description: __('How often searches turn into a location choice.', 'minimal-map'),
 				chart: (
 					<AnalyticsSparkline
@@ -124,7 +151,7 @@ export default function AnalyticsCards({
 				id: 'selection-source-mix',
 				icon: <PieChart aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Selection source mix', 'minimal-map'),
-				value: dominantSourceShare !== null ? formatPercentage(dominantSourceShare) : '—',
+				value: createPercentageValue(dominantSourceShare),
 				description: dominantSource && dominantSourceShare !== null
 					? sprintf(
 						__('%1$s leads with %2$s.', 'minimal-map'),
@@ -145,7 +172,7 @@ export default function AnalyticsCards({
 				id: 'selection-top-locations',
 				icon: <MapPin aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Top selected locations', 'minimal-map'),
-				value: topLocation ? formatMetricValue(topLocation.value) : '—',
+				value: createCountValue(topLocation?.value ?? null),
 				description: topLocation
 					? sprintf(__('Most selected: %s', 'minimal-map'), topLocation.label)
 					: __('No selected locations in this period yet.', 'minimal-map'),
@@ -175,7 +202,10 @@ export default function AnalyticsCards({
 							</div>
 							<div className="minimal-map-admin__feature-meta">
 								<span className="minimal-map-admin__feature-icon">{card.icon}</span>
-								<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
+								<AnimatedNumber
+									{...card.value}
+									className="minimal-map-admin__analytics-card-value"
+								/>
 							</div>
 							<h3 className="minimal-map-admin__feature-title">{card.title}</h3>
 							<p className="minimal-map-admin__analytics-card-description">{card.description}</p>
@@ -203,7 +233,7 @@ export default function AnalyticsCards({
 				id: 'action-total',
 				icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Total actions', 'minimal-map'),
-				value: hasData ? formatMetricValue(safeSummary.totalActions) : '—',
+				value: createCountValue(hasData ? safeSummary.totalActions : null),
 				description: __('Clicks and expansions after a location is viewed.', 'minimal-map'),
 				chart: (
 					<AnalyticsSparkline
@@ -219,7 +249,7 @@ export default function AnalyticsCards({
 				id: 'action-type-mix',
 				icon: <PieChart aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Action type mix', 'minimal-map'),
-				value: dominantActionTypeShare !== null ? formatPercentage(dominantActionTypeShare) : '—',
+				value: createPercentageValue(dominantActionTypeShare),
 				description: dominantActionType && dominantActionTypeShare !== null
 					? sprintf(
 						__('%1$s leads with %2$s.', 'minimal-map'),
@@ -240,7 +270,7 @@ export default function AnalyticsCards({
 				id: 'action-source-mix',
 				icon: <BarChart3 aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Action source mix', 'minimal-map'),
-				value: dominantSourceShare !== null ? formatPercentage(dominantSourceShare) : '—',
+				value: createPercentageValue(dominantSourceShare),
 				description: dominantSource && dominantSourceShare !== null
 					? sprintf(
 						__('%1$s drives %2$s of actions.', 'minimal-map'),
@@ -261,7 +291,7 @@ export default function AnalyticsCards({
 				id: 'action-top-locations',
 				icon: <MapPin aria-hidden="true" size={22} strokeWidth={1.8} />,
 				title: __('Top locations by actions', 'minimal-map'),
-				value: topLocation ? formatMetricValue(topLocation.value) : '—',
+				value: createCountValue(topLocation?.value ?? null),
 				description: topLocation
 					? sprintf(__('Most actioned: %s', 'minimal-map'), topLocation.label)
 					: __('No tracked actions in the selected period.', 'minimal-map'),
@@ -291,7 +321,10 @@ export default function AnalyticsCards({
 							</div>
 							<div className="minimal-map-admin__feature-meta">
 								<span className="minimal-map-admin__feature-icon">{card.icon}</span>
-								<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
+								<AnimatedNumber
+									{...card.value}
+									className="minimal-map-admin__analytics-card-value"
+								/>
 							</div>
 							<h3 className="minimal-map-admin__feature-title">{card.title}</h3>
 							<p className="minimal-map-admin__analytics-card-description">{card.description}</p>
@@ -319,7 +352,7 @@ export default function AnalyticsCards({
 			id: 'total',
 			icon: <ChartColumn aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Total searches', 'minimal-map'),
-			value: hasData ? formatMetricValue(safeSummary.totalSearches) : '—',
+			value: createCountValue(hasData ? safeSummary.totalSearches : null),
 			description: __('Demand across the selected period.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
@@ -335,7 +368,7 @@ export default function AnalyticsCards({
 			id: 'success-rate',
 			icon: <Target aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Success rate', 'minimal-map'),
-			value: hasData ? formatPercentage(safeSummary.successRate) : '—',
+			value: createPercentageValue(hasData ? safeSummary.successRate : null),
 			description: __('Searches returning at least one result.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
@@ -351,7 +384,7 @@ export default function AnalyticsCards({
 			id: 'zero',
 			icon: <SearchX aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Zero-result searches', 'minimal-map'),
-			value: hasData ? formatMetricValue(safeSummary.zeroResultSearches) : '—',
+			value: createCountValue(hasData ? safeSummary.zeroResultSearches : null),
 			description: __('Searches with no matching location.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
@@ -367,7 +400,7 @@ export default function AnalyticsCards({
 			id: 'distance',
 			icon: <Route aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Average distance to nearest store', 'minimal-map'),
-			value: formatDistanceValue(safeSummary.averageNearestDistanceMeters, hasData),
+			value: createDistanceValue(safeSummary.averageNearestDistanceMeters, hasData),
 			description: __('Average distance for searches with a nearby match.', 'minimal-map'),
 			chart: (
 				<AnalyticsSparkline
@@ -383,7 +416,7 @@ export default function AnalyticsCards({
 			id: 'top-queries',
 			icon: <Search aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Top search terms', 'minimal-map'),
-			value: topQuery ? formatMetricValue(topQuery.value) : '—',
+			value: createCountValue(topQuery?.value ?? null),
 			description: topQuery
 				? sprintf(__('Most searched: %s', 'minimal-map'), topQuery.label)
 				: __('No repeated search terms yet.', 'minimal-map'),
@@ -400,7 +433,7 @@ export default function AnalyticsCards({
 			id: 'top-zero-queries',
 			icon: <SearchX aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Top zero-result searches', 'minimal-map'),
-			value: topZeroResultQuery ? formatMetricValue(topZeroResultQuery.value) : '—',
+			value: createCountValue(topZeroResultQuery?.value ?? null),
 			description: topZeroResultQuery
 				? sprintf(__('Most requested without a result: %s', 'minimal-map'), topZeroResultQuery.label)
 				: __('No failed searches in the selected period.', 'minimal-map'),
@@ -417,7 +450,7 @@ export default function AnalyticsCards({
 			id: 'query-type-mix',
 			icon: <PieChart aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Query type mix', 'minimal-map'),
-			value: dominantQueryTypeShare !== null ? formatPercentage(dominantQueryTypeShare) : '—',
+			value: createPercentageValue(dominantQueryTypeShare),
 			description: dominantQueryType && dominantQueryTypeShare !== null
 				? sprintf(
 					__('%1$s leads with %2$s.', 'minimal-map'),
@@ -438,7 +471,7 @@ export default function AnalyticsCards({
 			id: 'result-distribution',
 			icon: <BarChart3 aria-hidden="true" size={22} strokeWidth={1.8} />,
 			title: __('Result distribution', 'minimal-map'),
-			value: dominantResultBucketShare !== null ? formatPercentage(dominantResultBucketShare) : '—',
+			value: createPercentageValue(dominantResultBucketShare),
 			description: dominantResultBucket && dominantResultBucketShare !== null
 				? sprintf(
 					__('%1$s is the largest bucket at %2$s.', 'minimal-map'),
@@ -472,7 +505,10 @@ export default function AnalyticsCards({
 						</div>
 						<div className="minimal-map-admin__feature-meta">
 							<span className="minimal-map-admin__feature-icon">{card.icon}</span>
-							<span className="minimal-map-admin__analytics-card-value">{card.value}</span>
+							<AnimatedNumber
+								{...card.value}
+								className="minimal-map-admin__analytics-card-value"
+							/>
 						</div>
 						<h3 className="minimal-map-admin__feature-title">{card.title}</h3>
 						<p className="minimal-map-admin__analytics-card-description">{card.description}</p>

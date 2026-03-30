@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import ContentHeader from '../ContentHeader';
 import { CARD_VIEWS } from '../app-config';
 import AdminSectionIcon from '../AdminSectionIcon';
+import AnimatedNumber from '../AnimatedNumber';
 import { createMinimalMap } from '../../map/bootstrap';
 import type { DashboardCardView, MinimalMapInstance, RawMapConfig } from '../../types';
 import type { AdminSectionComponentProps } from './types';
@@ -28,16 +29,43 @@ const CTA_COPY: Record<DashboardCardView, string> = {
 	styles: __('Open styles', 'minimal-map'),
 };
 
-const COUNT_LABELS: Record<DashboardCardView, (appConfig: AdminSectionComponentProps['appConfig']) => string> = {
-	analytics: (appConfig) => appConfig.analyticsConfig.enabled
-		? __('On', 'minimal-map')
-		: __('Off', 'minimal-map'),
-	locations: (appConfig) => `${typeof appConfig.stats.locations === 'number' ? appConfig.stats.locations : 0}`,
-	collections: (appConfig) => `${typeof appConfig.stats.collections === 'number' ? appConfig.stats.collections : 0}`,
-	logos: (appConfig) => `${typeof appConfig.stats.logos === 'number' ? appConfig.stats.logos : 0}`,
-	markers: (appConfig) => `${typeof appConfig.stats.markers === 'number' ? appConfig.stats.markers : 0}`,
-	tags: (appConfig) => `${typeof appConfig.stats.tags === 'number' ? appConfig.stats.tags : 0}`,
-	styles: (appConfig) => `${appConfig.mapConfig.styleThemes?.length ?? 0}`,
+type DashboardCardCountDisplay =
+	| { type: 'animated'; value: number }
+	| { label: string; type: 'static' };
+
+const COUNT_DISPLAYS: Record<DashboardCardView, (
+	appConfig: AdminSectionComponentProps['appConfig']
+) => DashboardCardCountDisplay> = {
+	analytics: (appConfig) => ({
+		label: appConfig.analyticsConfig.enabled
+			? __('On', 'minimal-map')
+			: __('Off', 'minimal-map'),
+		type: 'static',
+	}),
+	locations: (appConfig) => ({
+		type: 'animated',
+		value: typeof appConfig.stats.locations === 'number' ? appConfig.stats.locations : 0,
+	}),
+	collections: (appConfig) => ({
+		type: 'animated',
+		value: typeof appConfig.stats.collections === 'number' ? appConfig.stats.collections : 0,
+	}),
+	logos: (appConfig) => ({
+		type: 'animated',
+		value: typeof appConfig.stats.logos === 'number' ? appConfig.stats.logos : 0,
+	}),
+	markers: (appConfig) => ({
+		type: 'animated',
+		value: typeof appConfig.stats.markers === 'number' ? appConfig.stats.markers : 0,
+	}),
+	tags: (appConfig) => ({
+		type: 'animated',
+		value: typeof appConfig.stats.tags === 'number' ? appConfig.stats.tags : 0,
+	}),
+	styles: (appConfig) => ({
+		type: 'animated',
+		value: appConfig.mapConfig.styleThemes?.length ?? 0,
+	}),
 };
 
 function DashboardCard({ appConfig, view, title, url }: {
@@ -46,7 +74,7 @@ function DashboardCard({ appConfig, view, title, url }: {
 	title: string;
 	url: string;
 }) {
-	const count = COUNT_LABELS[view](appConfig);
+	const countDisplay = COUNT_DISPLAYS[view](appConfig);
 
 	return (
 		<Card className="minimal-map-admin__feature-card">
@@ -55,7 +83,15 @@ function DashboardCard({ appConfig, view, title, url }: {
 					<span className="minimal-map-admin__feature-icon">
 						<AdminSectionIcon view={view} />
 					</span>
-					<span className="minimal-map-admin__feature-count">{count}</span>
+					{countDisplay.type === 'animated' ? (
+						<AnimatedNumber
+							className="minimal-map-admin__feature-count"
+							locale={appConfig.mapConfig.siteLocale}
+							value={countDisplay.value}
+						/>
+					) : (
+						<span className="minimal-map-admin__feature-count">{countDisplay.label}</span>
+					)}
 				</div>
 				<h3 className="minimal-map-admin__feature-title">{title}</h3>
 				<p className="minimal-map-admin__feature-description">{CARD_COPY[view]}</p>
