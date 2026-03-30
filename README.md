@@ -9,7 +9,6 @@ Render a minimalist MapLibre-powered map in Wordpress.
 ## Features
 
 - Open source WordPress map plugin (MIT licensed)
-- Completely free map plugin for WordPress
 - WordPress-native map plugin built with native WordPress components
 - Built-in WordPress admin experience, not a bolted-on SaaS dashboard
 - Gutenberg map block for the block editor
