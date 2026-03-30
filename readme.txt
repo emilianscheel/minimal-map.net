@@ -73,8 +73,13 @@ Features include:
 * Iframe embed snippet generation for external embeds.
 * Custom map height controls with mobile-specific height overrides.
 * Scroll zoom, mobile two-finger zoom, and cooperative gesture settings.
-* English source strings with German translations.
+* English source strings with German and French translations.
 * Feels native to WordPress and built for modern WordPress sites.
+* Marker library with built-in SVG presets for rapid map styling.
+* Pre-built WordPress and static palette templates for style themes.
+* Multi-edit color selection for map style themes.
+* Animated analytics metrics with relative time labels and event icons.
+* Bulk-delete analytics data for privacy and data management.
 * Premium license key support to unlock advanced features.
 
 Only the latest stable WordPress release is supported. Older WordPress and PHP versions are intentionally out of scope for this plugin.
@@ -93,7 +98,7 @@ The plugin supports WordPress 6.9.4 and PHP 8.3. The codebase and CI pipeline ar
 
 = Does the plugin include translations? =
 
-Yes. English is the source language and German translations are included.
+Yes. English is the source language and German/French translations are included.
 
 == Screenshots ==
 
@@ -109,6 +114,17 @@ Yes. English is the source language and German translations are included.
 10. Map preview (`preview.png`)
 
 == Changelog ==
+
+= 0.8.0 =
+* Added marker library with built-in SVG presets for rapid map styling.
+* Added pre-built WordPress and static palette templates for style themes.
+* Added multi-edit color selection for map style themes.
+* Added animated analytics metrics with relative time labels and event icons.
+* Added bulk-delete analytics data feature.
+* Added French (fr_FR) translations.
+* Added "Clean" action for analytics data.
+* Fixed Complianz script blocking integration.
+* Refined admin modal layouts and stabilized analytics views.
 
 = 0.7.0 =
 * Added comprehensive search, selection, and action analytics with CSV export.
