@@ -586,4 +586,82 @@ describe('AnalyticsView', () => {
 
 		root.unmount();
 	});
+
+	test('renders absolute and relative timestamps in analytics time cells', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+		const originalDateNow = Date.now;
+
+		Date.now = () => new Date('2026-03-30T12:00:00Z').getTime();
+
+		try {
+			const controller = createControllerStub({
+				tables: {
+					search: {
+						queries: [
+							{
+								id: 1,
+								event_category: 'search',
+								query_text: 'Berlin Mitte',
+								query_type: 'text',
+								result_count: 3,
+								nearest_distance_meters: null,
+								location_id: null,
+								location_title: '',
+								interaction_source: '',
+								action_type: '',
+								action_target: '',
+								occurred_at_gmt: '2026-03-30T11:50:00Z',
+							},
+						],
+						totalItems: 1,
+						totalPages: 1,
+						view: createDefaultAnalyticsView('search'),
+					},
+					selection: {
+						queries: [],
+						totalItems: 0,
+						totalPages: 1,
+						view: createDefaultAnalyticsView('selection'),
+					},
+					action: {
+						queries: [],
+						totalItems: 0,
+						totalPages: 1,
+						view: createDefaultAnalyticsView('action'),
+					},
+				},
+			});
+
+			root.render(
+				createElement(
+					CacheProvider,
+					{ value: createTestCache(dom) },
+					createElement(AnalyticsView, {
+						controller,
+						siteLocale: 'en-US',
+						siteTimezone: 'Europe/Berlin',
+					})
+				)
+			);
+
+			await flushRender();
+
+			const absoluteTime = host.querySelector('.minimal-map-admin__analytics-time-cell-absolute');
+			const relativeTime = host.querySelector('.minimal-map-admin__analytics-time-cell-relative');
+			const expectedAbsolute = new Intl.DateTimeFormat('en-US', {
+				dateStyle: 'medium',
+				timeStyle: 'short',
+				timeZone: 'Europe/Berlin',
+			}).format(new Date('2026-03-30T11:50:00Z'));
+
+			expect(absoluteTime?.textContent).toBe(expectedAbsolute);
+			expect(relativeTime?.textContent).toBe('10 minutes ago');
+		} finally {
+			Date.now = originalDateNow;
+			root.unmount();
+		}
+	});
 });

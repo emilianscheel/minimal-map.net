@@ -530,6 +530,25 @@ svg.lucide {
   --wp-dataviews-color-background: #fff;
 }
 
+.minimal-map-admin__analytics-table-wrap
+  .minimal-map-admin__analytics-time-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.35;
+}
+
+.minimal-map-admin__analytics-table-wrap
+  .minimal-map-admin__analytics-time-cell-absolute {
+  color: #1e1e1e;
+}
+
+.minimal-map-admin__analytics-table-wrap
+  .minimal-map-admin__analytics-time-cell-relative {
+  color: #646970;
+  font-size: 9px;
+}
+
 .minimal-map-admin__locations-dataviews-header,
 .minimal-map-admin__analytics-dataviews-header,
 .minimal-map-admin__collections-dataviews-header {

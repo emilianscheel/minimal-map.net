@@ -2,6 +2,7 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewTable } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { formatRelativeDateTime } from '../../lib/formatRelativeDateTime';
 import type {
 	AnalyticsActionType,
 	AnalyticsEventCategory,
@@ -73,21 +74,30 @@ function formatDistance(distanceMeters: number | null): string {
 	return `${Math.round(distanceMeters)} m`;
 }
 
-function formatOccurredAt(
+function renderOccurredAt(
 	value: string,
-	timeFormatter: Intl.DateTimeFormat
-): string {
-	if (!value) {
+	siteLocale: string,
+	siteTimezone: string
+): JSX.Element | string {
+	const formatted = formatRelativeDateTime(value, {
+		locale: siteLocale,
+		timeZone: siteTimezone,
+	});
+
+	if (!formatted) {
 		return '—';
 	}
 
-	const date = new Date(value);
-
-	if (Number.isNaN(date.getTime())) {
-		return '—';
-	}
-
-	return timeFormatter.format(date);
+	return (
+		<div className="minimal-map-admin__analytics-time-cell">
+			<span className="minimal-map-admin__analytics-time-cell-absolute">
+				{formatted.absolute}
+			</span>
+			<span className="minimal-map-admin__analytics-time-cell-relative">
+				{formatted.relative}
+			</span>
+		</div>
+	);
 }
 
 function useAnalyticsFields(
@@ -96,12 +106,6 @@ function useAnalyticsFields(
 	siteTimezone: string
 ): Field<AnalyticsQueryRecord>[] {
 	return useMemo(() => {
-		const timeFormatter = new Intl.DateTimeFormat(siteLocale || undefined, {
-			dateStyle: 'medium',
-			timeStyle: 'short',
-			timeZone: siteTimezone || undefined,
-		});
-
 		if (category === 'selection') {
 			return [
 				{
@@ -135,7 +139,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => formatOccurredAt(item.occurred_at_gmt, timeFormatter),
+					render: ({ item }) => renderOccurredAt(item.occurred_at_gmt, siteLocale, siteTimezone),
 				},
 			] satisfies Field<AnalyticsQueryRecord>[];
 		}
@@ -181,7 +185,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => formatOccurredAt(item.occurred_at_gmt, timeFormatter),
+					render: ({ item }) => renderOccurredAt(item.occurred_at_gmt, siteLocale, siteTimezone),
 				},
 			] satisfies Field<AnalyticsQueryRecord>[];
 		}
@@ -226,7 +230,7 @@ function useAnalyticsFields(
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
-				render: ({ item }) => formatOccurredAt(item.occurred_at_gmt, timeFormatter),
+				render: ({ item }) => renderOccurredAt(item.occurred_at_gmt, siteLocale, siteTimezone),
 			},
 		] satisfies Field<AnalyticsQueryRecord>[];
 	}, [category, siteLocale, siteTimezone]);
