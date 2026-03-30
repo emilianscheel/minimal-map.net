@@ -1268,9 +1268,113 @@ class Config {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function get_admin_palette_templates() {
-		$templates = $this->get_wordpress_palette_templates();
+		$templates = $this->get_builtin_palette_templates();
+		$templates = array_merge( $templates, $this->get_wordpress_palette_templates() );
 
 		return $templates;
+	}
+
+	/**
+	 * Get static built-in palette templates available to the styles admin.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function get_builtin_palette_templates() {
+		return array(
+			array(
+				'id'     => 'builtin-palette-terracotta-coast',
+				'label'  => __( 'Terracotta Coast', 'minimal-map' ),
+				'colors' => array(
+					array(
+						'name'  => __( 'Canvas', 'minimal-map' ),
+						'slug'  => 'canvas',
+						'color' => '#f6efe6',
+					),
+					array(
+						'name'  => __( 'Ink', 'minimal-map' ),
+						'slug'  => 'ink',
+						'color' => '#5b4638',
+					),
+					array(
+						'name'  => __( 'Water', 'minimal-map' ),
+						'slug'  => 'water',
+						'color' => '#6ea7a2',
+					),
+					array(
+						'name'  => __( 'Land', 'minimal-map' ),
+						'slug'  => 'land',
+						'color' => '#a8b97f',
+					),
+					array(
+						'name'  => __( 'Transport', 'minimal-map' ),
+						'slug'  => 'transport',
+						'color' => '#caa98a',
+					),
+				),
+			),
+			array(
+				'id'     => 'builtin-palette-night-transit',
+				'label'  => __( 'Night Transit', 'minimal-map' ),
+				'colors' => array(
+					array(
+						'name'  => __( 'Canvas', 'minimal-map' ),
+						'slug'  => 'canvas',
+						'color' => '#1c2027',
+					),
+					array(
+						'name'  => __( 'Ink', 'minimal-map' ),
+						'slug'  => 'ink',
+						'color' => '#eef3f8',
+					),
+					array(
+						'name'  => __( 'Water', 'minimal-map' ),
+						'slug'  => 'water',
+						'color' => '#2f6f8e',
+					),
+					array(
+						'name'  => __( 'Land', 'minimal-map' ),
+						'slug'  => 'land',
+						'color' => '#3e5b47',
+					),
+					array(
+						'name'  => __( 'Transport', 'minimal-map' ),
+						'slug'  => 'transport',
+						'color' => '#8b7fd1',
+					),
+				),
+			),
+			array(
+				'id'     => 'builtin-palette-alpine-print',
+				'label'  => __( 'Alpine Print', 'minimal-map' ),
+				'colors' => array(
+					array(
+						'name'  => __( 'Canvas', 'minimal-map' ),
+						'slug'  => 'canvas',
+						'color' => '#edf2f0',
+					),
+					array(
+						'name'  => __( 'Ink', 'minimal-map' ),
+						'slug'  => 'ink',
+						'color' => '#334047',
+					),
+					array(
+						'name'  => __( 'Water', 'minimal-map' ),
+						'slug'  => 'water',
+						'color' => '#7ea9c7',
+					),
+					array(
+						'name'  => __( 'Land', 'minimal-map' ),
+						'slug'  => 'land',
+						'color' => '#b7c7a0',
+					),
+					array(
+						'name'  => __( 'Transport', 'minimal-map' ),
+						'slug'  => 'transport',
+						'color' => '#b07c6d',
+					),
+				),
+			),
+		);
 	}
 
 	/**

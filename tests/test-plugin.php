@@ -596,9 +596,22 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			$admin_config = $config->get_admin_app_config();
 			$templates    = $admin_config['stylesConfig']['paletteTemplates'];
 
-			$this->assertCount( 1, $templates );
-			$this->assertSame( 'wordpress-theme-palette', $templates[0]['id'] );
-			$this->assertSame( 'WordPress Theme Palette', $templates[0]['label'] );
+			$this->assertCount( 6, $templates );
+			$this->assertSame( 'builtin-palette-terracotta-coast', $templates[0]['id'] );
+			$this->assertSame( 'Terracotta Coast', $templates[0]['label'] );
+			$this->assertSame( 'builtin-palette-night-transit', $templates[1]['id'] );
+			$this->assertSame( 'Night Transit', $templates[1]['label'] );
+			$this->assertSame( 'builtin-palette-alpine-print', $templates[2]['id'] );
+			$this->assertSame( 'Alpine Print', $templates[2]['label'] );
+			$this->assertSame( 'wordpress-theme-palette-1', $templates[3]['id'] );
+			$this->assertSame( 'WordPress Theme Palette #1', $templates[3]['label'] );
+			$this->assertSame( 'default', $templates[3]['deriveVariant'] );
+			$this->assertSame( 'wordpress-theme-palette-2', $templates[4]['id'] );
+			$this->assertSame( 'WordPress Theme Palette #2', $templates[4]['label'] );
+			$this->assertSame( 'swap-1', $templates[4]['deriveVariant'] );
+			$this->assertSame( 'wordpress-theme-palette-3', $templates[5]['id'] );
+			$this->assertSame( 'WordPress Theme Palette #3', $templates[5]['label'] );
+			$this->assertSame( 'swap-2', $templates[5]['deriveVariant'] );
 			$this->assertSame(
 				array(
 					array(
@@ -617,7 +630,7 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 						'color' => '#45a7ef',
 					),
 				),
-				$templates[0]['colors']
+				$templates[3]['colors']
 			);
 		} finally {
 			remove_filter( 'wp_theme_json_data_user', $filter );
@@ -672,7 +685,15 @@ class Minimal_Map_Plugin_Test extends WP_UnitTestCase {
 			$config       = new \MinimalMap\Config();
 			$admin_config = $config->get_admin_app_config();
 
-			$this->assertSame( array(), $admin_config['stylesConfig']['paletteTemplates'] );
+			$this->assertCount( 3, $admin_config['stylesConfig']['paletteTemplates'] );
+			$this->assertSame(
+				array(
+					'builtin-palette-terracotta-coast',
+					'builtin-palette-night-transit',
+					'builtin-palette-alpine-print',
+				),
+				array_column( $admin_config['stylesConfig']['paletteTemplates'], 'id' )
+			);
 		} finally {
 			remove_filter( 'wp_theme_json_data_user', $filter );
 			wp_clean_theme_json_cache();

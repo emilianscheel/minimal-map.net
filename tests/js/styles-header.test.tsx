@@ -60,8 +60,19 @@ const config: StylesAdminConfig = {
 	restPath: '/styles',
 	paletteTemplates: [
 		{
-			id: 'wordpress-theme-palette',
-			label: 'WordPress Theme Palette',
+			id: 'builtin-palette-terracotta-coast',
+			label: 'Terracotta Coast',
+			colors: [
+				{ name: 'Canvas', slug: 'canvas', color: '#f6efe6' },
+				{ name: 'Ink', slug: 'ink', color: '#5b4638' },
+				{ name: 'Water', slug: 'water', color: '#6ea7a2' },
+				{ name: 'Land', slug: 'land', color: '#a8b97f' },
+				{ name: 'Transport', slug: 'transport', color: '#caa98a' },
+			],
+		},
+		{
+			id: 'wordpress-theme-palette-1',
+			label: 'WordPress Theme Palette #1',
 			colors: [
 				{ name: 'Canvas', slug: 'canvas', color: '#f5efe7' },
 				{ name: 'Ink', slug: 'ink', color: '#1f2933' },
@@ -197,7 +208,7 @@ afterEach(() => {
 });
 
 describe('styles header templates', () => {
-	test('renders the template dropdown and creates a new WordPress palette theme', async () => {
+	test('renders the template dropdown and creates a new built-in palette theme', async () => {
 		const dom = new JSDOM('<!doctype html><div id="host"></div>');
 		setGlobalDom(dom);
 		const host = dom.window.document.getElementById('host') as HTMLDivElement;
@@ -206,18 +217,18 @@ describe('styles header templates', () => {
 			if (options.method === 'POST') {
 				return {
 					...defaultTheme,
-					slug: 'wordpress-palette',
+					slug: 'terracotta-coast',
 					label: options.data && typeof options.data === 'object'
 						? (options.data as { label: string }).label
-						: 'WordPress Palette',
+						: 'Terracotta Coast',
 				};
 			}
 
 			if (options.method === 'PUT') {
 				return {
 					...defaultTheme,
-					slug: 'wordpress-palette',
-					label: 'WordPress Palette',
+					slug: 'terracotta-coast',
+					label: 'Terracotta Coast',
 					colors: options.data && typeof options.data === 'object'
 						? (options.data as { colors: StyleThemeRecord['colors'] }).colors
 						: defaultTheme.colors,
@@ -244,17 +255,18 @@ describe('styles header templates', () => {
 			openTemplatesMenu(dom);
 			await flushRender();
 
-			expect(dom.window.document.body.textContent).toContain('WordPress Theme Palette');
+			expect(dom.window.document.body.textContent).toContain('Terracotta Coast');
+			expect(dom.window.document.body.textContent).toContain('WordPress Theme Palette #1');
 			expect(
 				dom.window.document.querySelectorAll('.minimal-map-styles__palette-template-swatch').length
 			).toBeGreaterThanOrEqual(4);
 
-			clickMenuItem(dom, 'WordPress Theme Palette');
+			clickMenuItem(dom, 'Terracotta Coast');
 			await flushRender();
 			await flushRender();
 
-			expect(host.textContent).toContain('WordPress Palette');
-			expect(host.textContent).toContain('Created a new theme from the current WordPress palette.');
+			expect(host.textContent).toContain('Terracotta Coast');
+			expect(host.textContent).toContain('Created a new theme from Terracotta Coast.');
 			expect(apiFetchMock).toHaveBeenCalledTimes(3);
 		} finally {
 			root.unmount();
