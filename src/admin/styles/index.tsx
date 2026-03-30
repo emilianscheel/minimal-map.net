@@ -6,7 +6,7 @@ import {
   Spinner,
 } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
-import { useEffect, useMemo, useRef } from "@wordpress/element";
+import { useEffect, useMemo, useRef, useState } from "@wordpress/element";
 import type { StylesController } from "./types";
 import { ColorControl } from "./ColorControl";
 import { CreateThemeModal } from "./CreateThemeModal";
@@ -16,12 +16,35 @@ import type {
   MinimalMapInstance,
   RawMapConfig,
   MapRuntimeConfig,
+  StyleThemeSlot,
 } from "../../types";
 import { COLOR_GROUPS, SLOT_LABELS } from "./constants";
 
 interface StylesViewProps {
   controller: StylesController;
   runtimeConfig: MapRuntimeConfig;
+}
+
+const ALL_COLOR_SLOTS: StyleThemeSlot[] = Array.from(
+  new Set(COLOR_GROUPS.flatMap((group) => group.slots)),
+);
+
+function buildMixedGradient(colors: string[]): string {
+  const uniqueColors = Array.from(new Set(colors));
+
+  if (uniqueColors.length <= 1) {
+    return uniqueColors[0] || "#000000";
+  }
+
+  const stops = uniqueColors.map((currentColor, index) => {
+    const stop = uniqueColors.length === 1
+      ? 0
+      : Math.round((index / (uniqueColors.length - 1)) * 100);
+
+    return `${currentColor} ${stop}%`;
+  });
+
+  return `linear-gradient(135deg, ${stops.join(", ")})`;
 }
 
 export default function StylesView({
@@ -43,6 +66,8 @@ export default function StylesView({
   } = controller;
   const mapHostRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MinimalMapInstance | null>(null);
+  const skipSelectionResetRef = useRef(false);
+  const [selectedSlots, setSelectedSlots] = useState<StyleThemeSlot[]>([]);
 
   const mapConfig = useMemo<RawMapConfig>(
     () => ({
@@ -59,6 +84,50 @@ export default function StylesView({
     }),
     [activeTheme?.basePreset, draftColors],
   );
+
+  useEffect(() => {
+    if (skipSelectionResetRef.current) {
+      skipSelectionResetRef.current = false;
+      return;
+    }
+
+    setSelectedSlots([]);
+  }, [activeTheme?.slug, draftColors]);
+
+  const applyColorToSlots = (slots: StyleThemeSlot[], color: string) => {
+    if (slots.length === 0) {
+      return;
+    }
+
+    skipSelectionResetRef.current = true;
+
+    slots.forEach((slot) => {
+      setDraftColor(slot, color);
+    });
+  };
+
+  const toggleSlotSelection = (slot: StyleThemeSlot, checked: boolean) => {
+    setSelectedSlots((currentSlots) => {
+      if (checked) {
+        return currentSlots.includes(slot)
+          ? currentSlots
+          : [ ...currentSlots, slot ];
+      }
+
+      return currentSlots.filter((currentSlot) => currentSlot !== slot);
+    });
+  };
+
+  const allSlotsSelected = selectedSlots.length === ALL_COLOR_SLOTS.length;
+  const hasSelectedSlots = selectedSlots.length > 0;
+  const selectedColors = selectedSlots.map((slot) => draftColors?.[slot] || "#000000");
+  const firstSelectedColor = selectedColors[0] || "#000000";
+  const uniqueSelectedColors = Array.from(new Set(selectedColors));
+  const hasMixedSelectedColors = uniqueSelectedColors.length > 1;
+  const multiEditColor = hasMixedSelectedColors
+    ? firstSelectedColor
+    : selectedColors[0] || "#000000";
+  const mixedSelectedGradient = buildMixedGradient(uniqueSelectedColors);
 
   useEffect(() => {
     if (!mapHostRef.current || !activeTheme) {
@@ -118,6 +187,25 @@ export default function StylesView({
       />
       <div className="minimal-map-styles__layout">
         <div className="minimal-map-styles__controls">
+          <Card className="minimal-map-styles__group-card">
+            <CardBody>
+              <ColorControl
+                label={__("Select all colors", "minimal-map")}
+                color={multiEditColor}
+                mixed={hasSelectedSlots && hasMixedSelectedColors}
+                mixedGradient={mixedSelectedGradient}
+                disabled={!hasSelectedSlots}
+                showCheckbox
+                checked={allSlotsSelected}
+                indeterminate={hasSelectedSlots && !allSlotsSelected}
+                checkboxLabel={__("Select all colors", "minimal-map")}
+                onCheckedChange={(checked) =>
+                  setSelectedSlots(checked ? ALL_COLOR_SLOTS : [])
+                }
+                onChange={(color) => applyColorToSlots(selectedSlots, color)}
+              />
+            </CardBody>
+          </Card>
           {COLOR_GROUPS.map((group) => (
             <Card key={group.label} className="minimal-map-styles__group-card">
               <CardBody>
@@ -130,7 +218,20 @@ export default function StylesView({
                       key={slot}
                       label={SLOT_LABELS[slot]}
                       color={draftColors?.[slot] || "#000000"}
-                      onChange={(color) => setDraftColor(slot, color)}
+                      showCheckbox
+                      checked={selectedSlots.includes(slot)}
+                      checkboxLabel={SLOT_LABELS[slot]}
+                      onCheckedChange={(checked) =>
+                        toggleSlotSelection(slot, checked)
+                      }
+                      onChange={(color) => {
+                        if (selectedSlots.includes(slot)) {
+                          applyColorToSlots(selectedSlots, color);
+                          return;
+                        }
+
+                        applyColorToSlots([ slot ], color);
+                      }}
                     />
                   ))}
                 </div>
