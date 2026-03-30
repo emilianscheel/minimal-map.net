@@ -77,12 +77,9 @@ Render a minimalist MapLibre-powered map in Wordpress.
 ## Development
 
 ```bash
-# Prepare the plugin for the WordPress Store
+bun run dev
 bun run build
-mkdir -p minimal-map-net
-cp -r includes languages templates build minimal-map.php readme.txt README.md block.json LICENSE minimal-map-net/
-zip -r minimal-map.zip minimal-map-net/ -x "*.map" "*~"
-rm -rf minimal-map-net
+bun run zip
 ```
 
 ```bash
