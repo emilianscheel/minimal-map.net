@@ -4,6 +4,7 @@ import AnalyticsCards, { getAnalyticsSectionTitle } from './AnalyticsCards';
 import AnalyticsEmptyState from './AnalyticsEmptyState';
 import AnalyticsSectionBoundary from './AnalyticsSectionBoundary';
 import AnalyticsTable from './AnalyticsTable';
+import DeleteAllAnalyticsModal from './DeleteAllAnalyticsModal';
 import EnableAnalyticsModal from './EnableAnalyticsModal';
 import type { AnalyticsController } from './types';
 
@@ -159,6 +160,7 @@ export default function AnalyticsView({
 					onConfirm={controller.onConfirmEnableAnalytics}
 				/>
 			) : null}
+			<DeleteAllAnalyticsModal controller={controller} />
 		</div>
 	);
 }

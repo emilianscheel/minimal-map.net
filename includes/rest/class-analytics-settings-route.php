@@ -106,6 +106,20 @@ class Analytics_Settings_Route {
 			);
 		}
 
+		if ( ! empty( $params['reset'] ) ) {
+			$deleted = $this->analytics->delete_all_queries();
+
+			if ( ! $deleted ) {
+				return new \WP_Error(
+					'minimal_map_analytics_reset_failed',
+					__( 'Analytics tracking data could not be deleted.', 'minimal-map' ),
+					array( 'status' => 500 )
+				);
+			}
+
+			$response['reset'] = true;
+		}
+
 		return rest_ensure_response( $response );
 	}
 
@@ -130,6 +144,10 @@ class Analytics_Settings_Route {
 				'type'     => 'boolean',
 			),
 			'complianzEnabled' => array(
+				'required' => false,
+				'type'     => 'boolean',
+			),
+			'reset' => array(
 				'required' => false,
 				'type'     => 'boolean',
 			),

@@ -28,6 +28,7 @@ const analyticsConfig: AnalyticsAdminConfig = {
 	nonce: '',
 	enabled: true,
 	complianzEnabled: false,
+	complianzInstalled: false,
 	settingsPath: '/settings',
 	summaryPath: '/summary',
 	queriesPath: '/queries',
@@ -93,7 +94,7 @@ async function flushRender(): Promise<void> {
 
 function openExportMenu(dom: JSDOM, host: HTMLDivElement): HTMLButtonElement {
 	const exportButton = host.querySelector(
-		'.minimal-map-admin__analytics-filter-group button'
+		'.minimal-map-admin__analytics-filter-group button[aria-label="Export analytics"]'
 	) as HTMLButtonElement;
 
 	exportButton.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true }));
@@ -176,11 +177,14 @@ describe('analytics export UI', () => {
 				{ value: createTestCache(dom.window.document.head) },
 				createElement(AnalyticsHeaderActions, {
 					complianzEnabled: false,
+					complianzInstalled: false,
 					enabled: true,
+					isDeletingAllAnalytics: false,
 					isExporting: false,
 					isSavingSettings: false,
 					range: '30d',
 					onChangeRange() {},
+					onOpenDeleteAllAnalyticsModal() {},
 					onExportCategory,
 					onToggleAnalytics() {},
 					onToggleComplianz() {},
@@ -193,9 +197,15 @@ describe('analytics export UI', () => {
 		const filterButtons = Array.from(
 			host.querySelectorAll('.minimal-map-admin__analytics-filter-group button')
 		) as HTMLButtonElement[];
+		const exportButton = host.querySelector(
+			'.minimal-map-admin__analytics-filter-group button[aria-label="Export analytics"]'
+		) as HTMLButtonElement | null;
+		const rangeButton = filterButtons.find((button) =>
+			button.textContent?.includes('Last 30 Days')
+		);
 
-		expect(filterButtons[0]).toBeDefined();
-		expect(filterButtons[1]?.textContent).toContain('Last 30 Days');
+		expect(exportButton).not.toBeNull();
+		expect(rangeButton).toBeDefined();
 
 		openExportMenu(dom, host);
 		await flushRender();
@@ -219,11 +229,14 @@ describe('analytics export UI', () => {
 				{ value: createTestCache(dom.window.document.head) },
 				createElement(AnalyticsHeaderActions, {
 					complianzEnabled: false,
+					complianzInstalled: false,
 					enabled: true,
+					isDeletingAllAnalytics: false,
 					isExporting: true,
 					isSavingSettings: false,
 					range: '30d',
 					onChangeRange() {},
+					onOpenDeleteAllAnalyticsModal() {},
 					onExportCategory() {},
 					onToggleAnalytics() {},
 					onToggleComplianz() {},
@@ -234,10 +247,52 @@ describe('analytics export UI', () => {
 		await flushRender();
 
 		const exportButton = host.querySelector(
-			'.minimal-map-admin__analytics-filter-group button'
+			'.minimal-map-admin__analytics-filter-group button[aria-label="Export analytics"]'
 		) as HTMLButtonElement;
 
 		expect(exportButton.disabled).toBe(true);
+
+		root.unmount();
+	});
+
+	test('renders a clean button and opens the delete-all dialog callback', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+		const onOpenDeleteAllAnalyticsModal = mock(() => {});
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom.window.document.head) },
+				createElement(AnalyticsHeaderActions, {
+					complianzEnabled: false,
+					complianzInstalled: false,
+					enabled: true,
+					isDeletingAllAnalytics: false,
+					isExporting: false,
+					isSavingSettings: false,
+					range: '30d',
+					onChangeRange() {},
+					onOpenDeleteAllAnalyticsModal,
+					onExportCategory() {},
+					onToggleAnalytics() {},
+					onToggleComplianz() {},
+				}),
+			),
+		);
+
+		await flushRender();
+
+		const cleanButton = Array.from(host.querySelectorAll('button')).find((button) =>
+			button.getAttribute('aria-label') === 'Clean tracking data'
+		) as HTMLButtonElement | undefined;
+
+		expect(cleanButton).toBeDefined();
+		cleanButton?.click();
+
+		expect(onOpenDeleteAllAnalyticsModal).toHaveBeenCalledTimes(1);
 
 		root.unmount();
 	});
@@ -250,6 +305,7 @@ describe('analytics export UI', () => {
 		const exportFile = mock(async () => {
 			throw new Error('Export failed');
 		});
+		const resetData = mock(async () => {});
 		const fetchSummary = mock(async (
 			_config: AnalyticsAdminConfig,
 			_range: 'today' | 'yesterday' | '7d' | '30d' | '90d' | 'all',
@@ -270,6 +326,7 @@ describe('analytics export UI', () => {
 						exportFile,
 						fetchQueries,
 						fetchSummary,
+						resetData,
 					},
 				}),
 			),
@@ -286,6 +343,61 @@ describe('analytics export UI', () => {
 
 		expect(exportFile).toHaveBeenCalledWith(analyticsConfig, '30d', 'search');
 		expect(dom.window.document.body.textContent).toContain('Export failed');
+
+		root.unmount();
+	});
+
+	test('shows a success notice when tracking data is deleted', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+		const resetData = mock(async () => {});
+		const fetchSummary = mock(async (
+			_config: AnalyticsAdminConfig,
+			_range: 'today' | 'yesterday' | '7d' | '30d' | '90d' | 'all',
+			category: AnalyticsEventCategory
+		) => getEmptySummary(category));
+		const fetchQueries = mock(async () => ({
+			items: [],
+			totalItems: 0,
+			totalPages: 1,
+		}));
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom.window.document.head) },
+				createElement(ControllerHarness, {
+					dependencies: {
+						fetchQueries,
+						fetchSummary,
+						resetData,
+					},
+				}),
+			),
+		);
+
+		await flushRender();
+		await flushRender();
+
+		const cleanButton = Array.from(host.querySelectorAll('button')).find((button) =>
+			button.getAttribute('aria-label') === 'Clean tracking data'
+		) as HTMLButtonElement | undefined;
+
+		cleanButton?.click();
+		await flushRender();
+
+		const deleteButton = Array.from(dom.window.document.body.querySelectorAll('button')).find(
+			(button) => button.textContent?.includes('Delete all tracking data')
+		) as HTMLButtonElement | undefined;
+
+		deleteButton?.click();
+		await flushRender();
+		await flushRender();
+
+		expect(resetData).toHaveBeenCalledWith(analyticsConfig);
+		expect(dom.window.document.body.textContent).toContain('All tracking data deleted.');
 
 		root.unmount();
 	});

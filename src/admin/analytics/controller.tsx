@@ -2,6 +2,7 @@ import type { ViewTable } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { exportAnalyticsFile, getAnalyticsExportErrorMessage } from '../../lib/analytics/exportAnalyticsFile';
+import { resetAnalyticsData } from '../../lib/analytics/resetAnalyticsData';
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAnalyticsQueries } from '../../lib/analytics/fetchAnalyticsQueries';
 import { fetchAnalyticsSummary } from '../../lib/analytics/fetchAnalyticsSummary';
@@ -37,6 +38,7 @@ interface AnalyticsControllerDependencies {
 	exportFile?: typeof exportAnalyticsFile;
 	fetchQueries?: typeof fetchAnalyticsQueries;
 	fetchSummary?: typeof fetchAnalyticsSummary;
+	resetData?: typeof resetAnalyticsData;
 	updateSettings?: typeof updateAnalyticsSettings;
 }
 
@@ -73,11 +75,14 @@ export function useAnalyticsController(
 	const exportFile = dependencies.exportFile ?? exportAnalyticsFile;
 	const fetchQueries = dependencies.fetchQueries ?? fetchAnalyticsQueries;
 	const fetchSummary = dependencies.fetchSummary ?? fetchAnalyticsSummary;
+	const resetData = dependencies.resetData ?? resetAnalyticsData;
 	const updateSettings = dependencies.updateSettings ?? updateAnalyticsSettings;
 	const [enabled, setEnabled] = useState(config.enabled);
 	const [complianzEnabled, setComplianzEnabled] = useState(config.complianzEnabled);
 	const complianzInstalled = config.complianzInstalled;
 	const [isConfirmEnableModalOpen, setConfirmEnableModalOpen] = useState(false);
+	const [isDeleteAllAnalyticsModalOpen, setDeleteAllAnalyticsModalOpen] = useState(false);
+	const [isDeletingAllAnalytics, setDeletingAllAnalytics] = useState(false);
 	const [isExporting, setIsExporting] = useState(false);
 	const [isLoadingSummary, setLoadingSummary] = useState(true);
 	const [isLoadingTables, setLoadingTables] = useState<Record<AnalyticsEventCategory, boolean>>({
@@ -340,15 +345,74 @@ export function useAnalyticsController(
 		}
 	}, [config, exportFile, range]);
 
+	const onCloseDeleteAllAnalyticsModal = useCallback(() => {
+		if (isDeletingAllAnalytics) {
+			return;
+		}
+
+		setDeleteAllAnalyticsModalOpen(false);
+	}, [isDeletingAllAnalytics]);
+
+	const onDeleteAllAnalytics = useCallback(async () => {
+		setDeletingAllAnalytics(true);
+		setNotice(null);
+
+		try {
+			await resetData(config);
+			setSummaries({
+				search: EMPTY_SEARCH_ANALYTICS_SUMMARY,
+				selection: EMPTY_SELECTION_ANALYTICS_SUMMARY,
+				action: EMPTY_ACTION_ANALYTICS_SUMMARY,
+			});
+			setTables((currentTables) => ({
+				search: {
+					...currentTables.search,
+					queries: [],
+					totalItems: 0,
+					totalPages: 1,
+				},
+				selection: {
+					...currentTables.selection,
+					queries: [],
+					totalItems: 0,
+					totalPages: 1,
+				},
+				action: {
+					...currentTables.action,
+					queries: [],
+					totalItems: 0,
+					totalPages: 1,
+				},
+			}));
+			setDeleteAllAnalyticsModalOpen(false);
+			setNotice({
+				status: 'success',
+				message: __('All tracking data deleted.', 'minimal-map'),
+			});
+		} catch (error) {
+			setNotice({
+				status: 'error',
+				message:
+					error instanceof Error
+						? error.message
+						: __('Analytics tracking data could not be deleted.', 'minimal-map'),
+			});
+		} finally {
+			setDeletingAllAnalytics(false);
+		}
+	}, [config, resetData]);
+
 	const headerAction = useMemo(() => (
 		<AnalyticsHeaderActions
 			complianzEnabled={complianzEnabled}
 			complianzInstalled={complianzInstalled}
 			enabled={enabled}
+			isDeletingAllAnalytics={isDeletingAllAnalytics}
 			isExporting={isExporting}
 			isSavingSettings={isSavingSettings}
 			range={range}
 			onChangeRange={onChangeRange}
+			onOpenDeleteAllAnalyticsModal={() => setDeleteAllAnalyticsModalOpen(true)}
 			onExportCategory={(category) => {
 				void onExportCategory(category);
 			}}
@@ -368,6 +432,7 @@ export function useAnalyticsController(
 		complianzEnabled,
 		complianzInstalled,
 		enabled,
+		isDeletingAllAnalytics,
 		isExporting,
 		isSavingSettings,
 		onChangeRange,
@@ -382,6 +447,8 @@ export function useAnalyticsController(
 		complianzInstalled,
 		headerAction,
 		isConfirmEnableModalOpen,
+		isDeleteAllAnalyticsModalOpen,
+		isDeletingAllAnalytics,
 		isLoading: isLoadingSummary || isLoadingTables.search || isLoadingTables.selection || isLoadingTables.action,
 		isLoadingSummary,
 		isSavingSettings,
@@ -394,9 +461,12 @@ export function useAnalyticsController(
 		onChangeRange,
 		onChangeView,
 		onCloseConfirmEnableModal: () => setConfirmEnableModalOpen(false),
+		onCloseDeleteAllAnalyticsModal,
 		onConfirmEnableAnalytics: async () => {
 			await persistSettings({ enabled: true });
 		},
+		onDeleteAllAnalytics,
+		onOpenDeleteAllAnalyticsModal: () => setDeleteAllAnalyticsModalOpen(true),
 		onToggleAnalytics: () => {
 			if (enabled) {
 				void persistSettings({ enabled: false });

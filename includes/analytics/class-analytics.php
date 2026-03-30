@@ -172,6 +172,23 @@ class Analytics {
 	}
 
 	/**
+	 * Delete all stored analytics rows.
+	 *
+	 * @return bool
+	 */
+	public function delete_all_queries() {
+		if ( ! $this->table_exists() ) {
+			return true;
+		}
+
+		global $wpdb;
+
+		$deleted = $wpdb->query( "DELETE FROM {$this->get_table_name()}" );
+
+		return false !== $deleted;
+	}
+
+	/**
 	 * Whether analytics tracking is enabled.
 	 *
 	 * @return bool

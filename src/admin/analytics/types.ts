@@ -39,6 +39,8 @@ export interface AnalyticsController {
 	complianzInstalled: boolean;
 	headerAction: ReactNode;
 	isConfirmEnableModalOpen: boolean;
+	isDeleteAllAnalyticsModalOpen: boolean;
+	isDeletingAllAnalytics: boolean;
 	isLoading: boolean;
 	isLoadingSummary: boolean;
 	isSavingSettings: boolean;
@@ -51,7 +53,10 @@ export interface AnalyticsController {
 	onChangeRange: (range: AnalyticsRangeKey) => void;
 	onChangeView: (category: AnalyticsEventCategory, view: ViewTable) => void;
 	onCloseConfirmEnableModal: () => void;
+	onCloseDeleteAllAnalyticsModal: () => void;
 	onConfirmEnableAnalytics: () => Promise<void>;
+	onDeleteAllAnalytics: () => Promise<void>;
+	onOpenDeleteAllAnalyticsModal: () => void;
 	onToggleAnalytics: () => void;
 	onToggleComplianz: () => void;
 }
