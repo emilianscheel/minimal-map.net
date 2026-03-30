@@ -1,6 +1,7 @@
 import type { ViewGrid } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
 import type { MarkerRecord, StyleThemeRecord } from '../../types';
+import type { SvgColorEntry } from '../../lib/markers/svgColors';
 
 export interface MarkersNotice {
 	status: 'success' | 'error';
@@ -40,4 +41,13 @@ export interface MarkersController {
 	submitError: string | null;
 	totalPages: number;
 	view: ViewGrid;
+	isColorEditModalOpen: boolean;
+	colorEditingMarker: MarkerRecord | null;
+	draftSvgColors: SvgColorEntry[];
+	colorEditSubmitError: string | null;
+	onOpenEditMarkerColors: (marker: MarkerRecord) => void;
+	onCancelEditMarkerColors: () => void;
+	onChangeMarkerColor: (id: string, color: string) => void;
+	onToggleMarkerColorNone: (id: string) => void;
+	onConfirmEditMarkerColors: () => Promise<void>;
 }

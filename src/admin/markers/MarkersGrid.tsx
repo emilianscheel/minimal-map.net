@@ -2,7 +2,7 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewGrid } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Download, Pencil, Trash2 } from 'lucide-react';
+import { Download, Palette, Pencil, Trash2 } from 'lucide-react';
 import type { MarkerRecord } from '../../types';
 import MarkerMiniMap from '../../components/MarkerMiniMap';
 import type { MarkersController } from './types';
@@ -47,7 +47,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 			},
 			{
 				id: 'edit',
-				label: __('Edit', 'minimal-map'),
+				label: __('Rename', 'minimal-map'),
 				icon: <Pencil size={18} />,
 				context: 'single',
 				supportsBulk: false,
@@ -55,6 +55,19 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 				callback: (items) => {
 					if (items.length === 1) {
 						controller.onEditMarker(items[0]);
+					}
+				},
+			},
+			{
+				id: 'edit-colors',
+				label: __('Edit colors', 'minimal-map'),
+				icon: <Palette size={18} />,
+				context: 'single',
+				supportsBulk: false,
+				disabled: controller.isRowActionPending || controller.isSubmitting,
+				callback: (items) => {
+					if (items.length === 1) {
+						controller.onOpenEditMarkerColors(items[0]);
 					}
 				},
 			},

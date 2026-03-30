@@ -14,6 +14,8 @@ import { formatFilename, hasFilenameBasename, parseFilenameParts } from '../../l
 import { configureApiFetch } from '../../lib/locations/configureApiFetch';
 import { fetchAllMarkers } from '../../lib/markers/fetchAllMarkers';
 import { updateMarker } from '../../lib/markers/updateMarker';
+import { applySvgColors, parseSvgColors } from '../../lib/markers/svgColors';
+import type { SvgColorEntry } from '../../lib/markers/svgColors';
 import { UploadMarkerButton } from './UploadMarkerButton';
 import { ThemeSelector } from '../styles/ThemeSelector';
 import type { MarkersController } from './types';
@@ -51,6 +53,10 @@ export function useMarkersController(
 	const [isDeleteAllMarkersModalOpen, setDeleteAllMarkersModalOpen] = useState(false);
 	const [isDeletingAllMarkers, setDeletingAllMarkers] = useState(false);
 	const [isEditModalOpen, setEditModalOpen] = useState(false);
+	const [isColorEditModalOpen, setColorEditModalOpen] = useState(false);
+	const [colorEditingMarker, setColorEditingMarker] = useState<MarkerRecord | null>(null);
+	const [draftSvgColors, setDraftSvgColors] = useState<SvgColorEntry[]>([]);
+	const [colorEditSubmitError, setColorEditSubmitError] = useState<string | null>(null);
 	const [markers, setMarkers] = useState<MarkerRecord[]>([]);
 	const [totalItems, setTotalItems] = useState(0);
 	const [isLoading, setLoading] = useState(enabled);
@@ -109,6 +115,12 @@ export function useMarkersController(
 		setSubmitError(null);
 	}, []);
 
+	const resetColorEditModalState = useCallback((): void => {
+		setColorEditingMarker(null);
+		setDraftSvgColors([]);
+		setColorEditSubmitError(null);
+	}, []);
+
 	const onEditMarker = useCallback((marker: MarkerRecord): void => {
 		const { basename, extension } = parseFilenameParts(marker.title);
 
@@ -132,6 +144,63 @@ export function useMarkersController(
 		setEditFilenameBasename(value);
 		setSubmitError(null);
 	}, []);
+
+	const onOpenEditMarkerColors = useCallback((marker: MarkerRecord): void => {
+		setColorEditingMarker(marker);
+		setDraftSvgColors(parseSvgColors(marker.content));
+		setColorEditSubmitError(null);
+		setColorEditModalOpen(true);
+	}, []);
+
+	const onCancelEditMarkerColors = useCallback((): void => {
+		if (isSubmitting) {
+			return;
+		}
+		setColorEditModalOpen(false);
+		resetColorEditModalState();
+	}, [isSubmitting, resetColorEditModalState]);
+
+	const onChangeMarkerColor = useCallback((id: string, color: string): void => {
+		setDraftSvgColors((prev) =>
+			prev.map((entry) => (entry.id === id ? { ...entry, value: color, isNone: false } : entry))
+		);
+		setColorEditSubmitError(null);
+	}, []);
+
+	const onToggleMarkerColorNone = useCallback((id: string): void => {
+		setDraftSvgColors((prev) =>
+			prev.map((entry) => (entry.id === id ? { ...entry, isNone: !entry.isNone } : entry))
+		);
+		setColorEditSubmitError(null);
+	}, []);
+
+	const onConfirmEditMarkerColors = useCallback(async (): Promise<void> => {
+		if (!colorEditingMarker) {
+			return;
+		}
+
+		setSubmitting(true);
+		setColorEditSubmitError(null);
+		setActionNotice(null);
+
+		try {
+			const updatedContent = applySvgColors(colorEditingMarker.content, draftSvgColors);
+			await updateMarker(config, colorEditingMarker.id, colorEditingMarker.title, updatedContent);
+			await loadMarkers();
+			setColorEditModalOpen(false);
+			resetColorEditModalState();
+			setActionNotice({
+				status: 'success',
+				message: __('Marker updated.', 'minimal-map'),
+			});
+		} catch (error) {
+			setColorEditSubmitError(
+				error instanceof Error ? error.message : __('Marker could not be updated.', 'minimal-map')
+			);
+		} finally {
+			setSubmitting(false);
+		}
+	}, [colorEditingMarker, config, draftSvgColors, loadMarkers, resetColorEditModalState]);
 
 	const onCloseDeleteAllMarkersModal = useCallback((): void => {
 		if (isDeletingAllMarkers || isRowActionPending) {
@@ -382,5 +451,14 @@ export function useMarkersController(
 		submitError,
 		totalPages,
 		view,
+		isColorEditModalOpen,
+		colorEditingMarker,
+		draftSvgColors,
+		colorEditSubmitError,
+		onOpenEditMarkerColors,
+		onCancelEditMarkerColors,
+		onChangeMarkerColor,
+		onToggleMarkerColorNone,
+		onConfirmEditMarkerColors,
 	};
 }
