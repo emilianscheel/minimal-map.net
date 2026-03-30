@@ -1902,7 +1902,10 @@ body.toplevel_page_minimal-map
     .components-base-control__field {
       display: flex;
       align-items: center;
-      gap: 14px;
+    }
+
+    .components-base-control__field div {
+      gap: 10px;
     }
 
     .components-checkbox-control__input-container {
