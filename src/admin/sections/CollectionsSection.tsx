@@ -14,8 +14,6 @@ export default function CollectionsSection({
 		true,
 		{
 			activeTheme: stylesController.activeTheme,
-			themes: stylesController.themes,
-			onSwitchTheme: stylesController.switchTheme,
 		}
 	);
 

@@ -34,7 +34,6 @@ import { importLocations } from '../../lib/locations/importLocations';
 import { updateCollection } from "../../lib/collections/updateCollection";
 import { deleteLocation } from "../../lib/locations/deleteLocation";
 import { ImportLocationsButton } from "../locations/ImportLocationsButton";
-import { ThemeSelector } from "../styles/ThemeSelector";
 import { KeyboardShortcut, getShortcutAriaKeys } from "../../components/Kbd";
 import { useSingleKeyShortcut } from "../../lib/keyboard/useSingleKeyShortcut";
 import type {
@@ -49,8 +48,6 @@ export function useCollectionsController(
   enabled: boolean,
   themeData: {
     activeTheme: StyleThemeRecord | null;
-    themes: StyleThemeRecord[];
-    onSwitchTheme: (slug: string) => void;
   },
 ): CollectionsController {
   const buildDeleteCollectionNotice = useCallback(
@@ -866,11 +863,6 @@ export function useCollectionsController(
             isImporting={isImporting}
           />
         </div>
-        <ThemeSelector
-          activeTheme={themeData.activeTheme}
-          themes={themeData.themes}
-          onSwitch={themeData.onSwitchTheme}
-        />
         <Button
           __next40pxDefaultSize
           variant="secondary"
