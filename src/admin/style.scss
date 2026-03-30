@@ -1793,9 +1793,7 @@ body.toplevel_page_minimal-map
   --wp-admin-theme-color: #3858e8;
   --wp-admin-theme-color--rgb: 56, 88, 232;
 
-  height: calc(
-    100vh - 32px - 100px - 70px
-  ); // Subtract admin bar, header, and padding
+  height: 100%;
   min-height: 500px;
   overflow: hidden;
 
@@ -1816,11 +1814,13 @@ body.toplevel_page_minimal-map
     gap: 32px;
     align-items: start;
     height: 100%;
+    min-height: 0;
   }
 
   &__controls {
     display: grid;
-    height: calc(100% - 12px);
+    height: calc(100% - 3px);
+    min-height: 0;
     overflow-y: auto;
     border: 1px solid #dcdcde;
     border-radius: 8px;
@@ -1914,14 +1914,18 @@ body.toplevel_page_minimal-map
   &__preview {
     position: relative;
     height: 100%;
+    min-height: 0;
   }
 
   &__preview-sticky {
     position: sticky;
-    top: 28px;
+    top: 0;
+    height: 100%;
   }
 
   &__preview-card.components-card {
+    display: flex;
+    height: 100%;
     border: 0;
     border-radius: 18px;
     overflow: hidden;
@@ -1931,7 +1935,7 @@ body.toplevel_page_minimal-map
 
   &__preview-card .components-card__body {
     padding: 0;
-    height: calc(100vh - 32px - 28px - 32px - 100px);
+    height: 100%;
     min-height: 480px;
   }
 
