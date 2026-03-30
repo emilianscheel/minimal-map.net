@@ -2,7 +2,6 @@ import { Button, Modal, Notice, SearchControl } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import type { KeyboardEvent } from 'react';
-import { Check } from 'lucide-react';
 import Kbd from '../../components/Kbd';
 import { shouldHandleModalEnter } from '../../lib/locations/shouldHandleModalEnter';
 import { markerLibrary } from '../../lib/markers/markerLibrary';
@@ -145,11 +144,6 @@ export default function MarkerLibraryModal({ controller }: { controller: Markers
 											src={svgToDataUrl(entry.content)}
 											alt={entry.name}
 										/>
-										{isSelected ? (
-											<div className="minimal-map-admin__library-card-check">
-												<Check size={10} strokeWidth={3} />
-											</div>
-										) : null}
 									</div>
 									<span className="minimal-map-admin__library-card-name">{entry.name}</span>
 								</button>
