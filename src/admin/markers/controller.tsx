@@ -7,7 +7,6 @@ import apiFetch from '@wordpress/api-fetch';
 import type {
 	MarkerRecord,
 	MarkersAdminConfig,
-	StyleThemeRecord,
 } from '../../types';
 import { fetchAdminMarkers } from '../../lib/admin/fetchPaginatedRecords';
 import { formatFilename, hasFilenameBasename, parseFilenameParts } from '../../lib/filenames';
@@ -17,7 +16,6 @@ import { updateMarker } from '../../lib/markers/updateMarker';
 import { applySvgColors, parseSvgColors } from '../../lib/markers/svgColors';
 import type { SvgColorEntry } from '../../lib/markers/svgColors';
 import { UploadMarkerButton } from './UploadMarkerButton';
-import { ThemeSelector } from '../styles/ThemeSelector';
 import type { MarkersController } from './types';
 import { triggerFileDownload } from '../../lib/download';
 
@@ -40,11 +38,6 @@ const DEFAULT_GRID_VIEW: ViewGrid = {
 export function useMarkersController(
 	config: MarkersAdminConfig,
 	enabled: boolean,
-	themeData: {
-		activeTheme: StyleThemeRecord | null;
-		themes: StyleThemeRecord[];
-		onSwitchTheme: (slug: string) => void;
-	}
 ): MarkersController {
 	const [actionNotice, setActionNotice] = useState<MarkersController['actionNotice']>(null);
 	const [editFilenameBasename, setEditFilenameBasename] = useState('');
@@ -403,7 +396,6 @@ export function useMarkersController(
 
 	return {
 		actionNotice,
-		activeTheme: themeData.activeTheme,
 		dismissActionNotice,
 		editFilenameBasename,
 		editFilenameExtension,
@@ -417,11 +409,6 @@ export function useMarkersController(
 					onClick={onOpenDeleteAllMarkersModal}
 					disabled={totalItems === 0 || isDeletingAllMarkers || isRowActionPending || isUploading}
 					__next40pxDefaultSize
-				/>
-				<ThemeSelector
-					activeTheme={themeData.activeTheme}
-					themes={themeData.themes}
-					onSwitch={themeData.onSwitchTheme}
 				/>
 				<UploadMarkerButton onUpload={onUploadMarkers} isUploading={isUploading} />
 			</div>

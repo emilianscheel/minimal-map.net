@@ -7,6 +7,7 @@ import MarkerMiniMap from '../../src/components/MarkerMiniMap';
 import MarkersGrid from '../../src/admin/markers/MarkersGrid';
 import type { MarkersController } from '../../src/admin/markers/types';
 import type { MarkerRecord, StyleThemeRecord } from '../../src/types';
+import { DEFAULT_POSITRON_THEME_COLORS } from '../../src/lib/styles/defaultThemeColors';
 
 const originalGlobals = {
 	document: globalThis.document,
@@ -120,7 +121,6 @@ function createControllerStub(
 ): MarkersController {
 	return {
 		actionNotice: null,
-		activeTheme: createTheme(),
 		dismissActionNotice() {},
 		editFilenameBasename: '',
 		editFilenameExtension: 'svg',
@@ -240,10 +240,17 @@ describe('MarkerMiniMap', () => {
 
 		await flushRender();
 
+		const preview = host.querySelector(
+			'.minimal-map-admin__mini-map-preview--card'
+		) as HTMLDivElement | null;
+
 		expect(dom.window.document.body.textContent).toContain('marker-7.svg');
 		expect(
 			host.querySelectorAll('.minimal-map-admin__mini-map-preview--card').length
 		).toBeGreaterThan(0);
+		expect(preview?.style.getPropertyValue('--minimal-map-mini-map-background')).toBe(
+			DEFAULT_POSITRON_THEME_COLORS.background
+		);
 		expect(host.querySelector('.maplibregl-canvas')).toBeNull();
 
 		root.unmount();

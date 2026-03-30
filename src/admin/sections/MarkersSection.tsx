@@ -1,18 +1,12 @@
 import ContentHeader from '../ContentHeader';
 import MarkersView, { useMarkersController } from '../markers';
-import { useStylesController } from '../styles/controller';
 import type { AdminSectionComponentProps } from './types';
 
 export default function MarkersSection({
 	activeSection,
 	appConfig,
 }: AdminSectionComponentProps) {
-	const stylesController = useStylesController(appConfig.stylesConfig, true);
-	const controller = useMarkersController(appConfig.markersConfig, true, {
-		activeTheme: stylesController.activeTheme,
-		themes: stylesController.themes,
-		onSwitchTheme: stylesController.switchTheme,
-	});
+	const controller = useMarkersController(appConfig.markersConfig, true);
 
 	return (
 		<>

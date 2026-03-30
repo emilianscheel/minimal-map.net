@@ -1,6 +1,6 @@
 import type { ViewGrid } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
-import type { MarkerRecord, StyleThemeRecord } from '../../types';
+import type { MarkerRecord } from '../../types';
 import type { SvgColorEntry } from '../../lib/markers/svgColors';
 
 export interface MarkersNotice {
@@ -10,7 +10,6 @@ export interface MarkersNotice {
 
 export interface MarkersController {
 	actionNotice: MarkersNotice | null;
-	activeTheme: StyleThemeRecord | null;
 	dismissActionNotice: () => void;
 	editFilenameBasename: string;
 	editFilenameExtension: string;
