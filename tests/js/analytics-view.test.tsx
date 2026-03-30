@@ -664,4 +664,170 @@ describe('AnalyticsView', () => {
 			root.unmount();
 		}
 	});
+
+	test('renders inline icons for search query types', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub(),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
+		);
+
+		await flushRender();
+
+		const labelWrappers = Array.from(
+			host.querySelectorAll('.minimal-map-admin__analytics-label-with-icon')
+		);
+		const queryTypeWrapper = labelWrappers.find(
+			(wrapper) => wrapper.textContent?.trim() === 'Text'
+		);
+
+		expect(queryTypeWrapper).not.toBeUndefined();
+		expect(
+			queryTypeWrapper?.querySelector('.minimal-map-admin__analytics-label-icon')
+		).not.toBeNull();
+
+		root.unmount();
+	});
+
+	test('renders inline icons for selection sources and falls back to em dash for empty sources', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub({
+						tables: {
+							search: {
+								queries: [],
+								totalItems: 0,
+								totalPages: 1,
+								view: createDefaultAnalyticsView('search'),
+							},
+							selection: {
+								queries: [
+									{
+										id: 2,
+										event_category: 'selection',
+										query_text: 'Berlin',
+										query_type: 'text',
+										result_count: 0,
+										nearest_distance_meters: null,
+										location_id: 1,
+										location_title: 'Berlin Mitte',
+										interaction_source: 'search_panel',
+										action_type: '',
+										action_target: '',
+										occurred_at_gmt: '2026-03-21T08:05:00+00:00',
+									},
+									{
+										id: 3,
+										event_category: 'selection',
+										query_text: 'Hamburg',
+										query_type: 'text',
+										result_count: 0,
+										nearest_distance_meters: null,
+										location_id: 2,
+										location_title: 'Hamburg Port',
+										interaction_source: '',
+										action_type: '',
+										action_target: '',
+										occurred_at_gmt: '2026-03-21T08:06:00+00:00',
+									},
+								],
+								totalItems: 2,
+								totalPages: 1,
+								view: createDefaultAnalyticsView('selection'),
+							},
+							action: {
+								queries: [],
+								totalItems: 0,
+								totalPages: 1,
+								view: createDefaultAnalyticsView('action'),
+							},
+						},
+					}),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
+		);
+
+		await flushRender();
+
+		const labelWrappers = Array.from(
+			host.querySelectorAll('.minimal-map-admin__analytics-label-with-icon')
+		);
+		const sourceWrapper = labelWrappers.find(
+			(wrapper) => wrapper.textContent?.trim() === 'Search panel'
+		);
+		const selectionText = host.textContent ?? '';
+
+		expect(sourceWrapper).not.toBeUndefined();
+		expect(
+			sourceWrapper?.querySelector('.minimal-map-admin__analytics-label-icon')
+		).not.toBeNull();
+		expect(selectionText).toContain('Berlin Mitte');
+		expect(selectionText).toContain('Hamburg Port');
+		expect(selectionText).toContain('—');
+
+		root.unmount();
+	});
+
+	test('renders inline icons for action types and action sources', async () => {
+		const dom = new JSDOM('<!doctype html><div id="host"></div>');
+		setGlobalDom(dom);
+		const host = dom.window.document.getElementById('host') as HTMLDivElement;
+		const root = createRoot(host);
+
+		root.render(
+			createElement(
+				CacheProvider,
+				{ value: createTestCache(dom) },
+				createElement(AnalyticsView, {
+					controller: createControllerStub(),
+					siteLocale: 'en-US',
+					siteTimezone: 'Europe/Berlin',
+				})
+			)
+		);
+
+		await flushRender();
+
+		const labelWrappers = Array.from(
+			host.querySelectorAll('.minimal-map-admin__analytics-label-with-icon')
+		);
+		const actionTypeWrapper = labelWrappers.find(
+			(wrapper) => wrapper.textContent?.trim() === 'Website'
+		);
+		const actionSourceWrapper = labelWrappers.find(
+			(wrapper) => wrapper.textContent?.trim() === 'In-map card'
+		);
+
+		expect(actionTypeWrapper).not.toBeUndefined();
+		expect(actionSourceWrapper).not.toBeUndefined();
+		expect(
+			actionTypeWrapper?.querySelector('.minimal-map-admin__analytics-label-icon')
+		).not.toBeNull();
+		expect(
+			actionSourceWrapper?.querySelector('.minimal-map-admin__analytics-label-icon')
+		).not.toBeNull();
+
+		root.unmount();
+	});
 });

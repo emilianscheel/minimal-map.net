@@ -2,6 +2,20 @@ import { DataViews } from '@wordpress/dataviews/wp';
 import type { Action, Field, View, ViewTable } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	Clock3,
+	Globe,
+	LocateFixed,
+	Mail,
+	MapPin,
+	MapPinned,
+	MousePointerClick,
+	Navigation,
+	PanelLeft,
+	Phone,
+	Share2,
+	Type,
+} from 'lucide-react';
 import { formatRelativeDateTime } from '../../lib/formatRelativeDateTime';
 import type {
 	AnalyticsActionType,
@@ -16,47 +30,103 @@ import { ANALYTICS_TABLE_PER_PAGE } from './constants';
 
 const EMPTY_ANALYTICS_ACTIONS: Action<AnalyticsQueryRecord>[] = [];
 
-function formatQueryType(value: AnalyticsQueryType): string {
-	switch (value) {
-		case 'address':
-			return __('Address', 'minimal-map');
-		case 'coordinates':
-			return __('Coordinates', 'minimal-map');
-		case 'live_location':
-			return __('Live location', 'minimal-map');
-		case 'text':
-		default:
-			return __('Text', 'minimal-map');
+function renderLabelWithIcon(
+	label: string,
+	icon: JSX.Element | null
+): JSX.Element | string {
+	if (!label || !icon) {
+		return '—';
 	}
+
+	return (
+		<span className="minimal-map-admin__analytics-label-with-icon">
+			{icon}
+			<span>{label}</span>
+		</span>
+	);
 }
 
-function formatInteractionSource(value: AnalyticsInteractionSource | ''): string {
+function renderQueryType(value: AnalyticsQueryType | ''): JSX.Element | string {
 	switch (value) {
-		case 'map_marker':
-			return __('Map marker', 'minimal-map');
-		case 'in_map_card':
-			return __('In-map card', 'minimal-map');
-		case 'search_panel':
-			return __('Search panel', 'minimal-map');
+		case 'address':
+			return renderLabelWithIcon(
+				__('Address', 'minimal-map'),
+				<MapPinned className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
+		case 'coordinates':
+			return renderLabelWithIcon(
+				__('Coordinates', 'minimal-map'),
+				<LocateFixed className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
+		case 'live_location':
+			return renderLabelWithIcon(
+				__('Live location', 'minimal-map'),
+				<Navigation className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
+		case 'text':
+			return renderLabelWithIcon(
+				__('Text', 'minimal-map'),
+				<Type className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		default:
 			return '—';
 	}
 }
 
-function formatActionType(value: AnalyticsActionType | ''): string {
+function renderInteractionSource(value: AnalyticsInteractionSource | ''): JSX.Element | string {
+	switch (value) {
+		case 'map_marker':
+			return renderLabelWithIcon(
+				__('Map marker', 'minimal-map'),
+				<MapPin className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
+		case 'in_map_card':
+			return renderLabelWithIcon(
+				__('In-map card', 'minimal-map'),
+				<MousePointerClick className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
+		case 'search_panel':
+			return renderLabelWithIcon(
+				__('Search panel', 'minimal-map'),
+				<PanelLeft className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
+		default:
+			return '—';
+	}
+}
+
+function renderActionType(value: AnalyticsActionType | ''): JSX.Element | string {
 	switch (value) {
 		case 'opening_hours':
-			return __('Opening hours', 'minimal-map');
+			return renderLabelWithIcon(
+				__('Opening hours', 'minimal-map'),
+				<Clock3 className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		case 'telephone':
-			return __('Phone', 'minimal-map');
+			return renderLabelWithIcon(
+				__('Phone', 'minimal-map'),
+				<Phone className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		case 'email':
-			return __('Email', 'minimal-map');
+			return renderLabelWithIcon(
+				__('Email', 'minimal-map'),
+				<Mail className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		case 'website':
-			return __('Website', 'minimal-map');
+			return renderLabelWithIcon(
+				__('Website', 'minimal-map'),
+				<Globe className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		case 'social_media':
-			return __('Social media', 'minimal-map');
+			return renderLabelWithIcon(
+				__('Social media', 'minimal-map'),
+				<Share2 className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		case 'google_maps':
-			return __('Google Maps', 'minimal-map');
+			return renderLabelWithIcon(
+				__('Google Maps', 'minimal-map'),
+				<Navigation className="minimal-map-admin__analytics-label-icon" size={14} strokeWidth={1.8} aria-hidden="true" />
+			);
 		default:
 			return '—';
 	}
@@ -123,7 +193,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => formatInteractionSource(item.interaction_source),
+					render: ({ item }) => renderInteractionSource(item.interaction_source),
 				},
 				{
 					id: 'query_text',
@@ -161,7 +231,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => formatActionType(item.action_type),
+					render: ({ item }) => renderActionType(item.action_type),
 				},
 				{
 					id: 'interaction_source',
@@ -169,7 +239,7 @@ function useAnalyticsFields(
 					enableHiding: false,
 					enableSorting: false,
 					filterBy: false,
-					render: ({ item }) => formatInteractionSource(item.interaction_source),
+					render: ({ item }) => renderInteractionSource(item.interaction_source),
 				},
 				{
 					id: 'action_target',
@@ -206,7 +276,7 @@ function useAnalyticsFields(
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
-				render: ({ item }) => formatQueryType(item.query_type),
+				render: ({ item }) => renderQueryType(item.query_type),
 			},
 			{
 				id: 'result_count',

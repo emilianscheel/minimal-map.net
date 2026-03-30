@@ -531,6 +531,19 @@ svg.lucide {
 }
 
 .minimal-map-admin__analytics-table-wrap
+  .minimal-map-admin__analytics-label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.minimal-map-admin__analytics-table-wrap
+  .minimal-map-admin__analytics-label-icon {
+  flex: 0 0 auto;
+  color: inherit;
+}
+
+.minimal-map-admin__analytics-table-wrap
   .minimal-map-admin__analytics-time-cell {
   display: flex;
   flex-direction: column;
