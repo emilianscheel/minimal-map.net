@@ -8,6 +8,7 @@
     "version:bump": "bash ./bin/bump-version.sh",
     "typecheck": "bunx tsc --noEmit",
     "build": "bun run build:bundle && bun run build:check",
+    "zip": "bash ./bin/zip-release.sh",
     "build:bundle": "wp-scripts build",
     "build:check": "node ./bin/check-bundle-budgets.mjs",
     "build:stats": "mkdir -p reports && wp-scripts build --profile --json > reports/bundle-stats.json",
