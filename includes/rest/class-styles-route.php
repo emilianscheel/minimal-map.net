@@ -210,9 +210,49 @@ class Styles_Route {
 				),
 			);
 			update_option( self::OPTION_NAME, $themes );
+			return $themes;
 		}
 
-		return $themes;
+		$normalized_themes = array();
+		$did_change        = false;
+
+		foreach ( $themes as $slug => $theme ) {
+			if ( ! is_array( $theme ) ) {
+				continue;
+			}
+
+			$normalized_theme = $theme;
+			$normalized_theme['slug']       = isset( $theme['slug'] ) ? sanitize_title( (string) $theme['slug'] ) : sanitize_title( (string) $slug );
+			$normalized_theme['label']      = isset( $theme['label'] ) ? sanitize_text_field( (string) $theme['label'] ) : __( 'Untitled Theme', 'minimal-map' );
+			$normalized_theme['basePreset'] = isset( $theme['basePreset'] ) ? sanitize_key( (string) $theme['basePreset'] ) : 'positron';
+			$normalized_theme['colors']     = $this->sanitize_theme_colors(
+				isset( $theme['colors'] ) && is_array( $theme['colors'] ) ? $theme['colors'] : array()
+			);
+
+			if ( $normalized_theme !== $theme ) {
+				$did_change = true;
+			}
+
+			$normalized_themes[ $normalized_theme['slug'] ] = $normalized_theme;
+		}
+
+		if ( empty( $normalized_themes ) ) {
+			$normalized_themes = array(
+				'default' => array(
+					'slug'       => 'default',
+					'label'      => __( 'Default Theme', 'minimal-map' ),
+					'basePreset' => 'positron',
+					'colors'     => $this->get_default_positron_colors(),
+				),
+			);
+			$did_change = true;
+		}
+
+		if ( $did_change ) {
+			update_option( self::OPTION_NAME, $normalized_themes );
+		}
+
+		return $normalized_themes;
 	}
 
 	/**
@@ -265,8 +305,10 @@ class Styles_Route {
 			'waterLabelHalo'  => '#ffffff',
 			'roadLabel'       => '#666666',
 			'roadLabelHalo'   => '#ffffff',
+			'airportIcon'     => '#666666',
 			'placeLabel'      => '#333333',
 			'placeLabelHalo'  => '#ffffff',
+			'placeIcon'       => '#000000',
 		);
 	}
 

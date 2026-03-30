@@ -3,7 +3,7 @@ import type { StyleThemeColors, StyleThemeSlot } from '../../types';
 
 export interface StyleThemeManifestEntry {
 	layerId: string;
-	property: 'background-color' | 'fill-color' | 'fill-outline-color' | 'line-color' | 'text-color' | 'text-halo-color';
+	property: 'background-color' | 'fill-color' | 'fill-outline-color' | 'line-color' | 'text-color' | 'text-halo-color' | 'icon-color';
 }
 
 export const POSITRON_THEME_MANIFEST: Record<StyleThemeSlot, StyleThemeManifestEntry[]> = {
@@ -49,6 +49,7 @@ export const POSITRON_THEME_MANIFEST: Record<StyleThemeSlot, StyleThemeManifestE
 	],
 	roadMajorFill: [
 		{ layerId: 'highway_major_inner', property: 'line-color' },
+		{ layerId: 'highway_major_subtle', property: 'line-color' },
 		{ layerId: 'tunnel_motorway_inner', property: 'line-color' },
 	],
 	motorwayCasing: [
@@ -58,6 +59,7 @@ export const POSITRON_THEME_MANIFEST: Record<StyleThemeSlot, StyleThemeManifestE
 	motorwayFill: [
 		{ layerId: 'highway_motorway_inner', property: 'line-color' },
 		{ layerId: 'highway_motorway_bridge_inner', property: 'line-color' },
+		{ layerId: 'highway_motorway_subtle', property: 'line-color' },
 	],
 	rail: [
 		{ layerId: 'railway', property: 'line-color' },
@@ -104,6 +106,9 @@ export const POSITRON_THEME_MANIFEST: Record<StyleThemeSlot, StyleThemeManifestE
 		{ layerId: 'highway-name-major', property: 'text-halo-color' },
 		{ layerId: 'airport', property: 'text-halo-color' },
 	],
+	airportIcon: [
+		{ layerId: 'airport', property: 'icon-color' },
+	],
 	placeLabel: [
 		{ layerId: 'label_city', property: 'text-color' },
 		{ layerId: 'label_city_capital', property: 'text-color' },
@@ -125,6 +130,12 @@ export const POSITRON_THEME_MANIFEST: Record<StyleThemeSlot, StyleThemeManifestE
 		{ layerId: 'label_country_2', property: 'text-halo-color' },
 		{ layerId: 'label_country_3', property: 'text-halo-color' },
 		{ layerId: 'label_other', property: 'text-halo-color' },
+	],
+	placeIcon: [
+		{ layerId: 'label_city', property: 'icon-color' },
+		{ layerId: 'label_city_capital', property: 'icon-color' },
+		{ layerId: 'label_town', property: 'icon-color' },
+		{ layerId: 'label_village', property: 'icon-color' },
 	],
 };
 

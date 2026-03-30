@@ -178,6 +178,16 @@ export function deriveThemeFromPalette(
 		water,
 		MIN_LABEL_CONTRAST
 	);
+	const airportIcon = ensureContrast(
+		blend(defaultColors.airportIcon, blend(textAnchor, finalTransportAnchor, 0.16), 0.68),
+		background,
+		MIN_LABEL_CONTRAST
+	);
+	const placeIcon = ensureContrast(
+		blend(defaultColors.placeIcon, textAnchor, 0.78),
+		background,
+		MIN_LABEL_CONTRAST
+	);
 
 	const placeLabelHalo = createHalo(placeLabel, background, defaultColors.placeLabelHalo);
 	const roadLabelHalo = createHalo(roadLabel, roadMajorFill, defaultColors.roadLabelHalo);
@@ -208,8 +218,10 @@ export function deriveThemeFromPalette(
 		waterLabelHalo,
 		roadLabel,
 		roadLabelHalo,
+		airportIcon,
 		placeLabel,
 		placeLabelHalo,
+		placeIcon,
 	};
 }
 

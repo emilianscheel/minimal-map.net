@@ -98,8 +98,10 @@ function createTheme(): StyleThemeRecord {
 			waterLabelHalo: '#222222',
 			roadLabel: '#333333',
 			roadLabelHalo: '#444444',
+			airportIcon: '#4a4a4a',
 			placeLabel: '#555555',
 			placeLabelHalo: '#666666',
+			placeIcon: '#777777',
 		},
 	};
 }

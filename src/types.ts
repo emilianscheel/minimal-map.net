@@ -938,8 +938,10 @@ export type StyleThemeSlot =
 	| 'waterLabelHalo'
 	| 'roadLabel'
 	| 'roadLabelHalo'
+	| 'airportIcon'
 	| 'placeLabel'
-	| 'placeLabelHalo';
+	| 'placeLabelHalo'
+	| 'placeIcon';
 
 export type StyleThemeColors = Record<StyleThemeSlot, string>;
 

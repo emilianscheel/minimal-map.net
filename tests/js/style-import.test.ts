@@ -38,7 +38,8 @@ describe('style import parsing', () => {
 					{ id: 'water', type: 'fill', 'source-layer': 'water', paint: { 'fill-color': 'rgb(194, 200, 202)' } },
 					{ id: 'building', type: 'fill', 'source-layer': 'building', paint: { 'fill-color': 'rgb(234, 234, 229)', 'fill-outline-color': 'rgb(219, 219, 218)' } },
 					{ id: 'highway_minor', type: 'line', 'source-layer': 'transportation', paint: { 'line-color': '#dddddd' } },
-					{ id: 'label_city', type: 'symbol', 'source-layer': 'place', paint: { 'text-color': '#000000', 'text-halo-color': '#ffffff' } },
+					{ id: 'label_city', type: 'symbol', 'source-layer': 'place', paint: { 'text-color': '#000000', 'text-halo-color': '#ffffff', 'icon-color': '#111111' } },
+					{ id: 'airport', type: 'symbol', 'source-layer': 'aerodrome_label', paint: { 'text-color': '#666666', 'text-halo-color': '#ffffff', 'icon-color': '#777777' } },
 				],
 			},
 			{
@@ -57,6 +58,8 @@ describe('style import parsing', () => {
 		expect(parsed.colors.roadMinor).toBe('#dddddd');
 		expect(parsed.colors.placeLabel).toBe('#000000');
 		expect(parsed.colors.placeLabelHalo).toBe('#ffffff');
+		expect(parsed.colors.placeIcon).toBe('#111111');
+		expect(parsed.colors.airportIcon).toBe('#777777');
 	});
 
 	test('normalizes rgba and hsl colors to opaque hex', () => {

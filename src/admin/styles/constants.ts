@@ -26,8 +26,10 @@ export const SLOT_LABELS: Record<StyleThemeSlot, string> = {
 	waterLabelHalo: __('Water Label Halo', 'minimal-map'),
 	roadLabel: __('Road Labels', 'minimal-map'),
 	roadLabelHalo: __('Road Label Halo', 'minimal-map'),
+	airportIcon: __('Airport Icons', 'minimal-map'),
 	placeLabel: __('Place Labels', 'minimal-map'),
 	placeLabelHalo: __('Place Label Halo', 'minimal-map'),
+	placeIcon: __('Place Icons', 'minimal-map'),
 };
 
 export const COLOR_GROUPS: { label: string; slots: StyleThemeSlot[] }[] = [
@@ -48,7 +50,7 @@ export const COLOR_GROUPS: { label: string; slots: StyleThemeSlot[] }[] = [
 		slots: [ 'boundary', 'aerowayLine', 'aerowayArea' ],
 	},
 	{
-		label: __('Typography', 'minimal-map'),
-		slots: [ 'waterLabel', 'waterLabelHalo', 'roadLabel', 'roadLabelHalo', 'placeLabel', 'placeLabelHalo' ],
+		label: __('Typography & Icons', 'minimal-map'),
+		slots: [ 'waterLabel', 'waterLabelHalo', 'roadLabel', 'roadLabelHalo', 'airportIcon', 'placeLabel', 'placeLabelHalo', 'placeIcon' ],
 	},
 ];

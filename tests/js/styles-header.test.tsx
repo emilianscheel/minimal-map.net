@@ -49,8 +49,10 @@ const defaultTheme: StyleThemeRecord = {
 		waterLabelHalo: '#ffffff',
 		roadLabel: '#666666',
 		roadLabelHalo: '#ffffff',
+		airportIcon: '#666666',
 		placeLabel: '#333333',
 		placeLabelHalo: '#ffffff',
+		placeIcon: '#000000',
 	},
 };
 

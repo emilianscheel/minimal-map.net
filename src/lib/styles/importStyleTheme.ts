@@ -313,6 +313,12 @@ const SLOT_FALLBACKS: Record<StyleThemeSlot, SemanticCandidate[]> = {
 				(context.sourceLayer === 'transportation_name' || hasAny(context, [ 'road', 'street', 'highway', 'airport', 'transportation_name' ])),
 		},
 	],
+	airportIcon: [
+		{
+			property: 'icon-color',
+			matches: (context) => isSymbol(context) && context.id === 'airport',
+		},
+	],
 	placeLabel: [
 		{
 			property: 'text-color',
@@ -327,6 +333,14 @@ const SLOT_FALLBACKS: Record<StyleThemeSlot, SemanticCandidate[]> = {
 			matches: (context) =>
 				isSymbol(context) &&
 				(context.sourceLayer === 'place' || hasAny(context, [ 'place', 'city', 'town', 'village', 'country', 'state', 'settlement' ])),
+		},
+	],
+	placeIcon: [
+		{
+			property: 'icon-color',
+			matches: (context) =>
+				isSymbol(context) &&
+				hasAny(context, [ 'label_city', 'label_city_capital', 'label_town', 'label_village' ]),
 		},
 	],
 };
