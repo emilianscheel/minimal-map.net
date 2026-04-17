@@ -175,7 +175,7 @@ describe('iframe embed snippet', () => {
 		expect(parsedUrl.searchParams.get('minimal-map-config')).toBeTruthy();
 	});
 
-	test('builds the iframe snippet using responsive desktop and mobile heights', () => {
+	test('builds the iframe snippet without an embedded style tag', () => {
 		const snippet = buildIframeSnippet(
 			createAttributes({
 				height: 55,
@@ -186,9 +186,9 @@ describe('iframe embed snippet', () => {
 			runtimeConfig
 		);
 
-		expect(snippet).toContain('--minimal-map-embed-height:55vh;');
-		expect(snippet).toContain('--minimal-map-embed-height-mobile:320px;');
-		expect(snippet).toContain('@media (max-width:700px)');
+		expect(snippet).toContain('style="display:block;width:100%;height:55vh;border:0;"');
+		expect(snippet).not.toContain('<style>');
+		expect(snippet).not.toContain('@media');
 		expect(snippet).toContain('title="Minimal Map"');
 	});
 

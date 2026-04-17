@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Rest;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Proxies free-text geocoding for the frontend search panel.
  */
@@ -33,6 +35,7 @@ class Frontend_Geocode_Route {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'handle_request' ),
+				// Public by design: frontend visitors can geocode search queries for visible maps.
 				'permission_callback' => '__return_true',
 				'args'                => $this->get_route_args(),
 			)

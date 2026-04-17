@@ -7,6 +7,8 @@
 
 namespace MinimalMap;
 
+defined( 'ABSPATH' ) || exit;
+
 use MinimalMap\Admin\Admin_Menu;
 use MinimalMap\Analytics\Analytics;
 use MinimalMap\Blocks\Map_Block;
@@ -22,7 +24,6 @@ use MinimalMap\Rest\Admin_Query_Route;
 use MinimalMap\Tags\Tag_Taxonomy;
 use MinimalMap\Rest\Frontend_Geocode_Route;
 use MinimalMap\Rest\Geocode_Route;
-use MinimalMap\Rest\License_Route;
 use MinimalMap\Rest\Locations_Route;
 use MinimalMap\Rest\Locations_Settings_Route;
 use MinimalMap\Rest\Styles_Route;
@@ -137,13 +138,6 @@ final class Plugin {
 	private $locations_settings_route;
 
 	/**
-	 * License verification REST route service.
-	 *
-	 * @var License_Route
-	 */
-	private $license_route;
-
-	/**
 	 * Styles REST route service.
 	 *
 	 * @var Styles_Route
@@ -218,7 +212,6 @@ final class Plugin {
 		$this->geocode_route      = new Geocode_Route();
 		$this->locations_route    = new Locations_Route( $config );
 		$this->locations_settings_route = new Locations_Settings_Route();
-		$this->license_route      = new License_Route();
 		$this->styles_route       = new Styles_Route();
 		$this->analytics_settings_route = new Analytics_Settings_Route( $this->analytics );
 		$this->analytics_summary_route  = new Analytics_Summary_Route( $this->analytics );
@@ -247,7 +240,6 @@ final class Plugin {
 	 */
 	private function register_hooks() {
 		add_filter( 'plugin_action_links_' . plugin_basename( MINIMAL_MAP_FILE ), array( $this, 'add_plugin_action_links' ) );
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'init', array( $this->analytics, 'ensure_schema' ), 1 );
 		add_action( 'init', array( $this->analytics, 'schedule_cleanup' ) );
 		add_action( 'init', array( $this->collection_post_type, 'register' ), 5 );
@@ -273,7 +265,6 @@ final class Plugin {
 		add_action( 'rest_api_init', array( $this->geocode_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->locations_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->locations_settings_route, 'register' ) );
-		add_action( 'rest_api_init', array( $this->license_route, 'register' ) );
 		add_action( 'rest_api_init', array( $this->styles_route, 'register' ) );
 	}
 
@@ -288,27 +279,13 @@ final class Plugin {
 			return $actions;
 		}
 
-		$plugin_actions = array();
-
-		if ( License_Route::has_local_activation() ) {
-			$plugin_actions['dashboard'] = sprintf(
+		$plugin_actions = array(
+			'dashboard' => sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( Admin_Menu::get_view_url( Admin_Menu::DEFAULT_VIEW ) ),
 				esc_html__( 'Dashboard', 'minimal-map' )
-			);
-		} else {
-			$plugin_actions['buy-premium'] = sprintf(
-				'<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
-				esc_url( License_Route::PRODUCT_URL ),
-				esc_html__( 'Buy Premium', 'minimal-map' )
-			);
-
-			$plugin_actions['enter-license-key'] = sprintf(
-				'<a href="%1$s">%2$s</a>',
-				esc_url( Admin_Menu::get_license_modal_url() ),
-				esc_html__( 'Enter License Key', 'minimal-map' )
-			);
-		}
+			),
+		);
 
 		return array_merge(
 			$plugin_actions,
@@ -316,16 +293,4 @@ final class Plugin {
 		);
 	}
 
-	/**
-	 * Load the plugin textdomain.
-	 *
-	 * @return void
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain(
-			'minimal-map',
-			false,
-			dirname( plugin_basename( MINIMAL_MAP_FILE ) ) . '/languages'
-		);
-	}
 }

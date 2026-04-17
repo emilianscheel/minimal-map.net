@@ -457,7 +457,6 @@ export interface TagRestResponse {
 export interface AdminAppConfig {
 	currentView: AdminSectionView;
 	sections: AdminSection[];
-	isPremium: boolean;
 	stats: AdminStats;
 	mapConfig: MapRuntimeConfig;
 	locationsConfig: LocationsAdminConfig;
@@ -467,7 +466,6 @@ export interface AdminAppConfig {
 	tagsConfig: TagsAdminConfig;
 	stylesConfig: StylesAdminConfig;
 	analyticsConfig: AnalyticsAdminConfig;
-	licenseConfig: LicenseAdminConfig;
 }
 
 export interface PaginatedResult<T> {
@@ -509,14 +507,6 @@ export interface AdminCollectionListItem extends CollectionRecord {
 export type AdminMarkerListItem = MarkerRecord;
 
 export type AdminLogoListItem = LogoRecord;
-
-export interface LicenseAdminConfig {
-	nonce: string;
-	path: string;
-	purchaseUrl: string;
-	hasActivation: boolean;
-	openOnLoad: boolean;
-}
 
 export type DashboardCardView = Extract<
 	AdminSectionView,

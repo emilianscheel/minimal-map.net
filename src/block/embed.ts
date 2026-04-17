@@ -1,5 +1,5 @@
 import { normalizeHeightUnit } from '../map/defaults';
-import { formatHeightCssValue, MOBILE_BREAKPOINT } from '../map/responsive';
+import { formatHeightCssValue } from '../map/responsive';
 import type { MapBlockAttributes, MapRuntimeConfig } from '../types';
 
 export const EMBED_PAYLOAD_VERSION = 1;
@@ -182,13 +182,5 @@ export function buildIframeSnippet(
 		attributes.height,
 		normalizeHeightUnit(attributes.heightUnit)
 	);
-	const heightMobileCssValue =
-		typeof attributes.heightMobile === 'number' && attributes.heightMobile > 0
-			? formatHeightCssValue(
-					attributes.heightMobile,
-					normalizeHeightUnit(attributes.heightMobileUnit ?? attributes.heightUnit)
-				)
-			: heightCssValue;
-
-	return `<div class="minimal-map-embed" style="--minimal-map-embed-height:${escapeHtmlAttribute(heightCssValue)};--minimal-map-embed-height-mobile:${escapeHtmlAttribute(heightMobileCssValue)};"><style>.minimal-map-embed{width:100%;}.minimal-map-embed>iframe{display:block;width:100%;height:var(--minimal-map-embed-height);border:0;}@media (max-width:${MOBILE_BREAKPOINT}px){.minimal-map-embed>iframe{height:var(--minimal-map-embed-height-mobile)!important;}}</style><iframe src="${escapeHtmlAttribute(src)}" title="Minimal Map" loading="lazy"></iframe></div>`;
+	return `<div class="minimal-map-embed" style="width:100%;"><iframe src="${escapeHtmlAttribute(src)}" title="Minimal Map" loading="lazy" style="display:block;width:100%;height:${escapeHtmlAttribute(heightCssValue)};border:0;"></iframe></div>`;
 }

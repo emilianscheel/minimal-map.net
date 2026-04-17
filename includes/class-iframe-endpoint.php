@@ -7,6 +7,8 @@
 
 namespace MinimalMap;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Renders one standalone map document for iframe embeds.
  */
@@ -122,6 +124,8 @@ class Iframe_Endpoint {
 	 * @return string
 	 */
 	private function render_document( $context ) {
+		$this->enqueue_document_styles();
+
 		if ( '' !== $context['map_surface_markup'] ) {
 			wp_enqueue_style( 'minimal-map-style' );
 			wp_enqueue_script( 'minimal-map-frontend' );
@@ -137,5 +141,19 @@ class Iframe_Endpoint {
 		ob_start();
 		require MINIMAL_MAP_PATH . 'templates/map-iframe.php';
 		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Enqueue iframe document reset styles.
+	 *
+	 * @return void
+	 */
+	private function enqueue_document_styles() {
+		wp_register_style( 'minimal-map-iframe', false, array(), MINIMAL_MAP_VERSION );
+		wp_add_inline_style(
+			'minimal-map-iframe',
+			'html,body{margin:0;padding:0;background:transparent;}html{margin-top:0!important;}body.minimal-map-iframe-page{font-family:var(--minimal-map-font-family,var(--wp--style--global--font-family,inherit));}.minimal-map-iframe-page .minimal-map-surface{width:100%;}.minimal-map-iframe-page__error{padding:16px;color:#1e1e1e;font-size:14px;line-height:1.5;}'
+		);
+		wp_enqueue_style( 'minimal-map-iframe' );
 	}
 }

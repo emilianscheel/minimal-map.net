@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Minimal Map 0.8.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map.net\n"
-"POT-Creation-Date: 2026-03-29T20:58:33+00:00\n"
+"POT-Creation-Date: 2026-04-17T05:43:01+00:00\n"
 "PO-Revision-Date: 2026-03-19 18:15+0100\n"
 "Last-Translator: Emilian Scheel\n"
 "Language-Team: German\n"
@@ -17,10 +17,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Plugin Name of the plugin
-#: minimal-map.php includes/admin/class-admin-menu.php:141
-#: includes/admin/class-admin-menu.php:142
-#: includes/blocks/class-map-block.php:55
-#: includes/class-iframe-endpoint.php:109
+#: minimal-map.php includes/admin/class-admin-menu.php:112
+#: includes/admin/class-admin-menu.php:113
+#: includes/blocks/class-map-block.php:57
+#: includes/class-iframe-endpoint.php:111
 msgid "Minimal Map"
 msgstr "Minimal Map"
 
@@ -36,271 +36,300 @@ msgstr ""
 msgid "Emilian Scheel"
 msgstr "Emilian Scheel"
 
-#: includes/admin/class-admin-menu.php:42 includes/class-plugin.php:297
+#: includes/admin/class-admin-menu.php:39 includes/class-plugin.php:286
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: includes/admin/class-admin-menu.php:43
+#: includes/admin/class-admin-menu.php:40
 msgid "An overview of Minimal Map sections and upcoming data tools."
 msgstr ""
 "Ein Überblick über die Minimal Map-Bereiche und kommende Datenwerkzeuge."
 
-#: includes/admin/class-admin-menu.php:46
+#: includes/admin/class-admin-menu.php:43
 msgid "Analytics"
 msgstr "Statistiken"
 
-#: includes/admin/class-admin-menu.php:47
+#: includes/admin/class-admin-menu.php:44
 msgid ""
 "Review map search demand and identify where people are looking for locations."
 msgstr ""
 "Überprüfe die Suchanfragen und erkenne, wo Nutzer nach Standorten suchen."
 
-#: includes/admin/class-admin-menu.php:50
-#: includes/locations/class-location-post-type.php:128
+#: includes/admin/class-admin-menu.php:47
+#: includes/locations/class-location-post-type.php:130
 msgid "Locations"
 msgstr "Standorte"
 
-#: includes/admin/class-admin-menu.php:51
+#: includes/admin/class-admin-menu.php:48
 msgid "Create and organize the places you want to render on your maps."
 msgstr ""
 "Erstelle und organisiere die Orte, die du auf deinen Karten anzeigen "
 "möchtest."
 
-#: includes/admin/class-admin-menu.php:54
-#: includes/collections/class-collection-post-type.php:44
+#: includes/admin/class-admin-menu.php:51
+#: includes/collections/class-collection-post-type.php:46
 msgid "Collections"
 msgstr "Sammlungen"
 
-#: includes/admin/class-admin-menu.php:55
+#: includes/admin/class-admin-menu.php:52
 msgid ""
 "Assemble reusable groups of locations and manage their map-ready assignments."
 msgstr ""
 "Stelle wiederverwendbare Gruppen von Standorten zusammen und verwalte ihre "
 "kartentauglichen Zuweisungen."
 
-#: includes/admin/class-admin-menu.php:58
-#: includes/tags/class-tag-taxonomy.php:50
+#: includes/admin/class-admin-menu.php:55
+#: includes/tags/class-tag-taxonomy.php:52
 msgid "Tags"
 msgstr "Schlagwörter"
 
-#: includes/admin/class-admin-menu.php:59
+#: includes/admin/class-admin-menu.php:56
 msgid "Apply lightweight labels to keep map content easy to organize."
 msgstr ""
 "Verwende leichte Beschriftungen, damit Karteninhalte leicht zu organisieren "
 "bleiben."
 
-#: includes/admin/class-admin-menu.php:62
-#: includes/logos/class-logo-post-type.php:39
+#: includes/admin/class-admin-menu.php:59
+#: includes/logos/class-logo-post-type.php:41
 msgid "Logos"
 msgstr "Logos"
 
-#: includes/admin/class-admin-menu.php:63
+#: includes/admin/class-admin-menu.php:60
 msgid "Upload SVG logos and assign them across multiple locations."
 msgstr "Lade SVG-Logos hoch und weise sie mehreren Standorten zu."
 
-#: includes/admin/class-admin-menu.php:66
-#: includes/markers/class-marker-post-type.php:39
+#: includes/admin/class-admin-menu.php:63
+#: includes/markers/class-marker-post-type.php:41
 msgid "Markers"
 msgstr "Marker"
 
-#: includes/admin/class-admin-menu.php:67
+#: includes/admin/class-admin-menu.php:64
 msgid "Define the marker styles and visual pin variants used across maps."
 msgstr ""
 "Definiere die Marker-Stile und visuellen Pin-Varianten, die auf deinen "
 "Karten verwendet werden."
 
-#: includes/admin/class-admin-menu.php:70
+#: includes/admin/class-admin-menu.php:67
 msgid "Styles"
 msgstr "Stile"
 
-#: includes/admin/class-admin-menu.php:71
+#: includes/admin/class-admin-menu.php:68
 msgid "Manage the map styles and presets available inside the block editor."
 msgstr "Verwalte die im Block-Editor verfügbaren Kartenstile und Vorgaben."
 
-#: includes/analytics/class-analytics.php:438
-#: includes/analytics/class-analytics.php:467
+#: includes/analytics/class-analytics.php:457
+#: includes/analytics/class-analytics.php:486
 #, fuzzy
 msgid "Search panel"
 msgstr "Suchpanel"
 
-#: includes/analytics/class-analytics.php:439
+#: includes/analytics/class-analytics.php:458
 #, fuzzy
 msgid "Map marker"
 msgstr "Marker"
 
-#: includes/analytics/class-analytics.php:468
+#: includes/analytics/class-analytics.php:487
 #, fuzzy
 msgid "In-map card"
 msgstr "Importierter Standort"
 
-#: includes/analytics/class-analytics.php:1049
+#: includes/analytics/class-analytics.php:1068
 msgid "Text"
 msgstr "Text"
 
-#: includes/analytics/class-analytics.php:1054
+#: includes/analytics/class-analytics.php:1073
 msgid "Address"
 msgstr "Adresse"
 
-#: includes/analytics/class-analytics.php:1059
+#: includes/analytics/class-analytics.php:1078
 msgid "Coordinates"
 msgstr "Koordinaten"
 
-#: includes/analytics/class-analytics.php:1064
+#: includes/analytics/class-analytics.php:1083
 #, fuzzy
 msgid "Live location"
 msgstr "Live-Standort"
 
-#: includes/analytics/class-analytics.php:1101
+#: includes/analytics/class-analytics.php:1120
 #, fuzzy
 msgid "0 results"
 msgstr "0 Ergebnisse"
 
-#: includes/analytics/class-analytics.php:1106
+#: includes/analytics/class-analytics.php:1125
 #, fuzzy
 msgid "1 result"
 msgstr "1 Ergebnis"
 
-#: includes/analytics/class-analytics.php:1111
+#: includes/analytics/class-analytics.php:1130
 #, fuzzy
 msgid "2-5 results"
 msgstr "2-5 Ergebnisse"
 
-#: includes/analytics/class-analytics.php:1116
+#: includes/analytics/class-analytics.php:1135
 #, fuzzy
 msgid "6+ results"
 msgstr "6+ Ergebnisse"
 
-#: includes/analytics/class-analytics.php:1194
+#: includes/analytics/class-analytics.php:1213
 msgid "Opening hours"
 msgstr "Öffnungszeiten"
 
-#: includes/analytics/class-analytics.php:1195
+#: includes/analytics/class-analytics.php:1214
 msgid "Phone"
 msgstr "Telefon"
 
-#: includes/analytics/class-analytics.php:1196
+#: includes/analytics/class-analytics.php:1215
 msgid "Email"
 msgstr "E-Mail"
 
-#: includes/analytics/class-analytics.php:1197
+#: includes/analytics/class-analytics.php:1216
 msgid "Website"
 msgstr "Website"
 
-#: includes/analytics/class-analytics.php:1198
+#: includes/analytics/class-analytics.php:1217
 msgid "Social media"
 msgstr "Social Media"
 
-#: includes/analytics/class-analytics.php:1199
+#: includes/analytics/class-analytics.php:1218
 #, fuzzy
 msgid "Google Maps"
 msgstr "Google Maps"
 
-#: includes/blocks/class-map-block.php:56
+#: includes/blocks/class-map-block.php:58
 msgid "Render a minimalist MapLibre-powered map."
 msgstr "Zeige eine minimalistische, von MapLibre unterstützte Karte an."
 
-#: includes/class-config.php:56
+#: includes/class-config.php:57
 msgid "Liberty"
 msgstr "Liberty"
 
-#: includes/class-config.php:60
+#: includes/class-config.php:61
 msgid "Bright"
 msgstr "Bright"
 
-#: includes/class-config.php:64
+#: includes/class-config.php:65
 msgid "Positron"
 msgstr "Positron"
 
-#: includes/class-config.php:295 includes/class-config.php:320
+#: includes/class-config.php:296 includes/class-config.php:321
 msgid "Map preview unavailable because this browser does not support WebGL."
 msgstr ""
 "Kartenvorschau nicht verfügbar, da dieser Browser WebGL nicht unterstützt."
 
-#: includes/class-config.php:419 includes/class-config.php:428
-#: includes/class-config.php:437
+#: includes/class-config.php:420 includes/class-config.php:429
+#: includes/class-config.php:438
 msgid "The map embed configuration is missing or invalid."
 msgstr "Die Karten-Einbettungskonfiguration fehlt oder ist ungültig."
 
-#: includes/class-config.php:798
+#: includes/class-config.php:799
 #, fuzzy
 msgid "Minimal Map: Export Locations as CSV"
 msgstr "Minimal Map: Standorte als CSV exportieren"
 
-#: includes/class-config.php:808
+#: includes/class-config.php:809
 #, fuzzy
 msgid "Minimal Map: Export Locations as Excel"
 msgstr "Minimal Map: Standorte als Excel exportieren"
 
-#: includes/class-config.php:819
+#: includes/class-config.php:820
 #, fuzzy
 msgid "Minimal Map: Export Locations as JSON"
 msgstr "Minimal Map: Standorte als JSON exportieren"
 
-#: includes/class-config.php:829
+#: includes/class-config.php:830
 msgid "Minimal Map: Export Analytics Search Data as CSV"
 msgstr "Minimal Map: Statistiken zu Suchanfragen als CSV exportieren"
 
-#: includes/class-config.php:840
+#: includes/class-config.php:841
 msgid "Minimal Map: Export Analytics Selection Data as CSV"
 msgstr "Minimal Map: Statistiken zu Standort-Auswahlen als CSV exportieren"
 
-#: includes/class-config.php:851
+#: includes/class-config.php:852
 msgid "Minimal Map: Export Analytics Action Data as CSV"
 msgstr "Minimal Map: Statistiken zu Nutzeraktionen als CSV exportieren"
 
-#: includes/class-config.php:1301
-msgid "WordPress Theme Palette"
+#: includes/class-config.php:1268
+msgid "Terracotta Coast"
+msgstr ""
+
+#: includes/class-config.php:1271 includes/class-config.php:1302
+#: includes/class-config.php:1333
+msgid "Canvas"
+msgstr ""
+
+#: includes/class-config.php:1276 includes/class-config.php:1307
+#: includes/class-config.php:1338
+msgid "Ink"
+msgstr ""
+
+#: includes/class-config.php:1281 includes/class-config.php:1312
+#: includes/class-config.php:1343
+msgid "Water"
+msgstr ""
+
+#: includes/class-config.php:1286 includes/class-config.php:1317
+#: includes/class-config.php:1348
+msgid "Land"
+msgstr ""
+
+#: includes/class-config.php:1291 includes/class-config.php:1322
+#: includes/class-config.php:1353
+#, fuzzy
+msgid "Transport"
+msgstr "Strassen & Verkehr"
+
+#: includes/class-config.php:1299
+msgid "Night Transit"
+msgstr ""
+
+#: includes/class-config.php:1330
+msgid "Alpine Print"
+msgstr ""
+
+#. translators: %d: WordPress palette template number.
+#: includes/class-config.php:1404
+#, fuzzy, php-format
+msgid "WordPress Theme Palette #%d"
 msgstr "WordPress Theme-Palette"
 
 #. translators: %d: fallback palette color position.
-#: includes/class-config.php:1343
+#: includes/class-config.php:1452
 #, php-format
 msgid "Color %d"
 msgstr "Farbe %d"
 
-#: includes/class-iframe-endpoint.php:96
+#: includes/class-iframe-endpoint.php:98
 msgid "Invalid Minimal Map Embed"
 msgstr "Ungültige Minimal Map Einbettung"
 
-#: includes/class-plugin.php:303
-msgid "Buy Premium"
-msgstr "Premium kaufen"
-
-#: includes/class-plugin.php:309
-msgid "Enter License Key"
-msgstr "Lizenzschlüssel eingeben"
-
-#: includes/collections/class-collection-post-type.php:45
+#: includes/collections/class-collection-post-type.php:47
 msgid "Collection"
 msgstr "Sammlung"
 
-#: includes/locations/class-location-post-type.php:129
+#: includes/locations/class-location-post-type.php:131
 msgid "Location"
 msgstr "Standort"
 
-#: includes/locations/class-location-post-type.php:269
-msgid ""
-"You have reached the limit of 10 locations. Please upgrade to Premium to add "
-"more."
-msgstr ""
-"Du hast das Limit von 10 Standorten erreicht. Bitte aktualisiere auf "
-"Premium, um mehr hinzuzufügen."
-
-#: includes/logos/class-logo-post-type.php:40
+#: includes/logos/class-logo-post-type.php:42
 msgid "Logo"
 msgstr "Logo"
 
-#: includes/markers/class-marker-post-type.php:40
+#: includes/markers/class-marker-post-type.php:42
 msgid "Marker"
 msgstr "Marker"
 
-#: includes/rest/class-frontend-geocode-route.php:59
-#: includes/rest/class-frontend-geocode-route.php:83
-#: includes/rest/class-frontend-geocode-route.php:95
+#: includes/rest/class-analytics-settings-route.php:117
+#, fuzzy
+msgid "Analytics tracking data could not be deleted."
+msgstr "Sammlung konnte nicht gelöscht werden."
+
+#: includes/rest/class-frontend-geocode-route.php:62
+#: includes/rest/class-frontend-geocode-route.php:86
+#: includes/rest/class-frontend-geocode-route.php:98
 msgid "No matching coordinates were found."
 msgstr "Es wurden keine passenden Koordinaten gefunden."
 
-#: includes/rest/class-geocode-route.php:88
+#: includes/rest/class-geocode-route.php:90
 msgid ""
 "The address could not be geocoded right now. Select the location manually on "
 "the map."
@@ -308,1513 +337,32 @@ msgstr ""
 "Die Adresse konnte derzeit nicht geokodiert werden. Wähle den Standort "
 "manuell auf der Karte aus."
 
-#: includes/rest/class-geocode-route.php:100
+#: includes/rest/class-geocode-route.php:102
 msgid ""
 "No matching coordinates were found. Select the location manually on the map."
 msgstr ""
 "Es wurden keine passenden Koordinaten gefunden. Wähle den Standort manuell "
 "auf der Karte aus."
 
-#: includes/rest/class-license-route.php:92
-msgid "A license key has already been redeemed on this site."
-msgstr "Ein Lizenzschlüssel wurde auf dieser Seite bereits eingelöst."
-
-#: includes/rest/class-license-route.php:111
-msgid "Could not connect to Gumroad. Please try again later."
-msgstr ""
-"Verbindung zu Gumroad fehlgeschlagen. Bitte versuche es später erneut."
-
-#: includes/rest/class-license-route.php:125
-msgid "Invalid license key."
-msgstr "Ungültiger Lizenzschlüssel."
-
-#: includes/rest/class-styles-route.php:153
-#: includes/rest/class-styles-route.php:182
+#: includes/rest/class-styles-route.php:155
+#: includes/rest/class-styles-route.php:184
 msgid "Style theme not found."
 msgstr "Stil-Theme nicht gefunden."
 
-#: includes/rest/class-styles-route.php:186
+#: includes/rest/class-styles-route.php:188
 msgid "The default theme cannot be deleted."
 msgstr "Das Standard-Theme kann nicht gelöscht werden."
 
-#: includes/rest/class-styles-route.php:207
+#: includes/rest/class-styles-route.php:209
+#: includes/rest/class-styles-route.php:245
 msgid "Default Theme"
 msgstr "Standard-Theme"
 
-#: includes/tags/class-tag-taxonomy.php:51
+#: includes/rest/class-styles-route.php:228
+#, fuzzy
+msgid "Untitled Theme"
+msgstr "Unbenannter Marker"
+
+#: includes/tags/class-tag-taxonomy.php:53
 msgid "Tag"
 msgstr "Schlagwort"
-
-#~ msgid "%1$d collection deleted. %2$s."
-#~ msgid_plural "%1$d collections deleted. %2$s."
-#~ msgstr[0] "%1$d Sammlung gelöscht. %2$s."
-#~ msgstr[1] "%1$d Sammlungen gelöscht. %2$s."
-
-#~ msgid "%1$d collection deleted. %2$s. Shared locations kept: %3$d."
-#~ msgid_plural "%1$d collections deleted. %2$s. Shared locations kept: %3$d."
-#~ msgstr[0] ""
-#~ "%1$d Sammlung gelöscht. %2$s. Geteilte Standorte beibehalten: %3$d."
-#~ msgstr[1] ""
-#~ "%1$d Sammlungen gelöscht. %2$s. Geteilte Standorte beibehalten: %3$d."
-
-#~ msgid "%1$s-%2$s"
-#~ msgstr "%1$s-%2$s"
-
-#~ msgid "%1$s, Lunch %2$s-%3$s"
-#~ msgstr "%1$s, Mittagspause %2$s-%3$s"
-
-#~ msgid "%d assigned location deleted"
-#~ msgid_plural "%d assigned locations deleted"
-#~ msgstr[0] "%d zugewiesener Standort gelöscht"
-#~ msgstr[1] "%d zugewiesene Standorte gelöscht"
-
-#~ msgid "%d collection deleted."
-#~ msgid_plural "%d collections deleted."
-#~ msgstr[0] "%d Sammlung gelöscht."
-#~ msgstr[1] "%d Sammlungen gelöscht."
-
-#, fuzzy
-#~ msgid "%d location cleared of its logo."
-#~ msgid_plural "%d locations cleared of their logos."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#, fuzzy
-#~ msgid "%d location cleared of its marker."
-#~ msgid_plural "%d locations cleared of their markers."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#, fuzzy
-#~ msgid "%d location cleared of its tags."
-#~ msgid_plural "%d locations cleared of their tags."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#~ msgid "%d location deleted."
-#~ msgid_plural "%d locations deleted."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#~ msgid "%d location imported and assigned to a new collection."
-#~ msgid_plural "%d locations imported and assigned to a new collection."
-#~ msgstr[0] "%d Standort importiert und einer neuen Sammlung zugewiesen."
-#~ msgstr[1] "%d Standorte importiert und einer neuen Sammlung zugewiesen."
-
-#, fuzzy
-#~ msgid "%d location updated with a logo."
-#~ msgid_plural "%d locations updated with a logo."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#, fuzzy
-#~ msgid "%d location updated with a marker."
-#~ msgid_plural "%d locations updated with a marker."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#, fuzzy
-#~ msgid "%d location updated with new opening hours."
-#~ msgid_plural "%d locations updated with new opening hours."
-#~ msgstr[0] "%d Standort mit neuen Öffnungszeiten aktualisiert."
-#~ msgstr[1] "%d Standorte mit neuen Öffnungszeiten aktualisiert."
-
-#, fuzzy
-#~ msgid "%d location updated with new tags."
-#~ msgid_plural "%d locations updated with new tags."
-#~ msgstr[0] "%d Standort gelöscht."
-#~ msgstr[1] "%d Standorte gelöscht."
-
-#~ msgid "%d logo deleted."
-#~ msgid_plural "%d logos deleted."
-#~ msgstr[0] "%d Logo gelöscht."
-#~ msgstr[1] "%d Logos gelöscht."
-
-#~ msgid "%d logo uploaded."
-#~ msgid_plural "%d logos uploaded."
-#~ msgstr[0] "%d Logo hochgeladen."
-#~ msgstr[1] "%d Logos hochgeladen."
-
-#~ msgid "%d marker deleted."
-#~ msgid_plural "%d markers deleted."
-#~ msgstr[0] "%d Marker gelöscht."
-#~ msgstr[1] "%d Marker gelöscht."
-
-#~ msgid "%d marker uploaded."
-#~ msgid_plural "%d markers uploaded."
-#~ msgstr[0] "%d Marker hochgeladen."
-#~ msgstr[1] "%d Marker hochgeladen."
-
-#~ msgid "%d tag deleted."
-#~ msgid_plural "%d tags deleted."
-#~ msgstr[0] "%d Schlagwort gelöscht."
-#~ msgstr[1] "%d Schlagwörter gelöscht."
-
-#~ msgid "%s away"
-#~ msgstr "%s entfernt"
-
-#~ msgid "+%d more"
-#~ msgstr "+%d weitere"
-
-#~ msgid "A title is required."
-#~ msgstr "Ein Titel ist erforderlich."
-
-#~ msgid "Add collection"
-#~ msgstr "Sammlung hinzufügen"
-
-#~ msgid "Add details such as seasonal opening hours or temporary exceptions."
-#~ msgstr ""
-#~ "Füge Details wie saisonale Öffnungszeiten oder vorübergehende Ausnahmen "
-#~ "hinzu."
-
-#~ msgid ""
-#~ "Add lightweight labels that make large map datasets easier to sort, "
-#~ "search, and evolve."
-#~ msgstr ""
-#~ "Füge leichte Schlagwörter hinzu, damit grosse Kartendatensätze leichter "
-#~ "sortiert, durchsucht und erweitert werden koennen."
-
-#~ msgid "Add location"
-#~ msgstr "Standort hinzufügen"
-
-#~ msgid "Add locations"
-#~ msgstr "Standorte hinzufügen"
-
-#~ msgid "Add tag"
-#~ msgstr "Schlagwort hinzufügen"
-
-#~ msgid "Administrative Boundaries"
-#~ msgstr "Verwaltungsgrenzen"
-
-#~ msgid "Airport Grounds"
-#~ msgstr "Flughafengelände"
-
-#~ msgid "All available logos are already assigned for this selection."
-#~ msgstr "Der Standort ist dieser Sammlung bereits zugewiesen."
-
-#~ msgid "All available markers are already assigned for this selection."
-#~ msgstr "Der Standort ist dieser Sammlung bereits zugewiesen."
-
-#~ msgid "All available tags are already assigned for this selection."
-#~ msgstr "Der Standort ist dieser Sammlung bereits zugewiesen."
-
-#~ msgid "All locations"
-#~ msgstr "Alle Standorte"
-
-#~ msgid "Allow Search"
-#~ msgstr "Suche erlauben"
-
-#~ msgid "Allow Two-Finger Zoom"
-#~ msgstr "Zwei-Finger-Zoom erlauben"
-
-#~ msgid "Allow Zoom via Scroll"
-#~ msgstr "Zoom per Scrollen erlauben"
-
-#~ msgid "Appearance"
-#~ msgstr "Darstellung"
-
-#, fuzzy
-#~ msgid ""
-#~ "Are you sure you want to delete %d collection? This action cannot be "
-#~ "undone."
-#~ msgid_plural ""
-#~ "Are you sure you want to delete %d collections? This action cannot be "
-#~ "undone."
-#~ msgstr[0] ""
-#~ "Bist du sicher, dass du %d Standort löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-#~ msgstr[1] ""
-#~ "Bist du sicher, dass du %d Standorte löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-
-#~ msgid ""
-#~ "Are you sure you want to delete %d location? This action cannot be undone."
-#~ msgid_plural ""
-#~ "Are you sure you want to delete %d locations? This action cannot be "
-#~ "undone."
-#~ msgstr[0] ""
-#~ "Bist du sicher, dass du %d Standort löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-#~ msgstr[1] ""
-#~ "Bist du sicher, dass du %d Standorte löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-
-#~ msgid ""
-#~ "Are you sure you want to delete %d logo? This action cannot be undone."
-#~ msgid_plural ""
-#~ "Are you sure you want to delete %d logos? This action cannot be undone."
-#~ msgstr[0] ""
-#~ "Bist du sicher, dass du %d Logo löschen möchtest? Diese Aktion kann nicht "
-#~ "rückgängig gemacht werden."
-#~ msgstr[1] ""
-#~ "Bist du sicher, dass du %d Logos löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-
-#~ msgid ""
-#~ "Are you sure you want to delete %d marker? This action cannot be undone."
-#~ msgid_plural ""
-#~ "Are you sure you want to delete %d markers? This action cannot be undone."
-#~ msgstr[0] ""
-#~ "Bist du sicher, dass du %d Marker löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-#~ msgstr[1] ""
-#~ "Bist du sicher, dass du %d Marker löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-
-#~ msgid ""
-#~ "Are you sure you want to delete %d tag? This action cannot be undone."
-#~ msgid_plural ""
-#~ "Are you sure you want to delete %d tags? This action cannot be undone."
-#~ msgstr[0] ""
-#~ "Bist du sicher, dass du %d Schlagwort löschen möchtest? Diese Aktion kann "
-#~ "nicht rückgängig gemacht werden."
-#~ msgstr[1] ""
-#~ "Bist du sicher, dass du %d Schlagwörter löschen möchtest? Diese Aktion "
-#~ "kann nicht rückgängig gemacht werden."
-
-#~ msgid "Are you sure you want to delete the theme:"
-#~ msgstr "Möchtest du das Theme wirklich löschen:"
-
-#~ msgid "Assign"
-#~ msgstr "Zuweisen"
-
-#~ msgid "Assign %s as logo"
-#~ msgstr "Logo zuweisen"
-
-#~ msgid "Assign %s as marker"
-#~ msgstr "Marker zuweisen"
-
-#~ msgid "Assign %s as tag"
-#~ msgstr "Schlagwörter zuweisen"
-
-#~ msgid "Assign locations"
-#~ msgstr "Standorte zuweisen"
-
-#~ msgid "Assign Logo"
-#~ msgstr "Logo zuweisen"
-
-#~ msgid "Assign Logos"
-#~ msgstr "Logo zuweisen"
-
-#~ msgid "Assign Marker"
-#~ msgstr "Marker zuweisen"
-
-#~ msgid "Assign Markers"
-#~ msgstr "Marker zuweisen"
-
-#~ msgid "Assign Opening Hours"
-#~ msgstr "Öffnungszeiten zuweisen"
-
-#~ msgid "Assign Tag"
-#~ msgstr "Schlagwörter zuweisen"
-
-#~ msgid "Assign Tags"
-#~ msgstr "Schlagwörter zuweisen"
-
-#~ msgid "Assign to collection"
-#~ msgstr "Sammlung zuweisen"
-
-#~ msgid "Assign to Collection"
-#~ msgstr "Sammlung zuweisen"
-
-#~ msgid "Back"
-#~ msgstr "Zurück"
-
-#~ msgid "Background"
-#~ msgstr "Hintergrund"
-
-#~ msgid "Background Color"
-#~ msgstr "Hintergrundfarbe"
-
-#~ msgid "Background Hover"
-#~ msgstr "Hover-Hintergrund"
-
-#~ msgid "Background Primary"
-#~ msgstr "Primärer Hintergrund"
-
-#~ msgid "Background Secondary"
-#~ msgstr "Sekundärer Hintergrund"
-
-#~ msgid "Base Surfaces"
-#~ msgstr "Grundflächen"
-
-#~ msgid "Border"
-#~ msgstr "Rand"
-
-#~ msgid "Border Radius"
-#~ msgstr "Eckenradius"
-
-#~ msgid "Border Radius Card"
-#~ msgstr "Eckenradius Karte"
-
-#~ msgid "Border Radius Input"
-#~ msgstr "Eckenradius Eingabefeld"
-
-#~ msgid "Border Width"
-#~ msgstr "Randbreite"
-
-#~ msgid "Bottom left"
-#~ msgstr "Unten links"
-
-#~ msgid "Bottom right"
-#~ msgstr "Unten rechts"
-
-#~ msgid ""
-#~ "Build reusable groups of locations and curate map-ready sets without "
-#~ "changing the location editor flow."
-#~ msgstr ""
-#~ "Baue wiederverwendbare Standortgruppen auf und stelle kartentaugliche "
-#~ "Sets zusammen, ohne den Bearbeitungsablauf für Standorte zu verändern."
-
-#~ msgid "Building Outlines"
-#~ msgstr "Gebäudeumrisse"
-
-#~ msgid "Buildings"
-#~ msgstr "Gebäude"
-
-#~ msgid "Cancel"
-#~ msgstr "Abbrechen"
-
-#~ msgid "Card Gap"
-#~ msgstr "Kartenabstand"
-
-#~ msgid "Center Latitude"
-#~ msgstr "Breitengrad des Zentrums"
-
-#~ msgid "Center Longitude"
-#~ msgstr "Längengrad des Zentrums"
-
-#~ msgid "Choose a custom SVG marker to apply to the selected locations."
-#~ msgstr ""
-#~ "Wähle einen benutzerdefinierten SVG-Marker für die ausgewählten Standorte "
-#~ "aus.Wähle einen benutzerdefinierten SVG-Marker oder wechsle zurück zum "
-#~ "Standardmarker."
-
-#~ msgid "City"
-#~ msgstr "Ort"
-
-#~ msgid "City is required to geocode the address."
-#~ msgstr "Der Ort ist erforderlich, um die Adresse zu geokodieren."
-
-#~ msgid "Clear search"
-#~ msgstr "Suche löschen"
-
-#~ msgid "Click on the map to place the location marker."
-#~ msgstr "Klicke auf die Karte, um den Standortmarker zu setzen."
-
-#~ msgid "Close"
-#~ msgstr "Kleines Minus"
-
-#~ msgid "Close small"
-#~ msgstr "Kleines Minus"
-
-#~ msgid "Closed"
-#~ msgstr "Geschlossen"
-
-#~ msgid "Closed - opens %1$s %2$s"
-#~ msgstr "Geschlossen - öffnet %1$s %2$s"
-
-#~ msgid "Closed - opens %s"
-#~ msgstr "Geschlossen - öffnet %s"
-
-#~ msgid "Collection could not be created."
-#~ msgstr "Sammlung konnte nicht erstellt werden."
-
-#~ msgid "Collection could not be deleted."
-#~ msgstr "Sammlung konnte nicht gelöscht werden."
-
-#~ msgid "Collection could not be removed from the location."
-#~ msgstr "Sammlung konnte vom Standort nicht entfernt werden."
-
-#~ msgid "Collection could not be updated."
-#~ msgstr "Sammlung konnte nicht aktualisiert werden."
-
-#~ msgid "Collection created."
-#~ msgstr "Sammlung erstellt."
-
-#~ msgid "Collection deleted."
-#~ msgstr "Sammlung gelöscht."
-
-#~ msgid "Collection deleted. %1$s. Shared locations kept: %2$d."
-#~ msgstr "Sammlung gelöscht. %1$s. Geteilte Standorte beibehalten: %2$d."
-
-#~ msgid "Collection deleted. %s."
-#~ msgstr "Sammlung gelöscht. %s."
-
-#~ msgid "Collection locations could not be saved."
-#~ msgstr "Standorte der Sammlung konnten nicht gespeichert werden."
-
-#~ msgid "Collection locations saved."
-#~ msgstr "Standorte der Sammlung gespeichert."
-
-#~ msgid "Collection removed from location."
-#~ msgstr "Sammlung vom Standort entfernt."
-
-#~ msgid "Collection title is required."
-#~ msgstr "Ein Titel für die Sammlung ist erforderlich."
-
-#~ msgid "Collection unavailable"
-#~ msgstr "Sammlung nicht verfügbar"
-
-#~ msgid "Collection updated."
-#~ msgstr "Sammlung aktualisiert."
-
-#, fuzzy
-#~ msgid "Collections could not be deleted."
-#~ msgstr "Sammlung konnte nicht gelöscht werden."
-
-#~ msgid "Collections could not be loaded."
-#~ msgstr "Sammlungen konnten nicht geladen werden."
-
-#~ msgid "Collections could not be merged."
-#~ msgstr "Sammlungen konnten nicht zusammengeführt werden."
-
-#~ msgid "Collections merged successfully."
-#~ msgstr "Sammlungen erfolgreich zusammengeführt."
-
-#~ msgid "Column"
-#~ msgstr "Spalte"
-
-#~ msgid "Confirm"
-#~ msgstr "Bestätigen"
-
-#~ msgid "Contact"
-#~ msgstr "Kontakt"
-
-#~ msgid "Copied"
-#~ msgstr "Kopiert"
-
-#~ msgid "Copy failed"
-#~ msgstr "Kopieren fehlgeschlagen"
-
-#~ msgid "Copy Snippet"
-#~ msgstr "Snippet kopieren"
-
-#~ msgid "Country"
-#~ msgstr "Land"
-
-#~ msgid "Country is required to geocode the address."
-#~ msgstr "Das Land ist erforderlich, um die Adresse zu geokodieren."
-
-#~ msgid "Create a collection first to assign this location."
-#~ msgstr "Erstelle zuerst eine Sammlung, um diesen Standort zuzuweisen."
-
-#~ msgid ""
-#~ "Create collections to organize your locations into groups. This makes it "
-#~ "easier to manage and display sets of locations on your maps."
-#~ msgstr ""
-#~ "Erstelle Sammlungen, um deine Standorte in Gruppen zu organisieren. So "
-#~ "lassen sich Standortgruppen auf deinen Karten leichter verwalten und "
-#~ "anzeigen."
-
-#~ msgid ""
-#~ "Create marker variants and keep your map pin system consistent across "
-#~ "locations and styles."
-#~ msgstr ""
-#~ "Erstelle Marker-Varianten und halte dein Karten-Pin-System über Standorte "
-#~ "und Stile hinweg konsistent."
-
-#~ msgid "Create New Theme"
-#~ msgstr "Neues Theme erstellen"
-
-#~ msgid ""
-#~ "Create tags to apply lightweight labels to your locations. This helps you "
-#~ "keep your map content organized and easy to search."
-#~ msgstr ""
-#~ "Erstelle Schlagwörter, um deinen Standorten leichte Beschriftungen "
-#~ "zuzuweisen. Das hilft dir, Karteninhalte organisiert und leicht "
-#~ "durchsuchbar zu halten."
-
-#~ msgid "Create Theme"
-#~ msgstr "Theme erstellen"
-
-#~ msgid "Credits"
-#~ msgstr "Quellenangaben"
-
-#~ msgid "CSV file does not match the supported import format."
-#~ msgstr "Die CSV-Datei entspricht nicht dem unterstützten Importformat."
-
-#~ msgid "CSV file is empty or missing headers."
-#~ msgstr "Die CSV-Datei ist leer oder es fehlen Kopfzeilen."
-
-#~ msgid "Day"
-#~ msgstr "Tag"
-
-#~ msgid "Default"
-#~ msgstr "Standard"
-
-#~ msgid "Delete"
-#~ msgstr "Löschen"
-
-#~ msgid "Delete %d location"
-#~ msgid_plural "Delete %d locations"
-#~ msgstr[0] "%d Standort löschen"
-#~ msgstr[1] "%d Standorte löschen"
-
-#~ msgid "Delete all collections"
-#~ msgstr "Alle Sammlungen löschen"
-
-#~ msgid "Delete all locations"
-#~ msgstr "Alle Standorte löschen"
-
-#~ msgid "Delete all logos"
-#~ msgstr "Alle Logos löschen"
-
-#~ msgid "Delete all markers"
-#~ msgstr "Alle Marker löschen"
-
-#~ msgid "Delete all tags"
-#~ msgstr "Alle Schlagwörter löschen"
-
-#~ msgid "Delete collection"
-#~ msgstr "Sammlung löschen"
-
-#~ msgid "Delete Current Theme"
-#~ msgstr "Aktuelles Theme löschen"
-
-#~ msgid "Delete location"
-#~ msgstr "Standort löschen"
-
-#~ msgid "Delete locations"
-#~ msgstr "Standorte löschen"
-
-#~ msgid "Delete Logo"
-#~ msgstr "Logo löschen"
-
-#~ msgid "Delete original collections after merge"
-#~ msgstr "Ursprüngliche Sammlungen nach dem Zusammenführen löschen"
-
-#~ msgid "Delete Tag"
-#~ msgstr "Logo löschen"
-
-#~ msgid "Delete Theme"
-#~ msgstr "Theme löschen"
-
-#~ msgid "Delete this collection and remove its saved location assignments?"
-#~ msgstr ""
-#~ "Diese Sammlung löschen und ihre gespeicherten Standortzuweisungen "
-#~ "entfernen?"
-
-#~ msgid "Delete this location and remove its saved collection assignments?"
-#~ msgstr ""
-#~ "Diesen Standort löschen und seine gespeicherten Sammlungszuweisungen "
-#~ "entfernen?"
-
-#~ msgid ""
-#~ "Delete this logo and clear it from every assigned location? This action "
-#~ "cannot be undone."
-#~ msgstr ""
-#~ "Dieses Logo löschen und aus allen zugewiesenen Standorten entfernen? "
-#~ "Diese Aktion kann nicht rückgängig gemacht werden."
-
-#, fuzzy
-#~ msgid "Delete this tag? This action cannot be undone."
-#~ msgstr ""
-#~ "Dieses Logo löschen und aus allen zugewiesenen Standorten entfernen? "
-#~ "Diese Aktion kann nicht rückgängig gemacht werden."
-
-#~ msgid "Download"
-#~ msgstr "Herunterladen"
-
-#~ msgid "Download as CSV"
-#~ msgstr "Als CSV herunterladen"
-
-#~ msgid "Download example CSV"
-#~ msgstr "Beispiel-CSV herunterladen"
-
-#~ msgid "Download Theme Config"
-#~ msgstr "Theme-Konfiguration herunterladen"
-
-#~ msgid "Drop CSV file here to import locations"
-#~ msgstr "CSV-Datei hier ablegen, um Standorte zu importieren"
-
-#~ msgid "Drop Minimal Map or MapLibre JSON theme files here to upload"
-#~ msgstr ""
-#~ "Minimal-Map- oder MapLibre-JSON-Theme-Dateien hier zum Hochladen ablegen"
-
-#~ msgid "Drop SVG files here to upload"
-#~ msgstr "SVG-Dateien hier zum Hochladen ablegen"
-
-#~ msgid "Drop SVG or PNG files here to upload"
-#~ msgstr "SVG- oder PNG-Dateien hier zum Hochladen ablegen"
-
-#~ msgid "Duplicate"
-#~ msgstr "Duplizieren"
-
-#~ msgid "Edit"
-#~ msgstr "Bearbeiten"
-
-#~ msgid "Edit collection"
-#~ msgstr "Sammlung bearbeiten"
-
-#~ msgid "Edit location"
-#~ msgstr "Standort bearbeiten"
-
-#~ msgid "Edit logo filename"
-#~ msgstr "Logo-Dateiname bearbeiten"
-
-#~ msgid "Edit marker filename"
-#~ msgstr "%d Marker hochgeladen."
-
-#~ msgid "Edit tag"
-#~ msgstr "Schlagwort bearbeiten"
-
-#~ msgid "Email address"
-#~ msgstr "E-Mail-Adresse"
-
-#~ msgid "Enable Tags Filter"
-#~ msgstr "Tag-Filter aktivieren"
-
-#~ msgid "Enter a name for the merged collection..."
-#~ msgstr "Namen für die zusammengeführte Sammlung eingeben..."
-
-#~ msgid "Enter a valid email address."
-#~ msgstr "Gib eine gültige E-Mail-Adresse ein."
-
-#~ msgid "Enter a valid lunch break start time in HH:MM format."
-#~ msgstr "Gib eine gültige Mittagszeit im Format HH:MM ein."
-
-#~ msgid "Enter a valid website URL."
-#~ msgstr "Gib eine gültige Website-URL ein."
-
-#~ msgid "Enter both lunch break start time and duration."
-#~ msgstr "Gib sowohl die Startzeit als auch die Dauer der Mittagspause ein."
-
-#~ msgid "Enter both opening and closing times."
-#~ msgstr "Gib sowohl Öffnungs- als auch Schliesszeiten ein."
-
-#~ msgid "Enter valid opening hours in HH:MM format."
-#~ msgstr "Gib gültige Öffnungszeiten im Format HH:MM ein."
-
-#~ msgid "Export locations"
-#~ msgstr "Standorte exportieren"
-
-#~ msgid "Export Options"
-#~ msgstr "Exportoptionen"
-
-#~ msgid "Failed to import locations."
-#~ msgstr "Standorte konnten nicht importiert werden."
-
-#~ msgid "Failed to import theme."
-#~ msgstr "Theme konnte nicht importiert werden."
-
-#~ msgid "Failed to read the selected file."
-#~ msgstr "Die ausgewählte Datei konnte nicht gelesen werden."
-
-#, fuzzy
-#~ msgid "Features"
-#~ msgstr "Weitere Elemente"
-
-#~ msgid "Filename"
-#~ msgstr "Dateiname"
-
-#~ msgid "Filename is required."
-#~ msgstr "Ein Schlagwortname ist erforderlich."
-
-#~ msgid "Filled plus circle"
-#~ msgstr "Ausgefüllter Plus-Kreis"
-
-#~ msgid "Finish"
-#~ msgstr "Abschliessen"
-
-#~ msgid "Foreground"
-#~ msgstr "Vordergrund"
-
-#~ msgid "Foreground Color"
-#~ msgstr "Vordergrundfarbe"
-
-#~ msgid "Foreground Primary"
-#~ msgstr "Primärer Vordergrund"
-
-#~ msgid "Foreground Secondary"
-#~ msgstr "Sekundärer Vordergrund"
-
-#~ msgid "Forests"
-#~ msgstr "Wälder"
-
-#~ msgid "Fri"
-#~ msgstr "Fr"
-
-#~ msgid "Friday"
-#~ msgstr "Freitag"
-
-#~ msgid "Google Maps Navigation"
-#~ msgstr "Google Maps Navigation"
-
-#~ msgid "Height"
-#~ msgstr "Höhe"
-
-#~ msgid "Height Mobile"
-#~ msgstr "Höhe"
-
-#~ msgid "House number"
-#~ msgstr "Hausnummer"
-
-#~ msgid "House number is required to geocode the address."
-#~ msgstr "Die Hausnummer ist erforderlich, um die Adresse zu geokodieren."
-
-#~ msgid "Ice & Glaciers"
-#~ msgstr "Eis & Gletscher"
-
-#~ msgid "Iframe Font Family"
-#~ msgstr "Iframe-Schriftfamilie"
-
-#~ msgid "Iframe Snippet"
-#~ msgstr "Iframe Snippet"
-
-#~ msgid ""
-#~ "Iframes cannot inherit the font family from the parent page "
-#~ "automatically. Paste a CSS font-family stack here to match it, or clear "
-#~ "the field to use the WordPress theme default."
-#~ msgstr ""
-#~ "Iframes können die Schriftfamilie nicht automatisch von der "
-#~ "übergeordneten Seite übernehmen. Füge hier einen CSS-Schriftstapel für "
-#~ "font-family ein, um sie anzupassen, oder leere das Feld, um den WordPress-"
-#~ "Theme-Standard zu verwenden."
-
-#~ msgid "Import custom CSV"
-#~ msgstr "Benutzerdefinierte CSV importieren"
-
-#~ msgid "Import locations from CSV"
-#~ msgstr "Standorte aus CSV importieren"
-
-#~ msgid "Import on"
-#~ msgstr "Import am"
-
-#~ msgid "Imported Location"
-#~ msgstr "Importierter Standort"
-
-#~ msgid "Imported theme with fallback default colors for: %s"
-#~ msgstr "Theme mit ersatzweisen Standardfarben importiert für: %s"
-
-#~ msgid "Invalid JSON file."
-#~ msgstr "Ungültige JSON-Datei."
-
-#~ msgid "Invalid PNG file."
-#~ msgstr "Ungültige PNG-Datei."
-
-#~ msgid "Invalid SVG file."
-#~ msgstr "Ungültige SVG-Datei."
-
-#~ msgid "Line"
-#~ msgstr "Linie"
-
-#~ msgid "Loading results..."
-#~ msgstr "Ergebnisse werden geladen..."
-
-#~ msgid "Location assigned to collection."
-#~ msgstr "Standort der Sammlung zugewiesen."
-
-#~ msgid "Location coordinates updated."
-#~ msgstr "Standortkoordinaten aktualisiert."
-
-#~ msgid "Location could not be assigned to the collection."
-#~ msgstr "Standort konnte der Sammlung nicht zugewiesen werden."
-
-#~ msgid "Location could not be created."
-#~ msgstr "Standort konnte nicht erstellt werden."
-
-#~ msgid "Location could not be deleted."
-#~ msgstr "Standort konnte nicht gelöscht werden."
-
-#~ msgid "Location could not be duplicated."
-#~ msgstr "Standort konnte nicht dupliziert werden."
-
-#~ msgid "Location could not be retrieved."
-#~ msgstr "Standort konnte nicht ermittelt werden."
-
-#~ msgid "Location could not be updated."
-#~ msgstr "Standort konnte nicht aktualisiert werden."
-
-#~ msgid "Location deleted."
-#~ msgstr "Standort gelöscht."
-
-#~ msgid "Location duplicated."
-#~ msgstr "Standort dupliziert."
-
-#~ msgid "Location is already assigned to that collection."
-#~ msgstr "Der Standort ist dieser Sammlung bereits zugewiesen."
-
-#~ msgid "Location logos could not be updated."
-#~ msgstr "Standortlogo konnte nicht aktualisiert werden."
-
-#~ msgid "Location markers could not be updated."
-#~ msgstr "Standortmarker konnte nicht aktualisiert werden."
-
-#~ msgid "Location tags could not be updated."
-#~ msgstr "Schlagwörter des Standorts konnten nicht aktualisiert werden."
-
-#~ msgid "Locations and collections could not be loaded."
-#~ msgstr "Standorte und Sammlungen konnten nicht geladen werden."
-
-#~ msgid "Locations could not be deleted."
-#~ msgstr "Standorte konnten nicht gelöscht werden."
-
-#~ msgid "Logo assigned to location."
-#~ msgstr "Standort der Sammlung zugewiesen."
-
-#~ msgid "Logo could not be deleted."
-#~ msgstr "Logo konnte nicht gelöscht werden."
-
-#~ msgid "Logo could not be updated."
-#~ msgstr "Schlagwort konnte nicht aktualisiert werden."
-
-#~ msgid "Logo deleted."
-#~ msgstr "Logo gelöscht."
-
-#~ msgid "Logo removed from location."
-#~ msgstr "Logo vom Standort entfernt."
-
-#~ msgid "Logo updated."
-#~ msgstr "Logo hochgeladen."
-
-#~ msgid "Logo uploaded."
-#~ msgstr "Logo hochgeladen."
-
-#~ msgid "Logos could not be deleted."
-#~ msgstr "Logos konnten nicht gelöscht werden."
-
-#~ msgid "Logos could not be loaded."
-#~ msgstr "Logos konnten nicht geladen werden."
-
-#~ msgid "Logos could not be removed from the selected locations."
-#~ msgstr "Logo konnte vom Standort nicht entfernt werden."
-
-#~ msgid "Logos could not be uploaded."
-#~ msgstr "Logos konnten nicht hochgeladen werden."
-
-#~ msgid "Lunch"
-#~ msgstr "Mittagspause"
-
-#~ msgid "Lunch break duration (minutes)"
-#~ msgstr "Dauer der Mittagspause (Minuten)"
-
-#~ msgid "Lunch break start"
-#~ msgstr "Beginn der Mittagspause"
-
-#~ msgid "Lunch breaks require opening hours for that day."
-#~ msgstr "Mittagspausen erfordern Öffnungszeiten für diesen Tag."
-
-#~ msgid "Major Road Casing"
-#~ msgstr "Umrandung Hauptstrassen"
-
-#~ msgid "Major Road Fill"
-#~ msgstr "Füllung Hauptstrassen"
-
-#~ msgid ""
-#~ "Manage every place you want to render on your maps and prepare it for "
-#~ "future block integrations."
-#~ msgstr ""
-#~ "Verwalte jeden Ort, den du auf deinen Karten anzeigen möchtest, und "
-#~ "bereite ihn für zukünftige Block-Integrationen vor."
-
-#~ msgid "Map credits"
-#~ msgstr "Kartenquellen"
-
-#~ msgid "Map preview"
-#~ msgstr "Kartenvorschau"
-
-#~ msgid "Marker assigned to location."
-#~ msgstr "Standort der Sammlung zugewiesen."
-
-#~ msgid "Marker could not be deleted."
-#~ msgstr "Marker konnte nicht gelöscht werden."
-
-#~ msgid "Marker could not be updated."
-#~ msgstr "Marker konnten nicht hochgeladen werden."
-
-#~ msgid "Marker deleted."
-#~ msgstr "Marker gelöscht."
-
-#~ msgid "Marker removed from location."
-#~ msgstr "Logo vom Standort entfernt."
-
-#~ msgid "Marker updated."
-#~ msgstr "Marker hochgeladen."
-
-#~ msgid "Marker uploaded."
-#~ msgstr "Marker hochgeladen."
-
-#~ msgid "Markers could not be deleted."
-#~ msgstr "Marker konnten nicht gelöscht werden."
-
-#~ msgid "Markers could not be loaded."
-#~ msgstr "Marker konnten nicht geladen werden."
-
-#~ msgid "Markers could not be removed from the selected locations."
-#~ msgstr "Logo konnte vom Standort nicht entfernt werden."
-
-#~ msgid "Markers could not be uploaded."
-#~ msgstr "Marker konnten nicht hochgeladen werden."
-
-#~ msgid "Merge collections"
-#~ msgstr "Sammlungen zusammenführen"
-
-#~ msgid "Minimal Map Preview"
-#~ msgstr "Minimal Map-Vorschau"
-
-#~ msgid "Minor Roads"
-#~ msgstr "Nebenstrassen"
-
-#~ msgid "Mon"
-#~ msgstr "Mo"
-
-#~ msgid "Monday"
-#~ msgstr "Montag"
-
-#~ msgid "Motorway Casing"
-#~ msgstr "Umrandung Autobahnen"
-
-#~ msgid "Motorway Fill"
-#~ msgstr "Füllung Autobahnen"
-
-#~ msgid "Name"
-#~ msgstr "Name"
-
-#~ msgid "New collection title"
-#~ msgstr "Titel der neuen Sammlung"
-
-#~ msgid "Next"
-#~ msgstr "Weiter"
-
-#~ msgid "No collections available."
-#~ msgstr "Keine Sammlungen verfügbar."
-
-#~ msgid "No collections found"
-#~ msgstr "Keine Sammlungen gefunden"
-
-#~ msgid "No custom marker assigned yet."
-#~ msgstr "Noch kein benutzerdefinierter Marker zugewiesen."
-
-#~ msgid "No locations found"
-#~ msgstr "Keine Standorte gefunden"
-
-#~ msgid "No logo assigned yet."
-#~ msgstr "Noch kein Logo zugewiesen."
-
-#~ msgid "No logos found"
-#~ msgstr "Keine Logos gefunden"
-
-#~ msgid "No markers found"
-#~ msgstr "Keine Marker gefunden"
-
-#~ msgid "No tags assigned yet."
-#~ msgstr "Noch keine Schlagwörter zugewiesen."
-
-#~ msgid "No tags found"
-#~ msgstr "Keine Schlagwörter gefunden"
-
-#~ msgid "None"
-#~ msgstr "Keine"
-
-#~ msgid "None of the selected locations have custom markers assigned."
-#~ msgstr ""
-#~ "Keiner der ausgewählten Standorte hat benutzerdefinierte Marker "
-#~ "zugewiesen."
-
-#~ msgid "None of the selected locations have logos assigned."
-#~ msgstr "Keiner der ausgewählten Standorte hat Logos zugewiesen."
-
-#~ msgid "None of the selected locations have tags assigned."
-#~ msgstr "Keiner der ausgewählten Standorte hat Schlagwörter zugewiesen."
-
-#~ msgid "Not assigned to any collection yet."
-#~ msgstr "Noch keiner Sammlung zugewiesen."
-
-#~ msgid "Note"
-#~ msgstr "Notiz"
-
-#~ msgid "Open"
-#~ msgstr "Schlagwörter öffnen"
-
-#~ msgid "Open - closes %s"
-#~ msgstr "Geöffnet - schließt %s"
-
-#~ msgid "Open collections"
-#~ msgstr "Sammlungen öffnen"
-
-#~ msgid "Open in Google Maps"
-#~ msgstr "In Google Maps öffnen"
-
-#~ msgid "Open locations"
-#~ msgstr "Standorte öffnen"
-
-#~ msgid "Open logos"
-#~ msgstr "Logos öffnen"
-
-#~ msgid "Open markers"
-#~ msgstr "Marker öffnen"
-
-#~ msgid "Open tags"
-#~ msgstr "Schlagwörter öffnen"
-
-#~ msgid "Opening Hours"
-#~ msgstr "Öffnungszeiten"
-
-#~ msgid "Opening hours could not be updated."
-#~ msgstr "Schlagwort konnte nicht aktualisiert werden."
-
-#~ msgid "Opening hours notes"
-#~ msgstr "Notizen zu Öffnungszeiten"
-
-#~ msgid "Opening hours updated."
-#~ msgstr "Öffnungszeiten aktualisiert."
-
-#~ msgid "Optional"
-#~ msgstr "Optional"
-
-#~ msgid "Other Features"
-#~ msgstr "Weitere Elemente"
-
-#~ msgid "Outer Margin"
-#~ msgstr "Aussenabstand"
-
-#~ msgid "Padding"
-#~ msgstr "Innenabstand"
-
-#~ msgid "Panel Width"
-#~ msgstr "Panelbreite"
-
-#~ msgid "Parks"
-#~ msgstr "Parks"
-
-#~ msgid "Pedestrian Paths"
-#~ msgstr "Fusswege"
-
-#~ msgid "Place Label Halo"
-#~ msgstr "Halo für Ortsbeschriftungen"
-
-#~ msgid "Place Labels"
-#~ msgstr "Ortsbeschriftungen"
-
-#~ msgid "Plus"
-#~ msgstr "Plus"
-
-#~ msgid "Plus circle"
-#~ msgstr "Plus-Kreis"
-
-#~ msgid "PNG file could not be read."
-#~ msgstr "PNG-Datei konnte nicht gelesen werden."
-
-#~ msgid "Position"
-#~ msgstr "Position"
-
-#~ msgid "Postal code"
-#~ msgstr "Postleitzahl"
-
-#~ msgid "Postal code is required to geocode the address."
-#~ msgstr "Die Postleitzahl ist erforderlich, um die Adresse zu geokodieren."
-
-#~ msgid "Press"
-#~ msgstr "Adresse"
-
-#~ msgid "Preview"
-#~ msgstr "Vorschau"
-
-#~ msgid "Railway Lines"
-#~ msgstr "Bahnlinien"
-
-#~ msgid "Railway Patterns"
-#~ msgstr "Bahnmuster"
-
-#~ msgid "Remove collection"
-#~ msgstr "Sammlung entfernen"
-
-#~ msgid "Remove Logo"
-#~ msgstr "Logo entfernen"
-
-#~ msgid "Remove Logos"
-#~ msgstr "Logo entfernen"
-
-#~ msgid "Remove Markers"
-#~ msgstr "Marker speichern"
-
-#~ msgid "Remove Tags"
-#~ msgstr "Logo entfernen"
-
-#~ msgid "Remove this logo from the selected location?"
-#~ msgstr "Dieses Logo vom ausgewählten Standort entfernen?"
-
-#~ msgid "Require Two Fingers to Move"
-#~ msgstr "Zwei Finger zum Bewegen erforderlich"
-
-#~ msgid "Residential Areas"
-#~ msgstr "Wohngebiete"
-
-#~ msgid "Retrieve location"
-#~ msgstr "Standort ermitteln"
-
-#~ msgid "Rivers & Canals"
-#~ msgstr "Flüsse & Kanäle"
-
-#~ msgid "Road Label Halo"
-#~ msgstr "Halo für Strassenbeschriftungen"
-
-#~ msgid "Road Labels"
-#~ msgstr "Strassenbeschriftungen"
-
-#~ msgid "Roads & Transport"
-#~ msgstr "Strassen & Verkehr"
-
-#~ msgid "Runway Lines"
-#~ msgstr "Start- und Landebahnlinien"
-
-#~ msgid "Sat"
-#~ msgstr "Sa"
-
-#~ msgid "Saturday"
-#~ msgstr "Samstag"
-
-#~ msgid "Save changes"
-#~ msgstr "Änderungen speichern"
-
-#~ msgid "Save Logo"
-#~ msgstr "Logo speichern"
-
-#~ msgid "Save Marker"
-#~ msgstr "Marker speichern"
-
-#~ msgid "Save Opening Hours"
-#~ msgstr "Öffnungszeiten speichern"
-
-#~ msgid "Save Tags"
-#~ msgstr "Schlagwörter speichern"
-
-#~ msgid "Save Theme"
-#~ msgstr "Theme speichern"
-
-#~ msgid "Search locations"
-#~ msgstr "Standorte suchen"
-
-#~ msgid "Search locations..."
-#~ msgstr "Standorte suchen..."
-
-#~ msgid "Select a location on the map before finishing."
-#~ msgstr "Wähle vor dem Abschluss einen Standort auf der Karte aus."
-
-#~ msgid "Select at least two collections to merge into a new one."
-#~ msgstr ""
-#~ "Wähle mindestens zwei Sammlungen aus, um sie zu einer neuen "
-#~ "zusammenzuführen."
-
-#~ msgid "Select at least two collections to merge."
-#~ msgstr "Wähle mindestens zwei Sammlungen zum Zusammenführen aus."
-
-#~ msgid "Select color"
-#~ msgstr "Farbe auswählen"
-
-#~ msgid "Select only new tags to add. Existing tags stay assigned."
-#~ msgstr ""
-#~ "Wähle nur neue Schlagwörter zum Hinzufügen aus. Bestehende Schlagwörter "
-#~ "bleiben zugewiesen."
-
-#~ msgid "Select theme"
-#~ msgstr "Theme auswählen"
-
-#~ msgid "Selected collection could not be found."
-#~ msgstr "Die ausgewählte Sammlung konnte nicht gefunden werden."
-
-#~ msgid "Separator"
-#~ msgstr "Trenner"
-
-#~ msgid "Set opening hours for \"%s\"."
-#~ msgstr "Öffnungszeiten für \"%s\" festlegen."
-
-#~ msgid "Set opening hours for %d selected location."
-#~ msgid_plural "Set opening hours for %d selected locations."
-#~ msgstr[0] "Öffnungszeiten für %d ausgewählten Standort festlegen."
-#~ msgstr[1] "Öffnungszeiten für %d ausgewählte Standorte festlegen."
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Show icon"
-#~ msgstr "Icon anzeigen"
-
-#~ msgid "Show Zoom Controls"
-#~ msgstr "Zoom-Steuerelemente anzeigen"
-
-#~ msgid "Skip shared locations"
-#~ msgstr "Geteilte Standorte überspringen"
-
-#~ msgid ""
-#~ "Start adding locations to your maps. You can add them manually or import "
-#~ "them from a file."
-#~ msgstr ""
-#~ "Beginne damit, Standorte zu deinen Karten hinzuzufügen. Du kannst sie "
-#~ "manuell anlegen oder aus einer Datei importieren."
-
-#~ msgid "State"
-#~ msgstr "Bundesland"
-
-#~ msgid "Street"
-#~ msgstr "Strasse"
-
-#~ msgid "Street is required to geocode the address."
-#~ msgstr "Die Strasse ist erforderlich, um die Adresse zu geokodieren."
-
-#~ msgid "Structures"
-#~ msgstr "Strukturen"
-
-#~ msgid "Style Preset"
-#~ msgstr "Stilvorgabe"
-
-#~ msgid "Style Theme"
-#~ msgstr "Stil-Theme"
-
-#~ msgid "Sun"
-#~ msgstr "So"
-
-#~ msgid "Sunday"
-#~ msgstr "Sonntag"
-
-#~ msgid "Switch Collection"
-#~ msgstr "Sammlung wechseln"
-
-#~ msgid "Switch Theme"
-#~ msgstr "Theme wechseln"
-
-#~ msgid "Tag could not be created."
-#~ msgstr "Schlagwort konnte nicht erstellt werden."
-
-#~ msgid "Tag could not be deleted."
-#~ msgstr "Schlagwort konnte nicht gelöscht werden."
-
-#~ msgid "Tag could not be updated."
-#~ msgstr "Schlagwort konnte nicht aktualisiert werden."
-
-#~ msgid "Tag created."
-#~ msgstr "Schlagwort erstellt."
-
-#~ msgid "Tag deleted."
-#~ msgstr "Schlagwort gelöscht."
-
-#~ msgid "Tag name is required."
-#~ msgstr "Ein Schlagwortname ist erforderlich."
-
-#~ msgid "Tag updated."
-#~ msgstr "Schlagwort aktualisiert."
-
-#~ msgid "Tags (optional)"
-#~ msgstr "Schlagwörter (optional)"
-
-#~ msgid "Tags added to location."
-#~ msgstr "Standorte konnten nicht importiert werden."
-
-#~ msgid "Tags could not be deleted."
-#~ msgstr "Schlagwörter konnten nicht gelöscht werden."
-
-#~ msgid "Tags could not be loaded."
-#~ msgstr "Schlagwörter konnten nicht geladen werden."
-
-#~ msgid "Tags could not be removed from the selected locations."
-#~ msgstr "Logo konnte vom Standort nicht entfernt werden."
-
-#~ msgid "Tags removed from location."
-#~ msgstr "Logo vom Standort entfernt."
-
-#~ msgid "Telephone"
-#~ msgstr "Telefon"
-
-#~ msgid "The %s extension will be preserved."
-#~ msgstr "Die %s Erweiterung bleibt erhalten."
-
-#~ msgid "The selected location already has no logo assigned."
-#~ msgstr "Der ausgewählte Standort hat bereits kein zugewiesenes Logo."
-
-#~ msgid "The selected location already has no marker assigned."
-#~ msgstr "Der ausgewählte Standort hat bereits keinen zugewiesenen Marker."
-
-#~ msgid "The selected location already has no tags assigned."
-#~ msgstr ""
-#~ "Der ausgewählte Standort hat bereits keine zugewiesenen Schlagwörter."
-
-#~ msgid "Theme Name"
-#~ msgstr "Theme-Name"
-
-#~ msgid "This location already has no logo assigned."
-#~ msgstr "Dieser Standort hat bereits kein zugewiesenes Logo."
-
-#~ msgid "Thu"
-#~ msgstr "Do"
-
-#~ msgid "Thursday"
-#~ msgstr "Donnerstag"
-
-#~ msgid "Title"
-#~ msgstr "Titel"
-
-#~ msgid "Top left"
-#~ msgstr "Oben links"
-
-#~ msgid "Top right"
-#~ msgstr "Oben rechts"
-
-#~ msgid "Tue"
-#~ msgstr "Di"
-
-#~ msgid "Tuesday"
-#~ msgstr "Dienstag"
-
-#~ msgid "Typography"
-#~ msgstr "Typografie"
-
-#~ msgid "Untitled collection"
-#~ msgstr "Unbenannte Sammlung"
-
-#~ msgid "Hidden"
-#~ msgstr "Versteckt"
-
-#~ msgid "Hidden location"
-#~ msgstr "Versteckter Standort"
-
-#~ msgid "Hide"
-#~ msgstr "Ausblenden"
-
-#~ msgid "Hide all"
-#~ msgstr "Alle ausblenden"
-
-#~ msgid "Location is already hidden."
-#~ msgstr "Standort ist bereits ausgeblendet."
-
-#~ msgid "Location is already shown."
-#~ msgstr "Standort wird bereits angezeigt."
-
-#~ msgid "Location hidden."
-#~ msgstr "Standort ausgeblendet."
-
-#~ msgid "Location shown."
-#~ msgstr "Standort eingeblendet."
-
-#~ msgid "Location visibility could not be updated."
-#~ msgstr "Die Sichtbarkeit des Standorts konnte nicht aktualisiert werden."
-
-#~ msgid "All selected locations are already hidden."
-#~ msgstr "Alle ausgewählten Standorte sind bereits ausgeblendet."
-
-#~ msgid "All selected locations are already shown."
-#~ msgstr "Alle ausgewählten Standorte werden bereits angezeigt."
-
-#~ msgid "%d location hidden."
-#~ msgid_plural "%d locations hidden."
-#~ msgstr[0] "%d Standort ausgeblendet."
-#~ msgstr[1] "%d Standorte ausgeblendet."
-
-#~ msgid "%d location shown."
-#~ msgid_plural "%d locations shown."
-#~ msgstr[0] "%d Standort eingeblendet."
-#~ msgstr[1] "%d Standorte eingeblendet."
-
-#~ msgid "Untitled logo"
-#~ msgstr "Unbenanntes Logo"
-
-#~ msgid "Untitled marker"
-#~ msgstr "Unbenannter Marker"
-
-#~ msgid "Untitled tag"
-#~ msgstr "Unbenanntes Logo"
-
-#~ msgid "Upload"
-#~ msgstr "Hochladen"
-
-#~ msgid "Upload a logo first to assign one to these locations."
-#~ msgstr "Lade zuerst ein Logo hoch, um diesem Standort eines zuzuweisen."
-
-#~ msgid "Upload a marker first to assign one to these locations."
-#~ msgstr "Lade zuerst einen Marker hoch, um diesem Standort einen zuzuweisen."
-
-#~ msgid "Upload Logos"
-#~ msgstr "Logos hochladen"
-
-#~ msgid "Upload Markers"
-#~ msgstr "Marker hochladen"
-
-#~ msgid ""
-#~ "Upload reusable SVG logos and assign them across multiple locations "
-#~ "without duplicating assets."
-#~ msgstr ""
-#~ "Lade wiederverwendbare SVG-Logos hoch und weise sie mehreren Standorten "
-#~ "zu, ohne Assets zu duplizieren."
-
-#~ msgid ""
-#~ "Upload SVG or PNG logos to reuse the same brand asset across multiple "
-#~ "locations. Drag and drop files here or use the upload button."
-#~ msgstr ""
-#~ "Lade SVG- oder PNG-Logos hoch, um dasselbe Marken-Asset an mehreren "
-#~ "Standorten wiederzuverwenden. Ziehe Dateien hierher oder verwende die "
-#~ "Upload-Schaltfläche."
-
-#~ msgid "Upload Theme File"
-#~ msgstr "Theme-Datei hochladen"
-
-#~ msgid ""
-#~ "Upload your custom SVG markers to personalize your maps. Simply drag and "
-#~ "drop your files here or use the button below."
-#~ msgstr ""
-#~ "Lade deine benutzerdefinierten SVG-Marker hoch, um deine Karten zu "
-#~ "personalisieren. Ziehe die Dateien einfach hierher oder verwende die "
-#~ "Schaltfläche unten."
-
-#~ msgid "Water Label Halo"
-#~ msgstr "Halo für Gewässerbeschriftungen"
-
-#~ msgid "Water Labels"
-#~ msgstr "Gewässerbeschriftungen"
-
-#~ msgid "Water Surfaces"
-#~ msgstr "Wasserflächen"
-
-#~ msgid "Wed"
-#~ msgstr "Mi"
-
-#~ msgid "Wednesday"
-#~ msgstr "Mittwoch"
-
-#~ msgid "Show"
-#~ msgstr "Einblenden"
-
-#~ msgid "Show all"
-#~ msgstr "Alle einblenden"
-
-#~ msgid ""
-#~ "When enabled, one can zoom the map using two fingers on mobile devices."
-#~ msgstr ""
-#~ "Wenn aktiviert, kann die Karte auf Mobilgeräten mit zwei Fingern gezoomt "
-#~ "werden."
-
-#~ msgid ""
-#~ "When enabled, one finger scrolls the page, while two fingers are required "
-#~ "to move the map."
-#~ msgstr ""
-#~ "Wenn aktiviert, scrollt ein Finger die Seite, während zwei Finger "
-#~ "erforderlich sind, um die Karte zu bewegen."
-
-#~ msgid "Zip code"
-#~ msgstr "Postleitzahl"
-
-#~ msgid "Zoom"
-#~ msgstr "Zoom"
-
-#~ msgid "Zoom Controls"
-#~ msgstr "Zoom-Steuerelemente"
-
-#~ msgid "Zoom in"
-#~ msgstr "Hineinzoomen"
-
-#~ msgid "Zoom out"
-#~ msgstr "Herauszoomen"
-
-#~ msgid "Embed via Iframe"
-#~ msgstr "Per Iframe einbetten"
-
-#~ msgid "Default marker"
-#~ msgstr "Standardmarker"
-
-#~ msgid "Location logo updated."
-#~ msgstr "Standortlogo aktualisiert."
-
-#~ msgid "Location marker updated."
-#~ msgstr "Standortmarker aktualisiert."
-
-#~ msgid "Location tags updated."
-#~ msgstr "Schlagwörter des Standorts aktualisiert."

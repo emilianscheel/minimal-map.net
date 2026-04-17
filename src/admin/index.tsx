@@ -1,6 +1,6 @@
 import { Button, Popover, SlotFillProvider } from "@wordpress/components";
 import domReady from "@wordpress/dom-ready";
-import { Suspense, createRoot, lazy, useState } from "@wordpress/element";
+import { Suspense, createRoot, lazy } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import type { ComponentType, LazyExoticComponent } from "react";
 import AdminSectionIcon from "./AdminSectionIcon";
@@ -11,8 +11,6 @@ import {
   isAdminSectionView,
 } from "./app-config";
 import LoadingView from "./LoadingView";
-import LicenseKeyModal from "./premium/LicenseKeyModal";
-import Kbd from "../components/Kbd";
 import type { AdminSectionView } from "../types";
 import type { AdminSectionComponentProps } from "./sections/types";
 import "./style.scss";
@@ -89,11 +87,6 @@ const SECTION_COMPONENTS: Record<
 };
 
 function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
-  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(
-    adminConfig.licenseConfig.openOnLoad &&
-      !adminConfig.licenseConfig.hasActivation,
-  );
-
   return (
     <aside className="minimal-map-admin__sidebar">
       <nav
@@ -123,51 +116,7 @@ function AdminSidebar({ currentView }: { currentView: AdminSectionView }) {
             </Button>
           );
         })}
-
-        {!adminConfig.licenseConfig.hasActivation && (
-          <>
-            <Button
-              variant="tertiary"
-              __next40pxDefaultSize
-              className="minimal-map-admin__nav-item minimal-map-admin__nav-item--premium"
-              href={adminConfig.licenseConfig.purchaseUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ marginTop: "auto" }}
-            >
-              <span className="minimal-map-admin__nav-icon">
-                <AdminSectionIcon view="premium" />
-              </span>
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  width: "100%",
-                }}
-              >
-                <span>{__("Buy Premium", "minimal-map")}</span>
-                <Kbd variant="neutral">{__("Save 50%", "minimal-map")}</Kbd>
-              </span>
-            </Button>
-            <Button
-              variant="tertiary"
-              __next40pxDefaultSize
-              className="minimal-map-admin__nav-item minimal-map-admin__nav-item--license"
-              onClick={() => setIsLicenseModalOpen(true)}
-            >
-              <span className="minimal-map-admin__nav-icon">
-                <AdminSectionIcon view="license" />
-              </span>
-              <span>{__("Enter License Key", "minimal-map")}</span>
-            </Button>
-          </>
-        )}
       </nav>
-      <LicenseKeyModal
-        isOpen={isLicenseModalOpen}
-        onRequestClose={() => setIsLicenseModalOpen(false)}
-      />
     </aside>
   );
 }

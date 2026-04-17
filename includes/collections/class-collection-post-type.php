@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Collections;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registers the collection content model.
  */

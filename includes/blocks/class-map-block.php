@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Blocks;
 
+defined( 'ABSPATH' ) || exit;
+
 use MinimalMap\Map_View;
 
 /**

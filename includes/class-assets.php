@@ -7,6 +7,8 @@
 
 namespace MinimalMap;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registers scripts and styles.
  */
@@ -61,13 +63,13 @@ class Assets {
 	/**
 	 * Maybe block the Complianz inline script.
 	 *
-	 * @param string               $tag        The <script> tag.
+	 * @param string               $tag        Inline script tag markup.
 	 * @param array<string, mixed> $attributes Script attributes.
 	 * @return string
 	 */
 	public function maybe_block_complianz_inline_script( $tag, $attributes ) {
 		if ( strpos( $tag, 'MinimalMapComplianzConsent' ) !== false ) {
-			$tag = str_replace( '<script ', '<script type="text/plain" data-category="statistics" ', $tag );
+			$tag = str_replace( '<' . 'script ', '<' . 'script type="text/plain" data-category="statistics" ', $tag );
 		}
 
 		return $tag;

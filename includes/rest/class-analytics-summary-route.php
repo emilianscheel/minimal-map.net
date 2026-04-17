@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Rest;
 
+defined( 'ABSPATH' ) || exit;
+
 use MinimalMap\Admin\Admin_Menu;
 use MinimalMap\Analytics\Analytics;
 

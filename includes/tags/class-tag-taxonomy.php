@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Tags;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registers the tag taxonomy content model.
  */

@@ -4,6 +4,8 @@
  *
  * @package Minimal_Map
  */
+
+defined( 'ABSPATH' ) || exit;
 ?>
 <div class="wrap minimal-map-admin-wrap">
 	<div

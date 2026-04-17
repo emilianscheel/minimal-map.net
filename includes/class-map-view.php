@@ -7,6 +7,8 @@
 
 namespace MinimalMap;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Renders the frontend block markup.
  */

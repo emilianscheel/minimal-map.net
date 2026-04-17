@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Rest;
 
+defined( 'ABSPATH' ) || exit;
+
 use MinimalMap\Config;
 
 /**
@@ -51,6 +53,7 @@ class Locations_Route {
 			array(
 				'methods'             => \WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'handle_request' ),
+				// Public by design: visible frontend maps need published location data.
 				'permission_callback' => '__return_true',
 				'args'                => $this->get_route_args(),
 			)

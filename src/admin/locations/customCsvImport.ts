@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { OPENING_HOURS_DAY_ORDER } from '../../lib/locations/openingHours';
-import type { ParsedCsvData } from '../../lib/locations/importLocations';
+import type { ParsedLocationImportData } from '../../lib/locations/importLocations';
 import type { OpeningHoursDayKey } from '../../types';
 
 export interface CsvImportColumnOption {
@@ -35,7 +35,7 @@ export const CSV_OPENING_HOURS_NOTES_FIELD = {
 } as const;
 
 export function buildCsvImportColumnOptions(
-	parsedCsv: ParsedCsvData | null,
+	parsedCsv: ParsedLocationImportData | null,
 	columnIndexes?: number[]
 ): CsvImportColumnOption[] {
 	const options: CsvImportColumnOption[] = [{ label: __('None', 'minimal-map'), value: '' }];

@@ -7,6 +7,8 @@
 
 namespace MinimalMap;
 
+defined( 'ABSPATH' ) || exit;
+
 require_once MINIMAL_MAP_PATH . 'includes/class-config.php';
 require_once MINIMAL_MAP_PATH . 'includes/class-assets.php';
 require_once MINIMAL_MAP_PATH . 'includes/class-iframe-endpoint.php';
@@ -26,7 +28,6 @@ require_once MINIMAL_MAP_PATH . 'includes/rest/class-analytics-track-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-admin-query-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-frontend-geocode-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-geocode-route.php';
-require_once MINIMAL_MAP_PATH . 'includes/rest/class-license-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-locations-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-locations-settings-route.php';
 require_once MINIMAL_MAP_PATH . 'includes/rest/class-styles-route.php';

@@ -1,8 +1,6 @@
 import {
 	ChartColumn,
-	Gift,
 	Image,
-	Key,
 	LayoutDashboard,
 	Layers3,
 	MapPin,
@@ -13,7 +11,7 @@ import {
 } from 'lucide-react';
 import type { AdminSectionView } from '../types';
 
-const SECTION_ICONS: Record<AdminSectionView | 'premium' | 'license', LucideIcon> = {
+const SECTION_ICONS: Record<AdminSectionView, LucideIcon> = {
 	dashboard: LayoutDashboard,
 	analytics: ChartColumn,
 	locations: MapPinned,
@@ -22,11 +20,9 @@ const SECTION_ICONS: Record<AdminSectionView | 'premium' | 'license', LucideIcon
 	tags: Tags,
 	markers: MapPin,
 	styles: Palette,
-	premium: Gift,
-	license: Key,
 };
 
-export default function AdminSectionIcon({ view }: { view: AdminSectionView | 'premium' | 'license' }) {
+export default function AdminSectionIcon({ view }: { view: AdminSectionView }) {
 	const IconComponent = SECTION_ICONS[view] ?? LayoutDashboard;
 
 	return <IconComponent aria-hidden="true" size={24} strokeWidth={1.75} />;

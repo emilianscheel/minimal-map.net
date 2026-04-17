@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Analytics;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Provides analytics settings, persistence, and reporting.
  */

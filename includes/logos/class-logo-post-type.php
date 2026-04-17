@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Logos;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registers the logo content model.
  */

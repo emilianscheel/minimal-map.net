@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Locations;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registers the location content model.
  */
@@ -143,8 +145,6 @@ class Location_Post_Type {
 			)
 		);
 
-		add_filter( 'rest_pre_insert_' . self::POST_TYPE, array( $this, 'limit_locations' ), 10, 2 );
-
 		foreach ( self::META_FIELDS as $meta_key => $meta_config ) {
 			$register_args = array(
 				'auth_callback'     => array( $this, 'can_manage_locations' ),
@@ -242,36 +242,6 @@ class Location_Post_Type {
 	 */
 	public function can_manage_locations() {
 		return current_user_can( self::CAPABILITY );
-	}
-
-	/**
-	 * Limit the number of locations for non-premium users.
-	 *
-	 * @param \stdClass        $prepared_post Post data.
-	 * @param \WP_REST_Request $request Request object.
-	 * @return \stdClass|\WP_Error
-	 */
-	public function limit_locations( $prepared_post, $request ) {
-		// Only limit new locations.
-		if ( ! empty( $request->get_param( 'id' ) ) ) {
-			return $prepared_post;
-		}
-
-		$config = new \MinimalMap\Config();
-
-		if ( $config->is_premium() ) {
-			return $prepared_post;
-		}
-
-		if ( self::get_location_count() >= 10 ) {
-			return new \WP_Error(
-				'rest_location_limit_reached',
-				__( 'You have reached the limit of 10 locations. Please upgrade to Premium to add more.', 'minimal-map' ),
-				array( 'status' => 403 )
-			);
-		}
-
-		return $prepared_post;
 	}
 
 	/**

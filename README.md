@@ -72,7 +72,6 @@ Render a minimalist MapLibre-powered map in Wordpress.
 - **Multi-edit color selection** for map style themes
 - **Animated analytics metrics** with relative time labels and event icons
 - **Bulk-delete analytics data** for privacy and data management
-- **Premium license key support** to unlock advanced features and support
 
 ## Development
 

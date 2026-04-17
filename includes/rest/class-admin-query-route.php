@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Rest;
 
+defined( 'ABSPATH' ) || exit;
+
 use MinimalMap\Collections\Collection_Post_Type;
 use MinimalMap\Locations\Location_Post_Type;
 use MinimalMap\Logos\Logo_Post_Type;

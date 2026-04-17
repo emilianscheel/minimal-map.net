@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Markers;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Registers the marker content model.
  */

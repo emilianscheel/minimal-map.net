@@ -1,10 +1,10 @@
 === Minimal Map ===
-Contributors: Emilian Scheel
+Contributors: emilianscheel
 Tags: maps, gutenberg, blocks, geolocation
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 8.3
-Stable tag: 0.8.1
+Stable tag: 0.8.2
 License: MIT
 License URI: https://opensource.org/license/mit/
 
@@ -80,9 +80,30 @@ Features include:
 * Multi-edit color selection for map style themes.
 * Animated analytics metrics with relative time labels and event icons.
 * Bulk-delete analytics data for privacy and data management.
-* Premium license key support to unlock advanced features.
 
 Only the latest stable WordPress release is supported. Older WordPress and PHP versions are intentionally out of scope for this plugin.
+
+== External services ==
+
+Minimal Map can connect to external services to render maps, geocode addresses, and open navigation links.
+
+= OpenFreeMap =
+
+The bundled map presets load map style and tile data from OpenFreeMap when a map is displayed on the frontend, in the block editor preview, or in the admin map preview. The visitor's browser requests the selected style and map tiles directly from OpenFreeMap. Those requests include normal browser request data such as the requested tile/style URL, IP address, user agent, and referrer.
+
+OpenFreeMap is provided by OpenFreeMap. Terms of service: https://openfreemap.org/tos/ Privacy policy: https://openfreemap.org/privacy/
+
+= OpenStreetMap Nominatim =
+
+Address geocoding uses the OpenStreetMap Nominatim service when an administrator requests coordinates for an address, and frontend live search uses it when a visitor enters a free-text location search. The plugin sends the entered address or search query, the site URL as the request referrer, and a plugin user agent. Results are cached locally to reduce repeated requests.
+
+Nominatim is provided by the OpenStreetMap Foundation. Usage policy: https://operations.osmfoundation.org/policies/nominatim/ Privacy policy: https://osmfoundation.org/wiki/Privacy_Policy
+
+= Google Maps =
+
+If the optional Google Maps navigation button is enabled for a map, clicking that button opens Google Maps in a new browser tab. The destination location coordinates are included in the Google Maps URL. The plugin does not contact Google Maps until the visitor clicks the navigation link.
+
+Google Maps is provided by Google. Google Maps terms: https://www.google.com/help/terms_maps/ Privacy policy: https://policies.google.com/privacy
 
 == Installation ==
 
@@ -115,6 +136,13 @@ Yes. English is the source language and German/French translations are included.
 
 == Changelog ==
 
+= 0.8.2 =
+* Removed license verification and paid feature locking so all plugin features are free.
+* Removed the 10-location limit.
+* Added external service documentation for map tiles, geocoding, and navigation links.
+* Moved iframe document CSS to WordPress enqueue APIs.
+* Added direct-access guards to plugin PHP files.
+
 = 0.8.0 =
 * Added marker library with built-in SVG presets for rapid map styling.
 * Added pre-built WordPress and static palette templates for style themes.
@@ -138,7 +166,6 @@ Yes. English is the source language and German/French translations are included.
 * Added "Find Me" button and live user location "blue dot" indicator.
 * Added marker clustering for handling large datasets.
 * Added in-map location cards for modern overlay layouts.
-* Added premium license key support and purchase integration.
 * Added power-user keyboard shortcuts (n for new, m for merge).
 * Refined admin modal layouts and stabilized collection previews.
 * Unified modal widths and polished the dashboard experience.

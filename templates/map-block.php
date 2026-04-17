@@ -5,6 +5,8 @@
  * @package Minimal_Map
  */
 
+defined( 'ABSPATH' ) || exit;
+
 $wrapper_attributes = get_block_wrapper_attributes(
 	array(
 		'class' => 'minimal-map-block',

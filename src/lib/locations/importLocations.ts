@@ -600,7 +600,7 @@ export const REQUIRED_COMMON_CSV_HEADERS = [
 	'longitude',
 ] as const;
 
-export function isCommonCsvFormat(parsedCsv: ParsedCsvData): boolean {
+export function isCommonCsvFormat(parsedCsv: ParsedLocationImportData): boolean {
 	const headers = new Set(parsedCsv.normalizedHeaders);
 	return REQUIRED_COMMON_CSV_HEADERS.every((header) => headers.has(header));
 }
@@ -847,7 +847,7 @@ function buildCommonLocationForm(
 	};
 }
 
-function createRowRecord(parsedCsv: ParsedCsvData, row: string[]): Record<string, string> {
+function createRowRecord(parsedCsv: ParsedLocationImportData, row: string[]): Record<string, string> {
 	const record: Record<string, string> = {};
 
 	parsedCsv.normalizedHeaders.forEach((header, index) => {
@@ -868,7 +868,7 @@ function hasRequiredGeocodeFields(form: LocationFormState): boolean {
 }
 
 export function countMappedCsvGeocodeRequests(
-	parsedCsv: ParsedCsvData,
+	parsedCsv: ParsedLocationImportData,
 	mapping: CsvImportMapping
 ): number {
 	return parsedCsv.rows.reduce((count, row) => {

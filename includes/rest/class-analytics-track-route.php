@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Rest;
 
+defined( 'ABSPATH' ) || exit;
+
 use MinimalMap\Analytics\Analytics;
 
 /**
@@ -51,6 +53,7 @@ class Analytics_Track_Route {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'handle_request' ),
+				// Public by design: frontend visitors can submit analytics only when local analytics are enabled.
 				'permission_callback' => '__return_true',
 				'args'                => $this->get_route_args(),
 			)

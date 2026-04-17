@@ -7,6 +7,8 @@
 
 namespace MinimalMap\Rest;
 
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Proxies address geocoding through a plugin-owned REST endpoint.
  */
