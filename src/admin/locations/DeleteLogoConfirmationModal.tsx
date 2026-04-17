@@ -41,7 +41,7 @@ export default function DeleteLogoConfirmationModal({
 
 	return (
 		<Modal
-			title={__('Remove Logo', 'minimal-map')}
+			title={__('Remove Logo', 'minimal-map-net')}
 			onRequestClose={controller.onCloseDeleteLogoConfirmationModal}
 			shouldCloseOnClickOutside={!controller.isAssignmentSaving}
 			shouldCloseOnEsc={!controller.isAssignmentSaving}
@@ -51,20 +51,20 @@ export default function DeleteLogoConfirmationModal({
 				<p className="minimal-map-admin__collection-delete-dialog-copy">
 					{affectedLocations.length === 0
 						? isBulk
-							? __('None of the selected locations have a logo assigned. Confirm to close this selection.', 'minimal-map')
-							: __('This location already has no logo assigned.', 'minimal-map')
+							? __('None of the selected locations have a logo assigned. Confirm to close this selection.', 'minimal-map-net')
+							: __('This location already has no logo assigned.', 'minimal-map-net')
 						: isBulk
 							? sprintf(
 								_n(
 									'Remove logos from %d selected location? %d of them currently have a logo assigned.',
 									'Remove logos from %d selected locations? %d of them currently have a logo assigned.',
 									controller.selectedLogoRemovalLocations.length,
-									'minimal-map'
+									'minimal-map-net'
 								),
 								controller.selectedLogoRemovalLocations.length,
 								affectedLocations.length
 							)
-							: __('Remove this logo from the selected location?', 'minimal-map')}
+							: __('Remove this logo from the selected location?', 'minimal-map-net')}
 				</p>
 				{logo && !isBulk && (
 					<div className="minimal-map-admin__assigned-logo-card">
@@ -81,7 +81,7 @@ export default function DeleteLogoConfirmationModal({
 						disabled={controller.isAssignmentSaving}
 						data-minimal-map-dialog-ignore-enter="true"
 					>
-						{__('Cancel', 'minimal-map')}
+						{__('Cancel', 'minimal-map-net')}
 					</Button>
 					<Button
 						variant="primary"
@@ -91,7 +91,7 @@ export default function DeleteLogoConfirmationModal({
 						disabled={controller.isAssignmentSaving}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Remove Logos', 'minimal-map')}</span>
+							<span>{__('Remove Logos', 'minimal-map-net')}</span>
 							<Kbd variant="red">Enter</Kbd>
 						</span>
 					</Button>

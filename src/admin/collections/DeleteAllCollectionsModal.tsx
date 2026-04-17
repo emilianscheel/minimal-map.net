@@ -36,7 +36,7 @@ export default function DeleteAllCollectionsModal({
 
 	return (
 		<Modal
-			title={__('Delete all collections', 'minimal-map')}
+			title={__('Delete all collections', 'minimal-map-net')}
 			onRequestClose={controller.onCloseDeleteAllCollectionsModal}
 			shouldCloseOnClickOutside={!controller.isDeletingAllCollections}
 			shouldCloseOnEsc={!controller.isDeletingAllCollections}
@@ -74,7 +74,7 @@ export default function DeleteAllCollectionsModal({
 							'Are you sure you want to delete %d collection? This action cannot be undone.',
 							'Are you sure you want to delete %d collections? This action cannot be undone.',
 							controller.totalItems,
-							'minimal-map'
+							'minimal-map-net'
 						),
 						controller.totalItems
 					)}
@@ -82,7 +82,7 @@ export default function DeleteAllCollectionsModal({
 				<div className="minimal-map-admin__collection-delete-dialog-options">
 					<CheckboxControl
 						__nextHasNoMarginBottom
-						label={__('Delete locations', 'minimal-map')}
+						label={__('Delete locations', 'minimal-map-net')}
 						checked={deleteLocations}
 						onChange={setDeleteLocations}
 						disabled={controller.isDeletingAllCollections}
@@ -96,7 +96,7 @@ export default function DeleteAllCollectionsModal({
 						disabled={controller.isDeletingAllCollections}
 						data-minimal-map-dialog-ignore-enter="true"
 					>
-						{__('Cancel', 'minimal-map')}
+						{__('Cancel', 'minimal-map-net')}
 					</Button>
 					<Button
 						variant="primary"
@@ -108,7 +108,7 @@ export default function DeleteAllCollectionsModal({
 						disabled={controller.isDeletingAllCollections}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Delete all collections', 'minimal-map')}</span>
+							<span>{__('Delete all collections', 'minimal-map-net')}</span>
 							<Kbd variant="red">Enter</Kbd>
 						</span>
 					</Button>

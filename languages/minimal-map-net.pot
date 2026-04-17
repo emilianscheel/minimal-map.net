@@ -1,0 +1,3151 @@
+# Copyright (C) 2026 Emilian Scheel
+# This file is distributed under the MIT.
+msgid ""
+msgstr ""
+"Project-Id-Version: Minimal Map 0.8.3\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map.net\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-17T06:20:35+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: minimal-map-net\n"
+
+#. Plugin Name of the plugin
+#: minimal-map.php includes/admin/class-admin-menu.php:113
+#: includes/admin/class-admin-menu.php:114
+#: includes/blocks/class-map-block.php:57
+#: includes/class-iframe-endpoint.php:123
+msgid "Minimal Map"
+msgstr ""
+
+#. Description of the plugin
+#: minimal-map.php
+msgid "Gutenberg-first native map block and admin shell for WordPress."
+msgstr ""
+
+#. Author of the plugin
+#: minimal-map.php
+msgid "Emilian Scheel"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:39 includes/class-plugin.php:286
+msgid "Dashboard"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:40
+msgid "An overview of Minimal Map sections and upcoming data tools."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:43
+msgid "Analytics"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:44
+msgid ""
+"Review map search demand and identify where people are looking for locations."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:47
+#: includes/locations/class-location-post-type.php:130
+msgid "Locations"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:48
+msgid "Create and organize the places you want to render on your maps."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:51
+#: includes/collections/class-collection-post-type.php:46
+msgid "Collections"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:52
+msgid ""
+"Assemble reusable groups of locations and manage their map-ready assignments."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:55
+#: includes/tags/class-tag-taxonomy.php:52
+msgid "Tags"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:56
+msgid "Apply lightweight labels to keep map content easy to organize."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:59
+#: includes/logos/class-logo-post-type.php:41
+msgid "Logos"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:60
+msgid "Upload SVG logos and assign them across multiple locations."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:63
+#: includes/markers/class-marker-post-type.php:41
+msgid "Markers"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:64
+msgid "Define the marker styles and visual pin variants used across maps."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:67
+msgid "Styles"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php:68
+msgid "Manage the map styles and presets available inside the block editor."
+msgstr ""
+
+#: includes/analytics/class-analytics.php:470
+#: includes/analytics/class-analytics.php:499
+msgid "Search panel"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:471
+msgid "Map marker"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:500
+msgid "In-map card"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1086
+msgid "Text"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1091
+msgid "Address"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1096
+msgid "Coordinates"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1101
+msgid "Live location"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1138
+msgid "0 results"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1143
+msgid "1 result"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1148
+msgid "2-5 results"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1153
+msgid "6+ results"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1231
+msgid "Opening hours"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1232
+msgid "Phone"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1233
+msgid "Email"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1234
+msgid "Website"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1235
+msgid "Social media"
+msgstr ""
+
+#: includes/analytics/class-analytics.php:1236
+msgid "Google Maps"
+msgstr ""
+
+#: includes/blocks/class-map-block.php:58
+msgid "Render a minimalist MapLibre-powered map."
+msgstr ""
+
+#: includes/class-config.php:57
+msgid "Liberty"
+msgstr ""
+
+#: includes/class-config.php:61
+msgid "Bright"
+msgstr ""
+
+#: includes/class-config.php:65
+msgid "Positron"
+msgstr ""
+
+#: includes/class-config.php:296 includes/class-config.php:321
+msgid "Map preview unavailable because this browser does not support WebGL."
+msgstr ""
+
+#: includes/class-config.php:420 includes/class-config.php:429
+#: includes/class-config.php:438
+msgid "The map embed configuration is missing or invalid."
+msgstr ""
+
+#: includes/class-config.php:799
+msgid "Minimal Map: Export Locations as CSV"
+msgstr ""
+
+#: includes/class-config.php:809
+msgid "Minimal Map: Export Locations as Excel"
+msgstr ""
+
+#: includes/class-config.php:820
+msgid "Minimal Map: Export Locations as JSON"
+msgstr ""
+
+#: includes/class-config.php:830
+msgid "Minimal Map: Export Analytics Search Data as CSV"
+msgstr ""
+
+#: includes/class-config.php:841
+msgid "Minimal Map: Export Analytics Selection Data as CSV"
+msgstr ""
+
+#: includes/class-config.php:852
+msgid "Minimal Map: Export Analytics Action Data as CSV"
+msgstr ""
+
+#: includes/class-config.php:1268
+msgid "Terracotta Coast"
+msgstr ""
+
+#: includes/class-config.php:1271 includes/class-config.php:1302
+#: includes/class-config.php:1333
+msgid "Canvas"
+msgstr ""
+
+#: includes/class-config.php:1276 includes/class-config.php:1307
+#: includes/class-config.php:1338
+msgid "Ink"
+msgstr ""
+
+#: includes/class-config.php:1281 includes/class-config.php:1312
+#: includes/class-config.php:1343
+msgid "Water"
+msgstr ""
+
+#: includes/class-config.php:1286 includes/class-config.php:1317
+#: includes/class-config.php:1348
+msgid "Land"
+msgstr ""
+
+#: includes/class-config.php:1291 includes/class-config.php:1322
+#: includes/class-config.php:1353
+msgid "Transport"
+msgstr ""
+
+#: includes/class-config.php:1299
+msgid "Night Transit"
+msgstr ""
+
+#: includes/class-config.php:1330
+msgid "Alpine Print"
+msgstr ""
+
+#. translators: %d: WordPress palette template number.
+#: includes/class-config.php:1404
+#, php-format
+msgid "WordPress Theme Palette #%d"
+msgstr ""
+
+#. translators: %d: fallback palette color position.
+#: includes/class-config.php:1452
+#, php-format
+msgid "Color %d"
+msgstr ""
+
+#: includes/class-iframe-endpoint.php:110
+msgid "Invalid Minimal Map Embed"
+msgstr ""
+
+#: includes/collections/class-collection-post-type.php:47
+msgid "Collection"
+msgstr ""
+
+#: includes/locations/class-location-post-type.php:131
+msgid "Location"
+msgstr ""
+
+#: includes/logos/class-logo-post-type.php:42
+msgid "Logo"
+msgstr ""
+
+#: includes/markers/class-marker-post-type.php:42
+msgid "Marker"
+msgstr ""
+
+#: includes/rest/class-analytics-settings-route.php:117
+msgid "Analytics tracking data could not be deleted."
+msgstr ""
+
+#: includes/rest/class-frontend-geocode-route.php:62
+#: includes/rest/class-frontend-geocode-route.php:86
+#: includes/rest/class-frontend-geocode-route.php:98
+msgid "No matching coordinates were found."
+msgstr ""
+
+#: includes/rest/class-geocode-route.php:90
+msgid ""
+"The address could not be geocoded right now. Select the location manually on "
+"the map."
+msgstr ""
+
+#: includes/rest/class-geocode-route.php:102
+msgid ""
+"No matching coordinates were found. Select the location manually on the map."
+msgstr ""
+
+#: includes/rest/class-styles-route.php:155
+#: includes/rest/class-styles-route.php:184
+msgid "Style theme not found."
+msgstr ""
+
+#: includes/rest/class-styles-route.php:188
+msgid "The default theme cannot be deleted."
+msgstr ""
+
+#: includes/rest/class-styles-route.php:209
+#: includes/rest/class-styles-route.php:245
+msgid "Default Theme"
+msgstr ""
+
+#: includes/rest/class-styles-route.php:228
+msgid "Untitled Theme"
+msgstr ""
+
+#: includes/tags/class-tag-taxonomy.php:53
+msgid "Tag"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:126
+msgid "%1$d collection deleted. %2$s."
+msgid_plural "%1$d collections deleted. %2$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/collections/controller.tsx:120
+msgid "%1$d collection deleted. %2$s. Shared locations kept: %3$d."
+msgid_plural "%1$d collections deleted. %2$s. Shared locations kept: %3$d."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:276
+msgid "%1$s drives %2$s of actions."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:477
+msgid "%1$s is the largest bucket at %2$s."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:157
+#: src/admin/analytics/AnalyticsCards.tsx:255
+#: src/admin/analytics/AnalyticsCards.tsx:456
+msgid "%1$s leads with %2$s."
+msgstr ""
+
+#: src/map/location-opening-hours.ts:463
+msgid "%1$s-%2$s"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:479
+msgid "%1$s, Lunch %2$s-%3$s"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:109
+#: src/admin/collections/controller.tsx:64
+msgid "%d assigned location deleted"
+msgid_plural "%d assigned locations deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/collections/controller.tsx:98
+msgid "%d collection deleted."
+msgid_plural "%d collections deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1395
+msgid "%d location cleared of its logo."
+msgid_plural "%d locations cleared of their logos."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1450
+msgid "%d location cleared of its marker."
+msgid_plural "%d locations cleared of their markers."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1505
+msgid "%d location cleared of its tags."
+msgid_plural "%d locations cleared of their tags."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1683
+#: src/admin/locations/controller.tsx:1725
+msgid "%d location deleted."
+msgid_plural "%d locations deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:431
+msgid "%d location hidden."
+msgid_plural "%d locations hidden."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/collections/controller.tsx:811
+#: src/admin/locations/controller.tsx:2091
+#: src/admin/locations/controller.tsx:2167
+msgid "%d location imported and assigned to a new collection."
+msgid_plural "%d locations imported and assigned to a new collection."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:437
+msgid "%d location shown."
+msgid_plural "%d locations shown."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1103
+msgid "%d location updated with a logo."
+msgid_plural "%d locations updated with a logo."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1156
+msgid "%d location updated with a marker."
+msgid_plural "%d locations updated with a marker."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1312
+msgid "%d location updated with new opening hours."
+msgid_plural "%d locations updated with new opening hours."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/controller.tsx:1209
+msgid "%d location updated with new tags."
+msgid_plural "%d locations updated with new tags."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/logos/controller.tsx:261
+msgid "%d logo deleted."
+msgid_plural "%d logos deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/logos/controller.tsx:373
+msgid "%d logo uploaded."
+msgid_plural "%d logos uploaded."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/markers/controller.tsx:275
+msgid "%d marker deleted."
+msgid_plural "%d markers deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/markers/controller.tsx:382
+msgid "%d marker uploaded."
+msgid_plural "%d markers uploaded."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/tags/controller.tsx:280
+msgid "%d tag deleted."
+msgid_plural "%d tags deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/analytics/AnalyticsSectionBoundary.tsx:44
+msgid ""
+"%s analytics could not be rendered because one or more records contain "
+"unexpected data."
+msgstr ""
+
+#: src/map/location-card.tsx:470
+msgid "%s away"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:225
+msgid "+%d more"
+msgstr ""
+
+#: src/lib/locations/validateDetailsStep.ts:11
+msgid "A title is required."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:55
+#: src/admin/analytics/AnalyticsTable.tsx:230
+msgid "Action"
+msgstr ""
+
+#: src/admin/analytics/ExportAnalyticsDropdown.tsx:61
+msgid "Action Data as CSV"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:21
+msgid "action events"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:272
+#: src/admin/analytics/AnalyticsCards.tsx:283
+msgid "Action source mix"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:251
+#: src/admin/analytics/AnalyticsCards.tsx:262
+msgid "Action type mix"
+msgstr ""
+
+#: src/admin/collections/CollectionsEmptyState.tsx:13
+#: src/admin/collections/controller.tsx:889
+#: src/admin/collections/controller.tsx:919
+#: src/admin/collections/controller.tsx:926
+msgid "Add collection"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:125
+msgid "Add details such as seasonal opening hours or temporary exceptions."
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:18
+msgid ""
+"Add lightweight labels that make large map datasets easier to sort, search, "
+"and evolve."
+msgstr ""
+
+#: src/admin/locations/LocationsEmptyState.tsx:13
+#: src/admin/locations/controller.tsx:2351
+#: src/admin/locations/controller.tsx:2388
+msgid "Add location"
+msgstr ""
+
+#: src/admin/collections/CollectionsGrid.tsx:58
+msgid "Add locations"
+msgstr ""
+
+#: src/admin/locations/SocialMediaStep.tsx:105
+msgid "Add platform"
+msgstr ""
+
+#: src/admin/tags/TagsEmptyState.tsx:13 src/admin/tags/controller.tsx:325
+#: src/admin/tags/controller.tsx:343 src/admin/tags/controller.tsx:345
+msgid "Add tag"
+msgstr ""
+
+#: src/admin/styles/constants.ts:22
+msgid "Administrative Boundaries"
+msgstr ""
+
+#: src/admin/styles/constants.ts:24
+msgid "Airport Grounds"
+msgstr ""
+
+#: src/admin/styles/constants.ts:29
+msgid "Airport Icons"
+msgstr ""
+
+#: src/admin/analytics/constants.ts:25
+msgid "All"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:105
+msgid "All available logos are already assigned for this selection."
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:102
+msgid "All available markers are already assigned for this selection."
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:93
+msgid "All available tags are already assigned for this selection."
+msgstr ""
+
+#: src/block/edit.tsx:695 src/block/edit.tsx:733
+msgid "All locations"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:421
+msgid "All selected locations are already hidden."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:424
+msgid "All selected locations are already shown."
+msgstr ""
+
+#: src/admin/analytics/controller.tsx:390
+msgid "All tracking data deleted."
+msgstr ""
+
+#: src/block/edit.tsx:1225
+msgid "Allow Search"
+msgstr ""
+
+#: src/block/edit.tsx:1203
+msgid "Allow Two-Finger Zoom"
+msgstr ""
+
+#: src/block/edit.tsx:1198
+msgid "Allow Zoom via Scroll"
+msgstr ""
+
+#: src/lib/analytics/exportAnalyticsFile.ts:174
+msgid "Analytics data could not be exported."
+msgstr ""
+
+#: src/admin/analytics/controller.tsx:160
+#: src/admin/analytics/controller.tsx:190
+#: src/admin/analytics/controller.tsx:220
+#: src/admin/analytics/controller.tsx:250
+msgid "Analytics data could not be loaded."
+msgstr ""
+
+#: src/admin/analytics/controller.tsx:325
+msgid "Analytics settings could not be updated."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsHeaderActions.tsx:78
+msgid "Analytics tracking"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:37
+msgid "Analytics tracking is disabled"
+msgstr ""
+
+#: src/block/edit.tsx:1344
+msgid "Appearance"
+msgstr ""
+
+#: src/admin/styles/ApplyPaletteTemplateDropdown.tsx:29
+msgid "Apply palette template"
+msgstr ""
+
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:73
+msgid ""
+"Are you sure you want to delete %d collection? This action cannot be undone."
+msgid_plural ""
+"Are you sure you want to delete %d collections? This action cannot be undone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/DeleteAllLocationsModal.tsx:61
+#: src/admin/locations/DeleteLocationActionModal.tsx:85
+msgid ""
+"Are you sure you want to delete %d location? This action cannot be undone."
+msgid_plural ""
+"Are you sure you want to delete %d locations? This action cannot be undone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/logos/DeleteAllLogosModal.tsx:61
+msgid "Are you sure you want to delete %d logo? This action cannot be undone."
+msgid_plural ""
+"Are you sure you want to delete %d logos? This action cannot be undone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/markers/DeleteAllMarkersModal.tsx:61
+msgid ""
+"Are you sure you want to delete %d marker? This action cannot be undone."
+msgid_plural ""
+"Are you sure you want to delete %d markers? This action cannot be undone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/tags/DeleteAllTagsModal.tsx:61
+msgid "Are you sure you want to delete %d tag? This action cannot be undone."
+msgid_plural ""
+"Are you sure you want to delete %d tags? This action cannot be undone."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/analytics/DeleteAllAnalyticsModal.tsx:60
+msgid ""
+"Are you sure you want to delete all tracking data? This action cannot be "
+"undone."
+msgstr ""
+
+#: src/admin/styles/DeleteThemeModal.tsx:46
+msgid "Are you sure you want to delete the theme:"
+msgstr ""
+
+#: src/admin/locations/AssignToCollectionModal.tsx:114
+msgid "Assign"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:424
+msgid "Assign %s as logo"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:466
+msgid "Assign %s as marker"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:523
+msgid "Assign %s as tag"
+msgstr ""
+
+#: src/admin/collections/CollectionAssignmentModal.tsx:46
+msgid "Assign locations"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:60
+#: src/admin/locations/LocationsTable.tsx:446
+msgid "Assign Logo"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:447
+msgid "Assign Logos"
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:59
+#: src/admin/locations/LocationsTable.tsx:488
+msgid "Assign Marker"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:489
+msgid "Assign Markers"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:71
+msgid ""
+"Assign one new logo to %d selected location. %d currently have a logo "
+"assigned."
+msgid_plural ""
+"Assign one new logo to %d selected locations. %d currently have a logo "
+"assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:70
+msgid ""
+"Assign one new marker to %d selected location. %d currently use a custom "
+"marker."
+msgid_plural ""
+"Assign one new marker to %d selected locations. %d currently use a custom "
+"marker."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/AssignOpeningHoursModal.tsx:36
+#: src/admin/locations/LocationsTable.tsx:504
+msgid "Assign Opening Hours"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:545
+msgid "Assign Tag"
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:53
+#: src/admin/locations/LocationsTable.tsx:546
+msgid "Assign Tags"
+msgstr ""
+
+#: src/admin/locations/AssignToCollectionModal.tsx:54
+msgid "Assign to collection"
+msgstr ""
+
+#: src/admin/locations/AssignToCollectionModal.tsx:60
+#: src/admin/locations/LocationsTable.tsx:405
+msgid "Assign to Collection"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:404
+msgid "Average distance for searches with a nearby match."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:402
+msgid "Average distance to nearest store"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:407
+msgid "Average distance trend"
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:140
+#: src/admin/locations/CustomCsvImportModal.tsx:218
+#: src/admin/locations/LocationModal.tsx:109
+msgid "Back"
+msgstr ""
+
+#: src/admin/styles/constants.ts:5 src/block/edit.tsx:336
+#: src/block/edit.tsx:376 src/block/edit.tsx:477 src/block/edit.tsx:558
+msgid "Background"
+msgstr ""
+
+#: src/admin/tags/TagModal.tsx:50
+msgid "Background Color"
+msgstr ""
+
+#: src/block/edit.tsx:437
+msgid "Background Hover"
+msgstr ""
+
+#: src/block/edit.tsx:425
+msgid "Background Primary"
+msgstr ""
+
+#: src/block/edit.tsx:431
+msgid "Background Secondary"
+msgstr ""
+
+#: src/admin/styles/constants.ts:37
+msgid "Base Surfaces"
+msgstr ""
+
+#: src/block/edit.tsx:348
+msgid "Border"
+msgstr ""
+
+#: src/block/edit.tsx:1568 src/block/edit.tsx:1627
+msgid "Border Radius"
+msgstr ""
+
+#: src/block/edit.tsx:1527
+msgid "Border Radius Card"
+msgstr ""
+
+#: src/block/edit.tsx:1513
+msgid "Border Radius Input"
+msgstr ""
+
+#: src/block/edit.tsx:1461
+msgid "Border Width"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:56
+msgid "Bottom left"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:57
+msgid "Bottom right"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:15
+msgid ""
+"Build reusable groups of locations and curate map-ready sets without "
+"changing the location editor flow."
+msgstr ""
+
+#: src/admin/styles/constants.ts:13
+msgid "Building Outlines"
+msgstr ""
+
+#: src/admin/styles/constants.ts:12
+msgid "Buildings"
+msgstr ""
+
+#: src/admin/analytics/DeleteAllAnalyticsModal.tsx:69
+#: src/admin/analytics/EnableAnalyticsModal.tsx:33
+#: src/admin/collections/CollectionAssignmentModal.tsx:111
+#: src/admin/collections/CollectionModal.tsx:59
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:99
+#: src/admin/collections/DeleteCollectionActionModal.tsx:129
+#: src/admin/collections/MergeCollectionsModal.tsx:152
+#: src/admin/locations/AssignLogoModal.tsx:118
+#: src/admin/locations/AssignMarkerModal.tsx:115
+#: src/admin/locations/AssignOpeningHoursModal.tsx:81
+#: src/admin/locations/AssignTagsModal.tsx:105
+#: src/admin/locations/AssignToCollectionModal.tsx:101
+#: src/admin/locations/CustomCsvImportModal.tsx:179
+#: src/admin/locations/CustomCsvImportModal.tsx:229
+#: src/admin/locations/DeleteAllLocationsModal.tsx:77
+#: src/admin/locations/DeleteLocationActionModal.tsx:112
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:84
+#: src/admin/locations/LocationModal.tsx:121
+#: src/admin/locations/MarkerColorModal.tsx:69
+#: src/admin/locations/RemoveCollectionAssignmentModal.tsx:61
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:68
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:68
+#: src/admin/locations/ShowLocationConfirmationModal.tsx:57
+#: src/admin/logos/DeleteAllLogosModal.tsx:77
+#: src/admin/logos/DeleteLogoModal.tsx:51 src/admin/logos/EditLogoModal.tsx:64
+#: src/admin/markers/DeleteAllMarkersModal.tsx:77
+#: src/admin/markers/EditMarkerModal.tsx:115
+#: src/admin/markers/MarkerLibraryModal.tsx:163
+#: src/admin/markers/RenameMarkerModal.tsx:64
+#: src/admin/styles/CreateThemeModal.tsx:53
+#: src/admin/styles/DeleteThemeModal.tsx:50
+#: src/admin/tags/DeleteAllTagsModal.tsx:77
+#: src/admin/tags/DeleteTagModal.tsx:48 src/admin/tags/TagModal.tsx:69
+msgid "Cancel"
+msgstr ""
+
+#: src/block/edit.tsx:1540
+msgid "Card Gap"
+msgstr ""
+
+#: src/block/edit.tsx:1167
+msgid "Center Latitude"
+msgstr ""
+
+#: src/block/edit.tsx:1174
+msgid "Center Longitude"
+msgstr ""
+
+#: src/components/LocationMiniMap.tsx:64
+msgid "Change marker color"
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:103
+msgid "Choose a custom SVG marker to apply to the selected locations."
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:105
+#: src/lib/locations/importLocations.ts:300
+msgid "City"
+msgstr ""
+
+#: src/lib/locations/validateAddressStep.ts:21
+msgid "City is required to geocode the address."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsHeaderActions.tsx:43
+msgid "Clean tracking data"
+msgstr ""
+
+#: src/map/SearchControl.tsx:883
+msgid "Clear search"
+msgstr ""
+
+#: src/admin/locations/MapStep.tsx:80
+msgid "Click on the map to place the location marker."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:237
+msgid "Clicks and expansions after a location is viewed."
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:50
+#: src/admin/locations/OpeningHoursInput.tsx:81
+msgid "Close"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:95
+msgid "Close small"
+msgstr ""
+
+#: src/block/edit.tsx:524 src/lib/locations/formatOpeningHoursSummary.ts:37
+#: src/map/location-card.tsx:333 src/map/location-card.tsx:351
+#: src/map/location-opening-hours.ts:429 src/map/location-opening-hours.ts:459
+msgid "Closed"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:420
+msgid "Closed - opens %1$s %2$s"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:394
+msgid "Closed - opens %s"
+msgstr ""
+
+#: src/block/edit.tsx:1682
+msgid "Cluster"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:387
+msgid "Collection could not be created."
+msgstr ""
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:51
+#: src/admin/collections/controller.tsx:460
+msgid "Collection could not be deleted."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1840
+msgid "Collection could not be removed from the location."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:386
+msgid "Collection could not be updated."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:379
+msgid "Collection created."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:60
+msgid "Collection deleted."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:81
+msgid "Collection deleted. %1$s. Shared locations kept: %2$d."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:75
+msgid "Collection deleted. %s."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:631
+msgid "Collection locations could not be saved."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:623
+msgid "Collection locations saved."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1831
+msgid "Collection removed from location."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:351
+#: src/admin/collections/controller.tsx:708
+msgid "Collection title is required."
+msgstr ""
+
+#: src/block/edit.tsx:694
+msgid "Collection unavailable"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:378
+msgid "Collection updated."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:538
+msgid "Collections could not be deleted."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:244
+#: src/admin/collections/controller.tsx:662
+#: src/admin/locations/controller.tsx:904
+msgid "Collections could not be loaded."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:748
+msgid "Collections could not be merged."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:742
+msgid "Collections merged successfully."
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:52
+msgid "Column"
+msgstr ""
+
+#: src/admin/locations/RemoveCollectionAssignmentModal.tsx:72
+msgid "Confirm"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:131
+msgid "Contact"
+msgstr ""
+
+#: src/block/edit.tsx:1335
+msgid "Copied"
+msgstr ""
+
+#: src/block/edit.tsx:1338
+msgid "Copy failed"
+msgstr ""
+
+#: src/block/edit.tsx:1332
+msgid "Copy Snippet"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:118
+#: src/lib/locations/importLocations.ts:302
+msgid "Country"
+msgstr ""
+
+#: src/lib/locations/validateAddressStep.ts:25
+msgid "Country is required to geocode the address."
+msgstr ""
+
+#: src/admin/locations/AssignToCollectionModal.tsx:86
+msgid "Create a collection first to assign this location."
+msgstr ""
+
+#: src/admin/collections/CollectionsEmptyState.tsx:11
+msgid ""
+"Create collections to organize your locations into groups. This makes it "
+"easier to manage and display sets of locations on your maps."
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:17
+msgid ""
+"Create marker variants and keep your map pin system consistent across "
+"locations and styles."
+msgstr ""
+
+#: src/admin/styles/CreateThemeButton.tsx:13
+#: src/admin/styles/CreateThemeModal.tsx:39
+msgid "Create New Theme"
+msgstr ""
+
+#: src/admin/tags/TagsEmptyState.tsx:11
+msgid ""
+"Create tags to apply lightweight labels to your locations. This helps you "
+"keep your map content organized and easy to search."
+msgstr ""
+
+#: src/admin/styles/CreateThemeModal.tsx:62
+msgid "Create Theme"
+msgstr ""
+
+#: src/admin/styles/controller.tsx:214
+msgid "Created a new theme from %s."
+msgstr ""
+
+#: src/block/edit.tsx:1554
+msgid "Credits"
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:905
+msgid "CSV file does not match the supported import format."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:466
+msgid "CSV file is empty or missing headers."
+msgstr ""
+
+#: src/map/SearchControl.tsx:525
+msgid ""
+"Current location is still being determined. Please try again in a moment."
+msgstr ""
+
+#: src/map/SearchControl.tsx:528
+msgid "Current location is unavailable."
+msgstr ""
+
+#: src/block/edit.tsx:1152
+msgid "Data"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:48
+msgid "Day"
+msgstr ""
+
+#: src/block/edit.tsx:647
+msgid "Default"
+msgstr ""
+
+#: src/admin/collections/CollectionsGrid.tsx:91
+#: src/admin/locations/DeleteLocationActionModal.tsx:122
+#: src/admin/locations/LocationsTable.tsx:660 src/admin/logos/LogosGrid.tsx:68
+#: src/admin/markers/MarkersGrid.tsx:76 src/admin/tags/TagsGrid.tsx:55
+msgid "Delete"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:669
+msgid "Delete %d location"
+msgid_plural "Delete %d locations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:111
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:39
+#: src/admin/collections/controller.tsx:852
+msgid "Delete all collections"
+msgstr ""
+
+#: src/admin/locations/DeleteAllLocationsModal.tsx:47
+#: src/admin/locations/DeleteAllLocationsModal.tsx:89
+#: src/admin/locations/controller.tsx:2322
+msgid "Delete all locations"
+msgstr ""
+
+#: src/admin/logos/DeleteAllLogosModal.tsx:47
+#: src/admin/logos/DeleteAllLogosModal.tsx:89
+#: src/admin/logos/controller.tsx:406
+msgid "Delete all logos"
+msgstr ""
+
+#: src/admin/markers/DeleteAllMarkersModal.tsx:47
+#: src/admin/markers/DeleteAllMarkersModal.tsx:89
+#: src/admin/markers/controller.tsx:417
+msgid "Delete all markers"
+msgstr ""
+
+#: src/admin/tags/DeleteAllTagsModal.tsx:47
+#: src/admin/tags/DeleteAllTagsModal.tsx:89 src/admin/tags/controller.tsx:311
+msgid "Delete all tags"
+msgstr ""
+
+#: src/admin/analytics/DeleteAllAnalyticsModal.tsx:47
+#: src/admin/analytics/DeleteAllAnalyticsModal.tsx:81
+msgid "Delete all tracking data"
+msgstr ""
+
+#: src/admin/collections/CollectionsGrid.tsx:97
+#: src/admin/collections/DeleteCollectionActionModal.tsx:139
+msgid "Delete collection"
+msgstr ""
+
+#: src/admin/styles/DeleteThemeButton.tsx:14
+msgid "Delete Current Theme"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:667
+msgid "Delete location"
+msgstr ""
+
+#: src/admin/collections/DeleteAllCollectionsModal.tsx:85
+#: src/admin/collections/DeleteCollectionActionModal.tsx:94
+msgid "Delete locations"
+msgstr ""
+
+#: src/admin/logos/DeleteLogoModal.tsx:28
+#: src/admin/logos/DeleteLogoModal.tsx:61
+msgid "Delete Logo"
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:121
+msgid "Delete original collections after merge"
+msgstr ""
+
+#: src/admin/tags/DeleteTagModal.tsx:28 src/admin/tags/DeleteTagModal.tsx:58
+msgid "Delete Tag"
+msgstr ""
+
+#: src/admin/styles/DeleteThemeModal.tsx:39
+#: src/admin/styles/DeleteThemeModal.tsx:60
+msgid "Delete Theme"
+msgstr ""
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:83
+msgid "Delete this collection and remove its saved location assignments?"
+msgstr ""
+
+#: src/admin/locations/DeleteLocationActionModal.tsx:93
+msgid "Delete this location and remove its saved collection assignments?"
+msgstr ""
+
+#: src/admin/logos/DeleteLogoModal.tsx:36
+msgid ""
+"Delete this logo and clear it from every assigned location? This action "
+"cannot be undone."
+msgstr ""
+
+#: src/admin/tags/DeleteTagModal.tsx:36
+msgid "Delete this tag? This action cannot be undone."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:356
+msgid "Demand across the selected period."
+msgstr ""
+
+#: src/admin/logos/LogosGrid.tsx:42 src/admin/markers/MarkersGrid.tsx:37
+msgid "Download"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:46
+msgid "Download as CSV"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:55
+msgid "Download as Excel"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:64
+msgid "Download as JSON"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:73
+msgid "Download Example CSV"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:82
+msgid "Download Example Excel"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:91
+msgid "Download Example JSON"
+msgstr ""
+
+#: src/admin/styles/ExportThemeButton.tsx:13
+msgid "Download Theme Config"
+msgstr ""
+
+#: src/admin/locations/index.tsx:50
+msgid "Drop a CSV, Excel, or JSON file here to import locations"
+msgstr ""
+
+#: src/admin/collections/index.tsx:39
+msgid "Drop CSV file here to import locations"
+msgstr ""
+
+#: src/admin/styles/index.tsx:183
+msgid "Drop Minimal Map or MapLibre JSON theme files here to upload"
+msgstr ""
+
+#: src/admin/markers/index.tsx:37
+msgid "Drop SVG files here to upload"
+msgstr ""
+
+#: src/admin/logos/index.tsx:36
+msgid "Drop SVG or PNG files here to upload"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:340
+msgid "Duplicate"
+msgstr ""
+
+#: src/admin/collections/CollectionsGrid.tsx:76
+#: src/admin/locations/LocationsTable.tsx:355 src/admin/logos/LogosGrid.tsx:55
+#: src/admin/tags/TagsGrid.tsx:44
+msgid "Edit"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:918
+msgid "Edit collection"
+msgstr ""
+
+#: src/admin/markers/MarkersGrid.tsx:63
+msgid "Edit colors"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:2387
+msgid "Edit location"
+msgstr ""
+
+#: src/admin/logos/EditLogoModal.tsx:16
+msgid "Edit logo filename"
+msgstr ""
+
+#: src/admin/locations/MarkerColorModal.tsx:19
+msgid "Edit marker color"
+msgstr ""
+
+#: src/admin/locations/MarkerColorModal.tsx:19
+#: src/admin/markers/EditMarkerModal.tsx:32
+msgid "Edit marker colors"
+msgstr ""
+
+#: src/admin/tags/controller.tsx:343
+msgid "Edit tag"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:48
+msgid "Email address"
+msgstr ""
+
+#: src/block/edit.tsx:1297
+msgid "Embed"
+msgstr ""
+
+#: src/admin/analytics/EnableAnalyticsModal.tsx:43
+msgid "Enable analytics"
+msgstr ""
+
+#: src/admin/analytics/EnableAnalyticsModal.tsx:15
+msgid "Enable analytics tracking"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:38
+msgid ""
+"Enable analytics tracking to start collecting search demand data for this "
+"map plugin."
+msgstr ""
+
+#: src/block/edit.tsx:1246
+msgid "Enable Live Location Map"
+msgstr ""
+
+#: src/block/edit.tsx:1230
+msgid "Enable Live Location Search"
+msgstr ""
+
+#: src/block/edit.tsx:1276
+msgid "Enable Marker Clustering"
+msgstr ""
+
+#: src/block/edit.tsx:1269
+msgid "Enable Opened Quick Filter"
+msgstr ""
+
+#: src/block/edit.tsx:1252
+msgid ""
+"Enable search and zoom controls first to use the live location map button."
+msgstr ""
+
+#: src/block/edit.tsx:1236
+msgid "Enable search first to use the live location result card."
+msgstr ""
+
+#: src/block/edit.tsx:1262
+msgid "Enable Tags Filter"
+msgstr ""
+
+#: src/admin/analytics/EnableAnalyticsModal.tsx:22
+msgid ""
+"Enabling analytics will start storing frontend search, selection, and action "
+"events for new map interactions."
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:117
+msgid "Enter a name for the merged collection..."
+msgstr ""
+
+#: src/lib/locations/validateDetailsStep.ts:15
+msgid "Enter a valid email address."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:41
+msgid "Enter a valid lunch break start time in HH:MM format."
+msgstr ""
+
+#: src/lib/locations/validateDetailsStep.ts:19
+msgid "Enter a valid website URL."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:36
+msgid "Enter both lunch break start time and duration."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:21
+msgid "Enter both opening and closing times."
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:26
+msgid "Enter valid opening hours in HH:MM format."
+msgstr ""
+
+#: src/lib/locations/excel.ts:42
+msgid "Excel file is empty."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:123
+msgid "Explicit location picks from search or marker clicks."
+msgstr ""
+
+#: src/admin/analytics/ExportAnalyticsDropdown.tsx:27
+msgid "Export analytics"
+msgstr ""
+
+#: src/admin/locations/ExportLocationsDropdown.tsx:31
+msgid "Export locations"
+msgstr ""
+
+#: src/admin/analytics/ExportAnalyticsDropdown.tsx:35
+#: src/admin/locations/ExportLocationsDropdown.tsx:38
+msgid "Export Options"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:51
+#: src/admin/locations/SocialMediaStep.tsx:18
+#: src/lib/locations/importLocations.ts:294 src/map/location-card.tsx:155
+msgid "Facebook"
+msgstr ""
+
+#: src/admin/styles/controller.tsx:223
+msgid "Failed to create a theme from %s."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:826
+#: src/admin/locations/controller.tsx:2115
+#: src/admin/locations/controller.tsx:2186
+msgid "Failed to import locations."
+msgstr ""
+
+#: src/admin/styles/controller.tsx:277
+msgid "Failed to import theme."
+msgstr ""
+
+#: src/admin/styles/controller.tsx:308
+msgid "Failed to read the selected file."
+msgstr ""
+
+#: src/block/edit.tsx:1189
+msgid "Features"
+msgstr ""
+
+#: src/admin/logos/EditLogoModal.tsx:42 src/admin/logos/LogosGrid.tsx:15
+#: src/admin/markers/RenameMarkerModal.tsx:42
+msgid "Filename"
+msgstr ""
+
+#: src/admin/logos/controller.tsx:284 src/admin/markers/controller.tsx:307
+msgid "Filename is required."
+msgstr ""
+
+#: src/map/zoom-control-options.ts:74
+msgid "Filled plus circle"
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:170
+#: src/admin/locations/controller.tsx:2497
+msgid "Finish"
+msgstr ""
+
+#: src/block/edit.tsx:342 src/block/edit.tsx:382 src/block/edit.tsx:483
+#: src/block/edit.tsx:564
+msgid "Foreground"
+msgstr ""
+
+#: src/admin/tags/TagModal.tsx:56
+msgid "Foreground Color"
+msgstr ""
+
+#: src/block/edit.tsx:443
+msgid "Foreground Primary"
+msgstr ""
+
+#: src/block/edit.tsx:449
+msgid "Foreground Secondary"
+msgstr ""
+
+#: src/admin/styles/constants.ts:8
+msgid "Forests"
+msgstr ""
+
+#: src/block/edit.tsx:1165
+msgid "Frame"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:22
+#: src/lib/locations/formatOpeningHoursSummary.ts:14
+#: src/map/location-opening-hours.ts:38
+msgid "Fri"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:22
+#: src/map/location-opening-hours.ts:28
+msgid "Friday"
+msgstr ""
+
+#: src/block/edit.tsx:1607
+msgid "Google Maps Button"
+msgstr ""
+
+#: src/block/edit.tsx:1283
+msgid "Google Maps Navigation"
+msgstr ""
+
+#: src/block/edit.tsx:1357
+msgid "Height"
+msgstr ""
+
+#: src/block/edit.tsx:1368
+msgid "Height Mobile"
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:304
+msgid "Hidden"
+msgstr ""
+
+#: src/admin/locations/LocationTitleCell.tsx:16
+msgid "Hidden location. Click to show it again."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:371
+msgid "Hide"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:561
+msgid "Hide all"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:91
+#: src/lib/locations/importLocations.ts:299
+msgid "House number"
+msgstr ""
+
+#: src/lib/locations/validateAddressStep.ts:13
+msgid "House number is required to geocode the address."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:481
+msgid "How many results each search returned."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:139
+msgid "How often searches turn into a location choice."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:460
+msgid "How visitors are searching your map."
+msgstr ""
+
+#: src/admin/locations/SocialMediaStep.tsx:79
+msgid "https://..."
+msgstr ""
+
+#: src/admin/styles/constants.ts:9
+msgid "Ice & Glaciers"
+msgstr ""
+
+#: src/block/edit.tsx:1299
+msgid "Iframe Font Family"
+msgstr ""
+
+#: src/block/edit.tsx:1308
+msgid "Iframe Snippet"
+msgstr ""
+
+#: src/block/edit.tsx:1301
+msgid ""
+"Iframes cannot inherit the font family from the parent page automatically. "
+"Paste a CSS font-family stack here to match it, or clear the field to use "
+"the WordPress theme default."
+msgstr ""
+
+#: src/admin/locations/CustomCsvImportModal.tsx:19
+msgid "Import custom data"
+msgstr ""
+
+#: src/admin/locations/LocationImportProgressModal.tsx:14
+msgid "Import locations"
+msgstr ""
+
+#: src/admin/locations/ImportLocationsButton.tsx:14
+msgid "Import locations from CSV, Excel, or JSON"
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:615
+msgid "Import on"
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:619
+msgid "Imported Location"
+msgstr ""
+
+#: src/admin/styles/controller.tsx:268
+msgid "Imported theme with fallback default colors for: %s"
+msgstr ""
+
+#: src/block/edit.tsx:1290
+msgid "In-map Location Card"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:13
+msgid ""
+"Inspect search demand, result quality, and nearest-distance patterns without "
+"leaving the admin panel."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:49
+#: src/admin/locations/SocialMediaStep.tsx:16
+#: src/lib/locations/importLocations.ts:292 src/map/location-card.tsx:153
+msgid "Instagram"
+msgstr ""
+
+#: src/admin/markers/MarkerLibraryModal.tsx:84
+msgid "Install"
+msgstr ""
+
+#: src/admin/markers/MarkerLibraryModal.tsx:81
+msgid "Install %d marker"
+msgid_plural "Install %d markers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/styles/controller.tsx:301
+msgid "Invalid JSON file."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:30
+msgid "Invalid PNG file."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:42 src/admin/markers/controller.tsx:361
+msgid "Invalid SVG file."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:522
+msgid "JSON file is empty or missing fields."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:500
+msgid "JSON file is invalid."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:504
+msgid "JSON file must contain a non-empty array of objects."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:511
+msgid "JSON file must contain only objects."
+msgstr ""
+
+#: src/admin/analytics/constants.ts:23
+msgid "Last 30 Days"
+msgstr ""
+
+#: src/admin/analytics/constants.ts:22
+msgid "Last 7 Days"
+msgstr ""
+
+#: src/admin/analytics/constants.ts:24
+msgid "Last 90 Days"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:83
+msgid "Line"
+msgstr ""
+
+#: src/map/SearchControl.tsx:516 src/map/SearchControl.tsx:535
+msgid "Live location could not be loaded."
+msgstr ""
+
+#: src/map/SearchControl.tsx:638
+msgid "Live location is not supported in this browser."
+msgstr ""
+
+#: src/map/SearchControl.tsx:914
+msgid "Loading results..."
+msgstr ""
+
+#: src/map/SearchControl.tsx:520
+msgid "Location access was denied."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1788
+msgid "Location assigned to collection."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1619
+msgid "Location coordinates updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1797
+msgid "Location could not be assigned to the collection."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:2013
+msgid "Location could not be created."
+msgstr ""
+
+#: src/admin/locations/DeleteLocationActionModal.tsx:50
+#: src/admin/locations/controller.tsx:1657
+msgid "Location could not be deleted."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1573
+msgid "Location could not be duplicated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1628
+msgid "Location could not be retrieved."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:2012
+msgid "Location could not be updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1649
+#: src/admin/locations/controller.tsx:1681
+msgid "Location deleted."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1565
+msgid "Location duplicated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:427
+msgid "Location hidden."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1769
+msgid "Location is already assigned to that collection."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:420
+msgid "Location is already hidden."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:423
+msgid "Location is already shown."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1119
+msgid "Location logos could not be updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1172
+msgid "Location markers could not be updated."
+msgstr ""
+
+#: src/map/SearchControl.tsx:532
+msgid "Location request timed out."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:428
+msgid "Location shown."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1225
+msgid "Location tags could not be updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:452
+msgid "Location visibility could not be updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:235
+msgid "Locations and collections could not be loaded."
+msgstr ""
+
+#: src/admin/locations/DeleteLocationActionModal.tsx:49
+#: src/admin/locations/controller.tsx:1693
+#: src/admin/locations/controller.tsx:1740
+msgid "Locations could not be deleted."
+msgstr ""
+
+#: src/admin/commands.ts:88 src/lib/locations/exportLocationsFile.ts:58
+msgid "Locations could not be exported."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1101
+msgid "Logo assigned to location."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:231
+msgid "Logo could not be deleted."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:307
+msgid "Logo could not be updated."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:223
+msgid "Logo deleted."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1393
+msgid "Logo removed from location."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:303
+msgid "Logo updated."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:371
+msgid "Logo uploaded."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:269
+msgid "Logos could not be deleted."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:926 src/admin/logos/controller.tsx:106
+msgid "Logos could not be loaded."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1406
+msgid "Logos could not be removed from the selected locations."
+msgstr ""
+
+#: src/admin/logos/controller.tsx:381
+msgid "Logos could not be uploaded."
+msgstr ""
+
+#: src/lib/locations/formatOpeningHoursSummary.ts:34
+#: src/lib/locations/formatOpeningHoursSummary.ts:39
+msgid "Lunch"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:101
+#: src/admin/locations/OpeningHoursInput.tsx:55
+msgid "Lunch break duration (minutes)"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:52
+#: src/admin/locations/OpeningHoursInput.tsx:91
+msgid "Lunch break start"
+msgstr ""
+
+#: src/lib/locations/validateOpeningHoursStep.ts:31
+msgid "Lunch breaks require opening hours for that day."
+msgstr ""
+
+#: src/admin/styles/constants.ts:16
+msgid "Major Road Casing"
+msgstr ""
+
+#: src/admin/styles/constants.ts:17
+msgid "Major Road Fill"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:14
+msgid ""
+"Manage every place you want to render on your maps and prepare it for future "
+"block integrations."
+msgstr ""
+
+#: src/map/attribution-pill.ts:43
+msgid "Map credits"
+msgstr ""
+
+#: src/admin/collections/CollectionsGrid.tsx:21
+#: src/admin/locations/LocationsTable.tsx:63
+msgid "Map preview"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1154
+msgid "Marker assigned to location."
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:303
+msgid "Marker color"
+msgstr ""
+
+#: src/admin/locations/MarkerColorModal.tsx:56
+msgid "Marker Color"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:795
+msgid "Marker color could not be updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:788
+msgid "Marker color updated."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:789
+msgid "Marker colors updated."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:240
+msgid "Marker could not be deleted."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:192 src/admin/markers/controller.tsx:330
+msgid "Marker could not be updated."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:232
+msgid "Marker deleted."
+msgstr ""
+
+#: src/admin/markers/MarkerLibraryModal.tsx:89
+#: src/admin/markers/controller.tsx:425
+msgid "Marker library"
+msgstr ""
+
+#: src/admin/markers/EditMarkerModal.tsx:102
+msgid "Marker preview"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1448
+msgid "Marker removed from location."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:188 src/admin/markers/controller.tsx:326
+msgid "Marker updated."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:380
+msgid "Marker uploaded."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:285
+msgid "Markers could not be deleted."
+msgstr ""
+
+#: src/admin/markers/MarkerLibraryModal.tsx:63
+msgid "Markers could not be installed."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:948 src/admin/markers/controller.tsx:84
+#: src/lib/markers/fetchAllMarkers.ts:35
+msgid "Markers could not be loaded."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1461
+msgid "Markers could not be removed from the selected locations."
+msgstr ""
+
+#: src/admin/markers/controller.tsx:392
+msgid "Markers could not be uploaded."
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:48
+#: src/admin/collections/controller.tsx:876
+msgid "Merge collections"
+msgstr ""
+
+#: src/block/edit.tsx:1141
+msgid "Minimal Map Preview"
+msgstr ""
+
+#: src/admin/index.tsx:94
+msgid "Minimal Map Sections"
+msgstr ""
+
+#: src/admin/commands.ts:26
+msgid "Minimal Map: %s"
+msgstr ""
+
+#: src/admin/styles/constants.ts:15
+msgid "Minor Roads"
+msgstr ""
+
+#: src/admin/styles/ColorControl.tsx:92
+msgid "Mixed"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:18
+#: src/lib/locations/formatOpeningHoursSummary.ts:10
+#: src/map/location-opening-hours.ts:34
+msgid "Mon"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:18
+#: src/map/location-opening-hours.ts:24
+msgid "Monday"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:296
+msgid "Most actioned: %s"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:438
+msgid "Most requested without a result: %s"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:421
+msgid "Most searched: %s"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:177
+msgid "Most selected: %s"
+msgstr ""
+
+#: src/admin/styles/constants.ts:18
+msgid "Motorway Casing"
+msgstr ""
+
+#: src/admin/styles/constants.ts:19
+msgid "Motorway Fill"
+msgstr ""
+
+#: src/map/SearchControl.tsx:190 src/map/wp-controls.ts:86
+msgid "My location"
+msgstr ""
+
+#: src/admin/tags/TagModal.tsx:43 src/admin/tags/TagsGrid.tsx:15
+msgid "Name"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:291
+msgid "Nearest store"
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:114
+msgid "New collection title"
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:169
+#: src/admin/locations/CustomCsvImportModal.tsx:189
+#: src/admin/locations/CustomCsvImportModal.tsx:241
+#: src/admin/locations/LocationModal.tsx:140
+msgid "Next"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:46
+msgid "No analytics data in this period yet"
+msgstr ""
+
+#: src/block/edit.tsx:778
+msgid "No collections available."
+msgstr ""
+
+#: src/admin/collections/CollectionsEmptyState.tsx:10
+msgid "No collections found"
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:87
+msgid "No custom marker assigned yet."
+msgstr ""
+
+#: src/admin/markers/EditMarkerModal.tsx:57
+msgid "No editable colors found in this SVG."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:439
+msgid "No failed searches in the selected period."
+msgstr ""
+
+#: src/admin/locations/LocationsEmptyState.tsx:10 src/map/SearchControl.tsx:924
+#: src/map/SearchControl.tsx:985
+msgid "No locations found"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:90
+msgid "No logo assigned yet."
+msgstr ""
+
+#: src/admin/logos/LogosEmptyState.tsx:10
+msgid "No logos found"
+msgstr ""
+
+#: src/admin/markers/MarkersEmptyState.tsx:10
+msgid "No markers found"
+msgstr ""
+
+#: src/admin/markers/MarkerLibraryModal.tsx:124
+msgid "No markers found."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:27
+msgid "No matching records found"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:422
+msgid "No repeated search terms yet."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:178
+msgid "No selected locations in this period yet."
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:69
+msgid "No tags assigned yet."
+msgstr ""
+
+#: src/admin/tags/TagsEmptyState.tsx:10
+msgid "No tags found"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:297
+msgid "No tracked actions in the selected period."
+msgstr ""
+
+#: src/admin/locations/CustomCsvImportModal.tsx:22
+#: src/admin/locations/CustomCsvImportModal.tsx:29
+#: src/admin/locations/customCsvImport.ts:41
+msgid "None"
+msgstr ""
+
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:49
+msgid ""
+"None of the selected locations have a custom marker assigned. Confirm to "
+"close this selection."
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:54
+msgid ""
+"None of the selected locations have a logo assigned. Confirm to close this "
+"selection."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1446
+msgid "None of the selected locations have custom markers assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1391
+msgid "None of the selected locations have logos assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1501
+msgid "None of the selected locations have tags assigned."
+msgstr ""
+
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:49
+msgid ""
+"None of the selected locations have tags assigned. Confirm to close this "
+"selection."
+msgstr ""
+
+#: src/admin/locations/AssignToCollectionModal.tsx:72
+msgid "Not assigned to any collection yet."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:233
+msgid "Note"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:42
+msgid "Off"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:41
+msgid "On"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsHeaderActions.tsx:63
+msgid "Only track if Complianz confirmed"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:49
+#: src/admin/locations/OpeningHoursInput.tsx:71 src/block/edit.tsx:518
+msgid "Open"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:380
+msgid "Open - closes %s"
+msgstr ""
+
+#: src/map/location-opening-hours.ts:376
+msgid "Open - closes soon %s"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:23
+msgid "Open analytics"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:25
+msgid "Open collections"
+msgstr ""
+
+#: src/map/location-card.tsx:464
+msgid "Open in Google Maps"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:24
+msgid "Open locations"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:26
+msgid "Open logos"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:27
+msgid "Open markers"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:29
+msgid "Open styles"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:28
+msgid "Open tags"
+msgstr ""
+
+#: src/map/SearchControl.tsx:725
+msgid "Opened"
+msgstr ""
+
+#: src/block/edit.tsx:1663
+msgid "Opening Hours"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1328
+msgid "Opening hours could not be updated."
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:122
+#: src/admin/locations/customCsvImport.ts:34
+msgid "Opening hours notes"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1310
+msgid "Opening hours updated."
+msgstr ""
+
+#: src/map/location-opening-hours.ts:390
+msgid "Opens soon - %s"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:18
+#: src/admin/locations/OpeningHoursInput.tsx:32
+msgid "Optional"
+msgstr ""
+
+#: src/admin/styles/constants.ts:49
+msgid "Other Features"
+msgstr ""
+
+#: src/block/edit.tsx:1436 src/block/edit.tsx:1499 src/block/edit.tsx:1594
+msgid "Outer Margin"
+msgstr ""
+
+#: src/block/edit.tsx:1422 src/block/edit.tsx:1580 src/block/edit.tsx:1642
+msgid "Padding"
+msgstr ""
+
+#: src/admin/styles/ApplyPaletteTemplateDropdown.tsx:39
+msgid "Palette Templates"
+msgstr ""
+
+#: src/block/edit.tsx:1547
+msgid "Panel Width"
+msgstr ""
+
+#: src/admin/styles/constants.ts:6
+msgid "Parks"
+msgstr ""
+
+#: src/admin/styles/constants.ts:14
+msgid "Pedestrian Paths"
+msgstr ""
+
+#: src/admin/styles/constants.ts:32
+msgid "Place Icons"
+msgstr ""
+
+#: src/admin/styles/constants.ts:31
+msgid "Place Label Halo"
+msgstr ""
+
+#: src/admin/styles/constants.ts:30
+msgid "Place Labels"
+msgstr ""
+
+#: src/admin/locations/SocialMediaStep.tsx:64
+msgid "Platform"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:62
+msgid "Plus"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:68
+msgid "Plus circle"
+msgstr ""
+
+#: src/admin/logos/controller.tsx:33
+msgid "PNG file could not be read."
+msgstr ""
+
+#: src/block/edit.tsx:1399
+msgid "Position"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:99
+msgid "Postal code"
+msgstr ""
+
+#: src/lib/locations/validateAddressStep.ts:17
+msgid "Postal code is required to geocode the address."
+msgstr ""
+
+#: src/map/SearchControl.tsx:903
+msgid "Press"
+msgstr ""
+
+#: src/admin/logos/LogosGrid.tsx:23 src/admin/markers/MarkersGrid.tsx:23
+#: src/admin/tags/TagsGrid.tsx:23
+msgid "Preview"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:22
+msgid "queries"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:200
+#: src/admin/analytics/AnalyticsTable.tsx:266
+msgid "Query"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:275
+msgid "Query type"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:452
+#: src/admin/analytics/AnalyticsCards.tsx:463
+msgid "Query type mix"
+msgstr ""
+
+#: src/admin/styles/constants.ts:20
+msgid "Railway Lines"
+msgstr ""
+
+#: src/admin/styles/constants.ts:21
+msgid "Railway Patterns"
+msgstr ""
+
+#: src/admin/locations/RemoveCollectionAssignmentModal.tsx:41
+#: src/admin/locations/RemoveCollectionAssignmentModal.tsx:47
+msgid "Remove collection"
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:44
+msgid "Remove Logo"
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:94
+#: src/admin/locations/LocationsTable.tsx:593
+msgid "Remove Logos"
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:58
+msgid ""
+"Remove logos from %d selected location? %d of them currently have a logo "
+"assigned."
+msgid_plural ""
+"Remove logos from %d selected locations? %d of them currently have a logo "
+"assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/LocationsTable.tsx:609
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:40
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:78
+msgid "Remove Markers"
+msgstr ""
+
+#: src/admin/locations/RemoveMarkerConfirmationModal.tsx:51
+msgid ""
+"Remove markers from %d selected location? %d of them currently have a custom "
+"marker assigned."
+msgid_plural ""
+"Remove markers from %d selected locations? %d of them currently have a "
+"custom marker assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/SocialMediaStep.tsx:91
+msgid "Remove platform"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:644
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:40
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:78
+msgid "Remove Tags"
+msgstr ""
+
+#: src/admin/locations/RemoveTagsConfirmationModal.tsx:51
+msgid ""
+"Remove tags from %d selected location? %d of them currently have tags "
+"assigned."
+msgid_plural ""
+"Remove tags from %d selected locations? %d of them currently have tags "
+"assigned."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:67
+msgid "Remove this logo from the selected location?"
+msgstr ""
+
+#: src/admin/markers/MarkersGrid.tsx:50
+msgid "Rename"
+msgstr ""
+
+#: src/admin/markers/RenameMarkerModal.tsx:16
+msgid "Rename marker"
+msgstr ""
+
+#: src/block/edit.tsx:1214
+msgid "Require Two Fingers to Move"
+msgstr ""
+
+#: src/admin/styles/constants.ts:7
+msgid "Residential Areas"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:473
+#: src/admin/analytics/AnalyticsCards.tsx:484
+msgid "Result distribution"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:283
+msgid "Results"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:390
+msgid "Retrieve location"
+msgstr ""
+
+#: src/admin/styles/constants.ts:11
+msgid "Rivers & Canals"
+msgstr ""
+
+#: src/admin/styles/constants.ts:28
+msgid "Road Label Halo"
+msgstr ""
+
+#: src/admin/styles/constants.ts:27
+msgid "Road Labels"
+msgstr ""
+
+#: src/admin/styles/constants.ts:45
+msgid "Roads & Transport"
+msgstr ""
+
+#: src/admin/styles/constants.ts:23
+msgid "Runway Lines"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:23
+#: src/lib/locations/formatOpeningHoursSummary.ts:15
+#: src/map/location-opening-hours.ts:39
+msgid "Sat"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:23
+#: src/map/location-opening-hours.ts:29
+msgid "Saturday"
+msgstr ""
+
+#: src/admin/collections/controller.tsx:925
+#: src/admin/locations/MarkerColorModal.tsx:79
+#: src/admin/locations/controller.tsx:2496 src/admin/logos/EditLogoModal.tsx:74
+#: src/admin/markers/EditMarkerModal.tsx:125
+#: src/admin/markers/RenameMarkerModal.tsx:74 src/admin/tags/controller.tsx:345
+msgid "Save changes"
+msgstr ""
+
+#: src/admin/collections/CollectionAssignmentModal.tsx:121
+msgid "Save locations"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:128
+msgid "Save Logo"
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:125
+msgid "Save Marker"
+msgstr ""
+
+#: src/admin/locations/AssignOpeningHoursModal.tsx:91
+msgid "Save Opening Hours"
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:115
+msgid "Save Tags"
+msgstr ""
+
+#: src/admin/styles/controller.tsx:361
+msgid "Save Theme"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:58
+msgid "Search"
+msgstr ""
+
+#: src/admin/analytics/ExportAnalyticsDropdown.tsx:43
+msgid "Search Data as CSV"
+msgstr ""
+
+#: src/admin/collections/CollectionAssignmentModal.tsx:72
+#: src/map/SearchControl.tsx:876
+msgid "Search locations"
+msgstr ""
+
+#: src/map/SearchControl.tsx:875
+msgid "Search locations..."
+msgstr ""
+
+#: src/admin/markers/MarkerLibraryModal.tsx:117
+msgid "Search markers"
+msgstr ""
+
+#: src/block/edit.tsx:1469
+msgid "Search Panel"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:137
+msgid "Search-to-selection conversion"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:372
+msgid "Searches returning at least one result."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:388
+msgid "Searches with no matching location."
+msgstr ""
+
+#: src/admin/styles/ColorControl.tsx:71
+msgid "Select %s color"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1985
+msgid "Select a location on the map before finishing."
+msgstr ""
+
+#: src/admin/styles/index.tsx:193 src/admin/styles/index.tsx:201
+msgid "Select all colors"
+msgstr ""
+
+#: src/admin/collections/MergeCollectionsModal.tsx:88
+msgid "Select at least two collections to merge into a new one."
+msgstr ""
+
+#: src/admin/collections/controller.tsx:696
+msgid "Select at least two collections to merge."
+msgstr ""
+
+#: src/admin/locations/AssignTagsModal.tsx:94
+msgid "Select only new tags to add. Existing tags stay assigned."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsRangeSelector.tsx:18
+msgid "Select period"
+msgstr ""
+
+#: src/block/edit.tsx:672
+msgid "Select style preset"
+msgstr ""
+
+#: src/admin/styles/ThemeSelector.tsx:15
+msgid "Select theme"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsRangeSelector.tsx:19
+msgid "Select time period"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1761
+msgid "Selected collection could not be found."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:53
+msgid "Selection"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:142
+msgid "Selection conversion trend"
+msgstr ""
+
+#: src/admin/analytics/ExportAnalyticsDropdown.tsx:52
+msgid "Selection Data as CSV"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:19
+msgid "selection events"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:153
+#: src/admin/analytics/AnalyticsCards.tsx:164
+msgid "Selection source mix"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:89
+msgid "Separator"
+msgstr ""
+
+#: src/admin/markers/EditMarkerModal.tsx:86
+msgid "Set a color"
+msgstr ""
+
+#: src/admin/locations/MarkerColorModal.tsx:45
+msgid "Set a new marker color for %d selected location."
+msgid_plural "Set a new marker color for %d selected locations."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/locations/LocationsTable.tsx:627
+msgid "Set Marker Color"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:628
+msgid "Set Marker Colors"
+msgstr ""
+
+#: src/admin/locations/AssignOpeningHoursModal.tsx:59
+msgid "Set opening hours for \"%s\"."
+msgstr ""
+
+#: src/admin/locations/AssignOpeningHoursModal.tsx:47
+msgid "Set opening hours for %d selected location."
+msgid_plural "Set opening hours for %d selected locations."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/markers/EditMarkerModal.tsx:87
+msgid "Set to none"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:19
+msgid ""
+"Shape the visual language of your maps with reusable themes and live preview "
+"adjustments."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:371
+msgid "Show"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:577
+msgid "Show all"
+msgstr ""
+
+#: src/block/edit.tsx:1655
+msgid "Show icon"
+msgstr ""
+
+#: src/admin/locations/ShowLocationConfirmationModal.tsx:37
+#: src/admin/locations/ShowLocationConfirmationModal.tsx:66
+msgid "Show location"
+msgstr ""
+
+#: src/admin/locations/ShowLocationConfirmationModal.tsx:45
+msgid "Show this location again?"
+msgstr ""
+
+#: src/block/edit.tsx:1191
+msgid "Show Zoom Controls"
+msgstr ""
+
+#: src/admin/collections/DeleteCollectionActionModal.tsx:109
+msgid "Skip shared locations"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:161
+msgid "Social Media"
+msgstr ""
+
+#: src/block/edit.tsx:530
+msgid "Soon"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:192
+#: src/admin/analytics/AnalyticsTable.tsx:238
+msgid "Source"
+msgstr ""
+
+#: src/admin/locations/LocationsEmptyState.tsx:11
+msgid ""
+"Start adding locations to your maps. You can add them manually or import "
+"them from a file."
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:113
+msgid "State"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:85
+#: src/lib/locations/importLocations.ts:298
+msgid "Street"
+msgstr ""
+
+#: src/lib/locations/validateAddressStep.ts:9
+msgid "Street is required to geocode the address."
+msgstr ""
+
+#: src/admin/styles/constants.ts:41
+msgid "Structures"
+msgstr ""
+
+#: src/block/edit.tsx:674
+msgid "Style Preset"
+msgstr ""
+
+#: src/block/edit.tsx:649
+msgid "Style Theme"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:370
+msgid "Success rate"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:375
+msgid "Success rate trend"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:24
+#: src/lib/locations/formatOpeningHoursSummary.ts:16
+#: src/map/location-opening-hours.ts:40
+msgid "Sun"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:24
+#: src/map/location-opening-hours.ts:30
+msgid "Sunday"
+msgstr ""
+
+#: src/block/edit.tsx:725
+msgid "Switch Collection"
+msgstr ""
+
+#: src/block/edit.tsx:673
+msgid "Switch Style Preset"
+msgstr ""
+
+#: src/admin/styles/ThemeSelector.tsx:16 src/block/edit.tsx:648
+msgid "Switch Theme"
+msgstr ""
+
+#: src/admin/tags/controller.tsx:209
+msgid "Tag could not be created."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:234
+msgid "Tag could not be deleted."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:208
+msgid "Tag could not be updated."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:201
+msgid "Tag created."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:226
+msgid "Tag deleted."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:178
+msgid "Tag name is required."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:200
+msgid "Tag updated."
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:62
+msgid "Tags (optional)"
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1207
+msgid "Tags added to location."
+msgstr ""
+
+#: src/admin/tags/controller.tsx:290
+msgid "Tags could not be deleted."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:970 src/admin/tags/controller.tsx:71
+msgid "Tags could not be loaded."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1516
+msgid "Tags could not be removed from the selected locations."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1503
+msgid "Tags removed from location."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:246
+msgid "Target"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:54
+#: src/admin/locations/SocialMediaStep.tsx:21
+#: src/lib/locations/importLocations.ts:297 src/map/location-card.tsx:158
+msgid "Telegram"
+msgstr ""
+
+#: src/admin/locations/LocationModalFields.tsx:42
+msgid "Telephone"
+msgstr ""
+
+#: src/admin/styles/ApplyPaletteTemplateDropdown.tsx:34
+msgid "Templates"
+msgstr ""
+
+#: src/admin/logos/EditLogoModal.tsx:49
+#: src/admin/markers/RenameMarkerModal.tsx:49
+msgid "The %s extension will be preserved."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:268
+msgid "The locations page size could not be saved."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1390
+msgid "The selected location already has no logo assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1445
+msgid "The selected location already has no marker assigned."
+msgstr ""
+
+#: src/admin/locations/controller.tsx:1500
+msgid "The selected location already has no tags assigned."
+msgstr ""
+
+#: src/block/edit.tsx:1312
+msgid ""
+"The snippet updates automatically when this block configuration changes."
+msgstr ""
+
+#: src/admin/styles/CreateThemeModal.tsx:46
+msgid "Theme Name"
+msgstr ""
+
+#: src/admin/locations/DeleteLogoConfirmationModal.tsx:55
+msgid "This location already has no logo assigned."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:52
+#: src/admin/locations/SocialMediaStep.tsx:19
+#: src/lib/locations/importLocations.ts:295 src/map/location-card.tsx:156
+msgid "Threads"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:21
+#: src/lib/locations/formatOpeningHoursSummary.ts:13
+#: src/map/location-opening-hours.ts:37
+msgid "Thu"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:21
+#: src/map/location-opening-hours.ts:27
+msgid "Thursday"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsTable.tsx:208
+#: src/admin/analytics/AnalyticsTable.tsx:254
+#: src/admin/analytics/AnalyticsTable.tsx:299
+msgid "Time"
+msgstr ""
+
+#: src/admin/collections/CollectionAssignmentModal.tsx:18
+#: src/admin/collections/CollectionModal.tsx:47
+#: src/admin/collections/CollectionsGrid.tsx:36
+#: src/admin/collections/MergeCollectionsModal.tsx:23
+#: src/admin/locations/LocationModalFields.tsx:36
+#: src/admin/locations/LocationsTable.tsx:117
+#: src/admin/markers/MarkersGrid.tsx:15
+#: src/lib/locations/importLocations.ts:288
+msgid "Title"
+msgstr ""
+
+#: src/map/SearchControl.tsx:904
+msgid "to load results"
+msgstr ""
+
+#: src/admin/analytics/constants.ts:20
+msgid "Today"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:54
+msgid "Top left"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:293
+#: src/admin/analytics/AnalyticsCards.tsx:300
+msgid "Top locations by actions"
+msgstr ""
+
+#: src/map/zoom-control-options.ts:55
+msgid "Top right"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:418
+#: src/admin/analytics/AnalyticsCards.tsx:425
+msgid "Top search terms"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:174
+#: src/admin/analytics/AnalyticsCards.tsx:181
+msgid "Top selected locations"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:435
+#: src/admin/analytics/AnalyticsCards.tsx:442
+msgid "Top zero-result searches"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:235
+msgid "Total actions"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:240
+msgid "Total actions trend"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:354
+msgid "Total searches"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:359
+msgid "Total searches trend"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:121
+msgid "Total selections"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:126
+msgid "Total selections trend"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:49
+msgid ""
+"Tracking is currently disabled, but historic analytics data will still "
+"appear here when available."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:28
+msgid "Try a different search term to inspect the stored %s."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsEmptyState.tsx:48
+msgid "Try a wider time period or wait for visitors to interact with the map."
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:19
+#: src/lib/locations/formatOpeningHoursSummary.ts:11
+#: src/map/location-opening-hours.ts:35
+msgid "Tue"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:19
+#: src/map/location-opening-hours.ts:25
+msgid "Tuesday"
+msgstr ""
+
+#: src/admin/styles/constants.ts:53
+msgid "Typography & Icons"
+msgstr ""
+
+#: src/admin/locations/AssignToCollectionModal.tsx:24
+msgid "Untitled collection"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:28
+#: src/admin/locations/CustomCsvImportModal.tsx:24
+#: src/admin/locations/LocationsTable.tsx:422
+msgid "Untitled logo"
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:28
+#: src/admin/locations/CustomCsvImportModal.tsx:31
+#: src/admin/locations/LocationsTable.tsx:464
+msgid "Untitled marker"
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:521
+msgid "Untitled tag"
+msgstr ""
+
+#: src/admin/logos/LogosEmptyState.tsx:16
+#: src/admin/markers/MarkersEmptyState.tsx:13
+msgid "Upload"
+msgstr ""
+
+#: src/admin/locations/AssignLogoModal.tsx:104
+msgid "Upload a logo first to assign one to these locations."
+msgstr ""
+
+#: src/admin/locations/AssignMarkerModal.tsx:100
+msgid "Upload a marker first to assign one to these locations."
+msgstr ""
+
+#: src/admin/logos/UploadLogoButton.tsx:14
+msgid "Upload Logos"
+msgstr ""
+
+#: src/admin/markers/UploadMarkerButton.tsx:14
+msgid "Upload Markers"
+msgstr ""
+
+#: src/admin/sections/DashboardSection.tsx:16
+msgid ""
+"Upload reusable SVG logos and assign them across multiple locations without "
+"duplicating assets."
+msgstr ""
+
+#: src/admin/logos/LogosEmptyState.tsx:11
+msgid ""
+"Upload SVG or PNG logos to reuse the same brand asset across multiple "
+"locations. Drag and drop files here or use the upload button."
+msgstr ""
+
+#: src/admin/styles/ImportThemeButton.tsx:12
+msgid "Upload Theme File"
+msgstr ""
+
+#: src/admin/markers/MarkersEmptyState.tsx:11
+msgid ""
+"Upload your custom SVG markers to personalize your maps. Simply drag and "
+"drop your files here or use the button below."
+msgstr ""
+
+#: src/admin/locations/SocialMediaStep.tsx:77
+msgid "URL"
+msgstr ""
+
+#: src/admin/styles/constants.ts:26
+msgid "Water Label Halo"
+msgstr ""
+
+#: src/admin/styles/constants.ts:25
+msgid "Water Labels"
+msgstr ""
+
+#: src/admin/styles/constants.ts:10
+msgid "Water Surfaces"
+msgstr ""
+
+#: src/admin/locations/customCsvImport.ts:20
+#: src/lib/locations/formatOpeningHoursSummary.ts:12
+#: src/map/location-opening-hours.ts:36
+msgid "Wed"
+msgstr ""
+
+#: src/admin/locations/OpeningHoursInput.tsx:20
+#: src/map/location-opening-hours.ts:26
+msgid "Wednesday"
+msgstr ""
+
+#: src/block/edit.tsx:1205
+msgid "When enabled, one can zoom the map using two fingers on mobile devices."
+msgstr ""
+
+#: src/block/edit.tsx:1215
+msgid ""
+"When enabled, one finger scrolls the page, while two fingers are required to "
+"move the map."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:280
+msgid "Where follow-up actions happen most often."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:161
+msgid "Where people choose locations from."
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:259
+msgid "Which follow-up actions visitors use most."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:50
+#: src/admin/locations/SocialMediaStep.tsx:17
+#: src/lib/locations/importLocations.ts:293 src/map/location-card.tsx:154
+msgid "X"
+msgstr ""
+
+#: src/admin/analytics/constants.ts:21
+msgid "Yesterday"
+msgstr ""
+
+#: src/admin/analytics/EnableAnalyticsModal.tsx:25
+msgid "You may need to update your privacy terms before turning this on."
+msgstr ""
+
+#: src/admin/locations/LocationsTable.tsx:53
+#: src/admin/locations/SocialMediaStep.tsx:20
+#: src/lib/locations/importLocations.ts:296 src/map/location-card.tsx:157
+msgid "YouTube"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:386
+msgid "Zero-result searches"
+msgstr ""
+
+#: src/admin/analytics/AnalyticsCards.tsx:391
+msgid "Zero-result searches trend"
+msgstr ""
+
+#: src/lib/locations/importLocations.ts:301
+msgid "Zip code"
+msgstr ""
+
+#: src/block/edit.tsx:1379
+msgid "Zoom Controls"
+msgstr ""
+
+#: src/map/wp-controls.ts:72
+msgid "Zoom in"
+msgstr ""
+
+#: src/block/edit.tsx:1181
+msgid "Zoom Level"
+msgstr ""
+
+#: src/map/wp-controls.ts:78
+msgid "Zoom out"
+msgstr ""

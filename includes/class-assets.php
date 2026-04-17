@@ -146,7 +146,7 @@ class Assets {
 			true
 		);
 
-		wp_set_script_translations( $handle, 'minimal-map', MINIMAL_MAP_PATH . 'languages' );
+		wp_set_script_translations( $handle, 'minimal-map-net', MINIMAL_MAP_PATH . 'languages' );
 	}
 
 	/**

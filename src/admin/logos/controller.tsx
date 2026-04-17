@@ -27,10 +27,10 @@ async function readLogoFile(file: File): Promise<string> {
 					return;
 				}
 
-				reject(new Error(__('Invalid PNG file.', 'minimal-map')));
+				reject(new Error(__('Invalid PNG file.', 'minimal-map-net')));
 			};
 			reader.onerror = () => {
-				reject(new Error(__('PNG file could not be read.', 'minimal-map')));
+				reject(new Error(__('PNG file could not be read.', 'minimal-map-net')));
 			};
 			reader.readAsDataURL(file);
 		});
@@ -39,7 +39,7 @@ async function readLogoFile(file: File): Promise<string> {
 	const content = await file.text();
 
 	if (!content.includes('<svg')) {
-		throw new Error(__('Invalid SVG file.', 'minimal-map'));
+		throw new Error(__('Invalid SVG file.', 'minimal-map-net'));
 	}
 
 	return content;
@@ -103,7 +103,7 @@ export function useLogosController(
 			setTotalItems(result.totalItems);
 		} catch (error) {
 			setLoadError(
-				error instanceof Error ? error.message : __('Logos could not be loaded.', 'minimal-map')
+				error instanceof Error ? error.message : __('Logos could not be loaded.', 'minimal-map-net')
 			);
 		} finally {
 			setLoading(false);
@@ -220,7 +220,7 @@ export function useLogosController(
 			await loadLogos();
 			setActionNotice({
 				status: 'success',
-				message: __('Logo deleted.', 'minimal-map'),
+				message: __('Logo deleted.', 'minimal-map-net'),
 			});
 			setDeleteModalOpen(false);
 			setSelectedLogo(null);
@@ -228,7 +228,7 @@ export function useLogosController(
 			setActionNotice({
 				status: 'error',
 				message:
-					error instanceof Error ? error.message : __('Logo could not be deleted.', 'minimal-map'),
+					error instanceof Error ? error.message : __('Logo could not be deleted.', 'minimal-map-net'),
 			});
 		} finally {
 			setRowActionPending(false);
@@ -258,7 +258,7 @@ export function useLogosController(
 			setActionNotice({
 				status: 'success',
 				message: sprintf(
-					_n('%d logo deleted.', '%d logos deleted.', allLogos.length, 'minimal-map'),
+					_n('%d logo deleted.', '%d logos deleted.', allLogos.length, 'minimal-map-net'),
 					allLogos.length
 				),
 			});
@@ -266,7 +266,7 @@ export function useLogosController(
 			setActionNotice({
 				status: 'error',
 				message:
-					error instanceof Error ? error.message : __('Logos could not be deleted.', 'minimal-map'),
+					error instanceof Error ? error.message : __('Logos could not be deleted.', 'minimal-map-net'),
 			});
 			throw error;
 		} finally {
@@ -281,7 +281,7 @@ export function useLogosController(
 		}
 
 		if (!hasFilenameBasename(editFilenameBasename)) {
-			setSubmitError(__('Filename is required.', 'minimal-map'));
+			setSubmitError(__('Filename is required.', 'minimal-map-net'));
 			return;
 		}
 
@@ -300,11 +300,11 @@ export function useLogosController(
 			resetEditModalState();
 			setActionNotice({
 				status: 'success',
-				message: __('Logo updated.', 'minimal-map'),
+				message: __('Logo updated.', 'minimal-map-net'),
 			});
 		} catch (error) {
 			setSubmitError(
-				error instanceof Error ? error.message : __('Logo could not be updated.', 'minimal-map')
+				error instanceof Error ? error.message : __('Logo could not be updated.', 'minimal-map-net')
 			);
 		} finally {
 			setSubmitting(false);
@@ -368,9 +368,9 @@ export function useLogosController(
 					status: 'success',
 					message:
 						fileList.length === 1
-							? __('Logo uploaded.', 'minimal-map')
+							? __('Logo uploaded.', 'minimal-map-net')
 							: sprintf(
-								_n( '%d logo uploaded.', '%d logos uploaded.', fileList.length, 'minimal-map' ),
+								_n( '%d logo uploaded.', '%d logos uploaded.', fileList.length, 'minimal-map-net' ),
 								fileList.length
 							),
 				});
@@ -378,7 +378,7 @@ export function useLogosController(
 				setActionNotice({
 					status: 'error',
 					message:
-						error instanceof Error ? error.message : __('Logos could not be uploaded.', 'minimal-map'),
+						error instanceof Error ? error.message : __('Logos could not be uploaded.', 'minimal-map-net'),
 				});
 			} finally {
 				setUploading(false);
@@ -403,7 +403,7 @@ export function useLogosController(
 				<Button
 					variant="tertiary"
 					icon={<BrushCleaning size={18} strokeWidth={2} />}
-					label={__('Delete all logos', 'minimal-map')}
+					label={__('Delete all logos', 'minimal-map-net')}
 					onClick={onOpenDeleteAllLogosModal}
 					disabled={totalItems === 0 || isDeletingAllLogos || isRowActionPending || isUploading}
 					__next40pxDefaultSize

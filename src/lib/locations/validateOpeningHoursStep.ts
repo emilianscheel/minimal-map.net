@@ -18,27 +18,27 @@ export function validateOpeningHoursStep(form: LocationFormState): FieldErrors {
 		const hasLunchDuration = day.lunch_duration_minutes > 0;
 
 		if ((hasOpen && !hasClose) || (!hasOpen && hasClose)) {
-			dayErrors[dayKey] = __('Enter both opening and closing times.', 'minimal-map');
+			dayErrors[dayKey] = __('Enter both opening and closing times.', 'minimal-map-net');
 			continue;
 		}
 
 		if ((hasOpen && !isValidOpeningHoursTime(day.open)) || (hasClose && !isValidOpeningHoursTime(day.close))) {
-			dayErrors[dayKey] = __('Enter valid opening hours in HH:MM format.', 'minimal-map');
+			dayErrors[dayKey] = __('Enter valid opening hours in HH:MM format.', 'minimal-map-net');
 			continue;
 		}
 
 		if (!hasOpeningHoursForDay(day) && hasLunchBreakForDay(day)) {
-			dayErrors[dayKey] = __('Lunch breaks require opening hours for that day.', 'minimal-map');
+			dayErrors[dayKey] = __('Lunch breaks require opening hours for that day.', 'minimal-map-net');
 			continue;
 		}
 
 		if ((hasLunchStart && !hasLunchDuration) || (!hasLunchStart && hasLunchDuration)) {
-			dayErrors[dayKey] = __('Enter both lunch break start time and duration.', 'minimal-map');
+			dayErrors[dayKey] = __('Enter both lunch break start time and duration.', 'minimal-map-net');
 			continue;
 		}
 
 		if (hasLunchStart && !isValidOpeningHoursTime(day.lunch_start)) {
-			dayErrors[dayKey] = __('Enter a valid lunch break start time in HH:MM format.', 'minimal-map');
+			dayErrors[dayKey] = __('Enter a valid lunch break start time in HH:MM format.', 'minimal-map-net');
 		}
 	}
 

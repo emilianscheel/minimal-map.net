@@ -12,7 +12,7 @@ export default function LogosGrid({ controller }: { controller: LogosController 
 		() => [
 			{
 				id: 'title',
-				label: __('Filename', 'minimal-map'),
+				label: __('Filename', 'minimal-map-net'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
@@ -20,7 +20,7 @@ export default function LogosGrid({ controller }: { controller: LogosController 
 			},
 			{
 				id: 'logo_preview',
-				label: __('Preview', 'minimal-map'),
+				label: __('Preview', 'minimal-map-net'),
 				type: 'media',
 				enableHiding: false,
 				enableSorting: false,
@@ -39,7 +39,7 @@ export default function LogosGrid({ controller }: { controller: LogosController 
 		() => [
 			{
 				id: 'download',
-				label: __('Download', 'minimal-map'),
+				label: __('Download', 'minimal-map-net'),
 				icon: <Download size={18} />,
 				context: 'single',
 				supportsBulk: false,
@@ -52,7 +52,7 @@ export default function LogosGrid({ controller }: { controller: LogosController 
 			},
 			{
 				id: 'edit',
-				label: __('Edit', 'minimal-map'),
+				label: __('Edit', 'minimal-map-net'),
 				icon: <Pencil size={18} />,
 				context: 'single',
 				supportsBulk: false,
@@ -65,7 +65,7 @@ export default function LogosGrid({ controller }: { controller: LogosController 
 			},
 			{
 				id: 'delete',
-				label: __('Delete', 'minimal-map'),
+				label: __('Delete', 'minimal-map-net'),
 				icon: <Trash2 size={18} />,
 				context: 'single',
 				supportsBulk: false,

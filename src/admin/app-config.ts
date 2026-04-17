@@ -93,8 +93,8 @@ export function getActiveSection(
 ): AdminSection {
 	return sectionMap[currentView] ?? sectionMap.dashboard ?? {
 		view: 'dashboard',
-		title: __('Dashboard', 'minimal-map'),
-		description: __('An overview of Minimal Map sections and upcoming data tools.', 'minimal-map'),
+		title: __('Dashboard', 'minimal-map-net'),
+		description: __('An overview of Minimal Map sections and upcoming data tools.', 'minimal-map-net'),
 		url: '#',
 	};
 }

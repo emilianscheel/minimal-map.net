@@ -182,7 +182,7 @@ export default function StylesView({
         }}
         label={__(
           "Drop Minimal Map or MapLibre JSON theme files here to upload",
-          "minimal-map",
+          "minimal-map-net",
         )}
       />
       <div className="minimal-map-styles__layout">
@@ -190,7 +190,7 @@ export default function StylesView({
           <Card className="minimal-map-styles__group-card">
             <CardBody>
               <ColorControl
-                label={__("Select all colors", "minimal-map")}
+                label={__("Select all colors", "minimal-map-net")}
                 color={multiEditColor}
                 mixed={hasSelectedSlots && hasMixedSelectedColors}
                 mixedGradient={mixedSelectedGradient}
@@ -198,7 +198,7 @@ export default function StylesView({
                 showCheckbox
                 checked={allSlotsSelected}
                 indeterminate={hasSelectedSlots && !allSlotsSelected}
-                checkboxLabel={__("Select all colors", "minimal-map")}
+                checkboxLabel={__("Select all colors", "minimal-map-net")}
                 onCheckedChange={(checked) =>
                   setSelectedSlots(checked ? ALL_COLOR_SLOTS : [])
                 }

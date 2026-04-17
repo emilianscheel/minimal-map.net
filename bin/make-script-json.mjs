@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const languagesDir = path.resolve("languages");
+const textDomain = "minimal-map-net";
 const handles = [
   "minimal-map-block-editor",
   "minimal-map-admin",
@@ -11,12 +12,18 @@ const handles = [
 ];
 
 for (const entry of fs.readdirSync(languagesDir, { withFileTypes: true })) {
-  if (!entry.isFile() || !entry.name.endsWith(".po")) {
+  if (
+    !entry.isFile() ||
+    !entry.name.startsWith(`${textDomain}-`) ||
+    !entry.name.endsWith(".po")
+  ) {
     continue;
   }
 
   const poPath = path.join(languagesDir, entry.name);
-  const locale = entry.name.replace(/^minimal-map-/, "").replace(/\.po$/, "");
+  const locale = entry.name
+    .replace(new RegExp(`^${textDomain}-`), "")
+    .replace(/\.po$/, "");
   const messages = extractJsMessages(poPath);
 
   const payload = JSON.stringify({
@@ -42,7 +49,7 @@ for (const entry of fs.readdirSync(languagesDir, { withFileTypes: true })) {
   for (const handle of handles) {
     const outputPath = path.join(
       languagesDir,
-      `minimal-map-${locale}-${handle}.json`,
+      `${textDomain}-${locale}-${handle}.json`,
     );
     fs.writeFileSync(outputPath, `${payload}\n`);
     console.log(`Wrote ${path.relative(process.cwd(), outputPath)}`);

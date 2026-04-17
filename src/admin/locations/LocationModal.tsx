@@ -106,7 +106,7 @@ export default function LocationModal({ controller }: { controller: LocationsCon
 								icon={<ArrowLeft size={18} strokeWidth={2} />}
 								iconPosition="left"
 							>
-								{__('Back', 'minimal-map')}
+								{__('Back', 'minimal-map-net')}
 							</Button>
 						) : null}
 					</div>
@@ -118,7 +118,7 @@ export default function LocationModal({ controller }: { controller: LocationsCon
 							disabled={controller.isSubmitting || controller.isGeocoding}
 							data-minimal-map-dialog-ignore-enter="true"
 						>
-							{__('Cancel', 'minimal-map')}
+							{__('Cancel', 'minimal-map-net')}
 						</Button>
 						<Button
 							__next40pxDefaultSize
@@ -137,7 +137,7 @@ export default function LocationModal({ controller }: { controller: LocationsCon
 								<span>
 									{controller.step === 'map'
 										? controller.submitLabel
-										: __('Next', 'minimal-map')}
+										: __('Next', 'minimal-map-net')}
 								</span>
 								<Kbd variant="blue">Enter</Kbd>
 							</span>

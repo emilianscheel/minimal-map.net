@@ -49,8 +49,8 @@ class Tag_Taxonomy {
 			array( 'minimal_map_location' ),
 			array(
 				'labels'            => array(
-					'name'          => __( 'Tags', 'minimal-map' ),
-					'singular_name' => __( 'Tag', 'minimal-map' ),
+					'name'          => __( 'Tags', 'minimal-map-net' ),
+					'singular_name' => __( 'Tag', 'minimal-map-net' ),
 				),
 				'public'            => false,
 				'show_ui'           => false,

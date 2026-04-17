@@ -36,36 +36,36 @@ class Admin_Menu {
 	public static function get_sections() {
 		return array(
 			'dashboard'  => array(
-				'title'       => __( 'Dashboard', 'minimal-map' ),
-				'description' => __( 'An overview of Minimal Map sections and upcoming data tools.', 'minimal-map' ),
+				'title'       => __( 'Dashboard', 'minimal-map-net' ),
+				'description' => __( 'An overview of Minimal Map sections and upcoming data tools.', 'minimal-map-net' ),
 			),
 			'analytics'  => array(
-				'title'       => __( 'Analytics', 'minimal-map' ),
-				'description' => __( 'Review map search demand and identify where people are looking for locations.', 'minimal-map' ),
+				'title'       => __( 'Analytics', 'minimal-map-net' ),
+				'description' => __( 'Review map search demand and identify where people are looking for locations.', 'minimal-map-net' ),
 			),
 			'locations'  => array(
-				'title'       => __( 'Locations', 'minimal-map' ),
-				'description' => __( 'Create and organize the places you want to render on your maps.', 'minimal-map' ),
+				'title'       => __( 'Locations', 'minimal-map-net' ),
+				'description' => __( 'Create and organize the places you want to render on your maps.', 'minimal-map-net' ),
 			),
 			'collections' => array(
-				'title'       => __( 'Collections', 'minimal-map' ),
-				'description' => __( 'Assemble reusable groups of locations and manage their map-ready assignments.', 'minimal-map' ),
+				'title'       => __( 'Collections', 'minimal-map-net' ),
+				'description' => __( 'Assemble reusable groups of locations and manage their map-ready assignments.', 'minimal-map-net' ),
 			),
 			'tags'       => array(
-				'title'       => __( 'Tags', 'minimal-map' ),
-				'description' => __( 'Apply lightweight labels to keep map content easy to organize.', 'minimal-map' ),
+				'title'       => __( 'Tags', 'minimal-map-net' ),
+				'description' => __( 'Apply lightweight labels to keep map content easy to organize.', 'minimal-map-net' ),
 			),
 			'logos'      => array(
-				'title'       => __( 'Logos', 'minimal-map' ),
-				'description' => __( 'Upload SVG logos and assign them across multiple locations.', 'minimal-map' ),
+				'title'       => __( 'Logos', 'minimal-map-net' ),
+				'description' => __( 'Upload SVG logos and assign them across multiple locations.', 'minimal-map-net' ),
 			),
 			'markers'    => array(
-				'title'       => __( 'Markers', 'minimal-map' ),
-				'description' => __( 'Define the marker styles and visual pin variants used across maps.', 'minimal-map' ),
+				'title'       => __( 'Markers', 'minimal-map-net' ),
+				'description' => __( 'Define the marker styles and visual pin variants used across maps.', 'minimal-map-net' ),
 			),
 			'styles'     => array(
-				'title'       => __( 'Styles', 'minimal-map' ),
-				'description' => __( 'Manage the map styles and presets available inside the block editor.', 'minimal-map' ),
+				'title'       => __( 'Styles', 'minimal-map-net' ),
+				'description' => __( 'Manage the map styles and presets available inside the block editor.', 'minimal-map-net' ),
 			),
 		);
 	}
@@ -76,6 +76,7 @@ class Admin_Menu {
 	 * @return string
 	 */
 	public static function get_current_view() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin navigation state.
 		$view     = isset( $_GET['view'] ) ? sanitize_key( wp_unslash( $_GET['view'] ) ) : self::DEFAULT_VIEW;
 		$sections = self::get_sections();
 
@@ -109,8 +110,8 @@ class Admin_Menu {
 	 */
 	public function register() {
 		add_menu_page(
-			__( 'Minimal Map', 'minimal-map' ),
-			__( 'Minimal Map', 'minimal-map' ),
+			__( 'Minimal Map', 'minimal-map-net' ),
+			__( 'Minimal Map', 'minimal-map-net' ),
 			self::CAPABILITY,
 			self::TOP_LEVEL_SLUG,
 			array( $this, 'render_page' ),

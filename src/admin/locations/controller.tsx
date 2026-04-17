@@ -232,7 +232,7 @@ export function useLocationsController(
 			setLoadError(
 				error instanceof Error
 					? error.message
-					: __('Locations and collections could not be loaded.', 'minimal-map')
+					: __('Locations and collections could not be loaded.', 'minimal-map-net')
 			);
 		} finally {
 			setLoading(false);
@@ -265,7 +265,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('The locations page size could not be saved.', 'minimal-map'),
+							: __('The locations page size could not be saved.', 'minimal-map-net'),
 				});
 			}
 		},
@@ -417,28 +417,28 @@ export function useLocationsController(
 						affectedLocations.length === 0
 							? isHidden
 								? selectedLocations.length === 1
-									? __('Location is already hidden.', 'minimal-map')
-									: __('All selected locations are already hidden.', 'minimal-map')
+									? __('Location is already hidden.', 'minimal-map-net')
+									: __('All selected locations are already hidden.', 'minimal-map-net')
 								: selectedLocations.length === 1
-									? __('Location is already shown.', 'minimal-map')
-									: __('All selected locations are already shown.', 'minimal-map')
+									? __('Location is already shown.', 'minimal-map-net')
+									: __('All selected locations are already shown.', 'minimal-map-net')
 							: affectedLocations.length === 1
 								? isHidden
-									? __('Location hidden.', 'minimal-map')
-									: __('Location shown.', 'minimal-map')
+									? __('Location hidden.', 'minimal-map-net')
+									: __('Location shown.', 'minimal-map-net')
 								: sprintf(
 									isHidden
 										? _n(
 											'%d location hidden.',
 											'%d locations hidden.',
 											affectedLocations.length,
-											'minimal-map'
+											'minimal-map-net'
 										)
 										: _n(
 											'%d location shown.',
 											'%d locations shown.',
 											affectedLocations.length,
-											'minimal-map'
+											'minimal-map-net'
 										),
 									affectedLocations.length
 								),
@@ -449,7 +449,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Location visibility could not be updated.', 'minimal-map'),
+							: __('Location visibility could not be updated.', 'minimal-map-net'),
 				});
 				throw error;
 			} finally {
@@ -785,14 +785,14 @@ export function useLocationsController(
 				status: 'success',
 				message:
 					selectedMarkerColorLocations.length === 1
-						? __('Marker color updated.', 'minimal-map')
-						: __('Marker colors updated.', 'minimal-map'),
+						? __('Marker color updated.', 'minimal-map-net')
+						: __('Marker colors updated.', 'minimal-map-net'),
 			});
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error
 					? error.message
-					: __('Marker color could not be updated.', 'minimal-map')
+					: __('Marker color could not be updated.', 'minimal-map-net')
 			);
 		} finally {
 			setSubmitting(false);
@@ -901,7 +901,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Collections could not be loaded.', 'minimal-map'),
+						: __('Collections could not be loaded.', 'minimal-map-net'),
 			});
 		});
 
@@ -923,7 +923,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Logos could not be loaded.', 'minimal-map'),
+						: __('Logos could not be loaded.', 'minimal-map-net'),
 			});
 		});
 
@@ -945,7 +945,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Markers could not be loaded.', 'minimal-map'),
+						: __('Markers could not be loaded.', 'minimal-map-net'),
 			});
 		});
 
@@ -967,7 +967,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Tags could not be loaded.', 'minimal-map'),
+						: __('Tags could not be loaded.', 'minimal-map-net'),
 			});
 		});
 
@@ -1098,13 +1098,13 @@ export function useLocationsController(
 					status: 'success',
 					message:
 						targetLocations.length === 1
-							? __('Logo assigned to location.', 'minimal-map')
+							? __('Logo assigned to location.', 'minimal-map-net')
 							: sprintf(
 								_n(
 									'%d location updated with a logo.',
 									'%d locations updated with a logo.',
 									targetLocations.length,
-									'minimal-map'
+									'minimal-map-net'
 								),
 								targetLocations.length
 							),
@@ -1116,7 +1116,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Location logos could not be updated.', 'minimal-map'),
+							: __('Location logos could not be updated.', 'minimal-map-net'),
 				});
 			} finally {
 				setAssignmentSaving(false);
@@ -1151,13 +1151,13 @@ export function useLocationsController(
 					status: 'success',
 					message:
 						targetLocations.length === 1
-							? __('Marker assigned to location.', 'minimal-map')
+							? __('Marker assigned to location.', 'minimal-map-net')
 							: sprintf(
 								_n(
 									'%d location updated with a marker.',
 									'%d locations updated with a marker.',
 									targetLocations.length,
-									'minimal-map'
+									'minimal-map-net'
 								),
 								targetLocations.length
 							),
@@ -1169,7 +1169,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Location markers could not be updated.', 'minimal-map'),
+							: __('Location markers could not be updated.', 'minimal-map-net'),
 				});
 			} finally {
 				setAssignmentSaving(false);
@@ -1204,13 +1204,13 @@ export function useLocationsController(
 					status: 'success',
 					message:
 						targetLocations.length === 1
-							? __('Tags added to location.', 'minimal-map')
+							? __('Tags added to location.', 'minimal-map-net')
 							: sprintf(
 								_n(
 									'%d location updated with new tags.',
 									'%d locations updated with new tags.',
 									targetLocations.length,
-									'minimal-map'
+									'minimal-map-net'
 								),
 								targetLocations.length
 							),
@@ -1222,7 +1222,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Location tags could not be updated.', 'minimal-map'),
+							: __('Location tags could not be updated.', 'minimal-map-net'),
 				});
 			} finally {
 				setAssignmentSaving(false);
@@ -1307,13 +1307,13 @@ export function useLocationsController(
 				status: 'success',
 				message:
 					selectedOpeningHoursLocations.length === 1
-						? __('Opening hours updated.', 'minimal-map')
+						? __('Opening hours updated.', 'minimal-map-net')
 						: sprintf(
 								_n(
 									'%d location updated with new opening hours.',
 									'%d locations updated with new opening hours.',
 									selectedOpeningHoursLocations.length,
-									'minimal-map'
+									'minimal-map-net'
 								),
 								selectedOpeningHoursLocations.length
 						  ),
@@ -1325,7 +1325,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Opening hours could not be updated.', 'minimal-map'),
+						: __('Opening hours could not be updated.', 'minimal-map-net'),
 			});
 		} finally {
 			setAssignmentSaving(false);
@@ -1387,12 +1387,12 @@ export function useLocationsController(
 				message:
 					affectedLocations.length === 0
 						? selectedLogoRemovalLocations.length === 1
-							? __('The selected location already has no logo assigned.', 'minimal-map')
-							: __('None of the selected locations have logos assigned.', 'minimal-map')
+							? __('The selected location already has no logo assigned.', 'minimal-map-net')
+							: __('None of the selected locations have logos assigned.', 'minimal-map-net')
 						: affectedLocations.length === 1
-							? __('Logo removed from location.', 'minimal-map')
+							? __('Logo removed from location.', 'minimal-map-net')
 							: sprintf(
-								_n('%d location cleared of its logo.', '%d locations cleared of their logos.', affectedLocations.length, 'minimal-map'),
+								_n('%d location cleared of its logo.', '%d locations cleared of their logos.', affectedLocations.length, 'minimal-map-net'),
 								affectedLocations.length
 							),
 			});
@@ -1403,7 +1403,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Logos could not be removed from the selected locations.', 'minimal-map'),
+						: __('Logos could not be removed from the selected locations.', 'minimal-map-net'),
 			});
 		} finally {
 			setAssignmentSaving(false);
@@ -1442,12 +1442,12 @@ export function useLocationsController(
 				message:
 					affectedLocations.length === 0
 						? selectedMarkerRemovalLocations.length === 1
-							? __('The selected location already has no marker assigned.', 'minimal-map')
-							: __('None of the selected locations have custom markers assigned.', 'minimal-map')
+							? __('The selected location already has no marker assigned.', 'minimal-map-net')
+							: __('None of the selected locations have custom markers assigned.', 'minimal-map-net')
 						: affectedLocations.length === 1
-							? __('Marker removed from location.', 'minimal-map')
+							? __('Marker removed from location.', 'minimal-map-net')
 							: sprintf(
-								_n('%d location cleared of its marker.', '%d locations cleared of their markers.', affectedLocations.length, 'minimal-map'),
+								_n('%d location cleared of its marker.', '%d locations cleared of their markers.', affectedLocations.length, 'minimal-map-net'),
 								affectedLocations.length
 							),
 			});
@@ -1458,7 +1458,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Markers could not be removed from the selected locations.', 'minimal-map'),
+						: __('Markers could not be removed from the selected locations.', 'minimal-map-net'),
 			});
 		} finally {
 			setAssignmentSaving(false);
@@ -1497,12 +1497,12 @@ export function useLocationsController(
 				message:
 					affectedLocations.length === 0
 						? selectedTagRemovalLocations.length === 1
-							? __('The selected location already has no tags assigned.', 'minimal-map')
-							: __('None of the selected locations have tags assigned.', 'minimal-map')
+							? __('The selected location already has no tags assigned.', 'minimal-map-net')
+							: __('None of the selected locations have tags assigned.', 'minimal-map-net')
 						: affectedLocations.length === 1
-							? __('Tags removed from location.', 'minimal-map')
+							? __('Tags removed from location.', 'minimal-map-net')
 							: sprintf(
-								_n('%d location cleared of its tags.', '%d locations cleared of their tags.', affectedLocations.length, 'minimal-map'),
+								_n('%d location cleared of its tags.', '%d locations cleared of their tags.', affectedLocations.length, 'minimal-map-net'),
 								affectedLocations.length
 							),
 			});
@@ -1513,7 +1513,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Tags could not be removed from the selected locations.', 'minimal-map'),
+						: __('Tags could not be removed from the selected locations.', 'minimal-map-net'),
 			});
 		} finally {
 			setAssignmentSaving(false);
@@ -1562,7 +1562,7 @@ export function useLocationsController(
 				await loadLocations();
 				setActionNotice({
 					status: 'success',
-					message: __('Location duplicated.', 'minimal-map'),
+					message: __('Location duplicated.', 'minimal-map-net'),
 				});
 			} catch (error) {
 				setActionNotice({
@@ -1570,7 +1570,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Location could not be duplicated.', 'minimal-map'),
+							: __('Location could not be duplicated.', 'minimal-map-net'),
 				});
 				throw error;
 			} finally {
@@ -1616,7 +1616,7 @@ export function useLocationsController(
 				await loadLocations();
 				setActionNotice({
 					status: 'success',
-					message: __('Location coordinates updated.', 'minimal-map'),
+					message: __('Location coordinates updated.', 'minimal-map-net'),
 				});
 			} catch (error) {
 				if (!(error instanceof Error && error.message === validationMessage)) {
@@ -1625,7 +1625,7 @@ export function useLocationsController(
 						message:
 							error instanceof Error
 								? error.message
-								: __('Location could not be retrieved.', 'minimal-map'),
+								: __('Location could not be retrieved.', 'minimal-map-net'),
 					});
 				}
 				throw error;
@@ -1646,7 +1646,7 @@ export function useLocationsController(
 				await loadLocations();
 				setActionNotice({
 					status: 'success',
-					message: __('Location deleted.', 'minimal-map'),
+					message: __('Location deleted.', 'minimal-map-net'),
 				});
 			} catch (error) {
 				setActionNotice({
@@ -1654,7 +1654,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Location could not be deleted.', 'minimal-map'),
+							: __('Location could not be deleted.', 'minimal-map-net'),
 				});
 				throw error;
 			} finally {
@@ -1678,9 +1678,9 @@ export function useLocationsController(
 					status: 'success',
 					message:
 						items.length === 1
-							? __('Location deleted.', 'minimal-map')
+							? __('Location deleted.', 'minimal-map-net')
 							: sprintf(
-								_n( '%d location deleted.', '%d locations deleted.', items.length, 'minimal-map' ),
+								_n( '%d location deleted.', '%d locations deleted.', items.length, 'minimal-map-net' ),
 								items.length
 							),
 				});
@@ -1690,7 +1690,7 @@ export function useLocationsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Locations could not be deleted.', 'minimal-map'),
+							: __('Locations could not be deleted.', 'minimal-map-net'),
 				});
 				throw error;
 			} finally {
@@ -1726,7 +1726,7 @@ export function useLocationsController(
 						'%d location deleted.',
 						'%d locations deleted.',
 						allLocations.length,
-						'minimal-map'
+						'minimal-map-net'
 					),
 					allLocations.length
 				),
@@ -1737,7 +1737,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Locations could not be deleted.', 'minimal-map'),
+						: __('Locations could not be deleted.', 'minimal-map-net'),
 			});
 			throw error;
 		} finally {
@@ -1758,7 +1758,7 @@ export function useLocationsController(
 		if (!selectedCollection) {
 			setActionNotice({
 				status: 'error',
-				message: __('Selected collection could not be found.', 'minimal-map'),
+				message: __('Selected collection could not be found.', 'minimal-map-net'),
 			});
 			return;
 		}
@@ -1766,7 +1766,7 @@ export function useLocationsController(
 		if (selectedCollection.location_ids.includes(selectedAssignmentLocation.id)) {
 			setActionNotice({
 				status: 'success',
-				message: __('Location is already assigned to that collection.', 'minimal-map'),
+				message: __('Location is already assigned to that collection.', 'minimal-map-net'),
 			});
 			resetAssignToCollectionState();
 			return;
@@ -1785,7 +1785,7 @@ export function useLocationsController(
 			await loadLocations();
 			setActionNotice({
 				status: 'success',
-				message: __('Location assigned to collection.', 'minimal-map'),
+				message: __('Location assigned to collection.', 'minimal-map-net'),
 			});
 			resetAssignToCollectionState();
 		} catch (error) {
@@ -1794,7 +1794,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Location could not be assigned to the collection.', 'minimal-map'),
+						: __('Location could not be assigned to the collection.', 'minimal-map-net'),
 			});
 		} finally {
 			setAssignmentSaving(false);
@@ -1828,7 +1828,7 @@ export function useLocationsController(
 			await loadLocations();
 			setActionNotice({
 				status: 'success',
-				message: __('Collection removed from location.', 'minimal-map'),
+				message: __('Collection removed from location.', 'minimal-map-net'),
 			});
 			resetRemoveCollectionAssignmentState();
 		} catch (error) {
@@ -1837,7 +1837,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Collection could not be removed from the location.', 'minimal-map'),
+						: __('Collection could not be removed from the location.', 'minimal-map-net'),
 			});
 		} finally {
 			setRemovingCollectionAssignment(false);
@@ -1970,7 +1970,7 @@ export function useLocationsController(
 						? error.message
 						: __(
 								'The address could not be geocoded right now. Select the location manually on the map.',
-								'minimal-map'
+								'minimal-map-net'
 						  )
 				);
 			} finally {
@@ -1982,7 +1982,7 @@ export function useLocationsController(
 		}
 
 		if (!selectedCoordinates) {
-			setSubmitError(__('Select a location on the map before finishing.', 'minimal-map'));
+			setSubmitError(__('Select a location on the map before finishing.', 'minimal-map-net'));
 			return;
 		}
 
@@ -2009,8 +2009,8 @@ export function useLocationsController(
 				error instanceof Error
 					? error.message
 					: formMode === 'edit'
-						? __('Location could not be updated.', 'minimal-map')
-						: __('Location could not be created.', 'minimal-map')
+						? __('Location could not be updated.', 'minimal-map-net')
+						: __('Location could not be created.', 'minimal-map-net')
 			);
 		} finally {
 			setSubmitting(false);
@@ -2092,7 +2092,7 @@ export function useLocationsController(
 								'%d location imported and assigned to a new collection.',
 								'%d locations imported and assigned to a new collection.',
 								result.importedCount,
-								'minimal-map'
+								'minimal-map-net'
 							),
 							result.importedCount
 						),
@@ -2112,7 +2112,7 @@ export function useLocationsController(
 		} catch (error) {
 			setActionNotice({
 				status: 'error',
-				message: error instanceof Error ? error.message : __('Failed to import locations.', 'minimal-map'),
+				message: error instanceof Error ? error.message : __('Failed to import locations.', 'minimal-map-net'),
 			});
 		}
 	}, [
@@ -2168,7 +2168,7 @@ export function useLocationsController(
 						'%d location imported and assigned to a new collection.',
 						'%d locations imported and assigned to a new collection.',
 						result.importedCount,
-						'minimal-map'
+						'minimal-map-net'
 					),
 					result.importedCount
 				),
@@ -2183,7 +2183,7 @@ export function useLocationsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Failed to import locations.', 'minimal-map'),
+						: __('Failed to import locations.', 'minimal-map-net'),
 			});
 		} finally {
 			setIsImporting(false);
@@ -2319,7 +2319,7 @@ export function useLocationsController(
 						<Button
 							variant="tertiary"
 						icon={<BrushCleaning size={18} strokeWidth={2} />}
-						label={__('Delete all locations', 'minimal-map')}
+						label={__('Delete all locations', 'minimal-map-net')}
 						onClick={onOpenDeleteAllLocationsModal}
 						disabled={
 							totalItems === 0 ||
@@ -2348,7 +2348,7 @@ export function useLocationsController(
 					aria-keyshortcuts={getShortcutAriaKeys(['n'])}
 				>
 					<span className="minimal-map-admin__button-shortcut-content">
-						<span>{__('Add location', 'minimal-map')}</span>
+						<span>{__('Add location', 'minimal-map-net')}</span>
 						<KeyboardShortcut keys={['n']} variant="blue" />
 					</span>
 				</Button>
@@ -2384,8 +2384,8 @@ export function useLocationsController(
 		mapCenter,
 		modalTitle:
 			formMode === 'edit'
-				? __('Edit location', 'minimal-map')
-				: __('Add location', 'minimal-map'),
+				? __('Edit location', 'minimal-map-net')
+				: __('Add location', 'minimal-map-net'),
 		onBack,
 		onAssignLocationToCollection,
 		onAssignLogoToLocation,
@@ -2493,8 +2493,8 @@ export function useLocationsController(
 		selectedRemovalLocation,
 		submitLabel:
 			formMode === 'edit'
-				? __('Save changes', 'minimal-map')
-				: __('Finish', 'minimal-map'),
+				? __('Save changes', 'minimal-map-net')
+				: __('Finish', 'minimal-map-net'),
 		submitError,
 		step,
 		totalPages,

@@ -164,13 +164,14 @@ class Analytics {
 
 		$table_name = $this->get_table_name();
 		$cutoff     = gmdate( 'Y-m-d H:i:s', time() - ( self::RETENTION_DAYS * DAY_IN_SECONDS ) );
-
-		$wpdb->query(
-			$wpdb->prepare(
-				"DELETE FROM {$table_name} WHERE occurred_at_gmt < %s",
-				$cutoff
-			)
+		$delete_sql = $wpdb->prepare(
+			'DELETE FROM %i WHERE occurred_at_gmt < %s',
+			$table_name,
+			$cutoff
 		);
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Intentional custom analytics table cleanup; SQL is prepared above.
+		$wpdb->query( $delete_sql );
 	}
 
 	/**
@@ -185,7 +186,13 @@ class Analytics {
 
 		global $wpdb;
 
-		$deleted = $wpdb->query( "DELETE FROM {$this->get_table_name()}" );
+		$delete_sql = $wpdb->prepare(
+			'DELETE FROM %i',
+			$this->get_table_name()
+		);
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Intentional custom analytics table purge; SQL is prepared above.
+		$deleted = $wpdb->query( $delete_sql );
 
 		return false !== $deleted;
 	}
@@ -272,6 +279,7 @@ class Analytics {
 
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Intentional insert into the plugin's custom analytics table.
 		$inserted = $wpdb->insert(
 			$this->get_table_name(),
 			array(
@@ -355,23 +363,28 @@ class Analytics {
 			$params             = array_merge( $params, $search_where['params'] );
 		}
 
-		$where      = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
-		$count_sql  = "SELECT COUNT(*) FROM {$table_name} {$where}";
-		$items_sql  = "SELECT id, event_category, query_text, query_type, result_count, nearest_distance_meters, location_id, location_title, interaction_source, action_type, action_target, occurred_at_gmt
-			FROM {$table_name}
+		$where = empty( $where_conditions ) ? '' : 'WHERE ' . implode( ' AND ', $where_conditions );
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built from internal whitelisted fragments; table and values are prepared.
+		$count_sql = $wpdb->prepare(
+			"SELECT COUNT(*) FROM %i {$where}",
+			array_merge( array( $table_name ), $params )
+		);
+		$items_sql = "SELECT id, event_category, query_text, query_type, result_count, nearest_distance_meters, location_id, location_title, interaction_source, action_type, action_target, occurred_at_gmt
+			FROM %i
 			{$where}
 			ORDER BY occurred_at_gmt DESC, id DESC
 			LIMIT %d OFFSET %d";
-		$total_items = (int) (
-			$params
-				? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) )
-				: $wpdb->get_var( $count_sql )
-		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Intentional custom analytics table read; SQL is prepared above.
+		$total_items = (int) $wpdb->get_var( $count_sql );
 
-		$item_params   = $params;
+		$item_params   = array( $table_name );
+		$item_params   = array_merge( $item_params, $params );
 		$item_params[] = $per_page;
 		$item_params[] = $offset;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- SQL template is composed from internal fragments; identifiers and values are prepared here.
 		$query         = $wpdb->prepare( $items_sql, $item_params );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Intentional custom analytics table read; SQL is prepared above.
 		$rows          = $wpdb->get_results( $query, ARRAY_A );
 
 		return array(
@@ -454,8 +467,8 @@ class Analytics {
 				'sourceMix'    => $this->build_source_mix_breakdown(
 					$selection_rows,
 					array(
-						'search_panel' => __( 'Search panel', 'minimal-map' ),
-						'map_marker'   => __( 'Map marker', 'minimal-map' ),
+						'search_panel' => __( 'Search panel', 'minimal-map-net' ),
+						'map_marker'   => __( 'Map marker', 'minimal-map-net' ),
 					)
 				),
 				'topLocations' => $this->build_top_location_breakdown( $selection_rows ),
@@ -483,8 +496,8 @@ class Analytics {
 				'sourceMix'     => $this->build_source_mix_breakdown(
 					$rows,
 					array(
-						'search_panel' => __( 'Search panel', 'minimal-map' ),
-						'in_map_card'  => __( 'In-map card', 'minimal-map' ),
+						'search_panel' => __( 'Search panel', 'minimal-map-net' ),
+						'in_map_card'  => __( 'In-map card', 'minimal-map-net' ),
 					)
 				),
 				'topLocations'  => $this->build_top_location_breakdown( $rows ),
@@ -519,15 +532,20 @@ class Analytics {
 		}
 
 		$where = empty( $where_clauses ) ? '' : 'WHERE ' . implode( ' AND ', $where_clauses );
-		$sql   = "SELECT event_category, query_text, query_type, result_count, nearest_distance_meters, location_id, location_title, interaction_source, action_type, action_target, occurred_at_gmt
-			FROM {$table_name}
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is built from internal whitelisted fragments; table and values are prepared.
+		$sql = "SELECT event_category, query_text, query_type, result_count, nearest_distance_meters, location_id, location_title, interaction_source, action_type, action_target, occurred_at_gmt
+			FROM %i
 			{$where}
 			ORDER BY occurred_at_gmt ASC, id ASC";
 
-		if ( ! empty( $params ) ) {
-			$sql = $wpdb->prepare( $sql, $params );
-		}
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared -- SQL template is composed from internal fragments; identifiers and values are prepared here.
+		$sql = $wpdb->prepare(
+			$sql,
+			array_merge( array( $table_name ), $params )
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Intentional custom analytics table read; SQL is prepared above.
 		$rows = $wpdb->get_results( $sql, ARRAY_A );
 
 		return is_array( $rows ) ? $rows : array();
@@ -1065,22 +1083,22 @@ class Analytics {
 		return array(
 			array(
 				'key'   => 'text',
-				'label' => __( 'Text', 'minimal-map' ),
+				'label' => __( 'Text', 'minimal-map-net' ),
 				'value' => $counts['text'],
 			),
 			array(
 				'key'   => 'address',
-				'label' => __( 'Address', 'minimal-map' ),
+				'label' => __( 'Address', 'minimal-map-net' ),
 				'value' => $counts['address'],
 			),
 			array(
 				'key'   => 'coordinates',
-				'label' => __( 'Coordinates', 'minimal-map' ),
+				'label' => __( 'Coordinates', 'minimal-map-net' ),
 				'value' => $counts['coordinates'],
 			),
 			array(
 				'key'   => 'live_location',
-				'label' => __( 'Live location', 'minimal-map' ),
+				'label' => __( 'Live location', 'minimal-map-net' ),
 				'value' => $counts['live_location'],
 			),
 		);
@@ -1117,22 +1135,22 @@ class Analytics {
 		return array(
 			array(
 				'key'   => '0',
-				'label' => __( '0 results', 'minimal-map' ),
+				'label' => __( '0 results', 'minimal-map-net' ),
 				'value' => $counts['0'],
 			),
 			array(
 				'key'   => '1',
-				'label' => __( '1 result', 'minimal-map' ),
+				'label' => __( '1 result', 'minimal-map-net' ),
 				'value' => $counts['1'],
 			),
 			array(
 				'key'   => '2-5',
-				'label' => __( '2-5 results', 'minimal-map' ),
+				'label' => __( '2-5 results', 'minimal-map-net' ),
 				'value' => $counts['2-5'],
 			),
 			array(
 				'key'   => '6+',
-				'label' => __( '6+ results', 'minimal-map' ),
+				'label' => __( '6+ results', 'minimal-map-net' ),
 				'value' => $counts['6+'],
 			),
 		);
@@ -1210,12 +1228,12 @@ class Analytics {
 	 */
 	private function build_action_type_mix_breakdown( $rows ) {
 		$labels = array(
-			'opening_hours' => __( 'Opening hours', 'minimal-map' ),
-			'telephone'     => __( 'Phone', 'minimal-map' ),
-			'email'         => __( 'Email', 'minimal-map' ),
-			'website'       => __( 'Website', 'minimal-map' ),
-			'social_media'  => __( 'Social media', 'minimal-map' ),
-			'google_maps'   => __( 'Google Maps', 'minimal-map' ),
+			'opening_hours' => __( 'Opening hours', 'minimal-map-net' ),
+			'telephone'     => __( 'Phone', 'minimal-map-net' ),
+			'email'         => __( 'Email', 'minimal-map-net' ),
+			'website'       => __( 'Website', 'minimal-map-net' ),
+			'social_media'  => __( 'Social media', 'minimal-map-net' ),
+			'google_maps'   => __( 'Google Maps', 'minimal-map-net' ),
 		);
 		$counts = array_fill_keys( array_keys( $labels ), 0 );
 
@@ -1472,6 +1490,7 @@ class Analytics {
 		global $wpdb;
 
 		$table_name = $this->get_table_name();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Lightweight existence check for the plugin's custom analytics table.
 		$result     = $wpdb->get_var(
 			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name )
 		);

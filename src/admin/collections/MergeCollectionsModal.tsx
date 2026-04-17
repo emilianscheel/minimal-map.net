@@ -20,14 +20,14 @@ function useCollectionFields(): Field<CollectionRecord>[] {
 		() => [
 			{
 				id: 'title',
-				label: __('Title', 'minimal-map'),
+				label: __('Title', 'minimal-map-net'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
 			},
 			{
 				id: 'location_count',
-				label: __('Locations', 'minimal-map'),
+				label: __('Locations', 'minimal-map-net'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
@@ -45,7 +45,7 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 		return null;
 	}
 
-	const modalTitle = __('Merge collections', 'minimal-map');
+	const modalTitle = __('Merge collections', 'minimal-map-net');
 
 	return (
 		<Modal
@@ -85,14 +85,14 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 				{controller.mergeStep === 'selection' ? (
 					<div className="minimal-map-admin__assign-to-collection-dialog">
 						<p className="minimal-map-admin__assign-to-collection-copy">
-							{__('Select at least two collections to merge into a new one.', 'minimal-map')}
+							{__('Select at least two collections to merge into a new one.', 'minimal-map-net')}
 						</p>
 						<DataViewsPicker
 							data={controller.mergeCollections}
 							defaultLayouts={{ pickerTable: {} }}
 							fields={fields}
 							getItemId={(item: CollectionRecord) => `${item.id}`}
-							itemListLabel={__('Collections', 'minimal-map')}
+							itemListLabel={__('Collections', 'minimal-map-net')}
 							paginationInfo={{
 								totalItems: controller.mergeCollectionsTotalItems,
 								totalPages: 1,
@@ -111,14 +111,14 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 					<div className="minimal-map-admin__location-dialog-fields">
 						<TextControl
 							__nextHasNoMarginBottom
-							label={__('New collection title', 'minimal-map')}
+							label={__('New collection title', 'minimal-map-net')}
 							value={controller.mergeTitle}
 							onChange={controller.onChangeMergeTitle}
-							placeholder={__('Enter a name for the merged collection...', 'minimal-map')}
+							placeholder={__('Enter a name for the merged collection...', 'minimal-map-net')}
 						/>
 						<CheckboxControl
 							__nextHasNoMarginBottom
-							label={__('Delete original collections after merge', 'minimal-map')}
+							label={__('Delete original collections after merge', 'minimal-map-net')}
 							checked={controller.shouldDeleteAfterMerge}
 							onChange={controller.onToggleDeleteAfterMerge}
 						/>
@@ -137,7 +137,7 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 								icon={<ArrowLeft size={18} strokeWidth={2} />}
 								iconPosition="left"
 							>
-								{__('Back', 'minimal-map')}
+								{__('Back', 'minimal-map-net')}
 							</Button>
 						)}
 					</div>
@@ -149,7 +149,7 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 							disabled={controller.isMerging}
 							data-minimal-map-dialog-ignore-enter="true"
 						>
-							{__('Cancel', 'minimal-map')}
+							{__('Cancel', 'minimal-map-net')}
 						</Button>
 						<Button
 							__next40pxDefaultSize
@@ -166,8 +166,8 @@ export default function MergeCollectionsModal({ controller }: { controller: Coll
 							<span className="minimal-map-admin__location-dialog-button-content">
 								<span>
 									{controller.mergeStep === 'selection'
-										? __('Next', 'minimal-map')
-										: __('Finish', 'minimal-map')}
+										? __('Next', 'minimal-map-net')
+										: __('Finish', 'minimal-map-net')}
 								</span>
 								<Kbd variant="blue">Enter</Kbd>
 							</span>

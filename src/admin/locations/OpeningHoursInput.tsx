@@ -15,13 +15,13 @@ interface OpeningHoursInputProps {
 }
 
 const DAY_LABELS: Record<OpeningHoursDayKey, string> = {
-	monday: __('Monday', 'minimal-map'),
-	tuesday: __('Tuesday', 'minimal-map'),
-	wednesday: __('Wednesday', 'minimal-map'),
-	thursday: __('Thursday', 'minimal-map'),
-	friday: __('Friday', 'minimal-map'),
-	saturday: __('Saturday', 'minimal-map'),
-	sunday: __('Sunday', 'minimal-map'),
+	monday: __('Monday', 'minimal-map-net'),
+	tuesday: __('Tuesday', 'minimal-map-net'),
+	wednesday: __('Wednesday', 'minimal-map-net'),
+	thursday: __('Thursday', 'minimal-map-net'),
+	friday: __('Friday', 'minimal-map-net'),
+	saturday: __('Saturday', 'minimal-map-net'),
+	sunday: __('Sunday', 'minimal-map-net'),
 };
 
 function OptionalLabel({ label }: { label: string }) {
@@ -29,7 +29,7 @@ function OptionalLabel({ label }: { label: string }) {
 		<span className="minimal-map-admin__field-label-with-hint">
 			<span>{label}</span>
 			<span className="minimal-map-admin__field-optional-hint">
-				{__('Optional', 'minimal-map')}
+				{__('Optional', 'minimal-map-net')}
 			</span>
 		</span>
 	);
@@ -43,16 +43,16 @@ export default function OpeningHoursInput({
 }: OpeningHoursInputProps) {
 	return (
 		<div className="minimal-map-admin__location-dialog-fields minimal-map-admin__opening-hours-step">
-			<div className="minimal-map-admin__opening-hours-table" role="table" aria-label={__('Opening hours', 'minimal-map')}>
+			<div className="minimal-map-admin__opening-hours-table" role="table" aria-label={__('Opening hours', 'minimal-map-net')}>
 				<div className="minimal-map-admin__opening-hours-table-header" role="row">
-					<span role="columnheader">{__('Day', 'minimal-map')}</span>
-					<span role="columnheader">{__('Open', 'minimal-map')}</span>
-					<span role="columnheader">{__('Close', 'minimal-map')}</span>
+					<span role="columnheader">{__('Day', 'minimal-map-net')}</span>
+					<span role="columnheader">{__('Open', 'minimal-map-net')}</span>
+					<span role="columnheader">{__('Close', 'minimal-map-net')}</span>
 					<span role="columnheader">
-						<OptionalLabel label={__('Lunch break start', 'minimal-map')} />
+						<OptionalLabel label={__('Lunch break start', 'minimal-map-net')} />
 					</span>
 					<span role="columnheader">
-						<OptionalLabel label={__('Lunch break duration (minutes)', 'minimal-map')} />
+						<OptionalLabel label={__('Lunch break duration (minutes)', 'minimal-map-net')} />
 					</span>
 				</div>
 				{OPENING_HOURS_DAY_ORDER.map((dayKey, index) => {
@@ -68,7 +68,7 @@ export default function OpeningHoursInput({
 								<div role="cell">
 									<TextControl
 										autoFocus={index === 0}
-										label={index === 0 ? __('Open', 'minimal-map') : undefined}
+										label={index === 0 ? __('Open', 'minimal-map-net') : undefined}
 										hideLabelFromVision
 										type="time"
 										value={day.open}
@@ -78,7 +78,7 @@ export default function OpeningHoursInput({
 								</div>
 								<div role="cell">
 									<TextControl
-										label={index === 0 ? __('Close', 'minimal-map') : undefined}
+										label={index === 0 ? __('Close', 'minimal-map-net') : undefined}
 										hideLabelFromVision
 										type="time"
 										value={day.close}
@@ -88,7 +88,7 @@ export default function OpeningHoursInput({
 								</div>
 								<div role="cell">
 									<TextControl
-										label={index === 0 ? __('Lunch break start', 'minimal-map') : undefined}
+										label={index === 0 ? __('Lunch break start', 'minimal-map-net') : undefined}
 										hideLabelFromVision
 										type="time"
 										value={day.lunch_start}
@@ -98,7 +98,7 @@ export default function OpeningHoursInput({
 								</div>
 								<div role="cell">
 									<TextControl
-										label={index === 0 ? __('Lunch break duration (minutes)', 'minimal-map') : undefined}
+										label={index === 0 ? __('Lunch break duration (minutes)', 'minimal-map-net') : undefined}
 										hideLabelFromVision
 										type="number"
 										min={0}
@@ -119,12 +119,12 @@ export default function OpeningHoursInput({
 				})}
 			</div>
 			<TextareaControl
-				label={<OptionalLabel label={__('Opening hours notes', 'minimal-map')} />}
+				label={<OptionalLabel label={__('Opening hours notes', 'minimal-map-net')} />}
 				value={form.opening_hours_notes}
 				onChange={onChangeNotes}
 				help={__(
 					'Add details such as seasonal opening hours or temporary exceptions.',
-					'minimal-map'
+					'minimal-map-net'
 				)}
 				rows={4}
 			/>

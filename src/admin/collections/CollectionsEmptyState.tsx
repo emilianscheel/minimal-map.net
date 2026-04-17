@@ -7,10 +7,10 @@ export default function CollectionsEmptyState({ controller }: { controller: Coll
 	return (
 		<EmptyState
 			icon={<Layers3 />}
-			title={__('No collections found', 'minimal-map')}
-			description={__('Create collections to organize your locations into groups. This makes it easier to manage and display sets of locations on your maps.', 'minimal-map')}
+			title={__('No collections found', 'minimal-map-net')}
+			description={__('Create collections to organize your locations into groups. This makes it easier to manage and display sets of locations on your maps.', 'minimal-map-net')}
 			action={{
-				label: __('Add collection', 'minimal-map'),
+				label: __('Add collection', 'minimal-map-net'),
 				onClick: controller.onAddCollection,
 				icon: <Plus />,
 			}}

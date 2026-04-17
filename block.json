@@ -2,12 +2,12 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "minimal-map/map",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "title": "Minimal Map",
   "category": "widgets",
   "icon": "location-alt",
   "description": "Render a minimalist MapLibre-powered map.",
-  "textdomain": "minimal-map",
+  "textdomain": "minimal-map-net",
   "attributes": {
     "centerLat": {
       "type": "number",

@@ -2,19 +2,19 @@
 # This file is distributed under the same license as the Minimal Map plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Minimal Map 0.8.1\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map.net\n"
+"Project-Id-Version: Minimal Map 0.8.3\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map-net\n"
 "POT-Creation-Date: 2026-04-17T05:43:01+00:00\n"
-"PO-Revision-Date: 2026-03-19 18:15+0100\n"
+"PO-Revision-Date: 2026-03-29 21:00+0100\n"
 "Last-Translator: Emilian Scheel\n"
-"Language-Team: German\n"
-"Language: de_DE\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Emilian Scheel\n"
-"X-Domain: minimal-map\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: minimal-map-net\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. Plugin Name of the plugin
 #: minimal-map.php includes/admin/class-admin-menu.php:112
@@ -28,7 +28,7 @@ msgstr "Minimal Map"
 #: minimal-map.php
 msgid "Gutenberg-first native map block and admin shell for WordPress."
 msgstr ""
-"Gutenberg-orientierter nativer Kartenblock und Admin-Oberfläche für "
+"Bloc de carte natif orienté Gutenberg et interface d'administration pour "
 "WordPress."
 
 #. Author of the plugin
@@ -38,56 +38,55 @@ msgstr "Emilian Scheel"
 
 #: includes/admin/class-admin-menu.php:39 includes/class-plugin.php:286
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr "Tableau de bord"
 
 #: includes/admin/class-admin-menu.php:40
 msgid "An overview of Minimal Map sections and upcoming data tools."
-msgstr ""
-"Ein Überblick über die Minimal Map-Bereiche und kommende Datenwerkzeuge."
+msgstr "Un aperçu des sections Minimal Map et des outils de données à venir."
 
 #: includes/admin/class-admin-menu.php:43
 msgid "Analytics"
-msgstr "Statistiken"
+msgstr "Statistiques"
 
 #: includes/admin/class-admin-menu.php:44
 msgid ""
 "Review map search demand and identify where people are looking for locations."
 msgstr ""
-"Überprüfe die Suchanfragen und erkenne, wo Nutzer nach Standorten suchen."
+"Analysez la demande de recherche sur la carte et identifiez où les "
+"utilisateurs cherchent des lieux."
 
 #: includes/admin/class-admin-menu.php:47
 #: includes/locations/class-location-post-type.php:130
 msgid "Locations"
-msgstr "Standorte"
+msgstr "Lieux"
 
 #: includes/admin/class-admin-menu.php:48
 msgid "Create and organize the places you want to render on your maps."
 msgstr ""
-"Erstelle und organisiere die Orte, die du auf deinen Karten anzeigen "
-"möchtest."
+"Créez et organisez les endroits que vous souhaitez afficher sur vos cartes."
 
 #: includes/admin/class-admin-menu.php:51
 #: includes/collections/class-collection-post-type.php:46
 msgid "Collections"
-msgstr "Sammlungen"
+msgstr "Collections"
 
 #: includes/admin/class-admin-menu.php:52
 msgid ""
 "Assemble reusable groups of locations and manage their map-ready assignments."
 msgstr ""
-"Stelle wiederverwendbare Gruppen von Standorten zusammen und verwalte ihre "
-"kartentauglichen Zuweisungen."
+"Assemblez des groupes réutilisables de lieux et gérez leurs attributions "
+"cartographiques."
 
 #: includes/admin/class-admin-menu.php:55
 #: includes/tags/class-tag-taxonomy.php:52
 msgid "Tags"
-msgstr "Schlagwörter"
+msgstr "Étiquettes"
 
 #: includes/admin/class-admin-menu.php:56
 msgid "Apply lightweight labels to keep map content easy to organize."
 msgstr ""
-"Verwende leichte Beschriftungen, damit Karteninhalte leicht zu organisieren "
-"bleiben."
+"Appliquez des étiquettes légères pour faciliter l'organisation du contenu "
+"cartographique."
 
 #: includes/admin/class-admin-menu.php:59
 #: includes/logos/class-logo-post-type.php:41
@@ -96,46 +95,45 @@ msgstr "Logos"
 
 #: includes/admin/class-admin-menu.php:60
 msgid "Upload SVG logos and assign them across multiple locations."
-msgstr "Lade SVG-Logos hoch und weise sie mehreren Standorten zu."
+msgstr "Téléchargez des logos SVG et assignez-les à plusieurs lieux."
 
 #: includes/admin/class-admin-menu.php:63
 #: includes/markers/class-marker-post-type.php:41
 msgid "Markers"
-msgstr "Marker"
+msgstr "Marqueurs"
 
 #: includes/admin/class-admin-menu.php:64
 msgid "Define the marker styles and visual pin variants used across maps."
 msgstr ""
-"Definiere die Marker-Stile und visuellen Pin-Varianten, die auf deinen "
-"Karten verwendet werden."
+"Définissez les styles de marqueurs et les variantes visuelles utilisés sur "
+"les cartes."
 
 #: includes/admin/class-admin-menu.php:67
 msgid "Styles"
-msgstr "Stile"
+msgstr "Styles"
 
 #: includes/admin/class-admin-menu.php:68
 msgid "Manage the map styles and presets available inside the block editor."
-msgstr "Verwalte die im Block-Editor verfügbaren Kartenstile und Vorgaben."
+msgstr ""
+"Gérez les styles de carte et les préréglages disponibles dans l'éditeur de "
+"blocs."
 
 #: includes/analytics/class-analytics.php:457
 #: includes/analytics/class-analytics.php:486
-#, fuzzy
 msgid "Search panel"
-msgstr "Suchpanel"
+msgstr "Panneau de recherche"
 
 #: includes/analytics/class-analytics.php:458
-#, fuzzy
 msgid "Map marker"
-msgstr "Marker"
+msgstr "Marqueur sur la carte"
 
 #: includes/analytics/class-analytics.php:487
-#, fuzzy
 msgid "In-map card"
-msgstr "Importierter Standort"
+msgstr "Fiche intégrée"
 
 #: includes/analytics/class-analytics.php:1068
 msgid "Text"
-msgstr "Text"
+msgstr "Texte"
 
 #: includes/analytics/class-analytics.php:1073
 msgid "Address"
@@ -143,61 +141,55 @@ msgstr "Adresse"
 
 #: includes/analytics/class-analytics.php:1078
 msgid "Coordinates"
-msgstr "Koordinaten"
+msgstr "Coordonnées"
 
 #: includes/analytics/class-analytics.php:1083
-#, fuzzy
 msgid "Live location"
-msgstr "Live-Standort"
+msgstr "Position en direct"
 
 #: includes/analytics/class-analytics.php:1120
-#, fuzzy
 msgid "0 results"
-msgstr "0 Ergebnisse"
+msgstr "0 résultat"
 
 #: includes/analytics/class-analytics.php:1125
-#, fuzzy
 msgid "1 result"
-msgstr "1 Ergebnis"
+msgstr "1 résultat"
 
 #: includes/analytics/class-analytics.php:1130
-#, fuzzy
 msgid "2-5 results"
-msgstr "2-5 Ergebnisse"
+msgstr "2-5 résultats"
 
 #: includes/analytics/class-analytics.php:1135
-#, fuzzy
 msgid "6+ results"
-msgstr "6+ Ergebnisse"
+msgstr "6+ résultats"
 
 #: includes/analytics/class-analytics.php:1213
 msgid "Opening hours"
-msgstr "Öffnungszeiten"
+msgstr "Horaires d'ouverture"
 
 #: includes/analytics/class-analytics.php:1214
 msgid "Phone"
-msgstr "Telefon"
+msgstr "Téléphone"
 
 #: includes/analytics/class-analytics.php:1215
 msgid "Email"
-msgstr "E-Mail"
+msgstr "E-mail"
 
 #: includes/analytics/class-analytics.php:1216
 msgid "Website"
-msgstr "Website"
+msgstr "Site web"
 
 #: includes/analytics/class-analytics.php:1217
 msgid "Social media"
-msgstr "Social Media"
+msgstr "Réseaux sociaux"
 
 #: includes/analytics/class-analytics.php:1218
-#, fuzzy
 msgid "Google Maps"
 msgstr "Google Maps"
 
 #: includes/blocks/class-map-block.php:58
 msgid "Render a minimalist MapLibre-powered map."
-msgstr "Zeige eine minimalistische, von MapLibre unterstützte Karte an."
+msgstr "Affiche une carte minimaliste propulsée par MapLibre."
 
 #: includes/class-config.php:57
 msgid "Liberty"
@@ -214,39 +206,37 @@ msgstr "Positron"
 #: includes/class-config.php:296 includes/class-config.php:321
 msgid "Map preview unavailable because this browser does not support WebGL."
 msgstr ""
-"Kartenvorschau nicht verfügbar, da dieser Browser WebGL nicht unterstützt."
+"Aperçu de la carte indisponible car ce navigateur ne prend pas en charge "
+"WebGL."
 
 #: includes/class-config.php:420 includes/class-config.php:429
 #: includes/class-config.php:438
 msgid "The map embed configuration is missing or invalid."
-msgstr "Die Karten-Einbettungskonfiguration fehlt oder ist ungültig."
+msgstr "La configuration d'intégration de la carte est manquante ou invalide."
 
 #: includes/class-config.php:799
-#, fuzzy
 msgid "Minimal Map: Export Locations as CSV"
-msgstr "Minimal Map: Standorte als CSV exportieren"
+msgstr "Minimal Map : Exporter les lieux en CSV"
 
 #: includes/class-config.php:809
-#, fuzzy
 msgid "Minimal Map: Export Locations as Excel"
-msgstr "Minimal Map: Standorte als Excel exportieren"
+msgstr "Minimal Map : Exporter les lieux en Excel"
 
 #: includes/class-config.php:820
-#, fuzzy
 msgid "Minimal Map: Export Locations as JSON"
-msgstr "Minimal Map: Standorte als JSON exportieren"
+msgstr "Minimal Map : Exporter les lieux en JSON"
 
 #: includes/class-config.php:830
 msgid "Minimal Map: Export Analytics Search Data as CSV"
-msgstr "Minimal Map: Statistiken zu Suchanfragen als CSV exportieren"
+msgstr "Minimal Map : Exporter les données de recherche analytiques en CSV"
 
 #: includes/class-config.php:841
 msgid "Minimal Map: Export Analytics Selection Data as CSV"
-msgstr "Minimal Map: Statistiken zu Standort-Auswahlen als CSV exportieren"
+msgstr "Minimal Map : Exporter les données de sélection analytiques en CSV"
 
 #: includes/class-config.php:852
 msgid "Minimal Map: Export Analytics Action Data as CSV"
-msgstr "Minimal Map: Statistiken zu Nutzeraktionen als CSV exportieren"
+msgstr "Minimal Map : Exporter les données d'action analytiques en CSV"
 
 #: includes/class-config.php:1268
 msgid "Terracotta Coast"
@@ -274,9 +264,8 @@ msgstr ""
 
 #: includes/class-config.php:1291 includes/class-config.php:1322
 #: includes/class-config.php:1353
-#, fuzzy
 msgid "Transport"
-msgstr "Strassen & Verkehr"
+msgstr ""
 
 #: includes/class-config.php:1299
 msgid "Night Transit"
@@ -290,25 +279,25 @@ msgstr ""
 #: includes/class-config.php:1404
 #, fuzzy, php-format
 msgid "WordPress Theme Palette #%d"
-msgstr "WordPress Theme-Palette"
+msgstr "Palette du thème WordPress"
 
 #. translators: %d: fallback palette color position.
 #: includes/class-config.php:1452
 #, php-format
 msgid "Color %d"
-msgstr "Farbe %d"
+msgstr "Couleur %d"
 
 #: includes/class-iframe-endpoint.php:98
 msgid "Invalid Minimal Map Embed"
-msgstr "Ungültige Minimal Map Einbettung"
+msgstr "Intégration Minimal Map invalide"
 
 #: includes/collections/class-collection-post-type.php:47
 msgid "Collection"
-msgstr "Sammlung"
+msgstr "Collection"
 
 #: includes/locations/class-location-post-type.php:131
 msgid "Location"
-msgstr "Standort"
+msgstr "Lieu"
 
 #: includes/logos/class-logo-post-type.php:42
 msgid "Logo"
@@ -316,53 +305,51 @@ msgstr "Logo"
 
 #: includes/markers/class-marker-post-type.php:42
 msgid "Marker"
-msgstr "Marker"
+msgstr "Marqueur"
 
 #: includes/rest/class-analytics-settings-route.php:117
-#, fuzzy
 msgid "Analytics tracking data could not be deleted."
-msgstr "Sammlung konnte nicht gelöscht werden."
+msgstr ""
 
 #: includes/rest/class-frontend-geocode-route.php:62
 #: includes/rest/class-frontend-geocode-route.php:86
 #: includes/rest/class-frontend-geocode-route.php:98
 msgid "No matching coordinates were found."
-msgstr "Es wurden keine passenden Koordinaten gefunden."
+msgstr "Aucune coordonnée correspondante n'a été trouvée."
 
 #: includes/rest/class-geocode-route.php:90
 msgid ""
 "The address could not be geocoded right now. Select the location manually on "
 "the map."
 msgstr ""
-"Die Adresse konnte derzeit nicht geokodiert werden. Wähle den Standort "
-"manuell auf der Karte aus."
+"L'adresse n'a pas pu être géocodée pour le moment. Sélectionnez le lieu "
+"manuellement sur la carte."
 
 #: includes/rest/class-geocode-route.php:102
 msgid ""
 "No matching coordinates were found. Select the location manually on the map."
 msgstr ""
-"Es wurden keine passenden Koordinaten gefunden. Wähle den Standort manuell "
-"auf der Karte aus."
+"Aucune coordonnée correspondante n'a été trouvée. Sélectionnez le lieu "
+"manuellement sur la carte."
 
 #: includes/rest/class-styles-route.php:155
 #: includes/rest/class-styles-route.php:184
 msgid "Style theme not found."
-msgstr "Stil-Theme nicht gefunden."
+msgstr "Thème de style introuvable."
 
 #: includes/rest/class-styles-route.php:188
 msgid "The default theme cannot be deleted."
-msgstr "Das Standard-Theme kann nicht gelöscht werden."
+msgstr "Le thème par défaut ne peut pas être supprimé."
 
 #: includes/rest/class-styles-route.php:209
 #: includes/rest/class-styles-route.php:245
 msgid "Default Theme"
-msgstr "Standard-Theme"
+msgstr "Thème par défaut"
 
 #: includes/rest/class-styles-route.php:228
-#, fuzzy
 msgid "Untitled Theme"
-msgstr "Unbenannter Marker"
+msgstr ""
 
 #: includes/tags/class-tag-taxonomy.php:53
 msgid "Tag"
-msgstr "Schlagwort"
+msgstr "Étiquette"

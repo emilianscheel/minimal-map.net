@@ -62,7 +62,8 @@ class Iframe_Endpoint {
 		remove_action( 'wp_head', '_admin_bar_bump_cb' );
 		remove_action( 'admin_head', '_admin_bar_bump_cb' );
 
-		$encoded_config = isset( $_GET[ self::CONFIG_QUERY_VAR ] ) ? wp_unslash( (string) $_GET[ self::CONFIG_QUERY_VAR ] ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public iframe embed payload; it does not mutate site data.
+		$encoded_config = isset( $_GET[ self::CONFIG_QUERY_VAR ] ) ? $this->sanitize_encoded_config( sanitize_text_field( wp_unslash( (string) $_GET[ self::CONFIG_QUERY_VAR ] ) ) ) : '';
 		$response       = $this->build_response( $encoded_config );
 
 		status_header( $response['status'] );
@@ -78,7 +79,18 @@ class Iframe_Endpoint {
 	 * @return bool
 	 */
 	public function is_iframe_request() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public iframe flag; it does not mutate site data.
 		return isset( $_GET[ self::QUERY_VAR ] );
+	}
+
+	/**
+	 * Sanitize one base64url-encoded iframe config payload.
+	 *
+	 * @param string $encoded_config Raw encoded config.
+	 * @return string
+	 */
+	private function sanitize_encoded_config( $encoded_config ) {
+		return (string) preg_replace( '/[^A-Za-z0-9_-]/', '', $encoded_config );
 	}
 
 	/**
@@ -95,7 +107,7 @@ class Iframe_Endpoint {
 				'status' => 400,
 				'html'   => $this->render_document(
 					array(
-						'document_title'    => __( 'Invalid Minimal Map Embed', 'minimal-map' ),
+						'document_title'    => __( 'Invalid Minimal Map Embed', 'minimal-map-net' ),
 						'document_font_family' => $this->config->get_default_block_attributes()['fontFamily'],
 						'error_message'     => $normalized_config->get_error_message(),
 						'map_surface_markup' => '',
@@ -108,7 +120,7 @@ class Iframe_Endpoint {
 			'status' => 200,
 			'html'   => $this->render_document(
 				array(
-					'document_title'    => __( 'Minimal Map', 'minimal-map' ),
+					'document_title'    => __( 'Minimal Map', 'minimal-map-net' ),
 					'document_font_family' => $normalized_config['fontFamily'],
 					'error_message'     => '',
 					'map_surface_markup' => $this->map_view->render_surface( $normalized_config ),

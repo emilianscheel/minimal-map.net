@@ -38,8 +38,8 @@ class Marker_Post_Type {
 			self::POST_TYPE,
 			array(
 				'labels'              => array(
-					'name'          => __( 'Markers', 'minimal-map' ),
-					'singular_name' => __( 'Marker', 'minimal-map' ),
+					'name'          => __( 'Markers', 'minimal-map-net' ),
+					'singular_name' => __( 'Marker', 'minimal-map-net' ),
 				),
 				'public'              => false,
 				'show_ui'             => false,

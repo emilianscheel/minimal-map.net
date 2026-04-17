@@ -61,7 +61,7 @@ export default function LocationMiniMap({
 			theme={theme}
 			markerContent={previewMarkerContent}
 			onClick={onClick}
-			ariaLabel={onClick ? __('Change marker color', 'minimal-map') : undefined}
+			ariaLabel={onClick ? __('Change marker color', 'minimal-map-net') : undefined}
 			className="minimal-map-admin__location-mini-map"
 		/>
 	);
