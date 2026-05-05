@@ -12,7 +12,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 		() => [
 			{
 				id: 'title',
-				label: __('Title', 'minimal-map-net'),
+				label: __('Title', 'minimal-map'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
@@ -20,7 +20,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 			},
 			{
 				id: 'map_preview',
-				label: __('Preview', 'minimal-map-net'),
+				label: __('Preview', 'minimal-map'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
@@ -34,7 +34,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 		() => [
 			{
 				id: 'download',
-				label: __('Download', 'minimal-map-net'),
+				label: __('Download', 'minimal-map'),
 				icon: <Download size={18} />,
 				context: 'single',
 				supportsBulk: false,
@@ -47,7 +47,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 			},
 			{
 				id: 'edit',
-				label: __('Rename', 'minimal-map-net'),
+				label: __('Rename', 'minimal-map'),
 				icon: <Pencil size={18} />,
 				context: 'single',
 				supportsBulk: false,
@@ -60,7 +60,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 			},
 			{
 				id: 'edit-colors',
-				label: __('Edit colors', 'minimal-map-net'),
+				label: __('Edit colors', 'minimal-map'),
 				icon: <Palette size={18} />,
 				context: 'single',
 				supportsBulk: false,
@@ -73,7 +73,7 @@ export default function MarkersGrid({ controller }: { controller: MarkersControl
 			},
 			{
 				id: 'delete',
-				label: __('Delete', 'minimal-map-net'),
+				label: __('Delete', 'minimal-map'),
 				icon: <Trash2 size={18} />,
 				context: 'single',
 				supportsBulk: false,

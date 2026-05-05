@@ -10,7 +10,7 @@ export function CreateThemeButton({ onClick }: CreateThemeButtonProps) {
 	return (
 		<Button
 			icon={<Plus size={18} />}
-			label={__('Create New Theme', 'minimal-map-net')}
+			label={__('Create New Theme', 'minimal-map')}
 			onClick={onClick}
 			variant="tertiary"
 			__next40pxDefaultSize

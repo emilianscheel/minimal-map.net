@@ -2,33 +2,31 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Minimal Map 0.8.3\n"
+"Project-Id-Version: Minimal Map: Store Locator & Map Block 0.8.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/minimal-map.net\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-17T06:20:35+00:00\n"
+"POT-Creation-Date: 2026-04-25T06:54:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: minimal-map-net\n"
+"X-Domain: minimal-map\n"
 
 #. Plugin Name of the plugin
-#: minimal-map.php includes/admin/class-admin-menu.php:113
+#: minimal-map-net-locator-block.php includes/admin/class-admin-menu.php:113
 #: includes/admin/class-admin-menu.php:114
-#: includes/blocks/class-map-block.php:57
-#: includes/class-iframe-endpoint.php:123
-msgid "Minimal Map"
+msgid "Minimal Map: Store Locator & Map Block"
 msgstr ""
 
 #. Description of the plugin
-#: minimal-map.php
+#: minimal-map-net-locator-block.php
 msgid "Gutenberg-first native map block and admin shell for WordPress."
 msgstr ""
 
 #. Author of the plugin
-#: minimal-map.php
+#: minimal-map-net-locator-block.php
 msgid "Emilian Scheel"
 msgstr ""
 
@@ -37,7 +35,9 @@ msgid "Dashboard"
 msgstr ""
 
 #: includes/admin/class-admin-menu.php:40
-msgid "An overview of Minimal Map sections and upcoming data tools."
+msgid ""
+"An overview of Minimal Map: Store Locator & Map Block sections and upcoming "
+"data tools."
 msgstr ""
 
 #: includes/admin/class-admin-menu.php:43
@@ -172,6 +172,11 @@ msgstr ""
 msgid "Google Maps"
 msgstr ""
 
+#: includes/blocks/class-map-block.php:57
+#: includes/class-iframe-endpoint.php:123
+msgid "Minimal Map"
+msgstr ""
+
 #: includes/blocks/class-map-block.php:58
 msgid "Render a minimalist MapLibre-powered map."
 msgstr ""
@@ -198,27 +203,31 @@ msgid "The map embed configuration is missing or invalid."
 msgstr ""
 
 #: includes/class-config.php:799
-msgid "Minimal Map: Export Locations as CSV"
+msgid "Minimal Map: Store Locator & Map Block: Export Locations as CSV"
 msgstr ""
 
 #: includes/class-config.php:809
-msgid "Minimal Map: Export Locations as Excel"
+msgid "Minimal Map: Store Locator & Map Block: Export Locations as Excel"
 msgstr ""
 
 #: includes/class-config.php:820
-msgid "Minimal Map: Export Locations as JSON"
+msgid "Minimal Map: Store Locator & Map Block: Export Locations as JSON"
 msgstr ""
 
 #: includes/class-config.php:830
-msgid "Minimal Map: Export Analytics Search Data as CSV"
+msgid ""
+"Minimal Map: Store Locator & Map Block: Export Analytics Search Data as CSV"
 msgstr ""
 
 #: includes/class-config.php:841
-msgid "Minimal Map: Export Analytics Selection Data as CSV"
+msgid ""
+"Minimal Map: Store Locator & Map Block: Export Analytics Selection Data as "
+"CSV"
 msgstr ""
 
 #: includes/class-config.php:852
-msgid "Minimal Map: Export Analytics Action Data as CSV"
+msgid ""
+"Minimal Map: Store Locator & Map Block: Export Analytics Action Data as CSV"
 msgstr ""
 
 #: includes/class-config.php:1268
@@ -1983,11 +1992,11 @@ msgid "Minimal Map Preview"
 msgstr ""
 
 #: src/admin/index.tsx:94
-msgid "Minimal Map Sections"
+msgid "Minimal Map: Store Locator & Map Block Sections"
 msgstr ""
 
 #: src/admin/commands.ts:26
-msgid "Minimal Map: %s"
+msgid "Minimal Map: Store Locator & Map Block: %s"
 msgstr ""
 
 #: src/admin/styles/constants.ts:15

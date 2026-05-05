@@ -21,7 +21,7 @@ export default function AssignToCollectionModal({
     controller.selectedAssignmentLocation.id,
   );
   const options = controller.collections.map((collection) => ({
-    label: collection.title || __("Untitled collection", "minimal-map-net"),
+    label: collection.title || __("Untitled collection", "minimal-map"),
     value: `${collection.id}`,
   }));
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -51,13 +51,13 @@ export default function AssignToCollectionModal({
   return (
     <Modal
       className="minimal-map-admin__assign-to-collection-modal"
-      contentLabel={__("Assign to collection", "minimal-map-net")}
+      contentLabel={__("Assign to collection", "minimal-map")}
       focusOnMount="firstInputElement"
       onKeyDown={handleKeyDown}
       onRequestClose={controller.onCloseAssignToCollectionModal}
       shouldCloseOnClickOutside={!controller.isAssignmentSaving}
       shouldCloseOnEsc={!controller.isAssignmentSaving}
-      title={__("Assign to Collection", "minimal-map-net")}
+      title={__("Assign to Collection", "minimal-map")}
     >
       <div className="minimal-map-admin__assign-to-collection-dialog">
         <div className="minimal-map-admin__assign-to-collection-copy">
@@ -69,13 +69,13 @@ export default function AssignToCollectionModal({
             </div>
           ) : (
             <p className="minimal-map-admin__assign-to-collection-empty">
-              {__("Not assigned to any collection yet.", "minimal-map-net")}
+              {__("Not assigned to any collection yet.", "minimal-map")}
             </p>
           )}
         </div>
         <ComboboxControl
           __next40pxDefaultSize
-          label={__("Collection", "minimal-map-net")}
+          label={__("Collection", "minimal-map")}
           value={controller.assignmentCollectionId}
           options={options}
           onChange={(value) =>
@@ -85,7 +85,7 @@ export default function AssignToCollectionModal({
             options.length === 0
               ? __(
                   "Create a collection first to assign this location.",
-                  "minimal-map-net",
+                  "minimal-map",
                 )
               : undefined
           }
@@ -98,7 +98,7 @@ export default function AssignToCollectionModal({
             disabled={controller.isAssignmentSaving}
             data-minimal-map-dialog-ignore-enter="true"
           >
-            {__("Cancel", "minimal-map-net")}
+            {__("Cancel", "minimal-map")}
           </Button>
           <Button
             __next40pxDefaultSize
@@ -111,7 +111,7 @@ export default function AssignToCollectionModal({
             }
           >
             <span className="minimal-map-admin__location-dialog-button-content">
-              <span>{__("Assign", "minimal-map-net")}</span>
+              <span>{__("Assign", "minimal-map")}</span>
               <Kbd variant="blue">Enter</Kbd>
             </span>
           </Button>

@@ -3,15 +3,15 @@ import type { StyleOption, StylePresets } from '../types';
 
 export const DEFAULT_STYLE_PRESETS: StylePresets = {
 	liberty: {
-		label: __( 'Liberty', 'minimal-map-net' ),
+		label: __( 'Liberty', 'minimal-map' ),
 		style_url: 'https://tiles.openfreemap.org/styles/liberty',
 	},
 	bright: {
-		label: __( 'Bright', 'minimal-map-net' ),
+		label: __( 'Bright', 'minimal-map' ),
 		style_url: 'https://tiles.openfreemap.org/styles/bright',
 	},
 	positron: {
-		label: __( 'Positron', 'minimal-map-net' ),
+		label: __( 'Positron', 'minimal-map' ),
 		style_url: 'https://tiles.openfreemap.org/styles/positron',
 	},
 };

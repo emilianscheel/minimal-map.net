@@ -12,8 +12,8 @@ export function ThemeSelector({ activeTheme, themes, onSwitch }: ThemeSelectorPr
 	return (
 		<OptionDropdown
 			activeValue={activeTheme?.slug ?? null}
-			emptyLabel={__('Select theme', 'minimal-map-net')}
-			groupLabel={__('Switch Theme', 'minimal-map-net')}
+			emptyLabel={__('Select theme', 'minimal-map')}
+			groupLabel={__('Switch Theme', 'minimal-map')}
 			labelClassName="minimal-map-admin__option-dropdown-label"
 			onSelect={(value) => onSwitch(value)}
 			options={themes.map((theme) => ({

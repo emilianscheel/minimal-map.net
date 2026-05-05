@@ -54,8 +54,8 @@ class Map_Block {
 	 */
 	private function get_metadata_translations() {
 		return array(
-			'title'       => __( 'Minimal Map', 'minimal-map-net' ),
-			'description' => __( 'Render a minimalist MapLibre-powered map.', 'minimal-map-net' ),
+			'title'       => __( 'Minimal Map', 'minimal-map' ),
+			'description' => __( 'Render a minimalist MapLibre-powered map.', 'minimal-map' ),
 		);
 	}
 }

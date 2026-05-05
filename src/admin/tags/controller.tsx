@@ -68,7 +68,7 @@ export function useTagsController(
 			setLoadError(
 				error instanceof Error
 					? error.message
-					: __('Tags could not be loaded.', 'minimal-map-net')
+					: __('Tags could not be loaded.', 'minimal-map')
 			);
 		} finally {
 			setLoading(false);
@@ -175,7 +175,7 @@ export function useTagsController(
 
 	const onConfirm = useCallback(async (): Promise<void> => {
 		if (!form.name.trim()) {
-			setSubmitError(__('Tag name is required.', 'minimal-map-net'));
+			setSubmitError(__('Tag name is required.', 'minimal-map'));
 			return;
 		}
 
@@ -197,16 +197,16 @@ export function useTagsController(
 				status: 'success',
 				message:
 					formMode === 'edit'
-						? __('Tag updated.', 'minimal-map-net')
-						: __('Tag created.', 'minimal-map-net'),
+						? __('Tag updated.', 'minimal-map')
+						: __('Tag created.', 'minimal-map'),
 			});
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error
 					? error.message
 					: formMode === 'edit'
-					? __('Tag could not be updated.', 'minimal-map-net')
-					: __('Tag could not be created.', 'minimal-map-net')
+					? __('Tag could not be updated.', 'minimal-map')
+					: __('Tag could not be created.', 'minimal-map')
 			);
 		} finally {
 			setSubmitting(false);
@@ -223,7 +223,7 @@ export function useTagsController(
 				await loadTags();
 				setActionNotice({
 					status: 'success',
-					message: __('Tag deleted.', 'minimal-map-net'),
+					message: __('Tag deleted.', 'minimal-map'),
 				});
 			} catch (error) {
 				setActionNotice({
@@ -231,7 +231,7 @@ export function useTagsController(
 					message:
 						error instanceof Error
 							? error.message
-							: __('Tag could not be deleted.', 'minimal-map-net'),
+							: __('Tag could not be deleted.', 'minimal-map'),
 				});
 				throw error;
 			} finally {
@@ -277,7 +277,7 @@ export function useTagsController(
 			setActionNotice({
 				status: 'success',
 				message: sprintf(
-					_n('%d tag deleted.', '%d tags deleted.', allTags.length, 'minimal-map-net'),
+					_n('%d tag deleted.', '%d tags deleted.', allTags.length, 'minimal-map'),
 					allTags.length
 				),
 			});
@@ -287,7 +287,7 @@ export function useTagsController(
 				message:
 					error instanceof Error
 						? error.message
-						: __('Tags could not be deleted.', 'minimal-map-net'),
+						: __('Tags could not be deleted.', 'minimal-map'),
 			});
 			throw error;
 		} finally {
@@ -308,7 +308,7 @@ export function useTagsController(
 				<Button
 					variant="tertiary"
 					icon={<BrushCleaning size={18} strokeWidth={2} />}
-					label={__('Delete all tags', 'minimal-map-net')}
+					label={__('Delete all tags', 'minimal-map')}
 					onClick={onOpenDeleteAllTagsModal}
 					disabled={totalItems === 0 || isDeletingAllTags || isRowActionPending}
 					__next40pxDefaultSize
@@ -322,7 +322,7 @@ export function useTagsController(
 					aria-keyshortcuts={getShortcutAriaKeys(['n'])}
 				>
 					<span className="minimal-map-admin__button-shortcut-content">
-						<span>{__('Add tag', 'minimal-map-net')}</span>
+						<span>{__('Add tag', 'minimal-map')}</span>
 						<KeyboardShortcut keys={['n']} variant="blue" />
 					</span>
 				</Button>
@@ -340,9 +340,9 @@ export function useTagsController(
 		totalItems,
 		form,
 		formMode,
-		modalTitle: formMode === 'edit' ? __('Edit tag', 'minimal-map-net') : __('Add tag', 'minimal-map-net'),
+		modalTitle: formMode === 'edit' ? __('Edit tag', 'minimal-map') : __('Add tag', 'minimal-map'),
 		selectedTag,
-		submitLabel: formMode === 'edit' ? __('Save changes', 'minimal-map-net') : __('Add tag', 'minimal-map-net'),
+		submitLabel: formMode === 'edit' ? __('Save changes', 'minimal-map') : __('Add tag', 'minimal-map'),
 		submitError,
 		onAddTag,
 		onCloseDeleteAllTagsModal,

@@ -7,13 +7,13 @@ import {
 } from './openingHours';
 
 const SHORT_DAY_LABELS: Record<OpeningHoursDayKey, string> = {
-	monday: __('Mon', 'minimal-map-net'),
-	tuesday: __('Tue', 'minimal-map-net'),
-	wednesday: __('Wed', 'minimal-map-net'),
-	thursday: __('Thu', 'minimal-map-net'),
-	friday: __('Fri', 'minimal-map-net'),
-	saturday: __('Sat', 'minimal-map-net'),
-	sunday: __('Sun', 'minimal-map-net'),
+	monday: __('Mon', 'minimal-map'),
+	tuesday: __('Tue', 'minimal-map'),
+	wednesday: __('Wed', 'minimal-map'),
+	thursday: __('Thu', 'minimal-map'),
+	friday: __('Fri', 'minimal-map'),
+	saturday: __('Sat', 'minimal-map'),
+	sunday: __('Sun', 'minimal-map'),
 };
 
 function formatDayRange(dayKeys: OpeningHoursDayKey[]): string {
@@ -31,12 +31,12 @@ function formatGroupLine(
 	const dayRange = formatDayRange(dayKeys);
 
 	if (!hasOpeningHoursForDay(day) && hasLunchBreakForDay(day)) {
-		return `${dayRange} ${__('Lunch', 'minimal-map-net')} ${day.lunch_start} / ${day.lunch_duration_minutes}m`;
+		return `${dayRange} ${__('Lunch', 'minimal-map')} ${day.lunch_start} / ${day.lunch_duration_minutes}m`;
 	}
 
-	const hoursLabel = hasOpeningHoursForDay(day) ? `${day.open}-${day.close}` : __('Closed', 'minimal-map-net');
+	const hoursLabel = hasOpeningHoursForDay(day) ? `${day.open}-${day.close}` : __('Closed', 'minimal-map');
 	const lunchLabel = hasLunchBreakForDay(day)
-		? ` ${__('Lunch', 'minimal-map-net')} ${day.lunch_start} / ${day.lunch_duration_minutes}m`
+		? ` ${__('Lunch', 'minimal-map')} ${day.lunch_start} / ${day.lunch_duration_minutes}m`
 		: '';
 
 	return `${dayRange} ${hoursLabel}${lunchLabel}`;

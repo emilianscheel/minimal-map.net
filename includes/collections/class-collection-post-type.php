@@ -43,8 +43,8 @@ class Collection_Post_Type {
 			self::POST_TYPE,
 			array(
 				'labels'              => array(
-					'name'          => __( 'Collections', 'minimal-map-net' ),
-					'singular_name' => __( 'Collection', 'minimal-map-net' ),
+					'name'          => __( 'Collections', 'minimal-map' ),
+					'singular_name' => __( 'Collection', 'minimal-map' ),
 				),
 				'public'              => false,
 				'show_ui'             => false,

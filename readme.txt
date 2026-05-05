@@ -1,4 +1,4 @@
-=== Minimal Map ===
+=== Minimal Map: Store Locator & Map Block ===
 Contributors: emilianscheel
 Tags: maps, gutenberg, blocks, geolocation
 Requires at least: 6.9
@@ -8,11 +8,11 @@ Stable tag: 0.8.3
 License: MIT
 License URI: https://opensource.org/license/mit/
 
-Minimal Map adds a WordPress-native map block plus a dedicated admin workspace for locations, collections, markers, logos, tags, and style themes.
+WordPress store locator and MapLibre map block with a native admin workspace for locations, styles, tags, and analytics.
 
 == Description ==
 
-Minimal Map is built for current WordPress only. The plugin supports the latest stable WordPress release and PHP 8.3, and its build pipeline is optimized around that target instead of carrying legacy compatibility code.
+Minimal Map: Store Locator & Map Block is built for current WordPress only. The plugin supports the latest stable WordPress release and PHP 8.3, and its build pipeline is optimized around that target instead of carrying legacy compatibility code.
 
 Features include:
 
@@ -85,7 +85,7 @@ Only the latest stable WordPress release is supported. Older WordPress and PHP v
 
 == External services ==
 
-Minimal Map can connect to external services to render maps, geocode addresses, and open navigation links.
+Minimal Map: Store Locator & Map Block can connect to external services to render maps, geocode addresses, and open navigation links.
 
 = OpenFreeMap =
 
@@ -109,7 +109,7 @@ Google Maps is provided by Google. Google Maps terms: https://www.google.com/hel
 
 1. Upload the plugin to `/wp-content/plugins/`.
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Add the Minimal Map block in the block editor or manage data through the Minimal Map admin menu.
+1. Add the Minimal Map block in the block editor or manage data through the Minimal Map: Store Locator & Map Block admin menu.
 
 == Frequently Asked Questions ==
 

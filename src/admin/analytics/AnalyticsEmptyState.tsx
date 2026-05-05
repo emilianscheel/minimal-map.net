@@ -16,16 +16,16 @@ export default function AnalyticsEmptyState({
 }) {
 	if (hasSearch) {
 		const label = category === 'selection'
-			? __('selection events', 'minimal-map-net')
+			? __('selection events', 'minimal-map')
 			: category === 'action'
-				? __('action events', 'minimal-map-net')
-				: __('queries', 'minimal-map-net');
+				? __('action events', 'minimal-map')
+				: __('queries', 'minimal-map');
 
 		return (
 			<EmptyState
 				icon={<SearchX />}
-				title={__('No matching records found', 'minimal-map-net')}
-				description={sprintf(__('Try a different search term to inspect the stored %s.', 'minimal-map-net'), label)}
+				title={__('No matching records found', 'minimal-map')}
+				description={sprintf(__('Try a different search term to inspect the stored %s.', 'minimal-map'), label)}
 			/>
 		);
 	}
@@ -34,8 +34,8 @@ export default function AnalyticsEmptyState({
 		return (
 			<EmptyState
 				icon={<ChartColumn />}
-				title={__('Analytics tracking is disabled', 'minimal-map-net')}
-				description={__('Enable analytics tracking to start collecting search demand data for this map plugin.', 'minimal-map-net')}
+				title={__('Analytics tracking is disabled', 'minimal-map')}
+				description={__('Enable analytics tracking to start collecting search demand data for this map plugin.', 'minimal-map')}
 			/>
 		);
 	}
@@ -43,10 +43,10 @@ export default function AnalyticsEmptyState({
 	return (
 		<EmptyState
 			icon={<ChartColumn />}
-			title={__('No analytics data in this period yet', 'minimal-map-net')}
+			title={__('No analytics data in this period yet', 'minimal-map')}
 			description={enabled
-				? __('Try a wider time period or wait for visitors to interact with the map.', 'minimal-map-net')
-				: __('Tracking is currently disabled, but historic analytics data will still appear here when available.', 'minimal-map-net')}
+				? __('Try a wider time period or wait for visitors to interact with the map.', 'minimal-map')
+				: __('Tracking is currently disabled, but historic analytics data will still appear here when available.', 'minimal-map')}
 		/>
 	);
 }

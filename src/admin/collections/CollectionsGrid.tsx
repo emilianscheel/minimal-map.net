@@ -18,7 +18,7 @@ function useCollectionFields(
     () => [
       {
         id: "map_preview",
-        label: __("Map preview", "minimal-map-net"),
+        label: __("Map preview", "minimal-map"),
         type: "media",
         enableHiding: false,
         enableSorting: false,
@@ -33,7 +33,7 @@ function useCollectionFields(
       },
       {
         id: "title",
-        label: __("Title", "minimal-map-net"),
+        label: __("Title", "minimal-map"),
         enableHiding: false,
         enableSorting: false,
         filterBy: false,
@@ -41,7 +41,7 @@ function useCollectionFields(
       },
       {
         id: "add_locations",
-        label: __("Locations", "minimal-map-net"),
+        label: __("Locations", "minimal-map"),
         enableHiding: false,
         enableSorting: false,
         filterBy: false,
@@ -55,7 +55,7 @@ function useCollectionFields(
               onOpenAssignmentModal(item);
             }}
           >
-            {__("Add locations", "minimal-map-net")}
+            {__("Add locations", "minimal-map")}
           </Button>
         ),
       },
@@ -73,7 +73,7 @@ function useCollectionActions(
     () => [
       {
         id: "edit-collection",
-        label: __("Edit", "minimal-map-net"),
+        label: __("Edit", "minimal-map"),
         icon: <Pencil size={16} strokeWidth={2} />,
         context: "single",
         disabled: isRowActionPending,
@@ -88,13 +88,13 @@ function useCollectionActions(
       },
       {
         id: "delete-collection",
-        label: __("Delete", "minimal-map-net"),
+        label: __("Delete", "minimal-map"),
         icon: <Trash2 size={16} strokeWidth={2} />,
         context: "single",
         disabled: isRowActionPending,
         supportsBulk: false,
         callback: () => {},
-        modalHeader: __("Delete collection", "minimal-map-net"),
+        modalHeader: __("Delete collection", "minimal-map"),
         RenderModal: ({ items, closeModal, onActionPerformed }) => {
           if (!items[0]) {
             return <></>;

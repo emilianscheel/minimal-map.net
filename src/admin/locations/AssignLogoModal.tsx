@@ -25,7 +25,7 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 	const options = controller.logos
 		.filter((logo) => assignableLogoIds.has(logo.id))
 		.map((logo) => ({
-			label: logo.title || __('Untitled logo', 'minimal-map-net'),
+			label: logo.title || __('Untitled logo', 'minimal-map'),
 			value: `${logo.id}`,
 		}));
 	const assignedLocationCount = getLocationsWithAssignedLogos(controller.selectedLogoLocations).length;
@@ -57,7 +57,7 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 	return (
 		<Modal
 			className="minimal-map-admin__collection-modal"
-			title={__('Assign Logo', 'minimal-map-net')}
+			title={__('Assign Logo', 'minimal-map')}
 			onRequestClose={controller.onCloseAssignLogoModal}
 			shouldCloseOnClickOutside={!controller.isAssignmentSaving}
 			shouldCloseOnEsc={!controller.isAssignmentSaving}
@@ -72,7 +72,7 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 									'Assign one new logo to %d selected location. %d currently have a logo assigned.',
 									'Assign one new logo to %d selected locations. %d currently have a logo assigned.',
 									controller.selectedLogoLocations.length,
-									'minimal-map-net'
+									'minimal-map'
 								),
 								controller.selectedLogoLocations.length,
 								assignedLocationCount
@@ -87,22 +87,22 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 						</div>
 					) : (
 						<p className="minimal-map-admin__assign-to-collection-empty">
-							{__('No logo assigned yet.', 'minimal-map-net')}
+							{__('No logo assigned yet.', 'minimal-map')}
 						</p>
 					)}
 				</div>
 
 				<ComboboxControl
 					__next40pxDefaultSize
-					label={__('Logo', 'minimal-map-net')}
+					label={__('Logo', 'minimal-map')}
 					value={controller.assignmentLogoId}
 					options={options}
 					onChange={(value) => controller.onSelectAssignmentLogo(value ?? '')}
 					help={
 						options.length === 0
 							? controller.logos.length === 0
-								? __('Upload a logo first to assign one to these locations.', 'minimal-map-net')
-								: __('All available logos are already assigned for this selection.', 'minimal-map-net')
+								? __('Upload a logo first to assign one to these locations.', 'minimal-map')
+								: __('All available logos are already assigned for this selection.', 'minimal-map')
 							: undefined
 					}
 				/>
@@ -115,7 +115,7 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 						disabled={controller.isAssignmentSaving}
 						data-minimal-map-dialog-ignore-enter="true"
 					>
-						{__('Cancel', 'minimal-map-net')}
+						{__('Cancel', 'minimal-map')}
 					</Button>
 					<Button
 						__next40pxDefaultSize
@@ -125,7 +125,7 @@ export default function AssignLogoModal({ controller }: { controller: LocationsC
 						disabled={controller.isAssignmentSaving || !controller.assignmentLogoId}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Save Logo', 'minimal-map-net')}</span>
+							<span>{__('Save Logo', 'minimal-map')}</span>
 							<Kbd variant="blue">Enter</Kbd>
 						</span>
 					</Button>

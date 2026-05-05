@@ -24,7 +24,7 @@ export default function ExportAnalyticsDropdown({
 					aria-expanded={isOpen}
 					variant="tertiary"
 					icon={<Download size={18} />}
-					label={__('Export analytics', 'minimal-map-net')}
+					label={__('Export analytics', 'minimal-map')}
 					disabled={disabled}
 					__next40pxDefaultSize
 				>
@@ -32,7 +32,7 @@ export default function ExportAnalyticsDropdown({
 				</Button>
 			)}
 			renderContent={({ onClose }) => (
-				<MenuGroup label={__('Export Options', 'minimal-map-net')}>
+				<MenuGroup label={__('Export Options', 'minimal-map')}>
 					<MenuItem
 						onClick={() => {
 							onExportSearch();
@@ -40,7 +40,7 @@ export default function ExportAnalyticsDropdown({
 						}}
 						icon={<FileSpreadsheet size={16} />}
 					>
-						{__('Search Data as CSV', 'minimal-map-net')}
+						{__('Search Data as CSV', 'minimal-map')}
 					</MenuItem>
 					<MenuItem
 						onClick={() => {
@@ -49,7 +49,7 @@ export default function ExportAnalyticsDropdown({
 						}}
 						icon={<FileSpreadsheet size={16} />}
 					>
-						{__('Selection Data as CSV', 'minimal-map-net')}
+						{__('Selection Data as CSV', 'minimal-map')}
 					</MenuItem>
 					<MenuItem
 						onClick={() => {
@@ -58,7 +58,7 @@ export default function ExportAnalyticsDropdown({
 						}}
 						icon={<FileSpreadsheet size={16} />}
 					>
-						{__('Action Data as CSV', 'minimal-map-net')}
+						{__('Action Data as CSV', 'minimal-map')}
 					</MenuItem>
 				</MenuGroup>
 			)}

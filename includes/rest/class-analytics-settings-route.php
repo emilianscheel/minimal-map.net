@@ -114,7 +114,7 @@ class Analytics_Settings_Route {
 			if ( ! $deleted ) {
 				return new \WP_Error(
 					'minimal_map_analytics_reset_failed',
-					__( 'Analytics tracking data could not be deleted.', 'minimal-map-net' ),
+					__( 'Analytics tracking data could not be deleted.', 'minimal-map' ),
 					array( 'status' => 500 )
 				);
 			}

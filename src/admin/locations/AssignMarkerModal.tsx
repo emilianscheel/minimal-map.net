@@ -25,7 +25,7 @@ export default function AssignMarkerModal({ controller }: { controller: Location
 	const options = controller.markers
 		.filter((marker) => assignableMarkerIds.has(marker.id))
 		.map((marker) => ({
-			label: marker.title || __('Untitled marker', 'minimal-map-net'),
+			label: marker.title || __('Untitled marker', 'minimal-map'),
 			value: `${marker.id}`,
 		}));
 	const assignedLocationCount = getLocationsWithAssignedMarkers(controller.selectedMarkerLocations).length;
@@ -56,7 +56,7 @@ export default function AssignMarkerModal({ controller }: { controller: Location
 	return (
 		<Modal
 			className="minimal-map-admin__collection-modal"
-			title={__('Assign Marker', 'minimal-map-net')}
+			title={__('Assign Marker', 'minimal-map')}
 			onRequestClose={controller.onCloseAssignMarkerModal}
 			shouldCloseOnClickOutside={!controller.isAssignmentSaving}
 			shouldCloseOnEsc={!controller.isAssignmentSaving}
@@ -71,7 +71,7 @@ export default function AssignMarkerModal({ controller }: { controller: Location
 									'Assign one new marker to %d selected location. %d currently use a custom marker.',
 									'Assign one new marker to %d selected locations. %d currently use a custom marker.',
 									controller.selectedMarkerLocations.length,
-									'minimal-map-net'
+									'minimal-map'
 								),
 								controller.selectedMarkerLocations.length,
 								assignedLocationCount
@@ -84,23 +84,23 @@ export default function AssignMarkerModal({ controller }: { controller: Location
 						</div>
 					) : (
 						<p className="minimal-map-admin__assign-to-collection-empty">
-							{__('No custom marker assigned yet.', 'minimal-map-net')}
+							{__('No custom marker assigned yet.', 'minimal-map')}
 						</p>
 					)}
 				</div>
 
 				<ComboboxControl
 					__next40pxDefaultSize
-					label={__('Marker', 'minimal-map-net')}
+					label={__('Marker', 'minimal-map')}
 					value={controller.assignmentMarkerId}
 					options={options}
 					onChange={(value) => controller.onSelectAssignmentMarker(value ?? '')}
 					help={
 						controller.markers.length === 0
-							? __('Upload a marker first to assign one to these locations.', 'minimal-map-net')
+							? __('Upload a marker first to assign one to these locations.', 'minimal-map')
 							: options.length === 0
-								? __('All available markers are already assigned for this selection.', 'minimal-map-net')
-								: __('Choose a custom SVG marker to apply to the selected locations.', 'minimal-map-net')
+								? __('All available markers are already assigned for this selection.', 'minimal-map')
+								: __('Choose a custom SVG marker to apply to the selected locations.', 'minimal-map')
 					}
 				/>
 
@@ -112,7 +112,7 @@ export default function AssignMarkerModal({ controller }: { controller: Location
 						disabled={controller.isAssignmentSaving}
 						data-minimal-map-dialog-ignore-enter="true"
 					>
-						{__('Cancel', 'minimal-map-net')}
+						{__('Cancel', 'minimal-map')}
 					</Button>
 					<Button
 						__next40pxDefaultSize
@@ -122,7 +122,7 @@ export default function AssignMarkerModal({ controller }: { controller: Location
 						disabled={controller.isAssignmentSaving || !controller.assignmentMarkerId}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Save Marker', 'minimal-map-net')}</span>
+							<span>{__('Save Marker', 'minimal-map')}</span>
 							<Kbd variant="blue">Enter</Kbd>
 						</span>
 					</Button>

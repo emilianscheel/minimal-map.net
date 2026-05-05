@@ -9,7 +9,7 @@ export function ImportThemeButton({ onImport }: ImportThemeButtonProps) {
 	return (
 		<Button
 			icon={<Upload size={18} />}
-			label={__('Upload Theme File', 'minimal-map-net')}
+			label={__('Upload Theme File', 'minimal-map')}
 			onClick={() => {
 				const input = document.createElement('input');
 				input.type = 'file';

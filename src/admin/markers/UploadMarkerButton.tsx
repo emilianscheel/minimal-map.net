@@ -11,7 +11,7 @@ export function UploadMarkerButton({ onUpload, isUploading }: UploadMarkerButton
 	return (
 		<Button
 			icon={<Upload size={18} />}
-			label={__('Upload Markers', 'minimal-map-net')}
+			label={__('Upload Markers', 'minimal-map')}
 			onClick={() => {
 				const input = document.createElement('input');
 				input.type = 'file';

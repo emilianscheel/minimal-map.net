@@ -15,14 +15,14 @@ function useLocationFields(): Field<AdminLocationLookupItem>[] {
 		() => [
 			{
 				id: 'title',
-				label: __('Title', 'minimal-map-net'),
+				label: __('Title', 'minimal-map'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
 			},
 			{
 				id: 'address',
-				label: __('Address', 'minimal-map-net'),
+				label: __('Address', 'minimal-map'),
 				enableHiding: false,
 				enableSorting: false,
 				filterBy: false,
@@ -43,7 +43,7 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 	return (
 		<Modal
 			className="minimal-map-admin__collection-assignment-modal"
-			contentLabel={__('Assign locations', 'minimal-map-net')}
+			contentLabel={__('Assign locations', 'minimal-map')}
 			focusOnMount="firstInputElement"
 			onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
 				const target = event.target;
@@ -69,7 +69,7 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 			<div className="minimal-map-admin__collection-assignment-dialog">
 				<SearchControl
 					__nextHasNoMarginBottom
-					label={__('Search locations', 'minimal-map-net')}
+					label={__('Search locations', 'minimal-map')}
 					value={controller.assignmentSearch}
 					onChange={controller.onChangeAssignmentSearch}
 				/>
@@ -78,7 +78,7 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 					defaultLayouts={{ pickerTable: {} }}
 					fields={fields}
 					getItemId={(item: AdminLocationLookupItem) => `${item.id}`}
-					itemListLabel={__('Locations', 'minimal-map-net')}
+					itemListLabel={__('Locations', 'minimal-map')}
 					paginationInfo={{
 						totalItems: controller.assignmentTotalItems,
 						totalPages: Math.max(
@@ -108,7 +108,7 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 						disabled={controller.isAssignmentSaving}
 						data-minimal-map-dialog-ignore-enter="true"
 					>
-						{__('Cancel', 'minimal-map-net')}
+						{__('Cancel', 'minimal-map')}
 					</Button>
 					<Button
 						__next40pxDefaultSize
@@ -118,7 +118,7 @@ export default function CollectionAssignmentModal({ controller }: { controller: 
 						disabled={controller.isAssignmentSaving}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Save locations', 'minimal-map-net')}</span>
+							<span>{__('Save locations', 'minimal-map')}</span>
 							<Kbd variant="blue">Enter</Kbd>
 						</span>
 					</Button>

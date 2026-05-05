@@ -36,21 +36,21 @@ export function CreateThemeModal({ isOpen, onRequestClose, onCreate }: CreateThe
 
 	return (
 		<Modal
-			title={__('Create New Theme', 'minimal-map-net')}
+			title={__('Create New Theme', 'minimal-map')}
 			onRequestClose={onRequestClose}
 			overlayClassName="minimal-map-admin__modal-overlay"
 			onKeyDown={handleKeyDown}
 		>
 			<div className="minimal-map-admin__location-dialog">
 				<TextControl
-					label={__('Theme Name', 'minimal-map-net')}
+					label={__('Theme Name', 'minimal-map')}
 					value={name}
 					onChange={setName}
 					autoFocus
 				/>
 				<div className="minimal-map-admin__location-dialog-actions">
 					<Button variant="tertiary" onClick={onRequestClose}>
-						{__('Cancel', 'minimal-map-net')}
+						{__('Cancel', 'minimal-map')}
 					</Button>
 					<Button
 						variant="primary"
@@ -59,7 +59,7 @@ export function CreateThemeModal({ isOpen, onRequestClose, onCreate }: CreateThe
 						disabled={!name || isCreating}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Create Theme', 'minimal-map-net')}</span>
+							<span>{__('Create Theme', 'minimal-map')}</span>
 							<Kbd variant="blue">Enter</Kbd>
 						</span>
 					</Button>

@@ -127,8 +127,8 @@ class Location_Post_Type {
 			self::POST_TYPE,
 			array(
 				'labels'              => array(
-					'name'          => __( 'Locations', 'minimal-map-net' ),
-					'singular_name' => __( 'Location', 'minimal-map-net' ),
+					'name'          => __( 'Locations', 'minimal-map' ),
+					'singular_name' => __( 'Location', 'minimal-map' ),
 				),
 				'public'              => false,
 				'show_ui'             => false,

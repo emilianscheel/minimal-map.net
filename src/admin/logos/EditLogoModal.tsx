@@ -13,7 +13,7 @@ export default function EditLogoModal({ controller }: { controller: LogosControl
 	return (
 		<Modal
 			className="minimal-map-admin__collection-modal"
-			title={__('Edit logo filename', 'minimal-map-net')}
+			title={__('Edit logo filename', 'minimal-map')}
 			onRequestClose={controller.onCancelEditLogo}
 			shouldCloseOnClickOutside={!controller.isSubmitting}
 			shouldCloseOnEsc={!controller.isSubmitting}
@@ -39,14 +39,14 @@ export default function EditLogoModal({ controller }: { controller: LogosControl
 					<TextControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
-						label={__('Filename', 'minimal-map-net')}
+						label={__('Filename', 'minimal-map')}
 						value={controller.editFilenameBasename}
 						onChange={controller.onChangeEditFilename}
 						autoFocus
 						help={
 							controller.editFilenameExtension
 								? sprintf(
-										__('The %s extension will be preserved.', 'minimal-map-net'),
+										__('The %s extension will be preserved.', 'minimal-map'),
 										controller.editFilenameExtension
 									)
 								: undefined
@@ -61,7 +61,7 @@ export default function EditLogoModal({ controller }: { controller: LogosControl
 						onClick={controller.onCancelEditLogo}
 						disabled={controller.isSubmitting}
 					>
-						{__('Cancel', 'minimal-map-net')}
+						{__('Cancel', 'minimal-map')}
 					</Button>
 					<Button
 						__next40pxDefaultSize
@@ -71,7 +71,7 @@ export default function EditLogoModal({ controller }: { controller: LogosControl
 						disabled={controller.isSubmitting}
 					>
 						<span className="minimal-map-admin__location-dialog-button-content">
-							<span>{__('Save changes', 'minimal-map-net')}</span>
+							<span>{__('Save changes', 'minimal-map')}</span>
 							<Kbd variant="blue">Enter</Kbd>
 						</span>
 					</Button>

@@ -38,8 +38,8 @@ class Logo_Post_Type {
 			self::POST_TYPE,
 			array(
 				'labels'              => array(
-					'name'          => __( 'Logos', 'minimal-map-net' ),
-					'singular_name' => __( 'Logo', 'minimal-map-net' ),
+					'name'          => __( 'Logos', 'minimal-map' ),
+					'singular_name' => __( 'Logo', 'minimal-map' ),
 				),
 				'public'              => false,
 				'show_ui'             => false,

@@ -26,17 +26,17 @@ export function ApplyPaletteTemplateDropdown({
 					aria-expanded={isOpen}
 					variant="tertiary"
 					icon={<Palette size={18} />}
-					label={__('Apply palette template', 'minimal-map-net')}
+					label={__('Apply palette template', 'minimal-map')}
 					disabled={disabled}
 					isBusy={isBusy}
 					__next40pxDefaultSize
 				>
-					{__('Templates', 'minimal-map-net')}
+					{__('Templates', 'minimal-map')}
 					<ChevronDown size={16} />
 				</Button>
 			)}
 				renderContent={({ onClose }) => (
-				<MenuGroup label={__('Palette Templates', 'minimal-map-net')}>
+				<MenuGroup label={__('Palette Templates', 'minimal-map')}>
 					{templates.map((template) => {
 						const previewColors = getTemplatePreviewColors(template);
 
