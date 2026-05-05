@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Minimal Map: Store Locator & Map Block
+ * Plugin Name:       Minimal Map: Store Locator & Map Block by Emilian Scheel
  * Description:       Gutenberg-first native map block and admin shell for WordPress.
  * Version:           0.8.3
  * Requires at least: 6.9

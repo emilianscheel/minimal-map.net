@@ -4,9 +4,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-PACKAGE_DIR_NAME="minimal-map-net-locator-block"
+PACKAGE_DIR_NAME="minimal-map-net-locator-block-emiliansch"
 PACKAGE_DIR_PATH="${ROOT_DIR}/${PACKAGE_DIR_NAME}"
-ARCHIVE_PATH="${ROOT_DIR}/minimal-map-net-locator-block.zip"
+ARCHIVE_PATH="${ROOT_DIR}/minimal-map-net-locator-block-emiliansch.zip"
 
 cleanup() {
 	rm -rf "${PACKAGE_DIR_PATH}"
@@ -21,7 +21,7 @@ command -v zip >/dev/null 2>&1 || {
 	exit 1
 }
 
-for path in assets includes languages templates minimal-map-net-locator-block.php readme.txt README.md block.json LICENSE; do
+for path in assets includes languages templates minimal-map-net-locator-block-emiliansch.php readme.txt README.md block.json LICENSE; do
 	[ -e "${path}" ] || {
 		echo "Missing required path: ${path}" >&2
 		exit 1
@@ -45,7 +45,7 @@ mkdir -p "${PACKAGE_DIR_PATH}"
 	languages \
 	templates \
 	build \
-	minimal-map-net-locator-block.php \
+	minimal-map-net-locator-block-emiliansch.php \
 	readme.txt \
 	README.md \
 	block.json \
